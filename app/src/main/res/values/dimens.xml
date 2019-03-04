@@ -5,6 +5,7 @@
     <dimen name="progressbar_size">56dp</dimen>
     <dimen name="margin_medium">16dp</dimen>
     <dimen name="margin_normal">8dp</dimen>
+    <dimen name="padding_normal">8dp</dimen>
     <dimen name="padding_large">16dp</dimen>
     <dimen name="fab_size">56dp</dimen>
 </resources>
