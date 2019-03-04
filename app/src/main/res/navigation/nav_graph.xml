@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/homeFragment">
+    <fragment
+        android:id="@+id/dictionaryListFragment"
+        android:name="com.vocabulary.myvocabulary.ui.dictionaries.DictionaryListFragment"
+        android:label="fragment_dictionary_list"
+        tools:layout="@layout/fragment_dictionary_list"
+        />
+    <fragment
+        android:id="@+id/quizListFragment"
+        android:name="com.vocabulary.myvocabulary.ui.quizzes.QuizListFragment"
+        android:label="fragment_quiz_list"
+        tools:layout="@layout/fragment_quiz_list"/>
+    <fragment
+        android:id="@+id/homeFragment"
+        android:name="com.vocabulary.myvocabulary.ui.home.HomeFragment"
+        android:label="HomeFragment"
+        tools:layout="@layout/fragment_home">
+        <action
+            android:id="@+id/action_homeFragment_to_dictionaryListFragment"
+            app:destination="@id/dictionaryListFragment" />
+        <action
+            android:id="@+id/action_homeFragment_to_quizListFragment"
+            app:destination="@id/quizListFragment" />
+    </fragment>
+</navigation>
