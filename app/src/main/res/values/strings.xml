@@ -1,6 +1,9 @@
 <resources>
-    <string name="app_name">MyVocabulary</string>
+    <string name="app_name">My Vocabulary</string>
 
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="example_dictionary_name">Hungarian - English</string>
+    <string name="dictionaries_button">DICTIONARIES</string>
+    <string name="quizzes_button">QUIZZES</string>
 </resources>
