@@ -12,8 +12,8 @@ import kotlinx.android.synthetic.main.fragment_home.view.*
 class HomeFragment : Fragment() {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return inflater.inflate(R.layout.fragment_home, container, false).apply {
-            this.dictionary_button.setOnClickListener { view -> view.findNavController().navigate(R.id.action_homeFragment_to_dictionaryListFragment) }
-            this.quiz_button.setOnClickListener { view -> view.findNavController().navigate(R.id.action_homeFragment_to_quizListFragment) }
+            dictionary_button.setOnClickListener { it.findNavController().navigate(R.id.action_homeFragment_to_dictionaryListFragment) }
+            quiz_button.setOnClickListener { it.findNavController().navigate(R.id.action_homeFragment_to_quizListFragment) }
         }
     }
 }
