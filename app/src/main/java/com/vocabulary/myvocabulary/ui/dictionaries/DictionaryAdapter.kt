@@ -3,12 +3,12 @@ package com.vocabulary.myvocabulary.ui.dictionaries
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.AdapterView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.vocabulary.myvocabulary.R
+import com.vocabulary.myvocabulary.data.dictionaryDatabase.DictionaryEntry
 
-class DictionaryAdapter(private val dictionaryList : List<Dictionary>, private val itemClickListener: ItemClickListener) : RecyclerView.Adapter<DictionaryAdapter.DictionaryViewHolder>() {
+class DictionaryAdapter(private val dictionaryList : List<DictionaryEntry>, private val itemClickListener: ItemClickListener) : RecyclerView.Adapter<DictionaryAdapter.DictionaryViewHolder>() {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): DictionaryViewHolder {
         val inflater =LayoutInflater.from(parent.context)
         return DictionaryViewHolder(inflater.inflate(R.layout.row_dictionary, parent, false))
@@ -19,7 +19,9 @@ class DictionaryAdapter(private val dictionaryList : List<Dictionary>, private v
     }
 
     override fun onBindViewHolder(holder: DictionaryViewHolder, position: Int) {
-        holder.dictionaryName.setText(dictionaryList.get(position).getName())
+        if(holder.dictionaryName.text != null) {
+            holder.dictionaryName.text = dictionaryList[position].dictionaryName
+        }
     }
 
     inner class DictionaryViewHolder(itemView: View): RecyclerView.ViewHolder(itemView), View.OnClickListener {
@@ -35,6 +37,6 @@ class DictionaryAdapter(private val dictionaryList : List<Dictionary>, private v
     }
 
     interface ItemClickListener {
-        fun onItemClick(dictionary: Dictionary)
+        fun onItemClick(dictionaryEntry: DictionaryEntry)
     }
 }
