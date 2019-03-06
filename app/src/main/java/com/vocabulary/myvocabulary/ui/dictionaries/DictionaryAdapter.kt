@@ -6,7 +6,7 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.vocabulary.myvocabulary.R
-import com.vocabulary.myvocabulary.data.dictionaryDatabase.DictionaryEntry
+import com.vocabulary.myvocabulary.room.dictionaryData.DictionaryEntry
 
 class DictionaryAdapter(private val dictionaryList : List<DictionaryEntry>, private val itemClickListener: ItemClickListener) : RecyclerView.Adapter<DictionaryAdapter.DictionaryViewHolder>() {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): DictionaryViewHolder {

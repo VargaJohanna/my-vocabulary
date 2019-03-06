@@ -1,7 +1,7 @@
-package com.vocabulary.myvocabulary.data.wordDatabase
+package com.vocabulary.myvocabulary.room.wordData
 
 import androidx.room.*
-import com.vocabulary.myvocabulary.data.dictionaryDatabase.DictionaryEntry
+import com.vocabulary.myvocabulary.room.dictionaryData.DictionaryEntry
 import com.vocabulary.myvocabulary.utils.DateTypeConverter
 import java.util.*
 

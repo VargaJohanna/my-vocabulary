@@ -1,4 +1,4 @@
-package com.vocabulary.myvocabulary.data.dictionaryDatabase
+package com.vocabulary.myvocabulary.room.dictionaryData
 
 import androidx.room.*
 import io.reactivex.Observable
