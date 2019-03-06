@@ -1,4 +1,4 @@
-package com.vocabulary.myvocabulary.data.dictionaryDatabase
+package com.vocabulary.myvocabulary.room.dictionaryData
 
 import com.vocabulary.myvocabulary.ui.dictionaries.Dictionary
 import com.vocabulary.myvocabulary.ui.dictionaries.toDictionaryEntry

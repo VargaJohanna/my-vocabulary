@@ -1,8 +1,8 @@
 package com.vocabulary.myvocabulary.di
 
-import com.vocabulary.myvocabulary.data.AppDatabase
-import com.vocabulary.myvocabulary.data.dictionaryDatabase.DictionaryRepository
-import com.vocabulary.myvocabulary.data.dictionaryDatabase.DictionaryRepositoryImpl
+import com.vocabulary.myvocabulary.room.AppDatabase
+import com.vocabulary.myvocabulary.room.dictionaryData.DictionaryRepository
+import com.vocabulary.myvocabulary.room.dictionaryData.DictionaryRepositoryImpl
 import org.koin.dsl.module
 
 val repositoryModule = module {

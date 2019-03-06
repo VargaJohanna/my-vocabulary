@@ -1,13 +1,13 @@
-package com.vocabulary.myvocabulary.data
+package com.vocabulary.myvocabulary.room
 
 import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
-import com.vocabulary.myvocabulary.data.dictionaryDatabase.DictionaryDao
-import com.vocabulary.myvocabulary.data.dictionaryDatabase.DictionaryEntry
-import com.vocabulary.myvocabulary.data.wordDatabase.WordDao
-import com.vocabulary.myvocabulary.data.wordDatabase.WordEntry
+import com.vocabulary.myvocabulary.room.dictionaryData.DictionaryDao
+import com.vocabulary.myvocabulary.room.dictionaryData.DictionaryEntry
+import com.vocabulary.myvocabulary.room.wordData.WordDao
+import com.vocabulary.myvocabulary.room.wordData.WordEntry
 
 @Database(entities = arrayOf(DictionaryEntry::class, WordEntry::class), version = 1)
 abstract class AppDatabase : RoomDatabase() {

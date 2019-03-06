@@ -1,4 +1,4 @@
-package com.vocabulary.myvocabulary.data.wordDatabase
+package com.vocabulary.myvocabulary.room.wordData
 
 import androidx.room.*
 import com.vocabulary.myvocabulary.ui.dictionaries.Dictionary
