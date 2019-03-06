@@ -58,4 +58,10 @@ dependencies {
     implementation "androidx.core:core-ktx:1.0.1"
     implementation "android.arch.navigation:navigation-fragment-ktx:$nav_version"
     implementation "android.arch.navigation:navigation-ui-ktx:$nav_version"
+
+    // Koin
+    implementation "org.koin:koin-core:2.0.0-beta-1"
+    implementation "org.koin:koin-core-ext:2.0.0-beta-1"
+    implementation "org.koin:koin-androidx-scope:2.0.0-beta-1"
+    implementation "org.koin:koin-androidx-viewmodel:2.0.0-beta-1"
 }

@@ -1,22 +1,22 @@
 package com.vocabulary.myvocabulary.data.dictionaryDatabase
 
 import androidx.room.*
-import com.vocabulary.myvocabulary.ui.dictionaries.Dictionary
+import io.reactivex.Observable
 
 @Dao
 interface DictionaryDao {
     @Insert
-    fun insertDictionary(dictionary: Dictionary)
+    fun insertDictionary(dictionary: DictionaryEntry)
 
     @Update
-    fun updateDictionary(dictionary: Dictionary)
+    fun updateDictionary(dictionary: DictionaryEntry)
 
     @Delete
-    fun deleteDictionary(dictionary: Dictionary)
+    fun deleteDictionary(dictionary: DictionaryEntry)
 
     @Query("SELECT * FROM dictionaries")
-    fun getAllDictionaries(): List<Dictionary>
+    fun getAllDictionaries(): Observable<List<DictionaryEntry>>
 
     @Query("SELECT * FROM dictionaries WHERE dictionary_id = :dictionaryId")
-    fun getDictionaryById(dictionaryId: Long)
+    fun getDictionaryById(dictionaryId: Long): Observable<DictionaryEntry>
 }

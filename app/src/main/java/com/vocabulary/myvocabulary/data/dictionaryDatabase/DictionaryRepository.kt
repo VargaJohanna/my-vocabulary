@@ -1,5 +1,6 @@
 package com.vocabulary.myvocabulary.data.dictionaryDatabase
 
+import android.content.Context
 import com.vocabulary.myvocabulary.ui.dictionaries.Dictionary
 import io.reactivex.Observable
 
