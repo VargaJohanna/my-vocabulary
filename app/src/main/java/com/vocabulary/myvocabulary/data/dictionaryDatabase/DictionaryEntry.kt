@@ -4,6 +4,7 @@ import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import androidx.room.TypeConverters
+import com.vocabulary.myvocabulary.ui.dictionaries.Dictionary
 import com.vocabulary.myvocabulary.utils.DateTypeConverter
 import java.util.*
 
@@ -13,3 +14,5 @@ data class DictionaryEntry(
         @ColumnInfo(name = "dictionary_name") val dictionaryName: String?,
         @ColumnInfo(name = "dictionary_created") @TypeConverters(DateTypeConverter::class) val dictionaryCreated: Date?
 )
+
+fun DictionaryEntry.toDictionary() = Dictionary(dictionaryId, dictionaryName, dictionaryCreated)
