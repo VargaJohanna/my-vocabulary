@@ -2,7 +2,7 @@ package com.vocabulary.myvocabulary.rx
 
 import io.reactivex.Scheduler
 
-interface RxSchedulars {
+interface RxSchedulers {
     fun io(): Scheduler
     fun main(): Scheduler
 }

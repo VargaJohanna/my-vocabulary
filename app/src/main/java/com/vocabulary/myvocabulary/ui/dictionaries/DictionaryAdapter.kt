@@ -8,7 +8,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.vocabulary.myvocabulary.R
 import com.vocabulary.myvocabulary.room.dictionaryData.DictionaryEntry
 
-class DictionaryAdapter(private val dictionaryList : List<DictionaryEntry>, private val itemClickListener: ItemClickListener) : RecyclerView.Adapter<DictionaryAdapter.DictionaryViewHolder>() {
+class DictionaryAdapter(private var dictionaryList : List<Dictionary>, private val itemClickListener: ItemClickListener) : RecyclerView.Adapter<DictionaryAdapter.DictionaryViewHolder>() {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): DictionaryViewHolder {
         val inflater =LayoutInflater.from(parent.context)
         return DictionaryViewHolder(inflater.inflate(R.layout.row_dictionary, parent, false))
@@ -36,7 +36,12 @@ class DictionaryAdapter(private val dictionaryList : List<DictionaryEntry>, priv
         }
     }
 
+    fun updateList(list: List<Dictionary>) {
+        dictionaryList = list
+        notifyDataSetChanged()
+    }
+
     interface ItemClickListener {
-        fun onItemClick(dictionaryEntry: DictionaryEntry)
+        fun onItemClick(dictionaryEntry: Dictionary)
     }
 }
