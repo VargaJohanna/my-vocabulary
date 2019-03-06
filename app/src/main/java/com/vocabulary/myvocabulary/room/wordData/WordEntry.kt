@@ -7,10 +7,11 @@ import java.util.*
 
 @Entity(tableName = "words",
         foreignKeys = [ForeignKey(entity = DictionaryEntry::class,
-                parentColumns = arrayOf("dictionaryId"),
-                childColumns = arrayOf("containerDictionaryId"),
+                parentColumns = arrayOf("dictionary_id"),
+                childColumns = arrayOf("container_dictionary_id"),
                 onUpdate = ForeignKey.CASCADE,
-                onDelete = ForeignKey.CASCADE)])
+                onDelete = ForeignKey.CASCADE)],
+        indices = [Index("container_dictionary_id")])
 data class WordEntry(
         @PrimaryKey(autoGenerate = true) @ColumnInfo(name = "word_id") val wordId: Long?,
         @ColumnInfo(name = "container_dictionary_id") val containerDictionaryId: Long?,
