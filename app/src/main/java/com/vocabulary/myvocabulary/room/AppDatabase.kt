@@ -11,25 +11,19 @@ import com.vocabulary.myvocabulary.room.wordData.WordDao
 import com.vocabulary.myvocabulary.room.wordData.WordEntry
 import com.vocabulary.myvocabulary.utils.DateTypeConverter
 
-@Database(entities = arrayOf(DictionaryEntry::class, WordEntry::class), version = 1, exportSchema = false)
+@Database(entities = [DictionaryEntry::class, WordEntry::class], version = 1, exportSchema = false)
 @TypeConverters(DateTypeConverter::class)
 abstract class AppDatabase : RoomDatabase() {
     abstract fun dictionaryDao(): DictionaryDao
     abstract fun wordDao(): WordDao
 
     companion object {
-        private var instance: AppDatabase? = null
 
-        fun getInstance(context: Context): AppDatabase? {
-            if (instance == null) {
-                synchronized(AppDatabase::class) {
-                    instance = Room.databaseBuilder(context.applicationContext,
-                            AppDatabase::class.java, "appdatabase.db")
-                            .fallbackToDestructiveMigration()
-                            .build()
-                }
-            }
-            return instance
+        fun getInstance(context: Context): AppDatabase {
+            return Room.databaseBuilder(context.applicationContext,
+                    AppDatabase::class.java, "appdatabase.db")
+                    .fallbackToDestructiveMigration()
+                    .build()
         }
     }
 }

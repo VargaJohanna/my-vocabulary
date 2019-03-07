@@ -6,8 +6,9 @@ import androidx.lifecycle.ViewModel
 import com.vocabulary.myvocabulary.room.dictionaryData.DictionaryRepository
 import com.vocabulary.myvocabulary.rx.RxSchedulers
 import io.reactivex.Completable
-import io.reactivex.Observable
+import io.reactivex.Single
 import io.reactivex.disposables.CompositeDisposable
+import io.reactivex.disposables.Disposable
 
 class DictionaryListViewModel(
         private val dictionaryRepository: DictionaryRepository,
@@ -15,9 +16,9 @@ class DictionaryListViewModel(
 ) : ViewModel() {
 
     private val disposables = CompositeDisposable()
-    //    val dictionary: Observable<Dictionary> = dictionaryRepository.getDictionaryById()
-    private val dictionaryList: Observable<List<Dictionary>> = dictionaryRepository.getAllDictionaries()
-    private val numberOfDictionaries: Observable<Int> = dictionaryRepository.getNumberOfDictionaries()
+    //    val dictionary: Single<Dictionary> = dictionaryRepository.getDictionaryById()
+    private val dictionaryList: Single<List<Dictionary>> = dictionaryRepository.getAllDictionaries()
+    private val numberOfDictionaries: Single<Int> = dictionaryRepository.getNumberOfDictionaries()
     private val liveNumberOfDictionaries: MutableLiveData<Int> = MutableLiveData()
     private val liveDictionaryList: MutableLiveData<List<Dictionary>> = MutableLiveData()
 
@@ -27,11 +28,12 @@ class DictionaryListViewModel(
     }
 
     fun insertDictionary(dictionary: Dictionary) {
-        Completable.fromCallable { dictionaryRepository.createDictionary(dictionary) }
+        disposables += Completable.fromCallable { dictionaryRepository.createDictionary(dictionary) }
                 .subscribeOn(rxSchedulers.io())
                 .observeOn(rxSchedulers.main())
                 .subscribe()
     }
+
 
     private fun observeList() {
         disposables.add(
@@ -67,5 +69,9 @@ class DictionaryListViewModel(
     override fun onCleared() {
         disposables.clear()
         super.onCleared()
+    }
+
+    operator fun CompositeDisposable.plusAssign(disposable: Disposable) {
+        add(disposable)
     }
 }

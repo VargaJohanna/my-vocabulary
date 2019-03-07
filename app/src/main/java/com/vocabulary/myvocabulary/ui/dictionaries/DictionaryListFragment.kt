@@ -10,6 +10,7 @@ import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.vocabulary.myvocabulary.R
+import com.vocabulary.myvocabulary.ext.show
 import com.vocabulary.myvocabulary.room.dictionaryData.DefaultDictionary
 import kotlinx.android.synthetic.main.fragment_dictionary_list.view.*
 import org.koin.android.ext.android.inject
@@ -32,9 +33,10 @@ class DictionaryListFragment : Fragment(), DictionaryAdapter.ItemClickListener {
     }
 
     private fun generateDictionaryList(dictionaryAdapter: DictionaryAdapter, recyclerView: RecyclerView) {
-        val layoutManager = LinearLayoutManager(requireContext(), RecyclerView.VERTICAL, false)
-        recyclerView.layoutManager = layoutManager
-        recyclerView.adapter = dictionaryAdapter
+        recyclerView.apply {
+            layoutManager = LinearLayoutManager(requireContext(), RecyclerView.VERTICAL, false)
+            adapter = dictionaryAdapter
+        }
     }
 
     private fun observeList(dictionaryAdapter: DictionaryAdapter, progressBar: ProgressBar) {
@@ -52,13 +54,5 @@ class DictionaryListFragment : Fragment(), DictionaryAdapter.ItemClickListener {
                 viewModel.insertDictionary(defaultDictionary.getDefaultDictionary())
             }
         })
-    }
-
-    fun View.show(visible: Boolean) {
-        visibility = if (visible) {
-            View.VISIBLE
-        } else {
-            View.GONE
-        }
     }
 }
