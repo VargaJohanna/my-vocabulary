@@ -10,4 +10,5 @@ interface DictionaryRepository {
     fun updateDictionary(dictionary: Dictionary)
     fun getAllDictionaries(): Observable<List<Dictionary>>
     fun getDictionaryById(dictionaryId: Long): Observable<Dictionary>
+    fun getNumberOfDictionaries(): Observable<Int>
 }

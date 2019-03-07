@@ -1,6 +1,7 @@
 package com.vocabulary.myvocabulary
 
 import android.app.Application
+import com.vocabulary.myvocabulary.di.defaultDataModule
 import com.vocabulary.myvocabulary.di.repositoryModule
 import com.vocabulary.myvocabulary.di.schedulerModule
 import com.vocabulary.myvocabulary.di.viewModelModule
@@ -12,7 +13,7 @@ class MyApplication : Application() {
         super.onCreate()
         startKoin{
             androidContext(this@MyApplication)
-            modules(repositoryModule, viewModelModule, schedulerModule)
+            modules(repositoryModule, viewModelModule, schedulerModule, defaultDataModule)
         }
     }
 }
