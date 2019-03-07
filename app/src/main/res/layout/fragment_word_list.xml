@@ -6,12 +6,12 @@
     android:orientation="vertical">
 
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/dictionary_recycler_view"
+        android:id="@+id/word_recycler_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/dictionary_fab"
+        android:id="@+id/word_fab"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:fabSize="normal"
@@ -24,8 +24,8 @@
         style="@style/ProgressBarStyle"
         android:layout_width="@dimen/progressbar_size"
         android:layout_height="@dimen/progressbar_size"
-        android:layout_gravity="center"
         android:layout_marginBottom="8dp"
+        android:layout_gravity="center"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
