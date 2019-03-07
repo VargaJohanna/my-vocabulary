@@ -13,12 +13,12 @@ import java.util.*
                 onDelete = ForeignKey.CASCADE)],
         indices = [Index("container_dictionary_id")])
 data class WordEntry(
-        @PrimaryKey(autoGenerate = true) @ColumnInfo(name = "word_id") val wordId: Long?,
-        @ColumnInfo(name = "container_dictionary_id") val containerDictionaryId: Long?,
-        val word: String?,
-        val translation: String?,
-        @ColumnInfo(name = "been_asked") val beenAsked: Int?,
-        val failed: Int?,
-        val passed: Int?,
-        @ColumnInfo(name = "created") @TypeConverters(DateTypeConverter::class) val created: Date?
+        @PrimaryKey(autoGenerate = true) @ColumnInfo(name = "word_id") val wordId: Long,
+        @ColumnInfo(name = "container_dictionary_id") val containerDictionaryId: Long,
+        val word: String,
+        val translation: String,
+        @ColumnInfo(name = "been_asked") val beenAsked: Int,
+        val failed: Int,
+        val passed: Int,
+        @ColumnInfo(name = "created") @TypeConverters(DateTypeConverter::class) val created: Date
 )

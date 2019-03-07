@@ -6,12 +6,8 @@ import java.util.*
 
 class DateTypeConverter {
     @TypeConverter
-    fun toDate(value: Long?): Date? {
-        return if (value == null) null else Date(value)
-    }
+    fun toDate(value: Long): Date = Date(value)
 
     @TypeConverter
-    fun toLong(value: Date?): Long? {
-        return (if (value == null) null else value.time)?.toLong()
-    }
+    fun toLong(value: Date): Long = value.time
 }

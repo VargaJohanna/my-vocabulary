@@ -10,9 +10,9 @@ import java.util.*
 
 @Entity(tableName = "dictionaries")
 data class DictionaryEntry(
-        @PrimaryKey(autoGenerate = true) @ColumnInfo(name = "dictionary_id") val dictionaryId: Long?,
-        @ColumnInfo(name = "dictionary_name") val dictionaryName: String?,
-        @ColumnInfo(name = "dictionary_created") @TypeConverters(DateTypeConverter::class) val dictionaryCreated: Date?
+        @PrimaryKey(autoGenerate = true) @ColumnInfo(name = "dictionary_id") val dictionaryId: Long,
+        @ColumnInfo(name = "dictionary_name") val dictionaryName: String,
+        @ColumnInfo(name = "dictionary_created") @TypeConverters(DateTypeConverter::class) val dictionaryCreated: Date
 )
 
 fun DictionaryEntry.toDictionary() = Dictionary(dictionaryId, dictionaryName, dictionaryCreated)

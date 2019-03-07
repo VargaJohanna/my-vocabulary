@@ -6,6 +6,7 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.vocabulary.myvocabulary.R
+import kotlinx.android.synthetic.main.row_dictionary.view.*
 
 class DictionaryAdapter(private var dictionaryList: List<Dictionary>, private val itemClickListener: ItemClickListener) : RecyclerView.Adapter<DictionaryAdapter.DictionaryViewHolder>() {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): DictionaryViewHolder {
@@ -18,13 +19,13 @@ class DictionaryAdapter(private var dictionaryList: List<Dictionary>, private va
     }
 
     override fun onBindViewHolder(holder: DictionaryViewHolder, position: Int) {
-        if (holder.dictionaryName.text != null) {
-            holder.dictionaryName.text = dictionaryList[position].dictionaryName
-        }
+        holder.bind(dictionaryList[position])
     }
 
     inner class DictionaryViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView), View.OnClickListener {
-        val dictionaryName: TextView = itemView.findViewById(R.id.dictionary_name)
+        fun bind(dictionary: Dictionary) {
+            itemView.dictionary_name.text = dictionary.dictionaryName
+        }
 
         init {
             itemView.setOnClickListener(this)
