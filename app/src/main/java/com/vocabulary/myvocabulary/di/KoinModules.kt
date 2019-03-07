@@ -1,6 +1,7 @@
 package com.vocabulary.myvocabulary.di
 
 import com.vocabulary.myvocabulary.room.AppDatabase
+import com.vocabulary.myvocabulary.room.dictionaryData.DefaultDictionary
 import com.vocabulary.myvocabulary.room.dictionaryData.DictionaryRepository
 import com.vocabulary.myvocabulary.room.dictionaryData.DictionaryRepositoryImpl
 import com.vocabulary.myvocabulary.rx.RxSchedulers
@@ -21,4 +22,8 @@ val viewModelModule = module {
 
 val schedulerModule = module {
     factory<RxSchedulers> { SchedulersImpl() }
+}
+
+val defaultDataModule = module {
+    single { DefaultDictionary() }
 }

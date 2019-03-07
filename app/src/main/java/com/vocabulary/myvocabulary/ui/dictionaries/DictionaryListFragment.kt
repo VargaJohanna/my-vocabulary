@@ -6,14 +6,18 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ProgressBar
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.vocabulary.myvocabulary.R
+import com.vocabulary.myvocabulary.room.dictionaryData.DefaultDictionary
 import kotlinx.android.synthetic.main.fragment_dictionary_list.view.*
+import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.viewModel
 
 class DictionaryListFragment : Fragment(), DictionaryAdapter.ItemClickListener {
     private val viewModel: DictionaryListViewModel by viewModel()
+    private val defaultDictionary: DefaultDictionary by inject()
     override fun onItemClick(dictionaryEntry: Dictionary) {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
@@ -22,7 +26,8 @@ class DictionaryListFragment : Fragment(), DictionaryAdapter.ItemClickListener {
         val dictionaryAdapter = DictionaryAdapter(ArrayList(), this)
         return inflater.inflate(R.layout.fragment_dictionary_list, container, false).apply {
             generateDictionaryList(dictionaryAdapter, this.dictionary_recycler_view)
-            observeList(this.progress_bar)
+            setDefaultDatabase()
+            observeList(dictionaryAdapter, this.progress_bar)
         }
     }
 
@@ -32,8 +37,28 @@ class DictionaryListFragment : Fragment(), DictionaryAdapter.ItemClickListener {
         recyclerView.adapter = dictionaryAdapter
     }
 
-    private fun observeList(progressBar: ProgressBar) {
-        progressBar.visibility = View.VISIBLE
-        viewModel.dictionaryList.subscribe()
+    private fun observeList(dictionaryAdapter: DictionaryAdapter, progressBar: ProgressBar) {
+        progressBar.show(true)
+        viewModel.getDictionaryList().observe(this, Observer {
+            dictionaryAdapter.updateList(it)
+            progressBar.show(false)
+
+        })
+    }
+
+    private fun setDefaultDatabase() {
+        viewModel.getNumberOfDictionaries().observe(this, Observer {
+            if (it == 0) {
+                viewModel.insertDictionary(defaultDictionary.getDefaultDictionary())
+            }
+        })
+    }
+
+    fun View.show(visible: Boolean) {
+        visibility = if (visible) {
+            View.VISIBLE
+        } else {
+            View.GONE
+        }
     }
 }

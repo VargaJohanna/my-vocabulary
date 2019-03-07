@@ -4,6 +4,7 @@ import java.util.*
 
 data class Word (
         val wordId: Long?,
+        val containerDictionaryId: Long?,
         val word: String?,
         val translation: String?,
         val beenAsked: Int?,

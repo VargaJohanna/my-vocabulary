@@ -7,6 +7,10 @@ import io.reactivex.Observable
 class DictionaryRepositoryImpl(
         private val dictionaryDao: DictionaryDao
 ) : DictionaryRepository {
+    override fun getNumberOfDictionaries(): Observable<Int> {
+        return dictionaryDao.getNumberOfDictionaries()
+    }
+
     override fun createDictionary(dictionary: Dictionary) {
         dictionaryDao.insertDictionary(dictionary.toDictionaryEntry())
     }
