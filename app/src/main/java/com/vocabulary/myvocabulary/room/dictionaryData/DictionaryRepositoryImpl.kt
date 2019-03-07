@@ -2,7 +2,6 @@ package com.vocabulary.myvocabulary.room.dictionaryData
 
 import com.vocabulary.myvocabulary.ui.dictionaries.Dictionary
 import com.vocabulary.myvocabulary.ui.dictionaries.toDictionaryEntry
-import io.reactivex.Observable
 import io.reactivex.Single
 
 class DictionaryRepositoryImpl(
