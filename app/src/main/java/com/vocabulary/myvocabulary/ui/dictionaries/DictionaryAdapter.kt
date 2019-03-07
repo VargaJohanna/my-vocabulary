@@ -42,6 +42,6 @@ class DictionaryAdapter(private var dictionaryList: List<Dictionary>, private va
     }
 
     interface ItemClickListener {
-        fun onItemClick(dictionaryEntry: Dictionary)
+        fun onItemClick(dictionary: Dictionary)
     }
 }
