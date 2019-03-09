@@ -28,7 +28,7 @@ class WordListFragment : Fragment(), WordAdapter.WordItemClickListener {
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        val wordAdapter = WordAdapter(ArrayList(), this)
+        val wordAdapter = WordAdapter(emptyList(), this)
         return inflater.inflate(R.layout.fragment_word_list, container, false).apply {
             generateWordList(wordAdapter, this.word_recycler_view)
             setDefaultWordDatabase()
@@ -53,7 +53,7 @@ class WordListFragment : Fragment(), WordAdapter.WordItemClickListener {
 
     private fun setDefaultWordDatabase() {
         wordViewModel.isDefaultWordSet().observe(requireActivity(), Observer { isWordSet ->
-            if (wordViewModel.getDictionaryId() == 1L && !isWordSet) {
+            if (wordViewModel.dictionaryId == 1L && !isWordSet) {
                 val wordToAdd = defaultWordList.getDefaultWordList()
                 wordToAdd.forEach {
                     wordViewModel.insertWord(it)

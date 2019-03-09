@@ -9,5 +9,5 @@ interface WordRepository {
     fun updateWord(word: Word)
     fun getAllWords(dictionaryId: Long): Single<List<Word>>
     fun getWordById(wordId: Long): Single<Word>
-    fun isWordIdInDictionary(wordId: Long): Single<Int>
+    fun isWordIdInDictionary(wordId: Long): Single<Boolean>
 }

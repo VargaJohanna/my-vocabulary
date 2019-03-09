@@ -20,13 +20,13 @@ class WordAdapter(private var wordList: List<Word>, private val itemClickListene
     }
 
     inner class WordViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView), View.OnClickListener {
+        init {
+            itemView.setOnClickListener(this)
+        }
+
         fun bind(word: Word) {
             itemView.word.text = word.word
             itemView.translation.text = word.translation
-        }
-
-        init {
-            itemView.setOnClickListener(this)
         }
 
         override fun onClick(p0: View?) {

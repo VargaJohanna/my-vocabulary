@@ -16,16 +16,15 @@
         android:layout_marginEnd="@dimen/margin_small"
         app:layout_constraintEnd_toStartOf="@+id/guideline"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        tools:ignore="PrivateResource">
+        app:layout_constraintTop_toTopOf="parent">
 
         <TextView
             android:id="@+id/word"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_margin="@dimen/margin_normal"
-            android:gravity="left"
-            android:text="cat"
+            android:gravity="start"
+            tools:text="cat"
             android:textSize="@dimen/text_size_medium" />
 
     </com.google.android.material.card.MaterialCardView>
@@ -50,7 +49,7 @@
             android:layout_height="wrap_content"
             android:layout_margin="@dimen/margin_normal"
             android:gravity="center"
-            android:text="cica"
+            tools:text="cica"
             android:textSize="@dimen/text_size_medium" />
 
     </com.google.android.material.card.MaterialCardView>
