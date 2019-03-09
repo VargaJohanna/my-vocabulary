@@ -9,6 +9,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.vocabulary.myvocabulary.R
 import com.vocabulary.myvocabulary.ext.show
 import com.vocabulary.myvocabulary.room.dictionaryData.DefaultDictionary
@@ -29,6 +30,7 @@ class DictionaryListFragment : Fragment(), DictionaryAdapter.ItemClickListener {
             generateDictionaryList(dictionaryAdapter, this.dictionary_recycler_view)
             setDefaultDatabase()
             observeList(dictionaryAdapter, this.progress_bar)
+            this.dictionary_fab.onClick
         }
     }
 
@@ -54,5 +56,11 @@ class DictionaryListFragment : Fragment(), DictionaryAdapter.ItemClickListener {
                 viewModel.insertDictionary(defaultDictionary.getDefaultDictionary())
             }
         })
+    }
+
+    private fun setFabOnClick(fab: FloatingActionButton) {
+        fab.setOnClickListener {
+            viewModel.
+        }
     }
 }
