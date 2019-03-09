@@ -19,4 +19,7 @@ interface WordDao {
 
     @Query("SELECT * FROM words WHERE word_id = :wordId")
     fun getWordById(wordId: Long): Single<WordEntry>
+
+    @Query("SELECT count(*) FROM words WHERE word_id = :wordId")
+    fun getNumberOfWordById(wordId: Long): Single<Int>
 }

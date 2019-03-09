@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import android.widget.ProgressBar
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
+import androidx.navigation.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.vocabulary.myvocabulary.R
@@ -19,8 +20,10 @@ import org.koin.androidx.viewmodel.ext.viewModel
 class DictionaryListFragment : Fragment(), DictionaryAdapter.ItemClickListener {
     private val viewModel: DictionaryListViewModel by viewModel()
     private val defaultDictionary: DefaultDictionary by inject()
-    override fun onItemClick(dictionaryEntry: Dictionary) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+
+    override fun onItemClick(dictionary: Dictionary, view: View) {
+        val action = DictionaryListFragmentDirections.actionDictionaryListFragmentToWordListFragment(dictionary.dictionaryId)
+        view.findNavController().navigate(action)
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
