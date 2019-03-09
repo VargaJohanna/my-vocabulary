@@ -27,5 +27,7 @@ class WordRepositoryImpl(
         }
     }
 
-    override fun isWordIdInDictionary(wordId: Long): Single<Int> = wordDao.isWordIdInDictionary(wordId)
+    override fun isWordIdInDictionary(wordId: Long): Single<Boolean> = wordDao.getNumberOfWordById(wordId).map {
+        it != 0
+    }
 }
