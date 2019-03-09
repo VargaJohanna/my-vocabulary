@@ -16,7 +16,6 @@ class DictionaryListViewModel(
 ) : ViewModel() {
 
     private val disposables = CompositeDisposable()
-    //    val dictionary: Single<Dictionary> = dictionaryRepository.getDictionaryById()
     private val dictionaryList: Single<List<Dictionary>> = dictionaryRepository.getAllDictionaries()
     private val numberOfDictionaries: Single<Int> = dictionaryRepository.getNumberOfDictionaries()
     private val liveNumberOfDictionaries: MutableLiveData<Int> = MutableLiveData()

@@ -7,6 +7,7 @@ interface WordRepository {
     fun createWord(word: Word)
     fun deleteWord(word: Word)
     fun updateWord(word: Word)
-    fun getAllWords(): Single<List<Word>>
+    fun getAllWords(dictionaryId: Long): Single<List<Word>>
     fun getWordById(wordId: Long): Single<Word>
+    fun isWordIdInDictionary(wordId: Long): Single<Boolean>
 }

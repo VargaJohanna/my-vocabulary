@@ -2,6 +2,7 @@ package com.vocabulary.myvocabulary.room.wordData
 
 import androidx.room.*
 import com.vocabulary.myvocabulary.room.dictionaryData.DictionaryEntry
+import com.vocabulary.myvocabulary.ui.words.Word
 import com.vocabulary.myvocabulary.utils.DateTypeConverter
 import java.util.*
 
@@ -22,3 +23,5 @@ data class WordEntry(
         val passed: Int,
         @ColumnInfo(name = "created") @TypeConverters(DateTypeConverter::class) val created: Date
 )
+
+fun WordEntry.toWord() = Word(wordId, containerDictionaryId, word, translation, beenAsked, failed, passed, created)
