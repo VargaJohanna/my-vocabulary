@@ -1,5 +1,6 @@
 package com.vocabulary.myvocabulary.ui.words
 
+import com.vocabulary.myvocabulary.room.wordData.WordEntry
 import java.util.*
 
 data class Word (
@@ -12,3 +13,5 @@ data class Word (
         val passed: Int,
         val created: Date
 )
+
+fun Word.toWordEntry() = WordEntry(wordId, containerDictionaryId, word, translation, beenAsked, failed, passed, created)

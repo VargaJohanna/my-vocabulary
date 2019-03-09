@@ -31,8 +31,8 @@ class DictionaryAdapter(private var dictionaryList: List<Dictionary>, private va
             itemView.setOnClickListener(this)
         }
 
-        override fun onClick(p0: View?) {
-            itemClickListener.onItemClick(dictionaryList[adapterPosition])
+        override fun onClick(view: View) {
+            itemClickListener.onItemClick(dictionaryList[adapterPosition], view)
         }
     }
 
@@ -42,6 +42,6 @@ class DictionaryAdapter(private var dictionaryList: List<Dictionary>, private va
     }
 
     interface ItemClickListener {
-        fun onItemClick(dictionaryEntry: Dictionary)
+        fun onItemClick(dictionary: Dictionary, view: View)
     }
 }
