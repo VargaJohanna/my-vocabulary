@@ -4,11 +4,13 @@ import com.vocabulary.myvocabulary.room.AppDatabase
 import com.vocabulary.myvocabulary.room.dictionaryData.DefaultDictionary
 import com.vocabulary.myvocabulary.room.dictionaryData.DictionaryRepository
 import com.vocabulary.myvocabulary.room.dictionaryData.DictionaryRepositoryImpl
+import com.vocabulary.myvocabulary.room.wordData.DefaultWordList
 import com.vocabulary.myvocabulary.room.wordData.WordRepository
 import com.vocabulary.myvocabulary.room.wordData.WordRepositoryImpl
 import com.vocabulary.myvocabulary.rx.RxSchedulers
 import com.vocabulary.myvocabulary.rx.SchedulersImpl
 import com.vocabulary.myvocabulary.ui.dictionaries.DictionaryListViewModel
+import com.vocabulary.myvocabulary.ui.words.WordListViewModel
 import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.dsl.module
 
@@ -22,6 +24,7 @@ val repositoryModule = module {
 
 val viewModelModule = module {
     viewModel { DictionaryListViewModel(get(), get()) }
+    viewModel { (dictionaryId: Long) -> WordListViewModel(dictionaryId, get(), get()) }
 }
 
 val schedulerModule = module {
@@ -30,4 +33,5 @@ val schedulerModule = module {
 
 val defaultDataModule = module {
     single { DefaultDictionary() }
+    single { DefaultWordList() }
 }
