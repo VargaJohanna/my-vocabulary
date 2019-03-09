@@ -52,7 +52,7 @@ class WordListFragment : Fragment(), WordAdapter.WordItemClickListener {
     }
 
     private fun setDefaultWordDatabase() {
-        wordViewModel.isDefaultWordSet().observe(requireActivity(), Observer {isWordSet ->
+        wordViewModel.isDefaultWordSet().observe(requireActivity(), Observer { isWordSet ->
             if (wordViewModel.getDictionaryId() == 1L && !isWordSet) {
                 val wordToAdd = defaultWordList.getDefaultWordList()
                 wordToAdd.forEach {
