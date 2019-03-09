@@ -9,7 +9,15 @@
         android:name="com.vocabulary.myvocabulary.ui.dictionaries.DictionaryListFragment"
         android:label="fragment_dictionary_list"
         tools:layout="@layout/fragment_dictionary_list"
-        />
+        >
+        <action
+            android:id="@+id/action_dictionaryListFragment_to_wordListFragment"
+            app:destination="@id/wordListFragment">
+            <argument
+                android:name="dictionaryId"
+                app:argType="long"/>
+        </action>
+    </fragment>
     <fragment
         android:id="@+id/quizListFragment"
         android:name="com.vocabulary.myvocabulary.ui.quizzes.QuizListFragment"
@@ -26,5 +34,13 @@
         <action
             android:id="@+id/action_homeFragment_to_quizListFragment"
             app:destination="@id/quizListFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/wordListFragment"
+        android:name="com.vocabulary.myvocabulary.ui.words.WordListFragment"
+        android:label="WordListFragment" >
+        <argument
+            android:name="dictionaryId"
+            app:argType="long" />
     </fragment>
 </navigation>

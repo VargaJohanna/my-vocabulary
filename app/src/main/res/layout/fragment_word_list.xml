@@ -20,7 +20,7 @@
         android:layout_gravity="end|bottom" />
 
     <ProgressBar
-        android:id="@+id/progress_bar"
+        android:id="@+id/word_list_progress_bar"
         style="@style/ProgressBarStyle"
         android:layout_width="@dimen/progressbar_size"
         android:layout_height="@dimen/progressbar_size"
