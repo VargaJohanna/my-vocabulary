@@ -32,9 +32,7 @@ class DictionaryRepositoryImpl(
                 .subscribe { _numberOfDictionaries.onNext(it) }
     }
 
-    override fun createDictionary(dictionary: Dictionary): Long {
-        return dictionaryDao.insertDictionary(dictionary.toDictionaryEntry())
-    }
+    override fun createDictionary(dictionary: Dictionary) = dictionaryDao.insertDictionary(dictionary.toDictionaryEntry())
 
     override fun deleteDictionary(dictionary: Dictionary) = dictionaryDao.deleteDictionary(dictionary.toDictionaryEntry())
 

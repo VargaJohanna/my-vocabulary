@@ -6,7 +6,6 @@ import androidx.lifecycle.ViewModel
 import com.vocabulary.myvocabulary.room.wordData.WordRepository
 import com.vocabulary.myvocabulary.rx.RxSchedulers
 import io.reactivex.Completable
-import io.reactivex.Observable
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.Disposable
 
@@ -16,15 +15,11 @@ class WordListViewModel(
         private val rxSchedulers: RxSchedulers
 ) : ViewModel() {
     private val disposables = CompositeDisposable()
-    private val wordList = wordRepository.allWords
     private val liveWordList: MutableLiveData<List<Word>> = MutableLiveData()
     private val defaultWordId = 1L
-    private val isWordInDictionary: Observable<Boolean> = wordRepository.isWordInDictionary
     private val isDefaultWordInDictionary: MutableLiveData<Boolean> = MutableLiveData()
 
     init {
-        wordRepository.observeAllList(dictionaryId)
-        wordRepository.observeIfWordIsInDictionary(defaultWordId)
         observeList()
         observeIfWordInDictionary()
     }
@@ -37,14 +32,14 @@ class WordListViewModel(
     }
 
     private fun observeList() {
-        disposables += wordList
+        disposables += wordRepository.getObservableWordList(dictionaryId)
                 .subscribeOn(rxSchedulers.io())
                 .observeOn(rxSchedulers.main())
                 .subscribe { liveWordList.postValue(it) }
     }
 
     private fun observeIfWordInDictionary() {
-        disposables += isWordInDictionary
+        disposables += wordRepository.getIsWordInDictionary(defaultWordId)
                 .subscribeOn(rxSchedulers.io())
                 .observeOn(rxSchedulers.main())
                 .subscribe { isDefaultWordInDictionary.postValue(it) }
