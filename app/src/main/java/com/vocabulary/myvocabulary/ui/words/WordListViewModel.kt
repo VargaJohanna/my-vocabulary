@@ -44,11 +44,10 @@ class WordListViewModel(
     }
 
     private fun observeIfWordInDictionary() {
-        disposables.add(
-                isWordInDictionary
-                        .subscribeOn(rxSchedulers.io())
-                        .observeOn(rxSchedulers.main())
-                        .subscribe { isDefaultWordInDictionary.postValue(it) })
+        disposables += isWordInDictionary
+                .subscribeOn(rxSchedulers.io())
+                .observeOn(rxSchedulers.main())
+                .subscribe { isDefaultWordInDictionary.postValue(it) }
     }
 
     fun isDefaultWordSet(): LiveData<Boolean> = isDefaultWordInDictionary
