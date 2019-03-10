@@ -9,7 +9,9 @@ class DictionaryRepositoryImpl(
 ) : DictionaryRepository {
     override fun getNumberOfDictionaries() = dictionaryDao.getNumberOfDictionaries()
 
-    override fun createDictionary(dictionary: Dictionary) = dictionaryDao.insertDictionary(dictionary.toDictionaryEntry())
+    override fun createDictionary(dictionary: Dictionary): Long {
+        return dictionaryDao.insertDictionary(dictionary.toDictionaryEntry())
+    }
 
     override fun deleteDictionary(dictionary: Dictionary) = dictionaryDao.deleteDictionary(dictionary.toDictionaryEntry())
 

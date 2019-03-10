@@ -6,13 +6,13 @@ import io.reactivex.Single
 @Dao
 interface DictionaryDao {
     @Insert
-    fun insertDictionary(dictionary: DictionaryEntry)
+    fun insertDictionary(dictionaryEntry: DictionaryEntry): Long
 
     @Update
-    fun updateDictionary(dictionary: DictionaryEntry)
+    fun updateDictionary(dictionaryEntry: DictionaryEntry)
 
     @Delete
-    fun deleteDictionary(dictionary: DictionaryEntry)
+    fun deleteDictionary(dictionaryEntry: DictionaryEntry)
 
     @Query("SELECT * FROM dictionaries")
     fun getAllDictionaries(): Single<List<DictionaryEntry>>

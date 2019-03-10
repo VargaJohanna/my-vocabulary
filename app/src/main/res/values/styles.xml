@@ -24,4 +24,9 @@
         <item name="android:visibility">invisible</item>
     </style>
 
+    <style name="ErrorMessage">
+        <item name="android:textColor">@color/error</item>
+        <item name="android:textSize">@dimen/text_size_small</item>
+    </style>
+
 </resources>

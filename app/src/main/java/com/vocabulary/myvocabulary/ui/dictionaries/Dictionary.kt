@@ -6,7 +6,8 @@ import java.util.*
 data class Dictionary (
         val dictionaryId: Long,
         val dictionaryName: String,
-        val dictionaryCreated: Date
-)
+        val dictionaryCreated: Date) {
+    constructor(dictionaryName: String, dictionaryCreated: Date) : this(0, dictionaryName, dictionaryCreated)
+}
 
 fun Dictionary.toDictionaryEntry() = DictionaryEntry(dictionaryId, dictionaryName, dictionaryCreated)
