@@ -1,14 +1,15 @@
 package com.vocabulary.myvocabulary.room.dictionaryData
 
 import com.vocabulary.myvocabulary.ui.dictionaries.Dictionary
+import io.reactivex.Observable
 import io.reactivex.Single
 
 
 interface DictionaryRepository {
+    val allDictionaries: Observable<List<Dictionary>>
+    val numberOfDictionaries: Observable<Int>
     fun createDictionary(dictionary: Dictionary): Long
     fun deleteDictionary(dictionary: Dictionary)
     fun updateDictionary(dictionary: Dictionary)
-    fun getAllDictionaries(): Single<List<Dictionary>>
     fun getDictionaryById(dictionaryId: Long): Single<Dictionary>
-    fun getNumberOfDictionaries(): Single<Int>
 }
