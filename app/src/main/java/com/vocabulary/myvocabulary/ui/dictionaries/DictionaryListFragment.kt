@@ -28,7 +28,7 @@ import org.koin.androidx.viewmodel.ext.viewModel
 class DictionaryListFragment : Fragment(), DictionaryAdapter.ItemClickListener {
     private val viewModel: DictionaryListViewModel by viewModel()
     private val defaultDictionary: DefaultDictionary by inject()
-    private lateinit var dialog: AlertDialog
+    private  var dialog: AlertDialog? = null
 
     override fun onItemClick(dictionary: Dictionary, view: View) {
         val action = DictionaryListFragmentDirections.actionDictionaryToWordList(dictionary.dictionaryId)
@@ -37,13 +37,12 @@ class DictionaryListFragment : Fragment(), DictionaryAdapter.ItemClickListener {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val dictionaryAdapter = DictionaryAdapter(ArrayList(), this)
-        val dialogBuilder = AlertDialog.Builder(requireActivity(), R.style.ThemeOverlay_MaterialComponents_Dialog_Alert)
+        setDefaultDatabase()
+
         return inflater.inflate(R.layout.fragment_dictionary_list, container, false).apply {
             generateDictionaryList(dictionaryAdapter, this.dictionary_recycler_view)
-            setDefaultDatabase()
             observeList(dictionaryAdapter, this.progress_bar)
             setFabOnClickListener(this.dictionary_fab)
-            dialog = dialogBuilder.create()
         }
     }
 
@@ -85,33 +84,36 @@ class DictionaryListFragment : Fragment(), DictionaryAdapter.ItemClickListener {
         val cancelButton: Button = dialogView.findViewById(R.id.cancel_dictionary_creation)
         val errorMessage: TextView = dialogView.findViewById(R.id.dictionary_name_error)
 
-        dialog.setView(dialogView)
-        errorMessage.show(false)
-        setupTextChangedListener(editText, errorMessage)
-        createButton.setOnClickListener {
-            createDictionary(editText.text.toString(), dialog, errorMessage)
-        }
-        cancelButton.setOnClickListener {
+        val dialogBuilder = AlertDialog.Builder(requireActivity(), R.style.ThemeOverlay_MaterialComponents_Dialog_Alert)
+        dialog = dialogBuilder.create().apply {
+            setView(dialogView)
             errorMessage.show(false)
-            dialog.dismiss()
+            setupTextChangedListener(editText, errorMessage)
+            createButton.setOnClickListener {
+                createDictionary(editText.text.toString(), this, errorMessage)
+            }
+            cancelButton.setOnClickListener {
+                errorMessage.show(false)
+                dismiss()
+            }
+            setCanceledOnTouchOutside(false)
+            setTitle(R.string.create_new_dictionary_dialog_title)
+            show()
         }
-        dialog.setCanceledOnTouchOutside(false)
-        dialog.setTitle(R.string.create_new_dictionary_dialog_title)
-        dialog.show()
     }
 
     private fun setupTextChangedListener(editText: EditText, errorMessage: TextView) {
         editText.addTextChangedListener(object : TextWatcher {
             override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
-                if (errorMessage.visibility == View.VISIBLE) errorMessage.show(false)
+                errorMessage.show(false)
             }
 
             override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
-                if (errorMessage.visibility == View.VISIBLE) errorMessage.show(false)
+                errorMessage.show(false)
             }
 
             override fun afterTextChanged(p0: Editable?) {
-                if (errorMessage.visibility == View.VISIBLE) errorMessage.show(false)
+                errorMessage.show(false)
             }
         })
     }
@@ -129,7 +131,7 @@ class DictionaryListFragment : Fragment(), DictionaryAdapter.ItemClickListener {
     }
 
     override fun onStop() {
-        dialog.dismiss()
+        dialog?.dismiss()
         super.onStop()
     }
 }
