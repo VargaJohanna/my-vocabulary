@@ -6,7 +6,7 @@ import androidx.lifecycle.ViewModel
 import com.vocabulary.myvocabulary.room.wordData.WordRepository
 import com.vocabulary.myvocabulary.rx.RxSchedulers
 import io.reactivex.Completable
-import io.reactivex.Single
+import io.reactivex.Observable
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.Disposable
 
@@ -16,13 +16,15 @@ class WordListViewModel(
         private val rxSchedulers: RxSchedulers
 ) : ViewModel() {
     private val disposables = CompositeDisposable()
-    private val wordList: Single<List<Word>> = wordRepository.getAllWords(dictionaryId)
+    private val wordList = wordRepository.allWords
     private val liveWordList: MutableLiveData<List<Word>> = MutableLiveData()
     private val defaultWordId = 1L
-    private val isWordInDictionary: Single<Boolean> = wordRepository.isWordIdInDictionary(defaultWordId)
+    private val isWordInDictionary: Observable<Boolean> = wordRepository.isWordInDictionary
     private val isDefaultWordInDictionary: MutableLiveData<Boolean> = MutableLiveData()
 
     init {
+        wordRepository.observeAllList(dictionaryId)
+        wordRepository.observeIfWordIsInDictionary(defaultWordId)
         observeList()
         observeIfWordInDictionary()
     }
@@ -36,23 +38,17 @@ class WordListViewModel(
 
     private fun observeList() {
         disposables += wordList
-                .map {
-                    liveWordList.postValue(it)
-                }
                 .subscribeOn(rxSchedulers.io())
                 .observeOn(rxSchedulers.main())
-                .subscribe()
+                .subscribe { liveWordList.postValue(it) }
     }
 
     private fun observeIfWordInDictionary() {
         disposables.add(
                 isWordInDictionary
-                        .map {
-                            isDefaultWordInDictionary.postValue(it)
-                        }
                         .subscribeOn(rxSchedulers.io())
                         .observeOn(rxSchedulers.main())
-                        .subscribe())
+                        .subscribe { isDefaultWordInDictionary.postValue(it) })
     }
 
     fun isDefaultWordSet(): LiveData<Boolean> = isDefaultWordInDictionary

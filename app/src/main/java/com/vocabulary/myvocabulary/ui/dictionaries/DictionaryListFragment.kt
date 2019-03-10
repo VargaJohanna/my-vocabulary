@@ -38,12 +38,12 @@ class DictionaryListFragment : Fragment(), DictionaryAdapter.ItemClickListener {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val dictionaryAdapter = DictionaryAdapter(ArrayList(), this)
         val dialogBuilder = AlertDialog.Builder(requireActivity(), R.style.ThemeOverlay_MaterialComponents_Dialog_Alert)
-        dialog = dialogBuilder.create()
         return inflater.inflate(R.layout.fragment_dictionary_list, container, false).apply {
             generateDictionaryList(dictionaryAdapter, this.dictionary_recycler_view)
             setDefaultDatabase()
             observeList(dictionaryAdapter, this.progress_bar)
             setFabOnClickListener(this.dictionary_fab)
+            dialog = dialogBuilder.create()
         }
     }
 
@@ -101,17 +101,17 @@ class DictionaryListFragment : Fragment(), DictionaryAdapter.ItemClickListener {
     }
 
     private fun setupTextChangedListener(editText: EditText, errorMessage: TextView) {
-        editText.addTextChangedListener(object : TextWatcher{
+        editText.addTextChangedListener(object : TextWatcher {
             override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
-                if(errorMessage.visibility == View.VISIBLE) errorMessage.show(false)
+                if (errorMessage.visibility == View.VISIBLE) errorMessage.show(false)
             }
 
             override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
-                if(errorMessage.visibility == View.VISIBLE) errorMessage.show(false)
+                if (errorMessage.visibility == View.VISIBLE) errorMessage.show(false)
             }
 
             override fun afterTextChanged(p0: Editable?) {
-                if(errorMessage.visibility == View.VISIBLE) errorMessage.show(false)
+                if (errorMessage.visibility == View.VISIBLE) errorMessage.show(false)
             }
         })
     }
