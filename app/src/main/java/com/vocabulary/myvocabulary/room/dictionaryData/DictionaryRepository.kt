@@ -5,7 +5,7 @@ import io.reactivex.Single
 
 
 interface DictionaryRepository {
-    fun createDictionary(dictionary: Dictionary)
+    fun createDictionary(dictionary: Dictionary): Long
     fun deleteDictionary(dictionary: Dictionary)
     fun updateDictionary(dictionary: Dictionary)
     fun getAllDictionaries(): Single<List<Dictionary>>
