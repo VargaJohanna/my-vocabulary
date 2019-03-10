@@ -40,11 +40,10 @@ class DictionaryListViewModel(
     fun getCreatedId() = createdId
 
     private fun observeList() {
-        disposables.add(
-                dictionaryList
-                        .subscribeOn(rxSchedulers.io())
-                        .observeOn(rxSchedulers.main())
-                        .subscribe { liveDictionaryList.postValue(it) })
+        disposables += dictionaryList
+                .subscribeOn(rxSchedulers.io())
+                .observeOn(rxSchedulers.main())
+                .subscribe { liveDictionaryList.postValue(it) }
     }
 
     fun getDictionaryList(): LiveData<List<Dictionary>> {
@@ -52,11 +51,10 @@ class DictionaryListViewModel(
     }
 
     private fun observeNumberOfDictionaries() {
-        disposables.add(
-                numberOfDictionaries
-                        .subscribeOn(rxSchedulers.io())
-                        .observeOn(rxSchedulers.main())
-                        .subscribe { liveNumberOfDictionaries.postValue(it) })
+        disposables += numberOfDictionaries
+                .subscribeOn(rxSchedulers.io())
+                .observeOn(rxSchedulers.main())
+                .subscribe { liveNumberOfDictionaries.postValue(it) }
     }
 
     fun getNumberOfDictionaries(): LiveData<Int> {
