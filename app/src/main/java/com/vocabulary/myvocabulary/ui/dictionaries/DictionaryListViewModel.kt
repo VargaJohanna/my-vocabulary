@@ -5,10 +5,10 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.vocabulary.myvocabulary.room.dictionaryData.DictionaryRepository
 import com.vocabulary.myvocabulary.rx.RxSchedulers
-import io.reactivex.Completable
 import io.reactivex.Single
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.Disposable
+import java.util.*
 
 class DictionaryListViewModel(
         private val dictionaryRepository: DictionaryRepository,
@@ -16,10 +16,11 @@ class DictionaryListViewModel(
 ) : ViewModel() {
 
     private val disposables = CompositeDisposable()
-    private val dictionaryList: Single<List<Dictionary>> = dictionaryRepository.getAllDictionaries()
-    private val numberOfDictionaries: Single<Int> = dictionaryRepository.getNumberOfDictionaries()
-    private val liveNumberOfDictionaries: MutableLiveData<Int> = MutableLiveData()
+    private val dictionaryList = dictionaryRepository.allDictionaries
     private val liveDictionaryList: MutableLiveData<List<Dictionary>> = MutableLiveData()
+    private val numberOfDictionaries = dictionaryRepository.numberOfDictionaries
+    private val liveNumberOfDictionaries: MutableLiveData<Int> = MutableLiveData()
+    private var createdId: Long = 0
 
     init {
         observeList()
@@ -27,22 +28,22 @@ class DictionaryListViewModel(
     }
 
     fun insertDictionary(dictionary: Dictionary) {
-        disposables += Completable.fromCallable { dictionaryRepository.createDictionary(dictionary) }
+        disposables += Single.fromCallable {
+            dictionaryRepository.createDictionary(dictionary)
+        }
+                .map { createdId = it }
                 .subscribeOn(rxSchedulers.io())
                 .observeOn(rxSchedulers.main())
                 .subscribe()
     }
 
+    fun getCreatedId() = createdId
 
     private fun observeList() {
-        disposables.add(
-                dictionaryList
-                        .map {
-                            liveDictionaryList.postValue(it)
-                        }
-                        .subscribeOn(rxSchedulers.io())
-                        .observeOn(rxSchedulers.main())
-                        .subscribe())
+        disposables += dictionaryList
+                .subscribeOn(rxSchedulers.io())
+                .observeOn(rxSchedulers.main())
+                .subscribe { liveDictionaryList.postValue(it) }
     }
 
     fun getDictionaryList(): LiveData<List<Dictionary>> {
@@ -50,14 +51,10 @@ class DictionaryListViewModel(
     }
 
     private fun observeNumberOfDictionaries() {
-        disposables.add(
-                numberOfDictionaries
-                        .map {
-                            liveNumberOfDictionaries.postValue(it)
-                        }
-                        .subscribeOn(rxSchedulers.io())
-                        .observeOn(rxSchedulers.main())
-                        .subscribe())
+        disposables += numberOfDictionaries
+                .subscribeOn(rxSchedulers.io())
+                .observeOn(rxSchedulers.main())
+                .subscribe { liveNumberOfDictionaries.postValue(it) }
     }
 
     fun getNumberOfDictionaries(): LiveData<Int> {
@@ -73,4 +70,7 @@ class DictionaryListViewModel(
     operator fun CompositeDisposable.plusAssign(disposable: Disposable) {
         add(disposable)
     }
+
+    fun createDictionary(dictionaryName: String): Dictionary = Dictionary(dictionaryName, Calendar.getInstance().time)
+
 }

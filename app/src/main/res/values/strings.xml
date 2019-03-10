@@ -2,8 +2,13 @@
     <string name="app_name">My Vocabulary</string>
 
     <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="example_dictionary_name">Hungarian - English</string>
     <string name="dictionaries_button">DICTIONARIES</string>
     <string name="quizzes_button">QUIZZES</string>
+    <string name="add_a_title">Add a title</string>
+    <string name="create_dictionary_hint">Enter a title</string>
+    <string name="create_new_dictionary_dialog_title">Create New Dictionary</string>
+    <string name="create_button_label">Create</string>
+    <string name="cancel_button_label">Cancel</string>
+    <string name="please_enter_a_title">Please enter a title</string>
 </resources>
