@@ -23,18 +23,18 @@ class DictionaryAdapter(private var dictionaryList: List<Dictionary>, private va
 
     }
 
-    inner class DictionaryViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView), View.OnClickListener {
+    inner class DictionaryViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         fun bind(dictionary: Dictionary) {
             itemView.dictionary_name.text = dictionary.dictionaryName
         }
 
         init {
-            itemView.findViewById<TextView>(R.id.dictionary_name).setOnClickListener(this)
-            itemView.findViewById<TextView>(R.id.dictionary_options).setOnClickListener(this)
-        }
-
-        override fun onClick(view: View) {
-            itemClickListener.onItemClick(dictionaryList[adapterPosition], view)
+            itemView.dictionary_name.setOnClickListener {
+                itemClickListener.onItemClick(dictionaryList[adapterPosition])
+            }
+            itemView.dictionary_options.setOnClickListener {
+                itemClickListener.onOptionsClick(dictionaryList[adapterPosition], it)
+            }
         }
     }
 
@@ -44,6 +44,7 @@ class DictionaryAdapter(private var dictionaryList: List<Dictionary>, private va
     }
 
     interface ItemClickListener {
-        fun onItemClick(dictionary: Dictionary, view: View)
+        fun onItemClick(dictionary: Dictionary)
+        fun onOptionsClick(dictionary: Dictionary, view: View)
     }
 }
