@@ -12,7 +12,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.vocabulary.myvocabulary.R
 import kotlinx.android.synthetic.main.row_dictionary.view.*
 
-class DictionaryAdapter(private var context: Context, private var dictionaryList: List<Dictionary>, private val itemClickListener: ItemClickListener) : RecyclerView.Adapter<DictionaryAdapter.DictionaryViewHolder>() {
+class DictionaryAdapter(private var dictionaryList: List<Dictionary>, private val itemClickListener: ItemClickListener) : RecyclerView.Adapter<DictionaryAdapter.DictionaryViewHolder>() {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): DictionaryViewHolder {
         val inflater = LayoutInflater.from(parent.context)
         return DictionaryViewHolder(inflater.inflate(R.layout.row_dictionary, parent, false))

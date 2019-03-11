@@ -69,9 +69,8 @@ class DictionaryListViewModel(
         add(disposable)
     }
 
-    fun createDictionary(dictionaryName: String): Dictionary = Dictionary(dictionaryName = dictionaryName,
+    fun createDictionaryObject(dictionaryName: String): Dictionary = Dictionary(dictionaryName = dictionaryName,
             dictionaryCreated = Calendar.getInstance().time)
-    fun createDictionaryObject(dictionaryName: String): Dictionary = Dictionary(dictionaryName, Calendar.getInstance().time)
 
     fun renameDictionary(dictionary: Dictionary) {
         disposables += Completable.fromCallable {
