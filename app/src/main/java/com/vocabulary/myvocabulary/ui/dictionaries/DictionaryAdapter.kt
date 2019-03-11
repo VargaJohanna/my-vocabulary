@@ -1,14 +1,18 @@
 package com.vocabulary.myvocabulary.ui.dictionaries
 
+import android.content.Context
+import android.icu.lang.UCharacter.GraphemeClusterBreak.L
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.PopupMenu
 import android.widget.TextView
+import android.widget.Toast
 import androidx.recyclerview.widget.RecyclerView
 import com.vocabulary.myvocabulary.R
 import kotlinx.android.synthetic.main.row_dictionary.view.*
 
-class DictionaryAdapter(private var dictionaryList: List<Dictionary>, private val itemClickListener: ItemClickListener) : RecyclerView.Adapter<DictionaryAdapter.DictionaryViewHolder>() {
+class DictionaryAdapter(private var context: Context, private var dictionaryList: List<Dictionary>, private val itemClickListener: ItemClickListener) : RecyclerView.Adapter<DictionaryAdapter.DictionaryViewHolder>() {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): DictionaryViewHolder {
         val inflater = LayoutInflater.from(parent.context)
         return DictionaryViewHolder(inflater.inflate(R.layout.row_dictionary, parent, false))
@@ -20,6 +24,7 @@ class DictionaryAdapter(private var dictionaryList: List<Dictionary>, private va
 
     override fun onBindViewHolder(holder: DictionaryViewHolder, position: Int) {
         holder.bind(dictionaryList[position])
+
     }
 
     inner class DictionaryViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView), View.OnClickListener {
@@ -28,7 +33,8 @@ class DictionaryAdapter(private var dictionaryList: List<Dictionary>, private va
         }
 
         init {
-            itemView.setOnClickListener(this)
+            itemView.findViewById<TextView>(R.id.dictionary_name).setOnClickListener(this)
+            itemView.findViewById<TextView>(R.id.dictionary_options).setOnClickListener(this)
         }
 
         override fun onClick(view: View) {

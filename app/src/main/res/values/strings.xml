@@ -7,8 +7,15 @@
     <string name="quizzes_button">QUIZZES</string>
     <string name="add_a_title">Add a title</string>
     <string name="create_dictionary_hint">Enter a title</string>
+    <string name="rename_dictionary_hint">Enter a new title</string>
     <string name="create_new_dictionary_dialog_title">Create New Dictionary</string>
     <string name="create_button_label">Create</string>
+    <string name="dialog_rename_button_label">Rename</string>
     <string name="cancel_button_label">Cancel</string>
     <string name="please_enter_a_title">Please enter a title</string>
+    <string name="row_dictionary_options_dots">⋮</string>
+    <string name="dictionary_menu_rename">Rename</string>
+    <string name="dictionary_menu_delete">Delete</string>
+    <string name="dialog_delete_dictionary_title">Deleting dictionary</string>
+    <string name="dialog_rename_dictionary_dialog_title">Rename dictionary</string>
 </resources>
