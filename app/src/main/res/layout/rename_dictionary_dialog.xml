@@ -12,6 +12,7 @@
         android:layout_margin="@dimen/margin_medium"
         android:hint="@string/rename_dictionary_hint"
         android:paddingTop="@dimen/padding_normal"
+        android:inputType="textCapSentences"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />

@@ -3,9 +3,10 @@ package com.vocabulary.myvocabulary.ui.dictionaries
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.TextView
+import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.vocabulary.myvocabulary.R
+import com.vocabulary.myvocabulary.utils.DictionaryDiffUtilCallBack
 import kotlinx.android.synthetic.main.row_dictionary.view.*
 
 class DictionaryAdapter(private var dictionaryList: List<Dictionary>, private val itemClickListener: ItemClickListener) : RecyclerView.Adapter<DictionaryAdapter.DictionaryViewHolder>() {
@@ -38,9 +39,10 @@ class DictionaryAdapter(private var dictionaryList: List<Dictionary>, private va
         }
     }
 
-    fun updateList(list: List<Dictionary>) {
-        dictionaryList = list
-        notifyDataSetChanged()
+    fun updateList(newList: List<Dictionary>) {
+        val diffResult = DiffUtil.calculateDiff(DictionaryDiffUtilCallBack(dictionaryList, newList))
+        this.dictionaryList = newList
+        diffResult.dispatchUpdatesTo(this)
     }
 
     interface ItemClickListener {
