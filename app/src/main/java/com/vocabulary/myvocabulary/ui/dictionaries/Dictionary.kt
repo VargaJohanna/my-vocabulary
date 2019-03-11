@@ -4,10 +4,8 @@ import com.vocabulary.myvocabulary.room.dictionaryData.DictionaryEntry
 import java.util.*
 
 data class Dictionary (
-        val dictionaryId: Long,
+        val dictionaryId: Long = 0,
         val dictionaryName: String,
-        val dictionaryCreated: Date) {
-    constructor(dictionaryName: String, dictionaryCreated: Date) : this(0, dictionaryName, dictionaryCreated)
-}
+        val dictionaryCreated: Date)
 
 fun Dictionary.toDictionaryEntry() = DictionaryEntry(dictionaryId, dictionaryName, dictionaryCreated)
