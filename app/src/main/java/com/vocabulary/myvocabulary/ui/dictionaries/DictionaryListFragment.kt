@@ -27,13 +27,13 @@ class DictionaryListFragment : Fragment(), DictionaryAdapter.ItemClickListener {
     private val defaultDictionary: DefaultDictionary by inject()
     private var createDialog: AlertDialog? = null
     private var renameDialog: AlertDialog? = null
-    private  var dialog: AlertDialog? = null
+    private var dialog: AlertDialog? = null
 
     override fun onItemClick(dictionary: Dictionary, view: View) {
-        if(view.id == R.id.dictionary_name) {
+        if (view.id == R.id.dictionary_name) {
             val action = DictionaryListFragmentDirections.actionDictionaryToWordList(dictionary.dictionaryId)
             view.findViewById<TextView>(R.id.dictionary_name).findNavController().navigate(action)
-        } else if(view.id == R.id.dictionary_options){
+        } else if (view.id == R.id.dictionary_options) {
             createPopUpMenu(dictionary, view)
         }
     }
@@ -54,7 +54,7 @@ class DictionaryListFragment : Fragment(), DictionaryAdapter.ItemClickListener {
         val popup = PopupMenu(requireActivity(), view)
         popup.inflate(R.menu.dictionary_options_menu)
         popup.setOnMenuItemClickListener {
-            when(it.itemId) {
+            when (it.itemId) {
                 R.id.menu_dictionary_update -> showRenameDialog(dictionary)
                 R.id.menu_dictionary_delete -> showDeleteDialog(dictionary)
             }
@@ -163,7 +163,7 @@ class DictionaryListFragment : Fragment(), DictionaryAdapter.ItemClickListener {
         }
     }
 
-    private fun showRenameDialog(dictionary: Dictionary){
+    private fun showRenameDialog(dictionary: Dictionary) {
         val inflater = requireActivity().layoutInflater
         val dialogView: View = inflater.inflate(R.layout.rename_dictionary_dialog, null)
         val editText: EditText = dialogView.findViewById(R.id.rename_dictionary_edit)
