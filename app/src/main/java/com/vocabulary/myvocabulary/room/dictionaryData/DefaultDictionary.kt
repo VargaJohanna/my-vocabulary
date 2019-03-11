@@ -5,5 +5,5 @@ import java.util.*
 
 class DefaultDictionary {
     fun getDefaultDictionary() =
-            Dictionary("Hungarian Animals", Calendar.getInstance().time)
+            Dictionary(dictionaryName = "Hungarian Animals", dictionaryCreated =  Calendar.getInstance().time)
 }
