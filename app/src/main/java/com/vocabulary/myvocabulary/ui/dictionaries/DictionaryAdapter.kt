@@ -3,9 +3,10 @@ package com.vocabulary.myvocabulary.ui.dictionaries
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.TextView
+import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.vocabulary.myvocabulary.R
+import com.vocabulary.myvocabulary.utils.DictionaryDiffUtilCallBack
 import kotlinx.android.synthetic.main.row_dictionary.view.*
 
 class DictionaryAdapter(private var dictionaryList: List<Dictionary>, private val itemClickListener: ItemClickListener) : RecyclerView.Adapter<DictionaryAdapter.DictionaryViewHolder>() {
@@ -20,28 +21,32 @@ class DictionaryAdapter(private var dictionaryList: List<Dictionary>, private va
 
     override fun onBindViewHolder(holder: DictionaryViewHolder, position: Int) {
         holder.bind(dictionaryList[position])
+
     }
 
-    inner class DictionaryViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView), View.OnClickListener {
+    inner class DictionaryViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         fun bind(dictionary: Dictionary) {
             itemView.dictionary_name.text = dictionary.dictionaryName
         }
 
         init {
-            itemView.setOnClickListener(this)
-        }
-
-        override fun onClick(view: View) {
-            itemClickListener.onItemClick(dictionaryList[adapterPosition], view)
+            itemView.dictionary_name.setOnClickListener {
+                itemClickListener.onItemClick(dictionaryList[adapterPosition])
+            }
+            itemView.dictionary_options.setOnClickListener {
+                itemClickListener.onOptionsClick(dictionaryList[adapterPosition], it)
+            }
         }
     }
 
-    fun updateList(list: List<Dictionary>) {
-        dictionaryList = list
-        notifyDataSetChanged()
+    fun updateList(newList: List<Dictionary>) {
+        val diffResult = DiffUtil.calculateDiff(DictionaryDiffUtilCallBack(dictionaryList, newList))
+        this.dictionaryList = newList
+        diffResult.dispatchUpdatesTo(this)
     }
 
     interface ItemClickListener {
-        fun onItemClick(dictionary: Dictionary, view: View)
+        fun onItemClick(dictionary: Dictionary)
+        fun onOptionsClick(dictionary: Dictionary, view: View)
     }
 }
