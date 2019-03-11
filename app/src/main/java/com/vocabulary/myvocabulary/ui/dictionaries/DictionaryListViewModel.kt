@@ -17,9 +17,7 @@ class DictionaryListViewModel(
 ) : ViewModel() {
 
     private val disposables = CompositeDisposable()
-    private val dictionaryList = dictionaryRepository.allDictionaries
     private val liveDictionaryList: MutableLiveData<List<Dictionary>> = MutableLiveData()
-    private val numberOfDictionaries = dictionaryRepository.numberOfDictionaries
     private val liveNumberOfDictionaries: MutableLiveData<Int> = MutableLiveData()
     private var createdId: Long = 0
 
@@ -41,7 +39,7 @@ class DictionaryListViewModel(
     fun getCreatedId() = createdId
 
     private fun observeList() {
-        disposables += dictionaryList
+        disposables += dictionaryRepository.allDictionaries
                 .subscribeOn(rxSchedulers.io())
                 .observeOn(rxSchedulers.main())
                 .subscribe { liveDictionaryList.postValue(it) }
@@ -52,7 +50,7 @@ class DictionaryListViewModel(
     }
 
     private fun observeNumberOfDictionaries() {
-        disposables += numberOfDictionaries
+        disposables += dictionaryRepository.numberOfDictionaries
                 .subscribeOn(rxSchedulers.io())
                 .observeOn(rxSchedulers.main())
                 .subscribe { liveNumberOfDictionaries.postValue(it) }
@@ -61,7 +59,6 @@ class DictionaryListViewModel(
     fun getNumberOfDictionaries(): LiveData<Int> {
         return liveNumberOfDictionaries
     }
-
 
     override fun onCleared() {
         disposables.clear()
@@ -72,6 +69,8 @@ class DictionaryListViewModel(
         add(disposable)
     }
 
+    fun createDictionary(dictionaryName: String): Dictionary = Dictionary(dictionaryName = dictionaryName,
+            dictionaryCreated = Calendar.getInstance().time)
     fun createDictionaryObject(dictionaryName: String): Dictionary = Dictionary(dictionaryName, Calendar.getInstance().time)
 
     fun renameDictionary(dictionary: Dictionary) {
