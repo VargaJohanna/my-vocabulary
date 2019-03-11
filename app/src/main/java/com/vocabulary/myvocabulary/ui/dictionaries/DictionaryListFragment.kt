@@ -25,9 +25,8 @@ import org.koin.androidx.viewmodel.ext.viewModel
 class DictionaryListFragment : Fragment(), DictionaryAdapter.ItemClickListener {
     private val viewModel: DictionaryListViewModel by viewModel()
     private val defaultDictionary: DefaultDictionary by inject()
-    private lateinit var createDialog: AlertDialog
-    private lateinit var renameDialog: AlertDialog
-    private lateinit var dialogBuilder: AlertDialog.Builder
+    private var createDialog: AlertDialog? = null
+    private var renameDialog: AlertDialog? = null
     private  var dialog: AlertDialog? = null
 
     override fun onItemClick(dictionary: Dictionary, view: View) {
@@ -48,21 +47,19 @@ class DictionaryListFragment : Fragment(), DictionaryAdapter.ItemClickListener {
             setDefaultDatabase()
             observeList(dictionaryAdapter, this.progress_bar)
             setFabOnClickListener(this.dictionary_fab)
-            dialog = dialogBuilder.create()
         }
     }
 
     private fun createPopUpMenu(dictionary: Dictionary, view: View) {
         val popup = PopupMenu(requireActivity(), view)
         popup.inflate(R.menu.dictionary_options_menu)
-        popup.setOnMenuItemClickListener(PopupMenu.OnMenuItemClickListener {
-
+        popup.setOnMenuItemClickListener {
             when(it.itemId) {
                 R.id.menu_dictionary_update -> showRenameDialog(dictionary)
                 R.id.menu_dictionary_delete -> showDeleteDialog(dictionary)
             }
             true
-        })
+        }
         popup.show()
     }
 
@@ -105,7 +102,7 @@ class DictionaryListFragment : Fragment(), DictionaryAdapter.ItemClickListener {
         val errorMessage: TextView = dialogView.findViewById(R.id.dictionary_name_error_rename)
 
         val dialogBuilder = AlertDialog.Builder(requireActivity(), R.style.ThemeOverlay_MaterialComponents_Dialog_Alert)
-        dialog = dialogBuilder.create().apply {
+        createDialog = dialogBuilder.create().apply {
             setView(dialogView)
             errorMessage.show(false)
             setupTextChangedListener(editText, errorMessage)
@@ -156,35 +153,38 @@ class DictionaryListFragment : Fragment(), DictionaryAdapter.ItemClickListener {
     }
 
     private fun showDeleteDialog(dictionary: Dictionary) {
-        dialogBuilder.setTitle(R.string.dialog_delete_dictionary_title)
-        dialogBuilder.setMessage("Are you sure you want to delete \"${dictionary.dictionaryName}\" ?")
-        dialogBuilder.setPositiveButton("Delete") { dialogInterface, i ->
-            viewModel.deleteDictionary(dictionary)
+        AlertDialog.Builder(requireActivity(), R.style.ThemeOverlay_MaterialComponents_Dialog_Alert).apply {
+            setTitle(R.string.dialog_delete_dictionary_title)
+            setMessage("Are you sure you want to delete \"${dictionary.dictionaryName}\" ?")
+            setPositiveButton("Delete") { dialogInterface, i ->
+                viewModel.deleteDictionary(dictionary)
+            }
+            show()
         }
-        dialogBuilder.show()
     }
 
     private fun showRenameDialog(dictionary: Dictionary){
-        renameDialog = dialogBuilder.create()
         val inflater = requireActivity().layoutInflater
         val dialogView: View = inflater.inflate(R.layout.rename_dictionary_dialog, null)
         val editText: EditText = dialogView.findViewById(R.id.rename_dictionary_edit)
         val renameButton: Button = dialogView.findViewById(R.id.rename_dictionary_button)
         val cancelButton: Button = dialogView.findViewById(R.id.cancel_dictionary_rename_dialog)
         val errorMessage: TextView = dialogView.findViewById(R.id.dictionary_name_error_rename)
-
-        renameDialog.setView(dialogView)
-        errorMessage.show(false)
-        setupTextChangedListener(editText, errorMessage)
-        cancelButton.setOnClickListener {
+        val dialogBuilder = AlertDialog.Builder(requireActivity(), R.style.ThemeOverlay_MaterialComponents_Dialog_Alert)
+        renameDialog = dialogBuilder.create().apply {
+            setView(dialogView)
             errorMessage.show(false)
-            renameDialog.dismiss()
+            setupTextChangedListener(editText, errorMessage)
+            cancelButton.setOnClickListener {
+                errorMessage.show(false)
+                dismiss()
+            }
+            setTitle("Renaming \"${dictionary.dictionaryName}\" dictionary")
+            renameButton.setOnClickListener {
+                renameDictionary(editText.text.toString(), this, errorMessage, dictionary)
+            }
+            show()
         }
-        renameDialog.setTitle("Renaming \"${dictionary.dictionaryName}\" dictionary")
-        renameButton.setOnClickListener {
-            renameDictionary(editText.text.toString(), renameDialog, errorMessage, dictionary)
-        }
-        renameDialog.show()
     }
 
     private fun renameDictionary(inputText: String, optionDialog: AlertDialog, errorMessage: TextView, dictionary: Dictionary) {
