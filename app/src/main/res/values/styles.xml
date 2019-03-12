@@ -33,6 +33,7 @@
         <item name="android:textSize">@dimen/text_size_large</item>
         <item name="android:gravity">center</item>
         <item name="android:textColor">@color/primary_text</item>
+        <item name="android:paddingBottom">@dimen/padding_large</item>
     </style>
 
 </resources>

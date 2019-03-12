@@ -19,55 +19,30 @@
         app:layout_constraintTop_toTopOf="parent"
         tools:text="@string/word_list_dictionary_title_hint" />
 
-    <com.google.android.material.card.MaterialCardView
-        android:id="@+id/word_column_card"
-        style="@style/Widget.MaterialComponents.CardView"
+    <TextView
+        android:id="@+id/word_column_title"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="@dimen/margin_medium"
-        android:layout_marginEnd="@dimen/margin_small"
+        android:layout_margin="@dimen/margin_normal"
+        android:gravity="center"
+        android:text="@string/word_list_column_word"
+        android:textSize="@dimen/text_size_medium"
         app:layout_constraintEnd_toStartOf="@+id/guideline"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/word_list_title">
+        app:layout_constraintTop_toBottomOf="@+id/word_list_title"/>
 
-        <TextView
-            android:id="@+id/word_column_title"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_margin="@dimen/margin_normal"
-            android:gravity="center"
-            android:text="@string/word_list_column_word"
-            android:textColor="@color/primary_text"
-            android:textSize="@dimen/text_size_medium" />
-
-    </com.google.android.material.card.MaterialCardView>
-
-    <com.google.android.material.card.MaterialCardView
-        android:id="@+id/translation_column_card"
-        style="@style/Widget.MaterialComponents.CardView"
+    <TextView
+        android:id="@+id/translation_column_title"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="@dimen/margin_small"
-        android:layout_marginTop="@dimen/margin_medium"
-        android:layout_marginEnd="@dimen/margin_normal"
+        android:layout_margin="@dimen/margin_normal"
+        android:gravity="center"
+        android:textSize="@dimen/text_size_medium"
+        android:text="@string/word_list_column_translation"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toStartOf="@+id/guideline"
-        app:layout_constraintTop_toBottomOf="@+id/word_list_title"
-        tools:ignore="PrivateResource">
-
-        <TextView
-            android:id="@+id/translation_column_title"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_margin="@dimen/margin_normal"
-            android:gravity="center"
-            android:textColor="@color/primary_text"
-            android:textSize="@dimen/text_size_medium"
-            android:text="@string/word_list_column_translation" />
-
-    </com.google.android.material.card.MaterialCardView>
+        app:layout_constraintTop_toBottomOf="@+id/word_list_title"/>
 
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/guideline"
@@ -88,7 +63,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/word_column_card" />
+        app:layout_constraintTop_toBottomOf="@+id/translation_column_title" />
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/word_fab"
