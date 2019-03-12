@@ -1,7 +1,7 @@
 package com.vocabulary.myvocabulary.di
 
 import com.vocabulary.myvocabulary.room.AppDatabase
-import com.vocabulary.myvocabulary.room.dictionaryData.DefaultDictionary
+import com.vocabulary.myvocabulary.room.dictionaryData.DefaultDictionaryData
 import com.vocabulary.myvocabulary.room.dictionaryData.DictionaryRepository
 import com.vocabulary.myvocabulary.room.dictionaryData.DictionaryRepositoryImpl
 import com.vocabulary.myvocabulary.room.wordData.DefaultWordList
@@ -32,6 +32,6 @@ val schedulerModule = module {
 }
 
 val defaultDataModule = module {
-    single { DefaultDictionary() }
+    single { DefaultDictionaryData() }
     single { DefaultWordList() }
 }

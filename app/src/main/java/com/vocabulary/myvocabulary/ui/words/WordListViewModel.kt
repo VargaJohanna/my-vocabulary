@@ -8,6 +8,7 @@ import com.vocabulary.myvocabulary.rx.RxSchedulers
 import io.reactivex.Completable
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.Disposable
+import java.util.*
 
 class WordListViewModel(
         val dictionaryId: Long,
@@ -57,4 +58,9 @@ class WordListViewModel(
     operator fun CompositeDisposable.plusAssign(disposable: Disposable) {
         add(disposable)
     }
+
+    fun createWordObject(word: String, translation: String) = Word(containerDictionaryId = dictionaryId,
+            word = word,
+            translation = translation,
+            created = Calendar.getInstance().time)
 }

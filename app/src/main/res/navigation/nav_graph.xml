@@ -15,6 +15,9 @@
             <argument
                 android:name="dictionaryId"
                 app:argType="long" />
+            <argument
+                android:name="dictonaryName"
+                app:argType="string" />
         </action>
     </fragment>
     <fragment
@@ -42,5 +45,8 @@
         <argument
             android:name="dictionaryId"
             app:argType="long" />
+        <argument
+            android:name="dictonaryName"
+            app:argType="string" />
     </fragment>
 </navigation>

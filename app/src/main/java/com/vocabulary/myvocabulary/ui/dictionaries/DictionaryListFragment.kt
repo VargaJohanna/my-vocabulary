@@ -16,7 +16,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.vocabulary.myvocabulary.R
 import com.vocabulary.myvocabulary.ext.show
-import com.vocabulary.myvocabulary.room.dictionaryData.DefaultDictionary
+import com.vocabulary.myvocabulary.room.dictionaryData.DefaultDictionaryData
 import kotlinx.android.synthetic.main.create_dictionary_dialog.view.*
 import kotlinx.android.synthetic.main.fragment_dictionary_list.view.*
 import kotlinx.android.synthetic.main.rename_dictionary_dialog.view.*
@@ -25,13 +25,13 @@ import org.koin.androidx.viewmodel.ext.viewModel
 
 class DictionaryListFragment : Fragment(), DictionaryAdapter.ItemClickListener {
     private val viewModel: DictionaryListViewModel by viewModel()
-    private val defaultDictionary: DefaultDictionary by inject()
+    private val defaultDictionaryData: DefaultDictionaryData by inject()
     private var createDialog: AlertDialog? = null
     private var renameDialog: AlertDialog? = null
     private var popUp: PopupMenu? = null
 
     override fun onItemClick(dictionary: Dictionary) {
-        val action = DictionaryListFragmentDirections.actionDictionaryToWordList(dictionary.dictionaryId)
+        val action = DictionaryListFragmentDirections.actionDictionaryToWordList(dictionary.dictionaryId, dictionary.dictionaryName)
         findNavController().navigate(action)
     }
 
@@ -44,9 +44,9 @@ class DictionaryListFragment : Fragment(), DictionaryAdapter.ItemClickListener {
         setDefaultDatabase()
 
         return inflater.inflate(R.layout.fragment_dictionary_list, container, false).apply {
-            generateDictionaryList(dictionaryAdapter, this.dictionary_recycler_view)
-            observeList(dictionaryAdapter, this.progress_bar)
-            setFabOnClickListener(this.dictionary_fab)
+            generateDictionaryList(dictionaryAdapter, dictionary_recycler_view)
+            observeList(dictionaryAdapter, progress_bar)
+            setFabOnClickListener(dictionary_fab)
         }
     }
 
@@ -83,7 +83,7 @@ class DictionaryListFragment : Fragment(), DictionaryAdapter.ItemClickListener {
     private fun setDefaultDatabase() {
         viewModel.getNumberOfDictionaries().observe(this, Observer {
             if (it == 0) {
-                viewModel.insertDictionary(defaultDictionary.getDefaultDictionary())
+                viewModel.insertDefaultDictionary(defaultDictionaryData.getDefaultDictionary())
             }
         })
     }
@@ -114,7 +114,6 @@ class DictionaryListFragment : Fragment(), DictionaryAdapter.ItemClickListener {
                 errorMessage.show(false)
                 dismiss()
             }
-            setCanceledOnTouchOutside(false)
             setTitle(R.string.create_new_dictionary_dialog_title)
             show()
         }
@@ -137,12 +136,16 @@ class DictionaryListFragment : Fragment(), DictionaryAdapter.ItemClickListener {
     }
 
     private fun createDictionary(inputText: String, optionDialog: AlertDialog, errorMessage: TextView) {
-        if (!inputText.isEmpty()) {
+        if (inputText.isNotEmpty()) {
             errorMessage.show(false)
             viewModel.insertDictionary(viewModel.createDictionaryObject(inputText))
-            val action = DictionaryListFragmentDirections.actionDictionaryToWordList(viewModel.getCreatedId())
-            this.findNavController().navigate(action)
-            optionDialog.dismiss()
+            viewModel.newlyCreatedItemDetails.observe(requireActivity(), Observer { event ->
+                event.getContentIfNotHandled()?.let {
+                    val action = DictionaryListFragmentDirections.actionDictionaryToWordList(it.dictionaryId, it.dictionaryName)
+                    findNavController().navigate(action)
+                    optionDialog.dismiss()
+                }
+            })
         } else {
             errorMessage.show(true)
         }
