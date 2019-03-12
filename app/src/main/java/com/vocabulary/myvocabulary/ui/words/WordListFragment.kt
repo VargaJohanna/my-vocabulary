@@ -30,9 +30,10 @@ class WordListFragment : Fragment(), WordAdapter.WordItemClickListener {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val wordAdapter = WordAdapter(emptyList(), this)
         return inflater.inflate(R.layout.fragment_word_list, container, false).apply {
-            generateWordList(wordAdapter, this.word_recycler_view)
+            generateWordList(wordAdapter, word_recycler_view)
             setDefaultWordDatabase()
-            observeWordList(wordAdapter, this.word_list_progress_bar)
+            observeWordList(wordAdapter, word_list_progress_bar)
+            word_list_title.text = WordListFragmentArgs.fromBundle(arguments!!).dictonaryName
         }
     }
 

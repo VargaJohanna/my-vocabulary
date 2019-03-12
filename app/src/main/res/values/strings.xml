@@ -18,4 +18,7 @@
     <string name="dictionary_menu_delete">Delete</string>
     <string name="dialog_delete_dictionary_title">Deleting dictionary</string>
     <string name="dialog_rename_dictionary_dialog_title">Rename dictionary</string>
+    <string name="word_list_dictionary_title_hint">Dictionary title</string>
+    <string name="word_list_column_word">Word</string>
+    <string name="word_list_column_translation">Translation</string>
 </resources>
