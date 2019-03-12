@@ -63,4 +63,18 @@ class WordListViewModel(
             word = word,
             translation = translation,
             created = Calendar.getInstance().time)
+
+    fun updateWord(word: Word) {
+        disposables += Completable.fromCallable {
+            wordRepository.updateWord(word)
+        }.subscribeOn(rxSchedulers.io())
+                .subscribe()
+    }
+
+    fun deleteWord(word: Word) {
+        disposables += Completable.fromCallable {
+            wordRepository.deleteWord(word)
+        }.subscribeOn(rxSchedulers.io())
+                .subscribe()
+    }
 }
