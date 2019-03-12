@@ -20,8 +20,8 @@ class DictionaryListViewModel(
     private val disposables = CompositeDisposable()
     private val liveDictionaryList: MutableLiveData<List<Dictionary>> = MutableLiveData()
     private val liveNumberOfDictionaries: MutableLiveData<Int> = MutableLiveData()
-    private val _newlyCreatedItemDetails = MutableLiveData<Event<Map<String, String>>>()
-    val newlyCreatedItemDetails: LiveData<Event<Map<String, String>>> = _newlyCreatedItemDetails
+    private val _newlyCreatedItemDetails = MutableLiveData<Event<DictionaryDetails>>()
+    val newlyCreatedItemDetails: LiveData<Event<DictionaryDetails>> = _newlyCreatedItemDetails
 
     init {
         observeList()
@@ -33,7 +33,7 @@ class DictionaryListViewModel(
                 .subscribeOn(rxSchedulers.io())
                 .observeOn(rxSchedulers.main())
                 .subscribe { t: Long ->
-                    _newlyCreatedItemDetails.value = Event(mapOf(ID_KEY to t.toString(), ID_NAME to dictionary.dictionaryName))
+                    _newlyCreatedItemDetails.value = Event(DictionaryDetails(t, dictionary.dictionaryName))
                 }
     }
 
@@ -90,10 +90,5 @@ class DictionaryListViewModel(
             dictionaryRepository.deleteDictionary(dictionary)
         }.subscribeOn(rxSchedulers.io())
                 .subscribe()
-    }
-
-    companion object {
-        const val ID_KEY = "key"
-        const val ID_NAME = "name"
     }
 }

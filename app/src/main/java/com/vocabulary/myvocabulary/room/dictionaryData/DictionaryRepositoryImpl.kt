@@ -4,6 +4,7 @@ import com.vocabulary.myvocabulary.rx.RxSchedulers
 import com.vocabulary.myvocabulary.ui.dictionaries.Dictionary
 import com.vocabulary.myvocabulary.ui.dictionaries.toDictionaryEntry
 import io.reactivex.Observable
+import io.reactivex.Single
 import io.reactivex.subjects.BehaviorSubject
 
 class DictionaryRepositoryImpl(
@@ -31,11 +32,12 @@ class DictionaryRepositoryImpl(
 
     override fun updateDictionary(dictionary: Dictionary) = dictionaryDao.updateDictionary(dictionary.toDictionaryEntry())
 
-    override fun getDictionaryById(dictionaryId: Long): Observable<Dictionary> {
+    override fun getDictionaryById(dictionaryId: Long): Single<Dictionary> {
         return allDictionaries.map {
             it.first {
                 it.dictionaryId == dictionaryId
             }
         }
+                .firstOrError()
     }
 }
