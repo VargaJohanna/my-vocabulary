@@ -9,14 +9,13 @@
         android:id="@+id/materialCardView2"
         style="@style/Widget.MaterialComponents.CardView"
         android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/margin_normal"
+        android:layout_height="0dp"
         android:layout_marginStart="@dimen/margin_small"
-        android:layout_marginBottom="@dimen/margin_normal"
-        android:layout_marginEnd="@dimen/margin_small"
+        android:layout_marginEnd="2dp"
+        app:layout_constraintBottom_toBottomOf="@+id/materialCardView"
         app:layout_constraintEnd_toStartOf="@+id/guideline"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        app:layout_constraintTop_toTopOf="@+id/materialCardView">
 
         <TextView
             android:id="@+id/word"
@@ -24,8 +23,9 @@
             android:layout_height="wrap_content"
             android:layout_margin="@dimen/margin_normal"
             android:gravity="start"
-            tools:text="cat"
-            android:textSize="@dimen/text_size_medium" />
+            android:layout_gravity="center_vertical"
+            android:textSize="@dimen/text_size_medium"
+            tools:text="cat" />
 
     </com.google.android.material.card.MaterialCardView>
 
@@ -35,12 +35,14 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/margin_normal"
-        android:layout_marginStart="@dimen/margin_small"
+        android:layout_marginStart="2dp"
         android:layout_marginBottom="@dimen/margin_normal"
         android:layout_marginEnd="@dimen/margin_small"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="@+id/guideline"
         app:layout_constraintTop_toTopOf="parent"
+        android:orientation="horizontal"
+        app:contentPadding="@dimen/padding_small"
         tools:ignore="PrivateResource">
 
         <TextView
@@ -51,6 +53,18 @@
             android:gravity="center"
             tools:text="cica"
             android:textSize="@dimen/text_size_medium" />
+
+        <TextView
+            android:id="@+id/word_options"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_margin="@dimen/margin_normal"
+            android:gravity="center_vertical"
+            android:layout_gravity="end"
+            android:paddingStart="@dimen/padding_normal"
+            android:paddingEnd="@dimen/padding_normal"
+            android:text="@string/row_dictionary_options_dots"
+            android:textAppearance="?android:textAppearanceLarge" />
 
     </com.google.android.material.card.MaterialCardView>
 

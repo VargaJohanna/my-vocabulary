@@ -7,10 +7,7 @@ import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
-import android.widget.EditText
-import android.widget.ProgressBar
-import android.widget.TextView
+import android.widget.*
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -21,6 +18,7 @@ import com.vocabulary.myvocabulary.ext.show
 import com.vocabulary.myvocabulary.room.wordData.DefaultWordList
 import kotlinx.android.synthetic.main.create_word_dialog.view.*
 import kotlinx.android.synthetic.main.fragment_word_list.view.*
+import kotlinx.android.synthetic.main.rename_word_dialog.view.*
 import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.viewModel
 import org.koin.core.parameter.parametersOf
@@ -31,9 +29,15 @@ class WordListFragment : Fragment(), WordAdapter.WordItemClickListener {
         parametersOf(WordListFragmentArgs.fromBundle(arguments!!).dictionaryId)
     }
     private var createDialog: AlertDialog? = null
+    private var renameDialog: AlertDialog? = null
+    private var popUp: PopupMenu? = null
 
     override fun onItemClick(word: Word) {
         //
+    }
+
+    override fun onOptionsClick(word: Word, view: View) {
+        createPopUpMenu(word, view)
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -93,6 +97,7 @@ class WordListFragment : Fragment(), WordAdapter.WordItemClickListener {
         val dialogBuilder = AlertDialog.Builder(requireActivity(), R.style.ThemeOverlay_MaterialComponents_Dialog_Alert)
         createDialog = dialogBuilder.create().apply {
             setView(dialogView)
+            editTextWord.requestFocus()
             errorMessageWord.show(false)
             errorMessageTranslation.show(false)
             setupTextChangedListener(editTextWord, errorMessageWord)
@@ -112,6 +117,7 @@ class WordListFragment : Fragment(), WordAdapter.WordItemClickListener {
                         errorMessageTranslation,
                         false,
                         this)
+                editTextWord.requestFocus()
 
             }
 
@@ -154,6 +160,7 @@ class WordListFragment : Fragment(), WordAdapter.WordItemClickListener {
             wordViewModel.insertWord(wordViewModel.createWordObject(inputWord, inputTranslation))
             editTextWord.setText("")
             editTextTranslation.setText("")
+            editTextWord.requestFocus()
             if (toClose) {
                 alertDialog.dismiss()
             }
@@ -171,7 +178,96 @@ class WordListFragment : Fragment(), WordAdapter.WordItemClickListener {
 
     override fun onStop() {
         createDialog?.dismiss()
+        renameDialog?.dismiss()
+        popUp?.dismiss()
         super.onStop()
+    }
+
+    private fun createPopUpMenu(word: Word, view: View) {
+        popUp = PopupMenu(requireActivity(), view).apply {
+            inflate(R.menu.word_options_menu)
+            setOnMenuItemClickListener {
+                when (it.itemId) {
+                    R.id.menu_word_edit -> showEditDialog(word)
+                    R.id.menu_word_delete -> showDeleteWordDialog(word)
+                }
+                true
+            }
+            show()
+        }
+    }
+
+    private fun showDeleteWordDialog(word: Word) {
+        AlertDialog.Builder(requireActivity(), R.style.ThemeOverlay_MaterialComponents_Dialog_Alert).apply {
+            setTitle(R.string.dialog_delete_word_title)
+            setMessage("Are you sure you want to delete\n\"${word.word} - ${word.translation}\" ?")
+            setPositiveButton("Delete") { _, _ ->
+                wordViewModel.deleteWord(word)
+            }
+            show()
+        }
+    }
+
+    private fun showEditDialog(word: Word) {
+        val inflater = requireActivity().layoutInflater
+        val dialogView: View = inflater.inflate(R.layout.rename_word_dialog, null)
+        val editTextWord: EditText = dialogView.rename_word_edit
+        val editTextTranslation: EditText = dialogView.rename_translation_edit
+        val saveButton: Button = dialogView.rename_and_close_button
+        val cancelButton: TextView = dialogView.cancel_word_rename_button
+        val errorMessageWord: TextView = dialogView.word_rename_error
+        val errorMessageTranslation: TextView = dialogView.rename_translation_error
+
+        val dialogBuilder = AlertDialog.Builder(requireActivity(), R.style.ThemeOverlay_MaterialComponents_Dialog_Alert)
+        renameDialog = dialogBuilder.create().apply {
+            setView(dialogView)
+            editTextWord.requestFocus()
+            errorMessageWord.show(false)
+            errorMessageTranslation.show(false)
+            setupTextChangedListener(editTextWord, errorMessageWord)
+            setupTextChangedListener(editTextTranslation, errorMessageTranslation)
+            editTextWord.setText(word.word)
+            editTextTranslation.setText(word.translation)
+            saveButton.setOnClickListener {
+                updateWord(word,
+                        editTextWord,
+                        editTextTranslation,
+                        errorMessageWord,
+                        errorMessageTranslation,
+                        this)
+            }
+            cancelButton.setOnClickListener {
+                dismiss()
+            }
+            setTitle(R.string.edit_word_dialog_title)
+            show()
+        }
+    }
+
+    private fun updateWord(word: Word,
+                           editTextWord: EditText,
+                           editTextTranslation: EditText,
+                           errorMessageWord: TextView,
+                           errorMessageTranslation: TextView,
+                           alertDialog: AlertDialog) {
+        val inputWord = editTextWord.text.toString().trim()
+        val inputTranslation = editTextTranslation.text.toString().trim()
+
+        if (inputWord.isNotEmpty() && inputTranslation.isNotEmpty()) {
+            errorMessageWord.show(false)
+            errorMessageTranslation.show(false)
+            wordViewModel.updateWord(word.copy(word = inputWord, translation = inputTranslation))
+            alertDialog.dismiss()
+        } else if (inputWord.isEmpty() && inputTranslation.isEmpty()) {
+            errorMessageWord.show(true)
+            errorMessageTranslation.show(true)
+        } else if (inputWord.isEmpty()) {
+            errorMessageWord.show(true)
+            errorMessageTranslation.show(false)
+        } else if (inputTranslation.isEmpty()) {
+            errorMessageWord.show(false)
+            errorMessageTranslation.show(true)
+        }
     }
 
 }

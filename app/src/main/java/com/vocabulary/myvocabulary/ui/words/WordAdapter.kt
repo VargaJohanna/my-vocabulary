@@ -3,6 +3,7 @@ package com.vocabulary.myvocabulary.ui.words
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.constraintlayout.widget.Group
 import androidx.recyclerview.widget.RecyclerView
 import com.vocabulary.myvocabulary.R
 import kotlinx.android.synthetic.main.row_word.view.*
@@ -19,20 +20,24 @@ class WordAdapter(private var wordList: List<Word>, private val itemClickListene
         holder.bind(wordList[position])
     }
 
-    inner class WordViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView), View.OnClickListener {
+    inner class WordViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView){
         init {
-            itemView.setOnClickListener(this)
+            itemView.word.setOnClickListener{
+                itemClickListener.onItemClick(wordList[adapterPosition])
+            }
+            itemView.translation.setOnClickListener{
+                itemClickListener.onItemClick(wordList[adapterPosition])
+            }
+
+            itemView.word_options.setOnClickListener {
+                itemClickListener.onOptionsClick(wordList[adapterPosition], it)
+            }
         }
 
         fun bind(word: Word) {
             itemView.word.text = word.word
             itemView.translation.text = word.translation
         }
-
-        override fun onClick(p0: View?) {
-            itemClickListener.onItemClick(wordList[adapterPosition])
-        }
-
     }
 
     fun updateList(list: List<Word>) {
@@ -42,5 +47,6 @@ class WordAdapter(private var wordList: List<Word>, private val itemClickListene
 
     interface WordItemClickListener {
         fun onItemClick(word: Word)
+        fun onOptionsClick(word: Word, view: View)
     }
 }

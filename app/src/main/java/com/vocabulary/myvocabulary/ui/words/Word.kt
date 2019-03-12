@@ -14,4 +14,10 @@ data class Word(
         val created: Date
 )
 
-fun Word.toWordEntry() = WordEntry(wordId, containerDictionaryId, word, translation, beenAsked, failed, passed, created)
+fun Word.toWordEntry(): WordEntry {
+    return if (wordId == 0L) {
+        WordEntry(containerDictionaryId, word, translation, beenAsked, failed, passed, created)
+    } else {
+        WordEntry(wordId, containerDictionaryId, word, translation, beenAsked, failed, passed, created)
+    }
+}
