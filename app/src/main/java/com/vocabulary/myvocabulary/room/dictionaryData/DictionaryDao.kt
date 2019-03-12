@@ -18,9 +18,6 @@ interface DictionaryDao {
     @Query("SELECT * FROM dictionaries")
     fun getAllDictionaries(): Observable<List<DictionaryEntry>>
 
-    @Query("SELECT * FROM dictionaries WHERE dictionary_id = :dictionaryId")
-    fun getDictionaryById(dictionaryId: Long): Single<DictionaryEntry>
-
     @Query("SELECT count(*) FROM dictionaries")
     fun getNumberOfDictionaries(): Observable<Int>
 }
