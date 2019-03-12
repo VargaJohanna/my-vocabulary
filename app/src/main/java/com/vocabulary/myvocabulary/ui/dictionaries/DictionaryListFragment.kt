@@ -44,9 +44,9 @@ class DictionaryListFragment : Fragment(), DictionaryAdapter.ItemClickListener {
         setDefaultDatabase()
 
         return inflater.inflate(R.layout.fragment_dictionary_list, container, false).apply {
-            generateDictionaryList(dictionaryAdapter, this.dictionary_recycler_view)
-            observeList(dictionaryAdapter, this.progress_bar)
-            setFabOnClickListener(this.dictionary_fab)
+            generateDictionaryList(dictionaryAdapter, dictionary_recycler_view)
+            observeList(dictionaryAdapter, progress_bar)
+            setFabOnClickListener(dictionary_fab)
         }
     }
 
@@ -83,7 +83,7 @@ class DictionaryListFragment : Fragment(), DictionaryAdapter.ItemClickListener {
     private fun setDefaultDatabase() {
         viewModel.getNumberOfDictionaries().observe(this, Observer {
             if (it == 0) {
-                viewModel.insertDictionary(defaultDictionaryData.getDefaultDictionary())
+                viewModel.insertDefaultDictionary(defaultDictionaryData.getDefaultDictionary())
             }
         })
     }
@@ -136,12 +136,16 @@ class DictionaryListFragment : Fragment(), DictionaryAdapter.ItemClickListener {
     }
 
     private fun createDictionary(inputText: String, optionDialog: AlertDialog, errorMessage: TextView) {
-        if (!inputText.isEmpty()) {
+        if (inputText.isNotEmpty()) {
             errorMessage.show(false)
             viewModel.insertDictionary(viewModel.createDictionaryObject(inputText))
-            val action = DictionaryListFragmentDirections.actionDictionaryToWordList(viewModel.getCreatedId(), inputText)
-            this.findNavController().navigate(action)
-            optionDialog.dismiss()
+            viewModel.newlyCreatedItemDetails.observe(requireActivity(), Observer { event ->
+                event.getContentIfNotHandled()?.let {
+                    val action = DictionaryListFragmentDirections.actionDictionaryToWordList(it.getValue(DictionaryListViewModel.ID_KEY).toLong(), it.getValue(DictionaryListViewModel.ID_NAME))
+                    findNavController().navigate(action)
+                    optionDialog.dismiss()
+                }
+            })
         } else {
             errorMessage.show(true)
         }

@@ -5,6 +5,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.vocabulary.myvocabulary.room.dictionaryData.DictionaryRepository
 import com.vocabulary.myvocabulary.rx.RxSchedulers
+import com.vocabulary.myvocabulary.utils.Event
 import io.reactivex.Completable
 import io.reactivex.Single
 import io.reactivex.disposables.CompositeDisposable
@@ -19,7 +20,8 @@ class DictionaryListViewModel(
     private val disposables = CompositeDisposable()
     private val liveDictionaryList: MutableLiveData<List<Dictionary>> = MutableLiveData()
     private val liveNumberOfDictionaries: MutableLiveData<Int> = MutableLiveData()
-    private var createdId: Long = 0
+    private val _newlyCreatedItemDetails = MutableLiveData<Event<Map<String, String>>>()
+    val newlyCreatedItemDetails: LiveData<Event<Map<String, String>>> = _newlyCreatedItemDetails
 
     init {
         observeList()
@@ -27,16 +29,20 @@ class DictionaryListViewModel(
     }
 
     fun insertDictionary(dictionary: Dictionary) {
-        disposables += Single.fromCallable {
-            dictionaryRepository.createDictionary(dictionary)
-        }
-                .map { createdId = it }
+        disposables += Single.fromCallable { dictionaryRepository.createDictionary(dictionary) }
+                .subscribeOn(rxSchedulers.io())
+                .observeOn(rxSchedulers.main())
+                .subscribe { t: Long ->
+                    _newlyCreatedItemDetails.value = Event(mapOf(ID_KEY to t.toString(), ID_NAME to dictionary.dictionaryName))
+                }
+    }
+
+    fun insertDefaultDictionary(dictionary: Dictionary) {
+        disposables += Single.fromCallable { dictionaryRepository.createDictionary(dictionary) }
                 .subscribeOn(rxSchedulers.io())
                 .observeOn(rxSchedulers.main())
                 .subscribe()
     }
-
-    fun getCreatedId() = createdId
 
     private fun observeList() {
         disposables += dictionaryRepository.allDictionaries
@@ -84,5 +90,10 @@ class DictionaryListViewModel(
             dictionaryRepository.deleteDictionary(dictionary)
         }.subscribeOn(rxSchedulers.io())
                 .subscribe()
+    }
+
+    companion object {
+        const val ID_KEY = "key"
+        const val ID_NAME = "name"
     }
 }

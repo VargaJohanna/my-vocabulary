@@ -8,11 +8,15 @@
     <string name="add_a_title">Add a title</string>
     <string name="create_dictionary_hint">Enter a title</string>
     <string name="rename_dictionary_hint">Enter a new title</string>
+    <string name="create_word_hint">new word</string>
+    <string name="create_translation_hint">new translation</string>
     <string name="create_new_dictionary_dialog_title">Create New Dictionary</string>
     <string name="create_button_label">Create</string>
     <string name="dialog_rename_button_label">Rename</string>
     <string name="cancel_button_label">Cancel</string>
     <string name="please_enter_a_title">Please enter a title</string>
+    <string name="please_enter_a_word">Please enter a word</string>
+    <string name="please_enter_a_translation">Please enter a translation</string>
     <string name="row_dictionary_options_dots">⋮</string>
     <string name="dictionary_menu_rename">Rename</string>
     <string name="dictionary_menu_delete">Delete</string>
@@ -21,4 +25,8 @@
     <string name="word_list_dictionary_title_hint">Dictionary title</string>
     <string name="word_list_column_word">Word</string>
     <string name="word_list_column_translation">Translation</string>
+    <string name="create_new_word_dialog_title">Create</string>
+    <string name="save_button_label">Save</string>
+    <string name="add_more_button_label">Add more</string>
+
 </resources>
