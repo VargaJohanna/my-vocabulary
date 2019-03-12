@@ -11,5 +11,5 @@ interface DictionaryRepository {
     fun createDictionary(dictionary: Dictionary): Long
     fun deleteDictionary(dictionary: Dictionary)
     fun updateDictionary(dictionary: Dictionary)
-    fun getDictionaryById(dictionaryId: Long): Observable<Dictionary>
+    fun getDictionaryById(dictionaryId: Long): Single<Dictionary>
 }
