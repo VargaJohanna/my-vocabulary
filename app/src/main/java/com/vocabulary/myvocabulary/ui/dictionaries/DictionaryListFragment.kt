@@ -40,7 +40,7 @@ class DictionaryListFragment : Fragment(), DictionaryAdapter.ItemClickListener {
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        val dictionaryAdapter = DictionaryAdapter(ArrayList(), this)
+        val dictionaryAdapter = DictionaryAdapter(ArrayList(), this, true)
         setDefaultDatabase()
 
         return inflater.inflate(R.layout.fragment_dictionary_list, container, false).apply {

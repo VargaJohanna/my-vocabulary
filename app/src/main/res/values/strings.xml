@@ -33,5 +33,6 @@
     <string name="quiz_list_quick_one">Quick One</string>
     <string name="quiz_list_ask_me_everything">Ask Me Everything</string>
     <string name="quiz_list_weaknesses">Weaknesses</string>
+    <string name="quiz_dictionary_picker_title">Pick a dictionary</string>
 
 </resources>
