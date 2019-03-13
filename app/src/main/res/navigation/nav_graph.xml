@@ -57,5 +57,14 @@
         android:id="@+id/dictionaryPickerFragment"
         android:name="com.vocabulary.myvocabulary.ui.quizzes.DictionaryPickerFragment"
         android:label="DictionaryPickerFragment"
-        tools:layout="@layout/fragment_choose_dictionary"/>
+        tools:layout="@layout/fragment_choose_dictionary">
+        <action
+            android:id="@+id/action_dictionaryPickerFragment_to_quizFragment"
+            app:destination="@id/quizFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/quizFragment"
+        android:name="com.vocabulary.myvocabulary.ui.quizzes.QuizFragment"
+        android:label="QuizFragment"
+        tools:layout="@layout/fragment_quiz"/>
 </navigation>
