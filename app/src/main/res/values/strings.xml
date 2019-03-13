@@ -1,7 +1,5 @@
 <resources>
     <string name="app_name">My Vocabulary</string>
-
-    <!-- TODO: Remove or change this placeholder text -->
     <string name="example_dictionary_name">Hungarian - English</string>
     <string name="dictionaries_button">DICTIONARIES</string>
     <string name="quizzes_button">QUIZZES</string>
@@ -18,15 +16,22 @@
     <string name="please_enter_a_word">Please enter a word</string>
     <string name="please_enter_a_translation">Please enter a translation</string>
     <string name="row_dictionary_options_dots">⋮</string>
+    <string name="word_menu_edit_label">Edit</string>
+    <string name="dialog_delete_word_title">Deleting word</string>
     <string name="dictionary_menu_rename">Rename</string>
     <string name="dictionary_menu_delete">Delete</string>
     <string name="dialog_delete_dictionary_title">Deleting dictionary</string>
     <string name="dialog_rename_dictionary_dialog_title">Rename dictionary</string>
     <string name="word_list_dictionary_title_hint">Dictionary title</string>
-    <string name="word_list_column_word">Word</string>
-    <string name="word_list_column_translation">Translation</string>
+    <string name="word_list_column_word">Expression</string>
+    <string name="word_list_column_translation">Meaning</string>
     <string name="create_new_word_dialog_title">Create</string>
+    <string name="edit_word_dialog_title">Edit</string>
     <string name="save_button_label">Save</string>
     <string name="add_more_button_label">Add more</string>
+    <string name="quiz_list_choose_a_quiz_type">Choose a quiz type</string>
+    <string name="quiz_list_quick_one">Quick One</string>
+    <string name="quiz_list_ask_me_everything">Ask Me Everything</string>
+    <string name="quiz_list_weaknesses">Weaknesses</string>
 
 </resources>

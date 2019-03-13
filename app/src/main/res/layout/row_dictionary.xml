@@ -24,7 +24,7 @@
             android:layout_marginBottom="@dimen/margin_normal"
             android:gravity="center"
             android:text="@string/example_dictionary_name"
-            android:textSize="@dimen/text_size_medium"
+            android:textSize="@dimen/text_size_bigger"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@+id/guideline"
             app:layout_constraintStart_toStartOf="parent"
