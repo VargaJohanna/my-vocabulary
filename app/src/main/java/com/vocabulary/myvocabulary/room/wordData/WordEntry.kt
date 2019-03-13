@@ -20,7 +20,8 @@ data class WordEntry(
         @ColumnInfo(name = "been_asked") val beenAsked: Int,
         val failed: Int,
         val passed: Int,
-        @ColumnInfo(name = "created") @TypeConverters(DateTypeConverter::class) val created: Date) {
+        @ColumnInfo(name = "created") @TypeConverters(DateTypeConverter::class) val created: Date,
+        @ColumnInfo(name = "last_result") val lastResult: Boolean) {
     @Ignore
     constructor(containerDictionaryId: Long,
                 word: String,
@@ -28,8 +29,9 @@ data class WordEntry(
                 beenAsked: Int,
                 failed: Int,
                 passed: Int,
-                created: Date) :
-            this(0, containerDictionaryId, word, translation, beenAsked, failed, passed, created)
+                created: Date,
+                lastResult: Boolean) :
+            this(0, containerDictionaryId, word, translation, beenAsked, failed, passed, created, lastResult)
 }
 
-fun WordEntry.toWord() = Word(wordId, containerDictionaryId, word, translation, beenAsked, failed, passed, created)
+fun WordEntry.toWord() = Word(wordId, containerDictionaryId, word, translation, beenAsked, failed, passed, created, lastResult)
