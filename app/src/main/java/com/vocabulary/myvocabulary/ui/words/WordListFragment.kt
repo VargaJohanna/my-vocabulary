@@ -16,9 +16,9 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.vocabulary.myvocabulary.R
 import com.vocabulary.myvocabulary.ext.show
 import com.vocabulary.myvocabulary.room.wordData.DefaultWordList
-import kotlinx.android.synthetic.main.create_word_dialog.view.*
+import kotlinx.android.synthetic.main.dialog_create_word.view.*
 import kotlinx.android.synthetic.main.fragment_word_list.view.*
-import kotlinx.android.synthetic.main.rename_word_dialog.view.*
+import kotlinx.android.synthetic.main.dialog_rename_word.view.*
 import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.viewModel
 import org.koin.core.parameter.parametersOf
@@ -85,7 +85,7 @@ class WordListFragment : Fragment(), WordAdapter.WordItemClickListener {
 
     private fun openCreateDialog() {
         val inflater = requireActivity().layoutInflater
-        val dialogView: View = inflater.inflate(R.layout.create_word_dialog, null)
+        val dialogView: View = inflater.inflate(R.layout.dialog_create_word, null)
         val editTextWord: EditText = dialogView.new_word_edit
         val editTextTranslation: EditText = dialogView.new_translation_edit
         val saveButton: Button = dialogView.create_and_close_button
@@ -210,7 +210,7 @@ class WordListFragment : Fragment(), WordAdapter.WordItemClickListener {
 
     private fun showEditDialog(word: Word) {
         val inflater = requireActivity().layoutInflater
-        val dialogView: View = inflater.inflate(R.layout.rename_word_dialog, null)
+        val dialogView: View = inflater.inflate(R.layout.dialog_rename_word, null)
         val editTextWord: EditText = dialogView.rename_word_edit
         val editTextTranslation: EditText = dialogView.rename_translation_edit
         val saveButton: Button = dialogView.rename_and_close_button
