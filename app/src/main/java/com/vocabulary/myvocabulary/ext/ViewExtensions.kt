@@ -9,3 +9,11 @@ fun View.show(visible: Boolean) {
         View.INVISIBLE
     }
 }
+
+fun View.displayed(displayed: Boolean) {
+    visibility = if (displayed) {
+        View.VISIBLE
+    } else {
+        View.GONE
+    }
+}
