@@ -60,11 +60,19 @@
         tools:layout="@layout/fragment_choose_dictionary">
         <action
             android:id="@+id/action_dictionaryPickerFragment_to_quizFragment"
-            app:destination="@id/quizFragment" />
+            app:destination="@id/quizFragment">
+            <argument
+                android:name="dictionaryIdForQuiz"
+                app:argType="long" />
+        </action>
     </fragment>
     <fragment
         android:id="@+id/quizFragment"
         android:name="com.vocabulary.myvocabulary.ui.quizzes.QuizFragment"
         android:label="QuizFragment"
-        tools:layout="@layout/fragment_quiz"/>
+        tools:layout="@layout/fragment_quiz">
+        <argument
+            android:name="dictionaryIdForQuiz"
+            app:argType="long" />
+    </fragment>
 </navigation>
