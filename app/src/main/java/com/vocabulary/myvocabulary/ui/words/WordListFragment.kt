@@ -33,7 +33,7 @@ class WordListFragment : Fragment(), WordAdapter.WordItemClickListener {
     private var popUp: PopupMenu? = null
 
     override fun onItemClick(word: Word) {
-        //
+        //Open word detail fragment
     }
 
     override fun onOptionsClick(word: Word, view: View) {
