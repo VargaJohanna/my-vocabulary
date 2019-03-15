@@ -10,7 +10,7 @@ fun View.show(visible: Boolean) {
     }
 }
 
-fun View.displayed(displayed: Boolean) {
+fun View.display(displayed: Boolean) {
     visibility = if (displayed) {
         View.VISIBLE
     } else {

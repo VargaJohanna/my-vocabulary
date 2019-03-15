@@ -6,15 +6,15 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.vocabulary.myvocabulary.R
-import com.vocabulary.myvocabulary.ext.displayed
-import com.vocabulary.myvocabulary.ext.show
+import com.vocabulary.myvocabulary.ext.display
 import com.vocabulary.myvocabulary.utils.DictionaryDiffUtilCallBack
 import kotlinx.android.synthetic.main.row_dictionary.view.*
 
-class DictionaryAdapter(private var dictionaryList: List<Dictionary>,
-                        private val itemClickListener: ItemClickListener,
-                        private val allowItemEditing: Boolean) : RecyclerView.Adapter<DictionaryAdapter.DictionaryViewHolder>() {
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): DictionaryViewHolder {
+class DictionaryAdapter(
+        private var dictionaryList: List<Dictionary>,
+        private val itemClickListener: ItemClickListener,
+        private val allowItemEditing: Boolean) : RecyclerView.Adapter<DictionaryAdapter.DictionaryViewHolder>()
+{ override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): DictionaryViewHolder {
         val inflater = LayoutInflater.from(parent.context)
         return DictionaryViewHolder(inflater.inflate(R.layout.row_dictionary, parent, false))
     }
@@ -31,7 +31,7 @@ class DictionaryAdapter(private var dictionaryList: List<Dictionary>,
     inner class DictionaryViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         fun bind(dictionary: Dictionary) {
             itemView.dictionary_name.text = dictionary.dictionaryName
-            itemView.dictionary_options.displayed(allowItemEditing)
+            itemView.dictionary_options.display(allowItemEditing)
         }
 
         init {
