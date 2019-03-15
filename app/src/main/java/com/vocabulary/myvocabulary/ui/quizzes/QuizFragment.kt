@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import android.widget.ProgressBar
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.floatingactionbutton.FloatingActionButton
@@ -26,15 +27,30 @@ class QuizFragment : Fragment() {
         return inflater.inflate(R.layout.fragment_quiz, container, false).apply {
             generateWordList(quizAdapter, quiz_recycler_view)
             observeWordList(quizAdapter, quiz_progress_bar)
-            viewModel.updatePositionOfLastQuestion(viewModel.positionOfLastQuestion)
+            if(savedInstanceState == null) {
+                viewModel.initiatePositionOfLastQuestion()
+            }
             setNextFabOnClickListener(quiz_next_fab)
+            setCancelFabOnClickListener(quiz_cancel_fab)
 
+        }
+    }
+
+    private fun setCancelFabOnClickListener(fab: FloatingActionButton) {
+        fab.setOnClickListener {
+            // Navigate back to quiz list
         }
     }
 
     private fun setNextFabOnClickListener(fab: FloatingActionButton) {
         fab.setOnClickListener {
-            viewModel.updatePositionOfLastQuestion(viewModel.positionOfLastQuestion++)
+            viewModel.getLiveWordList().observe(requireActivity(), Observer { list ->
+                if (viewModel.positionOfLastQuestion + 1 < list.size) {
+                    viewModel.updatePositionOfLastQuestion(viewModel.positionOfLastQuestion + 1)
+                } else {
+                    // Navigate to results
+                }
+            })
         }
     }
 

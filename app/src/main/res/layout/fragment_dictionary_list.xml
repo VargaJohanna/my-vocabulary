@@ -17,6 +17,7 @@
         app:fabSize="normal"
         android:layout_margin="@dimen/margin_medium"
         android:src="@drawable/ic_plus_symbol"
+        android:tint="@color/icons"
         android:layout_gravity="end|bottom" />
 
     <ProgressBar

@@ -22,7 +22,7 @@ class QuizAskMeaningAdapter(private var wordList: List<Word>) : RecyclerView.Ada
         holder.bind(wordList[position])
     }
 
-    inner class QuizViewHolder(itemView: View) :RecyclerView.ViewHolder(itemView){
+    inner class QuizViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView){
         fun bind(word: Word) {
             itemView.question.text = word.word
         }
