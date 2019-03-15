@@ -51,7 +51,7 @@
                                             <option name="values">
                                               <map>
                                                 <entry key="color" value="000000" />
-                                                <entry key="scalingPercent" value="64" />
+                                                <entry key="scalingPercent" value="68" />
                                               </map>
                                             </option>
                                           </PersistentState>
@@ -64,7 +64,7 @@
                                       <entry key="backgroundAssetType" value="COLOR" />
                                       <entry key="backgroundColor" value="ffffff" />
                                       <entry key="backgroundLayerName" value="ic_launcher_background" />
-                                      <entry key="foregroundImage" value="C:\Users\varga\Pictures\Dictionary Logo\dark_purple.png" />
+                                      <entry key="foregroundImage" value="C:\Users\varga\Pictures\Dictionary Logo\dictionary_purple-200.png" />
                                       <entry key="foregroundLayerName" value="ic_launcher_foreground" />
                                       <entry key="outputName" value="ic_launcher_rounder" />
                                       <entry key="previewDensity" value="HIGH" />
@@ -156,8 +156,8 @@
                           <map>
                             <entry key="assetSourceType" value="FILE" />
                             <entry key="autoMirrored" value="true" />
-                            <entry key="outputName" value="ic_plus_symbol" />
-                            <entry key="sourceFile" value="C:\Users\varga\Downloads\plus_symbol.svg" />
+                            <entry key="outputName" value="ic_remove_icon" />
+                            <entry key="sourceFile" value="C:\Users\varga\Downloads\Remove_font_awesome.svg" />
                           </map>
                         </option>
                       </PersistentState>

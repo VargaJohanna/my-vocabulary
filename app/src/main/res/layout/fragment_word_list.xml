@@ -75,6 +75,7 @@
         android:layout_marginBottom="@dimen/margin_medium"
         android:src="@drawable/ic_plus_symbol"
         app:fabSize="normal"
+        android:tint="@color/icons"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
