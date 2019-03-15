@@ -17,9 +17,9 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.vocabulary.myvocabulary.R
 import com.vocabulary.myvocabulary.ext.show
 import com.vocabulary.myvocabulary.room.dictionaryData.DefaultDictionaryData
-import kotlinx.android.synthetic.main.create_dictionary_dialog.view.*
+import kotlinx.android.synthetic.main.dialog_create_dictionary.view.*
 import kotlinx.android.synthetic.main.fragment_dictionary_list.view.*
-import kotlinx.android.synthetic.main.rename_dictionary_dialog.view.*
+import kotlinx.android.synthetic.main.dialog_rename_dictionary.view.*
 import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.viewModel
 
@@ -40,7 +40,7 @@ class DictionaryListFragment : Fragment(), DictionaryAdapter.ItemClickListener {
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        val dictionaryAdapter = DictionaryAdapter(ArrayList(), this)
+        val dictionaryAdapter = DictionaryAdapter(ArrayList(), this, true)
         setDefaultDatabase()
 
         return inflater.inflate(R.layout.fragment_dictionary_list, container, false).apply {
@@ -96,7 +96,7 @@ class DictionaryListFragment : Fragment(), DictionaryAdapter.ItemClickListener {
 
     private fun openCreateDialog() {
         val inflater = requireActivity().layoutInflater
-        val dialogView: View = inflater.inflate(R.layout.create_dictionary_dialog, null)
+        val dialogView: View = inflater.inflate(R.layout.dialog_create_dictionary, null)
         val editText: EditText = dialogView.new_dictionary_edit
         val createButton: Button = dialogView.create_dictionary_button
         val cancelButton: Button = dialogView.cancel_dictionary_creation
@@ -171,7 +171,7 @@ class DictionaryListFragment : Fragment(), DictionaryAdapter.ItemClickListener {
 
     private fun showRenameDialog(dictionary: Dictionary) {
         val inflater = requireActivity().layoutInflater
-        val dialogView: View = inflater.inflate(R.layout.rename_dictionary_dialog, null)
+        val dialogView: View = inflater.inflate(R.layout.dialog_rename_dictionary, null)
         val editText: EditText = dialogView.rename_dictionary_edit
         val renameButton: Button = dialogView.rename_dictionary_button
         val cancelButton: Button = dialogView.cancel_dictionary_rename_dialog

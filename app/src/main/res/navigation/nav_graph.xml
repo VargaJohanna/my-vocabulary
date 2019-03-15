@@ -24,7 +24,11 @@
         android:id="@+id/quizListFragment"
         android:name="com.vocabulary.myvocabulary.ui.quizzes.QuizListFragment"
         android:label="fragment_quiz_list"
-        tools:layout="@layout/fragment_quiz_list" />
+        tools:layout="@layout/fragment_quiz_list" >
+        <action
+            android:id="@+id/to_dictionaryPickerFragment"
+            app:destination="@id/dictionaryPickerFragment" />
+    </fragment>
     <fragment
         android:id="@+id/homeFragment"
         android:name="com.vocabulary.myvocabulary.ui.home.HomeFragment"
@@ -48,5 +52,36 @@
         <argument
             android:name="dictonaryName"
             app:argType="string" />
+    </fragment>
+    <fragment
+        android:id="@+id/dictionaryPickerFragment"
+        android:name="com.vocabulary.myvocabulary.ui.quizzes.DictionaryPickerFragment"
+        android:label="DictionaryPickerFragment"
+        tools:layout="@layout/fragment_choose_dictionary">
+        <action
+            android:id="@+id/action_dictionaryPickerFragment_to_quizFragment"
+            app:destination="@id/quizFragment">
+            <argument
+                android:name="dictionaryIdForQuiz"
+                app:argType="long" />
+            <argument
+                android:name="quizOption"
+                app:argType="string" />
+        </action>
+    </fragment>
+    <fragment
+        android:id="@+id/quizFragment"
+        android:name="com.vocabulary.myvocabulary.ui.quizzes.QuizFragment"
+        android:label="QuizFragment"
+        tools:layout="@layout/fragment_quiz">
+        <argument
+            android:name="dictionaryIdForQuiz"
+            app:argType="long" />
+        <argument
+            android:name="quizOption"
+            app:argType="string" />
+        <action
+            android:id="@+id/from_quiz_to_quizList"
+            app:destination="@id/quizListFragment" />
     </fragment>
 </navigation>

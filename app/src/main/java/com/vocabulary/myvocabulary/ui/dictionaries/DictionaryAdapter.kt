@@ -6,11 +6,15 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.vocabulary.myvocabulary.R
+import com.vocabulary.myvocabulary.ext.display
 import com.vocabulary.myvocabulary.utils.DictionaryDiffUtilCallBack
 import kotlinx.android.synthetic.main.row_dictionary.view.*
 
-class DictionaryAdapter(private var dictionaryList: List<Dictionary>, private val itemClickListener: ItemClickListener) : RecyclerView.Adapter<DictionaryAdapter.DictionaryViewHolder>() {
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): DictionaryViewHolder {
+class DictionaryAdapter(
+        private var dictionaryList: List<Dictionary>,
+        private val itemClickListener: ItemClickListener,
+        private val allowItemEditing: Boolean) : RecyclerView.Adapter<DictionaryAdapter.DictionaryViewHolder>()
+{ override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): DictionaryViewHolder {
         val inflater = LayoutInflater.from(parent.context)
         return DictionaryViewHolder(inflater.inflate(R.layout.row_dictionary, parent, false))
     }
@@ -27,12 +31,14 @@ class DictionaryAdapter(private var dictionaryList: List<Dictionary>, private va
     inner class DictionaryViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         fun bind(dictionary: Dictionary) {
             itemView.dictionary_name.text = dictionary.dictionaryName
+            itemView.dictionary_options.display(allowItemEditing)
         }
 
         init {
             itemView.dictionary_name.setOnClickListener {
                 itemClickListener.onItemClick(dictionaryList[adapterPosition])
             }
+
             itemView.dictionary_options.setOnClickListener {
                 itemClickListener.onOptionsClick(dictionaryList[adapterPosition], it)
             }

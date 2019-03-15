@@ -4,38 +4,61 @@
     android:id="@+id/home_fragment_container"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:layout_gravity="center"
-    android:layout_margin="8dp">
+    android:layout_gravity="center">
 
     <Button
         android:id="@+id/dictionary_button"
+        style="@style/Widget.MaterialComponents.Button"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="8dp"
+        android:layout_marginStart="@dimen/margin_normal"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="@dimen/margin_normal"
+        android:layout_marginBottom="@dimen/margin_normal"
         android:backgroundTint="@color/colorPrimary"
         android:gravity="center"
-        android:padding="@dimen/padding_normal"
+        android:padding="@dimen/padding_extreme_large"
         android:text="@string/dictionaries_button"
-        android:textSize="@dimen/text_size_bigger"
+        android:textColor="@color/primary_light"
+        android:textSize="@dimen/text_size_large"
         app:layout_constraintBottom_toTopOf="@+id/quiz_button"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="@+id/guideline2" />
 
     <Button
         android:id="@+id/quiz_button"
+        style="@style/Widget.MaterialComponents.Button"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/margin_normal"
+        android:layout_marginTop="@dimen/margin_normal"
+        android:layout_marginEnd="@dimen/margin_normal"
         android:layout_marginBottom="8dp"
         android:backgroundTint="@color/colorPrimary"
-        android:padding="@dimen/padding_normal"
+        android:padding="@dimen/padding_extreme_large"
         android:text="@string/quizzes_button"
-        android:textSize="@dimen/text_size_bigger"
-        app:layout_constraintBottom_toBottomOf="parent"
+        android:textColor="@color/primary_light"
+        android:textSize="@dimen/text_size_large"
+        app:layout_constraintBottom_toTopOf="@+id/guideline3"
         app:layout_constraintEnd_toEndOf="@+id/dictionary_button"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="@+id/dictionary_button"
         app:layout_constraintTop_toBottomOf="@+id/dictionary_button" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.04" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.62" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
