@@ -35,6 +35,11 @@ class QuizViewModel(
 
     fun updatePositionOfLastQuestion(position: Int) {
         livePositionOfLastQuestion.postValue(position)
+        positionOfLastQuestion = position
+    }
+
+    fun initiatePositionOfLastQuestion() {
+        livePositionOfLastQuestion.postValue(0)
     }
 
     fun getLivePositionOfLastQuestion(): LiveData<Int> = livePositionOfLastQuestion
@@ -48,5 +53,6 @@ class QuizViewModel(
     operator fun CompositeDisposable.plusAssign(disposable: Disposable) {
         add(disposable)
     }
+
 
 }

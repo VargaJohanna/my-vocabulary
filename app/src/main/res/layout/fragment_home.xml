@@ -36,10 +36,10 @@
         android:layout_marginTop="@dimen/margin_normal"
         android:layout_marginEnd="@dimen/margin_normal"
         android:layout_marginBottom="8dp"
-        android:backgroundTint="@color/primary_light"
+        android:backgroundTint="@color/colorPrimary"
         android:padding="@dimen/padding_extreme_large"
         android:text="@string/quizzes_button"
-        android:textColor="@color/colorPrimary"
+        android:textColor="@color/primary_light"
         android:textSize="@dimen/text_size_large"
         app:layout_constraintBottom_toTopOf="@+id/guideline3"
         app:layout_constraintEnd_toEndOf="@+id/dictionary_button"
@@ -52,13 +52,13 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        app:layout_constraintGuide_percent="0.1" />
+        app:layout_constraintGuide_percent="0.04" />
 
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/guideline3"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        app:layout_constraintGuide_percent="0.7" />
+        app:layout_constraintGuide_percent="0.62" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

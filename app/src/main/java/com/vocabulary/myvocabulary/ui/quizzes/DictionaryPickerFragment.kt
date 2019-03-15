@@ -72,7 +72,6 @@ class DictionaryPickerFragment: Fragment(), DictionaryAdapter.ItemClickListener 
                 errorMessage.show(false)
                 val clickedButton = radioGroup.findViewById<RadioButton>(checkedId)
                 selectedOption = clickedButton.text.toString()
-                Toast.makeText(requireActivity(), clickedButton.text, Toast.LENGTH_SHORT).show()
             }
             doItButton.setOnClickListener {
                 if(selectedOption.isNotEmpty()) {
@@ -91,7 +90,7 @@ class DictionaryPickerFragment: Fragment(), DictionaryAdapter.ItemClickListener 
     }
 
     private fun startQuiz(selectedOption: String, dictionaryId: Long) {
-        val action = DictionaryPickerFragmentDirections.actionDictionaryPickerFragmentToQuizFragment(dictionaryId)
+        val action = DictionaryPickerFragmentDirections.actionDictionaryPickerFragmentToQuizFragment(dictionaryId, selectedOption)
         findNavController().navigate(action)
     }
 
