@@ -5,9 +5,9 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ProgressBar
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
-import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.floatingactionbutton.FloatingActionButton
@@ -27,22 +27,30 @@ class QuizFragment : Fragment() {
         return inflater.inflate(R.layout.fragment_quiz, container, false).apply {
             generateWordList(quizAdapter, quiz_recycler_view)
             observeWordList(quizAdapter, quiz_progress_bar)
+            setNextButtonIconUpdateListener(quiz_next_fab)
             setNextFabOnClickListener(quiz_next_fab)
-            setCancelFabOnClickListener(quiz_cancel_fab)
-
-        }
-    }
-
-    private fun setCancelFabOnClickListener(fab: FloatingActionButton) {
-        fab.setOnClickListener {
-            // Navigate back to quiz list
         }
     }
 
     private fun setNextFabOnClickListener(fab: FloatingActionButton) {
         fab.setOnClickListener {
-            viewModel.nextClicked()
+            if(viewModel.getListIsFinished().not()) {
+                viewModel.nextClicked()
+            } else {
+                // Open result
+                Toast.makeText(requireActivity(), "Open Results", Toast.LENGTH_SHORT).show()
+            }
         }
+    }
+
+    private fun setNextButtonIconUpdateListener(fab: FloatingActionButton) {
+        viewModel.getUpdateIcon().observe(requireActivity(), Observer {
+            if(it) {
+                fab.setImageDrawable(resources.getDrawable(R.drawable.ic_tick_icon, requireActivity().theme))
+            } else {
+                fab.setImageDrawable(resources.getDrawable(R.drawable.ic_arrow_right, requireActivity().theme))
+            }
+        })
     }
 
     private fun observeWordList(quizAdapter: QuizAskMeaningAdapter, progressBar: ProgressBar) {

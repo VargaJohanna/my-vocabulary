@@ -16,8 +16,10 @@ class QuizViewModel(
 ) : ViewModel() {
     private val disposables = CompositeDisposable()
     private val liveWordList: MutableLiveData<List<Word>> = MutableLiveData()
-    private var positionOfLastQuestion: Int = 1
+    private val updateIcon: MutableLiveData<Boolean> = MutableLiveData()
+    private var positionOfNextQuestion: Int = 1
     private lateinit var wordList: List<Word>
+    private var listIsFinished = false
 
     init {
         observeList()
@@ -43,9 +45,18 @@ class QuizViewModel(
     }
 
     fun nextClicked() {
-        if(positionOfLastQuestion + 1 < wordList.size) {
-            positionOfLastQuestion += 1
-            liveWordList.postValue(wordList.subList(0, positionOfLastQuestion))
+        if(positionOfNextQuestion < wordList.size) {
+            positionOfNextQuestion += 1
+            liveWordList.postValue(wordList.subList(0, positionOfNextQuestion))
+            if(positionOfNextQuestion == wordList.size) {
+                updateIcon.postValue(true)
+                listIsFinished = true
+            } else {
+                updateIcon.postValue(false)
+                listIsFinished = false
+            }
         }
     }
+    fun getListIsFinished() = listIsFinished
+    fun getUpdateIcon() :LiveData<Boolean> = updateIcon
 }
