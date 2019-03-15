@@ -16,9 +16,8 @@ class QuizViewModel(
 ) : ViewModel() {
     private val disposables = CompositeDisposable()
     private val liveWordList: MutableLiveData<List<Word>> = MutableLiveData()
-    private val livePositionOfLastQuestion: MutableLiveData<Int> = MutableLiveData()
-    var positionOfLastQuestion: Int = 0
-
+    private var positionOfLastQuestion: Int = 1
+    private lateinit var wordList: List<Word>
 
     init {
         observeList()
@@ -28,22 +27,11 @@ class QuizViewModel(
         disposables += wordRepository.getObservableWordList(dictionaryId)
                 .subscribeOn(rxSchedulers.io())
                 .observeOn(rxSchedulers.main())
-                .subscribe { liveWordList.postValue(it) }
+                .subscribe { wordList = it
+                liveWordList.postValue(it.subList(0, 1))}
     }
 
     fun getLiveWordList(): LiveData<List<Word>> = liveWordList
-
-    fun updatePositionOfLastQuestion(position: Int) {
-        livePositionOfLastQuestion.postValue(position)
-        positionOfLastQuestion = position
-    }
-
-    fun initiatePositionOfLastQuestion() {
-        livePositionOfLastQuestion.postValue(0)
-    }
-
-    fun getLivePositionOfLastQuestion(): LiveData<Int> = livePositionOfLastQuestion
-
 
     override fun onCleared() {
         disposables.clear()
@@ -54,5 +42,10 @@ class QuizViewModel(
         add(disposable)
     }
 
-
+    fun nextClicked() {
+        if(positionOfLastQuestion + 1 < wordList.size) {
+            positionOfLastQuestion += 1
+            liveWordList.postValue(wordList.subList(0, positionOfLastQuestion))
+        }
+    }
 }

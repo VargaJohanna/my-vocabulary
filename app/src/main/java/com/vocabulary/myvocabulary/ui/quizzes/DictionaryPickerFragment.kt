@@ -37,7 +37,6 @@ class DictionaryPickerFragment: Fragment(), DictionaryAdapter.ItemClickListener 
         return inflater.inflate(R.layout.fragment_choose_dictionary, container, false).apply {
             generateDictionaryList(dictionaryAdapter, quiz_dictionary_picker_recycler_view)
             observeList(dictionaryAdapter, progress_bar_dictionary_picker)
-
         }
     }
 
@@ -46,7 +45,6 @@ class DictionaryPickerFragment: Fragment(), DictionaryAdapter.ItemClickListener 
         viewModel.getDictionaryList().observe(this, Observer {
             dictionaryAdapter.updateList(it)
             progressBar.show(false)
-
         })
     }
 

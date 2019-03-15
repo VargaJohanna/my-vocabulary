@@ -27,9 +27,6 @@ class QuizFragment : Fragment() {
         return inflater.inflate(R.layout.fragment_quiz, container, false).apply {
             generateWordList(quizAdapter, quiz_recycler_view)
             observeWordList(quizAdapter, quiz_progress_bar)
-            if(savedInstanceState == null) {
-                viewModel.initiatePositionOfLastQuestion()
-            }
             setNextFabOnClickListener(quiz_next_fab)
             setCancelFabOnClickListener(quiz_cancel_fab)
 
@@ -44,22 +41,14 @@ class QuizFragment : Fragment() {
 
     private fun setNextFabOnClickListener(fab: FloatingActionButton) {
         fab.setOnClickListener {
-            viewModel.getLiveWordList().observe(requireActivity(), Observer { list ->
-                if (viewModel.positionOfLastQuestion + 1 < list.size) {
-                    viewModel.updatePositionOfLastQuestion(viewModel.positionOfLastQuestion + 1)
-                } else {
-                    // Navigate to results
-                }
-            })
+            viewModel.nextClicked()
         }
     }
 
     private fun observeWordList(quizAdapter: QuizAskMeaningAdapter, progressBar: ProgressBar) {
         progressBar.show(true)
         viewModel.getLiveWordList().observe(requireActivity(), Observer { list ->
-            viewModel.getLivePositionOfLastQuestion().observe(requireActivity(), Observer {
-                quizAdapter.updateList(list.subList(0, it + 1))
-            })
+            quizAdapter.updateList(list)
             progressBar.show(false)
         })
     }
