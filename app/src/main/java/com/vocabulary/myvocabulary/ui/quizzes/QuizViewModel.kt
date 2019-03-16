@@ -3,6 +3,7 @@ package com.vocabulary.myvocabulary.ui.quizzes
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import com.vocabulary.myvocabulary.R
 import com.vocabulary.myvocabulary.room.wordData.WordRepository
 import com.vocabulary.myvocabulary.rx.RxSchedulers
 import com.vocabulary.myvocabulary.ui.words.Word
@@ -11,6 +12,7 @@ import io.reactivex.disposables.Disposable
 
 class QuizViewModel(
         val dictionaryId: Long,
+        val optionType: String,
         private val wordRepository: WordRepository,
         private val rxSchedulers: RxSchedulers
 ) : ViewModel() {
@@ -30,7 +32,11 @@ class QuizViewModel(
                 .subscribeOn(rxSchedulers.io())
                 .observeOn(rxSchedulers.main())
                 .subscribe { wordList = it
-                liveWordList.postValue(it.subList(0, 1))}
+                liveWordList.postValue(it.subList(0, 1))
+                    if(wordList.size == 1) {
+                        updateIcon.postValue(true)
+                        listIsFinished = true
+                    }}
     }
 
     fun getLiveWordList(): LiveData<List<Word>> = liveWordList
@@ -59,4 +65,10 @@ class QuizViewModel(
     }
     fun getListIsFinished() = listIsFinished
     fun getUpdateIcon() :LiveData<Boolean> = updateIcon
+    fun isMeaning():Boolean = optionType.capitalize().equals(MEANING)
+
+    companion object {
+        const val MEANING = "Meaning"
+    }
+
 }

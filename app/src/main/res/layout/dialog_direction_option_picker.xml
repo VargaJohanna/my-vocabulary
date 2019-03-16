@@ -45,7 +45,7 @@
             android:textSize="@dimen/text_size_normal"
             android:padding="@dimen/padding_normal"
             android:layout_marginStart="@dimen/margin_medium"
-            android:text="@string/word_list_column_translation" />
+            android:text="@string/word_list_meaning" />
 
         <RadioButton
             android:id="@+id/expression_radio"
@@ -54,7 +54,7 @@
             android:padding="@dimen/padding_normal"
             android:layout_marginStart="@dimen/margin_medium"
             android:textSize="@dimen/text_size_normal"
-            android:text="@string/word_list_column_word" />
+            android:text="@string/word_list_expression" />
     </RadioGroup>
 
     <TextView

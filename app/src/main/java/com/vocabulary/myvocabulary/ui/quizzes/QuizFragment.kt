@@ -13,20 +13,24 @@ import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.vocabulary.myvocabulary.R
 import com.vocabulary.myvocabulary.ext.show
+import com.vocabulary.myvocabulary.utils.ItemDecorator
 import kotlinx.android.synthetic.main.fragment_quiz.view.*
 import org.koin.androidx.viewmodel.ext.viewModel
 import org.koin.core.parameter.parametersOf
 
 class QuizFragment : Fragment() {
     private val viewModel: QuizViewModel by viewModel {
-        parametersOf(QuizFragmentArgs.fromBundle(arguments!!).dictionaryIdForQuiz)
+        parametersOf(
+                QuizFragmentArgs.fromBundle(arguments!!).dictionaryIdForQuiz,
+                QuizFragmentArgs.fromBundle(arguments!!).quizOption
+        )
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        val quizAdapter = QuizAskMeaningAdapter(emptyList())
+        val quizWithMeaningAdapter = QuizAdapter(emptyList(), viewModel.isMeaning())
         return inflater.inflate(R.layout.fragment_quiz, container, false).apply {
-            generateWordList(quizAdapter, quiz_recycler_view)
-            observeWordList(quizAdapter, quiz_progress_bar)
+            generateWordList(quizWithMeaningAdapter, quiz_recycler_view)
+            observeWordList(quizWithMeaningAdapter, quiz_progress_bar)
             setNextButtonIconUpdateListener(quiz_next_fab)
             setNextFabOnClickListener(quiz_next_fab)
         }
@@ -53,7 +57,7 @@ class QuizFragment : Fragment() {
         })
     }
 
-    private fun observeWordList(quizAdapter: QuizAskMeaningAdapter, progressBar: ProgressBar) {
+    private fun observeWordList(quizAdapter: QuizAdapter, progressBar: ProgressBar) {
         progressBar.show(true)
         viewModel.getLiveWordList().observe(requireActivity(), Observer { list ->
             quizAdapter.updateList(list)
@@ -61,9 +65,10 @@ class QuizFragment : Fragment() {
         })
     }
 
-    private fun generateWordList(quizAdapter: QuizAskMeaningAdapter, recyclerView: RecyclerView) {
+    private fun generateWordList(quizAdapter: QuizAdapter, recyclerView: RecyclerView) {
         recyclerView.apply {
             layoutManager = LinearLayoutManager(requireContext(), RecyclerView.VERTICAL, false)
+            addItemDecoration(ItemDecorator(-120))
             adapter = quizAdapter
         }
     }
