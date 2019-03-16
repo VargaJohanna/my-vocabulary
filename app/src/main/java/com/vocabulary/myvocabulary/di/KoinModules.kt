@@ -26,7 +26,7 @@ val repositoryModule = module {
 val viewModelModule = module {
     viewModel { DictionaryListViewModel(get(), get()) }
     viewModel { (dictionaryId: Long) -> WordListViewModel(dictionaryId, get(), get()) }
-    viewModel { (dictionaryId: Long) -> QuizViewModel(dictionaryId, get(), get()) }
+    viewModel { (dictionaryId: Long, optionType: String) -> QuizViewModel(dictionaryId, optionType, get(), get()) }
 }
 
 val schedulerModule = module {
