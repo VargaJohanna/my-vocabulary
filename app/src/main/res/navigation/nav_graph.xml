@@ -81,7 +81,16 @@
             android:name="quizOption"
             app:argType="string" />
         <action
-            android:id="@+id/from_quiz_to_quizList"
+            android:id="@+id/action_quizFragment_to_resultFragment"
+            app:destination="@id/resultFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/resultFragment"
+        android:name="com.vocabulary.myvocabulary.ui.quizzes.ResultFragment"
+        android:label="ResultFragment"
+        tools:layout="@layout/fragment_result">
+        <action
+            android:id="@+id/action_resultFragment_to_quizListFragment"
             app:destination="@id/quizListFragment" />
     </fragment>
 </navigation>
