@@ -5,16 +5,16 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ProgressBar
-import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.vocabulary.myvocabulary.R
-import com.vocabulary.myvocabulary.di.schedulerModule
 import com.vocabulary.myvocabulary.ext.show
 import com.vocabulary.myvocabulary.rx.RxSchedulers
+import com.vocabulary.myvocabulary.ui.results.ResultViewModel
 import com.vocabulary.myvocabulary.utils.ItemDecorator
 import io.reactivex.Observable
 import io.reactivex.disposables.CompositeDisposable
@@ -38,7 +38,7 @@ class QuizFragment : Fragment() {
     private val disposables = CompositeDisposable()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        val quizAdapter = QuizAdapter(emptyList<QuizViewModel.FocusableWord>().toMutableList(), quizViewModel.isMeaning())
+        val quizAdapter = QuizAdapter(emptyList<QuizViewModel.FocusableWord>().toMutableList(), quizViewModel.directionType)
         return inflater.inflate(R.layout.fragment_quiz, container, false).apply {
             generateWordList(quizAdapter, quiz_recycler_view)
             observeWordList(quizAdapter, quiz_progress_bar)
@@ -53,8 +53,8 @@ class QuizFragment : Fragment() {
             if(quizViewModel.getListIsFinished().not()) {
                 quizViewModel.nextClicked()
             } else {
-                // Open result
-                Toast.makeText(requireActivity(), "Open Results", Toast.LENGTH_SHORT).show()
+                val action =QuizFragmentDirections.toResultFragment(quizViewModel.dictionaryId, quizViewModel.optionType)
+                findNavController().navigate(action)
             }
         }
     }

@@ -13,7 +13,7 @@ import io.reactivex.disposables.Disposable
 
 class QuizViewModel(
         val dictionaryId: Long,
-        val optionType: String,
+        val optionType: Int,
         private val wordRepository: WordRepository,
         private val rxSchedulers: RxSchedulers
 ) : ViewModel() {
@@ -23,6 +23,7 @@ class QuizViewModel(
     private val updateIcon: MutableLiveData<Boolean> = MutableLiveData()
     private var toIndexOfSubList: Int = 1
     private var listIsFinished = false
+    val directionType = optionType.toDirectionType()
 
     init {
         observeList()
@@ -75,11 +76,6 @@ class QuizViewModel(
 
     fun getListIsFinished() = listIsFinished
     fun getUpdateIcon(): LiveData<Boolean> = updateIcon
-    fun isMeaning(): Boolean = optionType.capitalize().equals(MEANING)
-
-    companion object {
-        const val MEANING = "Meaning"
-    }
 
     private fun setFocusableValue(position: Int) {
         focusableWordList.subList(0, toIndexOfSubList).forEachIndexed { index, focusableWord ->
@@ -98,6 +94,7 @@ class QuizViewModel(
 
     data class GuessedWord(
             val wordId: Long,
-            val guess: String
+            val guess: String,
+            val wordValue: String
     )
 }
