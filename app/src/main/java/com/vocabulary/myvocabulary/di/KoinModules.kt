@@ -11,7 +11,7 @@ import com.vocabulary.myvocabulary.rx.RxSchedulers
 import com.vocabulary.myvocabulary.rx.SchedulersImpl
 import com.vocabulary.myvocabulary.ui.dictionaries.DictionaryListViewModel
 import com.vocabulary.myvocabulary.ui.quizzes.QuizViewModel
-import com.vocabulary.myvocabulary.ui.quizzes.ResultViewModel
+import com.vocabulary.myvocabulary.ui.results.ResultViewModel
 import com.vocabulary.myvocabulary.ui.words.WordListViewModel
 import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.dsl.module
@@ -27,8 +27,8 @@ val repositoryModule = module {
 val viewModelModule = module {
     viewModel { DictionaryListViewModel(get(), get()) }
     viewModel { (dictionaryId: Long) -> WordListViewModel(dictionaryId, get(), get()) }
-    viewModel { (dictionaryId: Long, optionType: String) -> QuizViewModel(dictionaryId, optionType, get(), get()) }
-    viewModel { ResultViewModel(get()) }
+    viewModel { (dictionaryId: Long, optionType: Int) -> QuizViewModel(dictionaryId, optionType, get(), get()) }
+    viewModel { (directionType: Int, dictionaryId: Long) -> ResultViewModel(directionType, dictionaryId, get(), get()) }
 }
 
 val schedulerModule = module {

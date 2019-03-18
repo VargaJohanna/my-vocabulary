@@ -15,7 +15,7 @@ import kotlinx.android.synthetic.main.row_quiz.view.*
 
 class QuizAdapter(
         private var wordList: MutableList<QuizViewModel.FocusableWord>,
-        private var askMeaning: Boolean
+        private var askDirection: QuizDirectionType
 ) : RecyclerView.Adapter<QuizAdapter.QuizViewHolder>() {
     private val _guessedWord = BehaviorSubject.create<QuizViewModel.GuessedWord>()
     val guessedWord: Observable<QuizViewModel.GuessedWord> = _guessedWord
@@ -45,7 +45,7 @@ class QuizAdapter(
                 wordList[position] = wordList[position].copy(isFocused = false)
                 itemView.solution.addTextChangedListener(object :TextWatcher{
                     override fun afterTextChanged(p0: Editable) {
-                        setGuessedWord(QuizViewModel.GuessedWord(wordObject.word.wordId, p0.toString()))
+                        setGuessedWord(QuizViewModel.GuessedWord(wordObject.word.wordId, p0.toString(), wordObject.word.word))
                     }
 
                     override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
@@ -56,7 +56,7 @@ class QuizAdapter(
                 })
             }
             itemView.elevation = (position * 2).toFloat()
-            if (askMeaning) {
+            if (askDirection == QuizDirectionType.AskMeaning) {
                 itemView.question.text = wordObject.word.word
             } else {
                 itemView.question.text = wordObject.word.translation
