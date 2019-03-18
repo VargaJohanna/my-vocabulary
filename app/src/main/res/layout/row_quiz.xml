@@ -56,6 +56,7 @@
             android:gravity="start"
             android:hint="@string/quiz_hint_enter_solution"
             android:textSize="@dimen/text_size_medium"
+            android:enabled="false"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@id/guideline"

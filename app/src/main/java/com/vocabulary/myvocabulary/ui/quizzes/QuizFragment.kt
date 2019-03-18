@@ -27,7 +27,7 @@ class QuizFragment : Fragment() {
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        val quizWithMeaningAdapter = QuizAdapter(emptyList(), viewModel.isMeaning())
+        val quizWithMeaningAdapter = QuizAdapter(emptyList<QuizViewModel.FocusableWord>().toMutableList(), viewModel.isMeaning())
         return inflater.inflate(R.layout.fragment_quiz, container, false).apply {
             generateWordList(quizWithMeaningAdapter, quiz_recycler_view)
             observeWordList(quizWithMeaningAdapter, quiz_progress_bar)
@@ -59,8 +59,8 @@ class QuizFragment : Fragment() {
 
     private fun observeWordList(quizAdapter: QuizAdapter, progressBar: ProgressBar) {
         progressBar.show(true)
-        viewModel.getLiveWordList().observe(requireActivity(), Observer { list ->
-            quizAdapter.updateList(list)
+        viewModel.getLiveWordList().observe(requireActivity(), Observer {
+            quizAdapter.updateList(it)
             progressBar.show(false)
         })
     }

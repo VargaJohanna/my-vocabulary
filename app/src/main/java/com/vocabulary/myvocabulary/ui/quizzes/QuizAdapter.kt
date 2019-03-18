@@ -6,13 +6,11 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.vocabulary.myvocabulary.ext.convertDpToPx
-import com.vocabulary.myvocabulary.ui.words.Word
-import com.vocabulary.myvocabulary.utils.WordDiffUtilCallBack
 import kotlinx.android.synthetic.main.row_quiz.view.*
 
 
 class QuizAdapter(
-        private var wordList: List<Word>,
+        private var wordList: MutableList<QuizViewModel.FocusableWord>,
         private var askMeaning: Boolean
 ) : RecyclerView.Adapter<QuizAdapter.QuizViewHolder>() {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): QuizViewHolder {
@@ -27,22 +25,30 @@ class QuizAdapter(
     }
 
     inner class QuizViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        fun bind(word: Word, position: Int) {
+        fun bind(wordObject: QuizViewModel.FocusableWord, position: Int) {
             if (position == 0) {
                 setMarginParameters(itemView)
             }
+            if (position == wordList.size - 1) {
+                itemView.solution.isEnabled = true
+                itemView.solution.requestFocus()
+                wordList[position] = wordList[position].copy(isFocused = false)
+            } else {
+                itemView.solution.isEnabled = false
+                wordList[position] = wordList[position].copy(isFocused = false)
+            }
             itemView.elevation = (position * 2).toFloat()
             if (askMeaning) {
-                itemView.question.text = word.word
+                itemView.question.text = wordObject.word.word
             } else {
-                itemView.question.text = word.translation
+                itemView.question.text = wordObject.word.translation
             }
         }
     }
 
-    fun updateList(newList: List<Word>) {
-        val diffResult = DiffUtil.calculateDiff(WordDiffUtilCallBack(wordList, newList))
-        this.wordList = newList
+    fun updateList(newList: List<QuizViewModel.FocusableWord>) {
+        val diffResult = DiffUtil.calculateDiff(QuizDiffUtilCallBack(wordList, newList))
+        this.wordList = newList.toMutableList()
         diffResult.dispatchUpdatesTo(this)
     }
 
