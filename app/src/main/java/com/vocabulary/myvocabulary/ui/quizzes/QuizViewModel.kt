@@ -3,7 +3,6 @@ package com.vocabulary.myvocabulary.ui.quizzes
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.vocabulary.myvocabulary.R
 import com.vocabulary.myvocabulary.room.wordData.WordRepository
 import com.vocabulary.myvocabulary.rx.RxSchedulers
 import com.vocabulary.myvocabulary.ui.words.Word
@@ -17,10 +16,10 @@ class QuizViewModel(
         private val rxSchedulers: RxSchedulers
 ) : ViewModel() {
     private val disposables = CompositeDisposable()
-    private val liveWordList: MutableLiveData<List<Word>> = MutableLiveData()
+    private val liveWordList: MutableLiveData<List<FocusableWord>> = MutableLiveData()
+    private var focusableWordList: MutableList<FocusableWord> = emptyList<FocusableWord>().toMutableList()
     private val updateIcon: MutableLiveData<Boolean> = MutableLiveData()
-    private var positionOfNextQuestion: Int = 1
-    private lateinit var wordList: List<Word>
+    private var toIndexOfSubList: Int = 1
     private var listIsFinished = false
 
     init {
@@ -31,15 +30,22 @@ class QuizViewModel(
         disposables += wordRepository.getObservableWordList(dictionaryId)
                 .subscribeOn(rxSchedulers.io())
                 .observeOn(rxSchedulers.main())
-                .subscribe { wordList = it
-                liveWordList.postValue(it.subList(0, 1))
-                    if(wordList.size == 1) {
+                .subscribe {
+                    it.forEachIndexed() { index: Int, word: Word ->
+                        when (index) {
+                            0 -> focusableWordList.add(FocusableWord(word, true))
+                            else -> focusableWordList.add(FocusableWord(word, false))
+                        }
+                    }
+                    liveWordList.postValue(focusableWordList.subList(0, 1))
+                    if (focusableWordList.size == 1) {
                         updateIcon.postValue(true)
                         listIsFinished = true
-                    }}
+                    }
+                }
     }
 
-    fun getLiveWordList(): LiveData<List<Word>> = liveWordList
+    fun getLiveWordList(): LiveData<List<FocusableWord>> = liveWordList
 
     override fun onCleared() {
         disposables.clear()
@@ -51,10 +57,11 @@ class QuizViewModel(
     }
 
     fun nextClicked() {
-        if(positionOfNextQuestion < wordList.size) {
-            positionOfNextQuestion += 1
-            liveWordList.postValue(wordList.subList(0, positionOfNextQuestion))
-            if(positionOfNextQuestion == wordList.size) {
+        if (toIndexOfSubList < focusableWordList.size) {
+            toIndexOfSubList += 1
+            setFocusableValue(toIndexOfSubList)
+            liveWordList.postValue(focusableWordList.subList(0, toIndexOfSubList))
+            if (toIndexOfSubList == focusableWordList.size) {
                 updateIcon.postValue(true)
                 listIsFinished = true
             } else {
@@ -63,12 +70,28 @@ class QuizViewModel(
             }
         }
     }
+
     fun getListIsFinished() = listIsFinished
-    fun getUpdateIcon() :LiveData<Boolean> = updateIcon
-    fun isMeaning():Boolean = optionType.capitalize().equals(MEANING)
+    fun getUpdateIcon(): LiveData<Boolean> = updateIcon
+    fun isMeaning(): Boolean = optionType.capitalize().equals(MEANING)
 
     companion object {
         const val MEANING = "Meaning"
     }
 
+    private fun setFocusableValue(position: Int) {
+        focusableWordList.subList(0, toIndexOfSubList).forEachIndexed { index, focusableWord ->
+            when (index) {
+                position - 1 -> focusableWordList.subList(0, toIndexOfSubList)[index] = focusableWord.copy(isFocused = true)
+                position - 2 -> focusableWordList.subList(0, toIndexOfSubList)[index] = focusableWord.copy(isFocused = true)
+                else -> focusableWordList.subList(0, toIndexOfSubList)[index] = focusableWord.copy(isFocused = false)
+            }
+        }
+
+    }
+
+    data class FocusableWord(
+            val word: Word,
+            val isFocused: Boolean
+    )
 }
