@@ -12,25 +12,37 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.vocabulary.myvocabulary.R
+import com.vocabulary.myvocabulary.di.schedulerModule
 import com.vocabulary.myvocabulary.ext.show
+import com.vocabulary.myvocabulary.rx.RxSchedulers
 import com.vocabulary.myvocabulary.utils.ItemDecorator
+import io.reactivex.Observable
+import io.reactivex.disposables.CompositeDisposable
+import io.reactivex.disposables.Disposable
 import kotlinx.android.synthetic.main.fragment_quiz.view.*
+import org.koin.android.ext.android.inject
+import org.koin.androidx.viewmodel.ext.sharedViewModel
 import org.koin.androidx.viewmodel.ext.viewModel
 import org.koin.core.parameter.parametersOf
 
 class QuizFragment : Fragment() {
-    private val viewModel: QuizViewModel by viewModel {
+    private val rxSchedulers: RxSchedulers by inject()
+    private val resultViewModel: ResultViewModel by sharedViewModel()
+    private val quizViewModel: QuizViewModel by viewModel {
         parametersOf(
                 QuizFragmentArgs.fromBundle(arguments!!).dictionaryIdForQuiz,
                 QuizFragmentArgs.fromBundle(arguments!!).quizOption
         )
     }
 
+    private val disposables = CompositeDisposable()
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        val quizWithMeaningAdapter = QuizAdapter(emptyList<QuizViewModel.FocusableWord>().toMutableList(), viewModel.isMeaning())
+        val quizAdapter = QuizAdapter(emptyList<QuizViewModel.FocusableWord>().toMutableList(), quizViewModel.isMeaning())
         return inflater.inflate(R.layout.fragment_quiz, container, false).apply {
-            generateWordList(quizWithMeaningAdapter, quiz_recycler_view)
-            observeWordList(quizWithMeaningAdapter, quiz_progress_bar)
+            generateWordList(quizAdapter, quiz_recycler_view)
+            observeWordList(quizAdapter, quiz_progress_bar)
+            observeGuessedWord(quizAdapter.guessedWord)
             setNextButtonIconUpdateListener(quiz_next_fab)
             setNextFabOnClickListener(quiz_next_fab)
         }
@@ -38,8 +50,8 @@ class QuizFragment : Fragment() {
 
     private fun setNextFabOnClickListener(fab: FloatingActionButton) {
         fab.setOnClickListener {
-            if(viewModel.getListIsFinished().not()) {
-                viewModel.nextClicked()
+            if(quizViewModel.getListIsFinished().not()) {
+                quizViewModel.nextClicked()
             } else {
                 // Open result
                 Toast.makeText(requireActivity(), "Open Results", Toast.LENGTH_SHORT).show()
@@ -48,7 +60,7 @@ class QuizFragment : Fragment() {
     }
 
     private fun setNextButtonIconUpdateListener(fab: FloatingActionButton) {
-        viewModel.getUpdateIcon().observe(requireActivity(), Observer {
+        quizViewModel.getUpdateIcon().observe(requireActivity(), Observer {
             if(it) {
                 fab.setImageDrawable(resources.getDrawable(R.drawable.ic_tick_icon, requireActivity().theme))
             } else {
@@ -59,7 +71,7 @@ class QuizFragment : Fragment() {
 
     private fun observeWordList(quizAdapter: QuizAdapter, progressBar: ProgressBar) {
         progressBar.show(true)
-        viewModel.getLiveWordList().observe(requireActivity(), Observer {
+        quizViewModel.getLiveWordList().observe(requireActivity(), Observer {
             quizAdapter.updateList(it)
             progressBar.show(false)
         })
@@ -71,5 +83,18 @@ class QuizFragment : Fragment() {
             addItemDecoration(ItemDecorator(-120))
             adapter = quizAdapter
         }
+    }
+
+    private fun observeGuessedWord(guessedWord: Observable<QuizViewModel.GuessedWord>) {
+        disposables += guessedWord
+                .subscribeOn(rxSchedulers.io())
+                .observeOn(rxSchedulers.main())
+                .subscribe{
+                    resultViewModel.guessedWordMap[it.wordId] = it.guess
+                }
+    }
+
+    operator fun CompositeDisposable.plusAssign(disposable: Disposable) {
+        add(disposable)
     }
 }

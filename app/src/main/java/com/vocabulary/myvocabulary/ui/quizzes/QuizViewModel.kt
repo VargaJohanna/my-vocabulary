@@ -6,8 +6,10 @@ import androidx.lifecycle.ViewModel
 import com.vocabulary.myvocabulary.room.wordData.WordRepository
 import com.vocabulary.myvocabulary.rx.RxSchedulers
 import com.vocabulary.myvocabulary.ui.words.Word
+import io.reactivex.Observable
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.Disposable
+
 
 class QuizViewModel(
         val dictionaryId: Long,
@@ -31,7 +33,7 @@ class QuizViewModel(
                 .subscribeOn(rxSchedulers.io())
                 .observeOn(rxSchedulers.main())
                 .subscribe {
-                    it.forEachIndexed() { index: Int, word: Word ->
+                    it.forEachIndexed { index: Int, word: Word ->
                         when (index) {
                             0 -> focusableWordList.add(FocusableWord(word, true))
                             else -> focusableWordList.add(FocusableWord(word, false))
@@ -87,11 +89,15 @@ class QuizViewModel(
                 else -> focusableWordList.subList(0, toIndexOfSubList)[index] = focusableWord.copy(isFocused = false)
             }
         }
-
     }
 
     data class FocusableWord(
             val word: Word,
             val isFocused: Boolean
+    )
+
+    data class GuessedWord(
+            val wordId: Long,
+            val guess: String
     )
 }

@@ -1,11 +1,15 @@
 package com.vocabulary.myvocabulary.ui.quizzes
 
+import android.text.Editable
+import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.vocabulary.myvocabulary.ext.convertDpToPx
+import io.reactivex.Observable
+import io.reactivex.subjects.BehaviorSubject
 import kotlinx.android.synthetic.main.row_quiz.view.*
 
 
@@ -13,6 +17,9 @@ class QuizAdapter(
         private var wordList: MutableList<QuizViewModel.FocusableWord>,
         private var askMeaning: Boolean
 ) : RecyclerView.Adapter<QuizAdapter.QuizViewHolder>() {
+    private val _guessedWord = BehaviorSubject.create<QuizViewModel.GuessedWord>()
+    val guessedWord: Observable<QuizViewModel.GuessedWord> = _guessedWord
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): QuizViewHolder {
         val inflater = LayoutInflater.from(parent.context)
         return QuizViewHolder(inflater.inflate(com.vocabulary.myvocabulary.R.layout.row_quiz, parent, false))
@@ -36,6 +43,17 @@ class QuizAdapter(
             } else {
                 itemView.solution.isEnabled = false
                 wordList[position] = wordList[position].copy(isFocused = false)
+                itemView.solution.addTextChangedListener(object :TextWatcher{
+                    override fun afterTextChanged(p0: Editable) {
+                        setGuessedWord(QuizViewModel.GuessedWord(wordObject.word.wordId, p0.toString()))
+                    }
+
+                    override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
+                    }
+
+                    override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
+                    }
+                })
             }
             itemView.elevation = (position * 2).toFloat()
             if (askMeaning) {
@@ -64,5 +82,9 @@ class QuizAdapter(
                 , 0
         )
         itemView.layoutParams = params
+    }
+
+    fun setGuessedWord(guessedWord: QuizViewModel.GuessedWord) {
+        _guessedWord.onNext(guessedWord)
     }
 }
