@@ -6,15 +6,15 @@
     <string name="add_a_title">Add a title</string>
     <string name="create_dictionary_hint">Enter a title</string>
     <string name="rename_dictionary_hint">Enter a new title</string>
-    <string name="create_word_hint">new word</string>
-    <string name="create_translation_hint">new translation</string>
+    <string name="create_word_hint">new meaning</string>
+    <string name="create_translation_hint">new expression</string>
     <string name="create_new_dictionary_dialog_title">Create New Dictionary</string>
     <string name="create_button_label">Create</string>
     <string name="dialog_rename_button_label">Rename</string>
     <string name="cancel_button_label">Cancel</string>
     <string name="please_enter_a_title">Please enter a title</string>
-    <string name="please_enter_a_word">Please enter a word</string>
-    <string name="please_enter_a_translation">Please enter a translation</string>
+    <string name="please_enter_a_word">Please enter meaning</string>
+    <string name="please_enter_a_translation">Please enter expression</string>
     <string name="row_dictionary_options_dots">⋮</string>
     <string name="word_menu_edit_label">Edit</string>
     <string name="dialog_delete_word_title">Deleting word</string>
@@ -38,6 +38,8 @@
     <string name="dialog_lets_do_it">"Let's do it"</string>
     <string name="dialog_option_picker_error">"Please select one of the options!"</string>
     <string name="quiz_hint_enter_solution">Enter solution</string>
-    <string name="result_fragment_title">Result</string>
+    <string name="result_fragment_title">Results</string>
+    <string name="tick_description">Correct answer icon</string>
+    <string name="wrong_answer_icon_description">Wrong answer icon</string>
 
 </resources>

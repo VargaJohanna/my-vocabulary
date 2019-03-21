@@ -21,7 +21,8 @@ data class WordEntry(
         val failed: Int,
         val passed: Int,
         @ColumnInfo(name = "created") @TypeConverters(DateTypeConverter::class) val created: Date,
-        @ColumnInfo(name = "last_result") val lastResult: Boolean
+        @ColumnInfo(name = "last_result") val lastResult: Boolean,
+        @ColumnInfo(name = "last_guess") val lastGuess: String
 ) {
     @Ignore
     constructor(
@@ -32,8 +33,9 @@ data class WordEntry(
                 failed: Int,
                 passed: Int,
                 created: Date,
-                lastResult: Boolean
-    ) : this(0, containerDictionaryId, word, translation, beenAsked, failed, passed, created, lastResult)
+                lastResult: Boolean,
+                lastGuess: String
+    ) : this(0, containerDictionaryId, word, translation, beenAsked, failed, passed, created, lastResult, lastGuess)
 }
 
-fun WordEntry.toWord() = Word(wordId, containerDictionaryId, word, translation, beenAsked, failed, passed, created, lastResult)
+fun WordEntry.toWord() = Word(wordId, containerDictionaryId, word, translation, beenAsked, failed, passed, created, lastResult, lastGuess)

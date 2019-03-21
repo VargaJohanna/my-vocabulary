@@ -5,27 +5,22 @@ import androidx.lifecycle.ViewModel
 import com.vocabulary.myvocabulary.room.wordData.WordRepository
 import com.vocabulary.myvocabulary.rx.RxSchedulers
 import com.vocabulary.myvocabulary.ui.quizzes.QuizDirectionType
-import com.vocabulary.myvocabulary.ui.quizzes.toDirectionType
 import com.vocabulary.myvocabulary.ui.words.Word
-import io.reactivex.Completable
+import io.reactivex.Observable
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.Disposable
 
 class ResultViewModel(
-        val directionType: Int,
         val dictionaryId: Long,
         private val wordRepository: WordRepository,
         private val rxSchedulers: RxSchedulers
 ) : ViewModel() {
     private val disposables = CompositeDisposable()
     var guessedWordMap: MutableMap<Long, String> = emptyMap<Long, String>().toMutableMap()
-    private val liveWordList: MutableLiveData<List<Word>> = MutableLiveData()
-    private lateinit var currentWord: Word
+    private var _liveGuessedWordList: MutableList<Word> = emptyList<Word>().toMutableList()
+    private val liveGuessedWordList: MutableLiveData<List<Word>> = MutableLiveData()
+    var directionResult: QuizDirectionType = QuizDirectionType.AskWord
 
-    init {
-        observeList()
-        updateAllWords()
-    }
     override fun onCleared() {
         disposables.clear()
         super.onCleared()
@@ -35,44 +30,46 @@ class ResultViewModel(
         add(disposable)
     }
 
-    private fun updateWord(word: Word) {
-        disposables += Completable.fromCallable {
-            wordRepository.updateWord(word)
-        }.subscribeOn(rxSchedulers.io())
-                .subscribe()
-    }
-
-    private fun updateAllWords() {
-        for((k, _) in guessedWordMap) {
-            getWordById(k)
-            updateWord(currentWord.copy(lastResult = evaluateGuess(k)))
-        }
-    }
-
-    private fun observeList() {
-        disposables += wordRepository.getObservableWordList(dictionaryId)
-                .subscribeOn(rxSchedulers.io())
-                .observeOn(rxSchedulers.main())
-                .subscribe { liveWordList.postValue(it) }
-    }
-
-    private fun getWordById(id: Long){
-        disposables += wordRepository.getWordById(id)
-                .subscribeOn(rxSchedulers.io())
-                .observeOn(rxSchedulers.main())
+    fun getGuessResult(){
+        disposables += Observable.fromIterable(guessedWordMap.entries)
+                .flatMapSingle { entry ->
+                    wordRepository.getWordById(entry.key)
+                            .map {
+                                when(evaluateGuess(it)) {
+                                    true -> it.copy(lastResult = evaluateGuess(it), lastGuess = entry.value, beenAsked = it.beenAsked + 1,  passed = it.passed + 1)
+                                    false -> it.copy(lastResult = evaluateGuess(it), lastGuess = entry.value, beenAsked = it.beenAsked + 1, failed = it.failed + 1)
+                                }
+                            }
+                            .doOnSuccess {
+                                wordRepository.updateWord(it)
+                            }
+                }.toList()
                 .map {
-                    currentWord = it
+                    it
                 }
-                .subscribe()
+                .subscribeOn(rxSchedulers.io())
+                .observeOn(rxSchedulers.main())
+                .subscribe { t -> liveGuessedWordList.postValue(t) }
     }
 
-    private fun evaluateGuess(wordId: Long) : Boolean {
-        getWordById(wordId)
-        return if(directionType.toDirectionType() == QuizDirectionType.AskMeaning) {
-            currentWord.translation == guessedWordMap[wordId]
+    fun getLiveGuessedList() = liveGuessedWordList
+
+    private fun evaluateGuess(word: Word): Boolean {
+        return if (directionResult == QuizDirectionType.AskWord) {
+            word.translation == guessedWordMap[word.wordId]
         } else {
-            currentWord.word == guessedWordMap[wordId]
+            word.word == guessedWordMap[word.wordId]
         }
+    }
+
+    fun resetGuessedWordCollections() {
+        guessedWordMap = emptyMap<Long, String>().toMutableMap()
+        _liveGuessedWordList = emptyList<Word>().toMutableList()
+        liveGuessedWordList.postValue(_liveGuessedWordList)
+    }
+
+    fun setDirection(direction: QuizDirectionType) {
+        this.directionResult = direction
     }
 
 }

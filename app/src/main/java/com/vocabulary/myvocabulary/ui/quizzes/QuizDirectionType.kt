@@ -3,26 +3,26 @@ package com.vocabulary.myvocabulary.ui.quizzes
 sealed class QuizDirectionType(
         val id: Int
 ) {
-    object AskMeaning : QuizDirectionType(
+    object AskWord : QuizDirectionType(
             id = 0
     )
 
-    object AskExpression : QuizDirectionType(
+    object AskTranslation : QuizDirectionType(
             id = 1
     )
 }
 
 fun Int.toDirectionType():QuizDirectionType {
     return when(this) {
-        0 -> QuizDirectionType.AskMeaning
-        1 -> QuizDirectionType.AskExpression
+        0 -> QuizDirectionType.AskWord
+        1 -> QuizDirectionType.AskTranslation
         else -> throw IllegalStateException("Unknown Direction: $this")
     }
 }
 
 fun QuizDirectionType.toInt() : Int {
     return when (this) {
-        QuizDirectionType.AskMeaning -> 0
-        QuizDirectionType.AskExpression -> 1
+        QuizDirectionType.AskWord -> 0
+        QuizDirectionType.AskTranslation -> 1
     }
 }

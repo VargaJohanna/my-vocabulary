@@ -19,6 +19,7 @@ class QuizAdapter(
 ) : RecyclerView.Adapter<QuizAdapter.QuizViewHolder>() {
     private val _guessedWord = BehaviorSubject.create<QuizViewModel.GuessedWord>()
     val guessedWord: Observable<QuizViewModel.GuessedWord> = _guessedWord
+    private var guessEntered = false
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): QuizViewHolder {
         val inflater = LayoutInflater.from(parent.context)
@@ -33,33 +34,40 @@ class QuizAdapter(
 
     inner class QuizViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         fun bind(wordObject: QuizViewModel.FocusableWord, position: Int) {
-            if (position == 0) {
-                setMarginParameters(itemView)
+            when (position) {
+                0 -> setMarginParameters(itemView)
             }
-            if (position == wordList.size - 1) {
-                itemView.solution.isEnabled = true
-                itemView.solution.requestFocus()
-                wordList[position] = wordList[position].copy(isFocused = false)
-            } else {
-                itemView.solution.isEnabled = false
-                wordList[position] = wordList[position].copy(isFocused = false)
-                itemView.solution.addTextChangedListener(object :TextWatcher{
-                    override fun afterTextChanged(p0: Editable) {
-                        setGuessedWord(QuizViewModel.GuessedWord(wordObject.word.wordId, p0.toString(), wordObject.word.word))
-                    }
-
-                    override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
-                    }
-
-                    override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
-                    }
-                })
+            when (position) {
+                wordList.size - 1 -> {
+                    itemView.solution.isEnabled = true
+                    itemView.solution.requestFocus()
+                    wordList[position] = wordList[position].copy(isFocused = false)
+                }
+                else -> {
+                    itemView.solution.isEnabled = false
+                    wordList[position] = wordList[position].copy(isFocused = false)
+                }
             }
+            itemView.solution.addTextChangedListener(object :TextWatcher{
+                override fun afterTextChanged(p0: Editable) {
+                    setGuessedWord(QuizViewModel.GuessedWord(wordObject.word.wordId, p0.toString(), wordObject.word.word))
+                    guessEntered = p0.isNotEmpty()
+                }
+
+                override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
+                }
+
+                override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
+                }
+            })
+            when {
+                !guessEntered -> setGuessedWord(QuizViewModel.GuessedWord(wordObject.word.wordId, "", wordObject.word.word))
+            }
+            guessEntered = false
             itemView.elevation = (position * 2).toFloat()
-            if (askDirection == QuizDirectionType.AskMeaning) {
-                itemView.question.text = wordObject.word.word
-            } else {
-                itemView.question.text = wordObject.word.translation
+            when (askDirection) {
+                QuizDirectionType.AskWord -> itemView.question.text = wordObject.word.word
+                else -> itemView.question.text = wordObject.word.translation
             }
         }
     }

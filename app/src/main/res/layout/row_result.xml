@@ -56,20 +56,20 @@
                 app:layout_constraintTop_toTopOf="parent" />
 
             <TextView
-                android:id="@+id/entered_solution"
+                android:id="@+id/guess"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_margin="@dimen/margin_small"
                 android:gravity="start"
                 android:textSize="@dimen/text_size_small"
-                app:layout_constraintBottom_toTopOf="@+id/good_solution"
+                app:layout_constraintBottom_toTopOf="@+id/correct_solution"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toEndOf="@id/result_guideline"
                 app:layout_constraintTop_toTopOf="parent"
                 tools:text="cic" />
 
             <TextView
-                android:id="@+id/good_solution"
+                android:id="@+id/correct_solution"
                 android:visibility="gone"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -79,7 +79,7 @@
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toEndOf="@id/result_guideline"
-                app:layout_constraintTop_toBottomOf="@+id/entered_solution"
+                app:layout_constraintTop_toBottomOf="@+id/guess"
                 tools:text="cica" />
 
             <View
@@ -112,7 +112,8 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="@+id/result_guideline_end"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        android:contentDescription="@string/tick_description" />
 
     <ImageView
         android:visibility="gone"
@@ -128,6 +129,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="@+id/result_guideline_end"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        android:contentDescription="@string/wrong_answer_icon_description" />
 </androidx.constraintlayout.widget.ConstraintLayout>
 
