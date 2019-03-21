@@ -66,9 +66,9 @@ class DictionaryPickerFragment: Fragment(), DictionaryAdapter.ItemClickListener 
         val dialogBuilder = AlertDialog.Builder(requireActivity(), R.style.ThemeOverlay_MaterialComponents_Dialog_Alert)
         optionsDialog = dialogBuilder.create().apply {
             setView(dialogView)
-            radioGroup.setOnCheckedChangeListener { radioGroup, checkedId ->
+            radioGroup.setOnCheckedChangeListener { _, checkedId ->
                 errorMessage.show(false)
-                selectedOption = if (checkedId == R.id.meaning_radio) 0 else 1
+                selectedOption = if (checkedId == R.id.word_radio) 0 else 1
             }
             doItButton.setOnClickListener {
                 startQuiz(selectedOption, dictionaryId)

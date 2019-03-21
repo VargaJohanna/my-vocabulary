@@ -28,7 +28,7 @@ val viewModelModule = module {
     viewModel { DictionaryListViewModel(get(), get()) }
     viewModel { (dictionaryId: Long) -> WordListViewModel(dictionaryId, get(), get()) }
     viewModel { (dictionaryId: Long, optionType: Int) -> QuizViewModel(dictionaryId, optionType, get(), get()) }
-    viewModel { (directionType: Int, dictionaryId: Long) -> ResultViewModel(directionType, dictionaryId, get(), get()) }
+    viewModel { (dictionaryId: Long) -> ResultViewModel(dictionaryId, get(), get()) }
 }
 
 val schedulerModule = module {

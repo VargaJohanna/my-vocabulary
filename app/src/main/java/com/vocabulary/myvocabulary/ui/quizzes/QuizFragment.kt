@@ -27,7 +27,12 @@ import org.koin.core.parameter.parametersOf
 
 class QuizFragment : Fragment() {
     private val rxSchedulers: RxSchedulers by inject()
-    private val resultViewModel: ResultViewModel by sharedViewModel()
+    private val resultViewModel: ResultViewModel by sharedViewModel {
+        parametersOf(
+                QuizFragmentArgs.fromBundle(arguments!!).quizOption,
+                QuizFragmentArgs.fromBundle(arguments!!).dictionaryIdForQuiz
+                )
+    }
     private val quizViewModel: QuizViewModel by viewModel {
         parametersOf(
                 QuizFragmentArgs.fromBundle(arguments!!).dictionaryIdForQuiz,
@@ -39,6 +44,9 @@ class QuizFragment : Fragment() {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val quizAdapter = QuizAdapter(emptyList<QuizViewModel.FocusableWord>().toMutableList(), quizViewModel.directionType)
+        if(savedInstanceState == null) {
+            resultViewModel.resetGuessedWordCollections()
+        }
         return inflater.inflate(R.layout.fragment_quiz, container, false).apply {
             generateWordList(quizAdapter, quiz_recycler_view)
             observeWordList(quizAdapter, quiz_progress_bar)
@@ -53,7 +61,7 @@ class QuizFragment : Fragment() {
             if(quizViewModel.getListIsFinished().not()) {
                 quizViewModel.nextClicked()
             } else {
-                val action =QuizFragmentDirections.toResultFragment(quizViewModel.dictionaryId, quizViewModel.optionType)
+                val action = QuizFragmentDirections.toResultFragment(quizViewModel.dictionaryId, quizViewModel.optionType)
                 findNavController().navigate(action)
             }
         }
