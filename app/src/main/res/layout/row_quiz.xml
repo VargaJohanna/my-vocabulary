@@ -57,10 +57,12 @@
             android:hint="@string/quiz_hint_enter_solution"
             android:textSize="@dimen/text_size_medium"
             android:enabled="false"
+            android:longClickable="false"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@id/guideline"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="parent"
+            android:inputType="textNoSuggestions" />
 
         <View
             android:layout_width="match_parent"
