@@ -35,12 +35,9 @@ class QuizViewModel(
                 .observeOn(rxSchedulers.main())
                 .subscribe {
                     it.forEachIndexed { index: Int, word: Word ->
-                        if(failedOnly) {
-                            if(!word.lastResult) focusableWordList.add(FocusableWord(word, index == 0))
-                        }
-
-                        else focusableWordList.add(FocusableWord(word, index == 0))
-
+                        if (failedOnly) {
+                            if (!word.lastResult) focusableWordList.add(FocusableWord(word, index == 0))
+                        } else focusableWordList.add(FocusableWord(word, index == 0))
                     }
                     liveWordList.postValue(focusableWordList.subList(0, 1))
                     updateIcon.postValue(focusableWordList.size == 1)
