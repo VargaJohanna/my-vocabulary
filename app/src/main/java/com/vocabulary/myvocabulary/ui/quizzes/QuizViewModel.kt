@@ -13,6 +13,7 @@ import io.reactivex.disposables.CompositeDisposable
 class QuizViewModel(
         val dictionaryId: Long,
         val optionType: Int,
+        private val failedOnly: Boolean,
         private val wordRepository: WordRepository,
         private val rxSchedulers: RxSchedulers
 ) : ViewModel() {
@@ -34,13 +35,14 @@ class QuizViewModel(
                 .observeOn(rxSchedulers.main())
                 .subscribe {
                     it.forEachIndexed { index: Int, word: Word ->
-                        focusableWordList.add(FocusableWord(word, index == 0))
+                        if (failedOnly) {
+                            if (!word.lastResult) focusableWordList.add(FocusableWord(word, index == 0))
+                        } else focusableWordList.add(FocusableWord(word, index == 0))
                     }
                     liveWordList.postValue(focusableWordList.subList(0, 1))
-                    if (focusableWordList.size == 1) {
-                        updateIcon.postValue(true)
-                        listIsFinished = true
-                    }
+                    updateIcon.postValue(focusableWordList.size == 1)
+                    listIsFinished = focusableWordList.size == 1
+
                 }
     }
 

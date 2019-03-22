@@ -33,7 +33,7 @@
         android:layout_height="wrap_content"
         android:layout_gravity="end|bottom"
         android:layout_margin="@dimen/margin_medium"
-        android:src="@drawable/ic_retry"
+        android:src="@drawable/ic_arrow_right"
         android:tint="@color/icons"
         app:fabSize="normal"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -85,7 +85,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="end|bottom"
             android:layout_margin="@dimen/margin_medium"
-            android:src="@drawable/ic_redo"
+            android:src="@drawable/ic_retry"
             android:tint="@color/icons"
             app:fabSize="normal" />
     </LinearLayout>

@@ -29,14 +29,15 @@ class QuizFragment : Fragment() {
     private val rxSchedulers: RxSchedulers by inject()
     private val resultViewModel: ResultViewModel by sharedViewModel {
         parametersOf(
-                QuizFragmentArgs.fromBundle(arguments!!).quizOption,
-                QuizFragmentArgs.fromBundle(arguments!!).dictionaryIdForQuiz
+                QuizFragmentArgs.fromBundle(arguments!!).dictionaryId,
+                QuizFragmentArgs.fromBundle(arguments!!).quizOption
         )
     }
     private val quizViewModel: QuizViewModel by viewModel {
         parametersOf(
-                QuizFragmentArgs.fromBundle(arguments!!).dictionaryIdForQuiz,
-                QuizFragmentArgs.fromBundle(arguments!!).quizOption
+                QuizFragmentArgs.fromBundle(arguments!!).dictionaryId,
+                QuizFragmentArgs.fromBundle(arguments!!).quizOption,
+                QuizFragmentArgs.fromBundle(arguments!!).failedOnly
         )
     }
 
