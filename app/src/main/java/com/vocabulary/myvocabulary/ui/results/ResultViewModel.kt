@@ -9,7 +9,6 @@ import com.vocabulary.myvocabulary.ui.quizzes.QuizDirectionType
 import com.vocabulary.myvocabulary.ui.words.Word
 import io.reactivex.Observable
 import io.reactivex.disposables.CompositeDisposable
-import io.reactivex.disposables.Disposable
 
 class ResultViewModel(
         val dictionaryId: Long,
@@ -21,6 +20,7 @@ class ResultViewModel(
     private var _liveGuessedWordList: MutableList<Word> = mutableListOf()
     private val liveGuessedWordList: MutableLiveData<List<Word>> = MutableLiveData()
     var directionResult: QuizDirectionType = QuizDirectionType.AskWord
+    var isAllPassed = true
 
     override fun onCleared() {
         disposables.clear()
@@ -32,6 +32,7 @@ class ResultViewModel(
                 .flatMapSingle { entry ->
                     wordRepository.getWordById(entry.key)
                             .map {
+                                if(!evaluateGuess(it)) setAllPassedValue(false)
                                 when (evaluateGuess(it)) {
                                     true -> it.copy(lastResult = evaluateGuess(it), lastGuess = entry.value, beenAsked = it.beenAsked + 1, passed = it.passed + 1)
                                     false -> it.copy(lastResult = evaluateGuess(it), lastGuess = entry.value, beenAsked = it.beenAsked + 1, failed = it.failed + 1)
@@ -60,10 +61,15 @@ class ResultViewModel(
         guessedWordMap = mutableMapOf()
         _liveGuessedWordList = mutableListOf()
         liveGuessedWordList.postValue(_liveGuessedWordList)
+        isAllPassed = true
     }
 
     fun setDirection(direction: QuizDirectionType) {
         this.directionResult = direction
+    }
+
+    private fun setAllPassedValue(lastResult: Boolean) {
+        isAllPassed = lastResult
     }
 
 }
