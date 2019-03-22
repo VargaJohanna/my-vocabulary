@@ -39,22 +39,22 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
         <RadioButton
-            android:id="@+id/meaning_radio"
+            android:id="@+id/word_radio"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:textSize="@dimen/text_size_normal"
             android:padding="@dimen/padding_normal"
             android:layout_marginStart="@dimen/margin_medium"
-            android:text="@string/word_list_column_translation" />
+            android:text="@string/word_list_meaning" />
 
         <RadioButton
-            android:id="@+id/expression_radio"
+            android:id="@+id/translation_radio"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:padding="@dimen/padding_normal"
             android:layout_marginStart="@dimen/margin_medium"
             android:textSize="@dimen/text_size_normal"
-            android:text="@string/word_list_column_word" />
+            android:text="@string/word_list_expression" />
     </RadioGroup>
 
     <TextView

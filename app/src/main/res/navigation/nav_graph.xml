@@ -66,7 +66,7 @@
                 app:argType="long" />
             <argument
                 android:name="quizOption"
-                app:argType="string" />
+                app:argType="integer" />
         </action>
     </fragment>
     <fragment
@@ -79,9 +79,31 @@
             app:argType="long" />
         <argument
             android:name="quizOption"
-            app:argType="string" />
+            app:argType="integer" />
         <action
-            android:id="@+id/from_quiz_to_quizList"
+            android:id="@+id/to_resultFragment"
+            app:destination="@id/resultFragment">
+            <argument
+                android:name="dictionaryIdForResult"
+                app:argType="long" />
+            <argument
+                android:name="directionType"
+                app:argType="integer" />
+        </action>
+    </fragment>
+    <fragment
+        android:id="@+id/resultFragment"
+        android:name="com.vocabulary.myvocabulary.ui.results.ResultFragment"
+        android:label="ResultFragment"
+        tools:layout="@layout/fragment_result">
+        <action
+            android:id="@+id/from_result_to_quizListFragment"
             app:destination="@id/quizListFragment" />
+        <argument
+            android:name="dictionaryIdForResult"
+            app:argType="long" />
+        <argument
+            android:name="directionType"
+            app:argType="integer" />
     </fragment>
 </navigation>

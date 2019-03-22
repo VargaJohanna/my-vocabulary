@@ -3,11 +3,9 @@ package com.vocabulary.myvocabulary.ui.words
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.constraintlayout.widget.Group
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.vocabulary.myvocabulary.R
-import com.vocabulary.myvocabulary.utils.WordDiffUtilCallBack
 import kotlinx.android.synthetic.main.row_word.view.*
 
 class WordAdapter(private var wordList: List<Word>, private val itemClickListener: WordItemClickListener) : RecyclerView.Adapter<WordAdapter.WordViewHolder>() {
@@ -22,12 +20,12 @@ class WordAdapter(private var wordList: List<Word>, private val itemClickListene
         holder.bind(wordList[position])
     }
 
-    inner class WordViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView){
+    inner class WordViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         init {
-            itemView.word.setOnClickListener{
+            itemView.word.setOnClickListener {
                 itemClickListener.onItemClick(wordList[adapterPosition])
             }
-            itemView.translation.setOnClickListener{
+            itemView.translation.setOnClickListener {
                 itemClickListener.onItemClick(wordList[adapterPosition])
             }
 

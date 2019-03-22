@@ -12,13 +12,14 @@ data class Word(
         val failed: Int = 0,
         val passed: Int = 0,
         val created: Date,
-        val lastResult: Boolean = false
+        val lastResult: Boolean = false,
+        val lastGuess: String = ""
 )
 
 fun Word.toWordEntry(): WordEntry {
     return if (wordId == 0L) {
-        WordEntry(containerDictionaryId, word, translation, beenAsked, failed, passed, created, lastResult)
+        WordEntry(containerDictionaryId, word, translation, beenAsked, failed, passed, created, lastResult, lastGuess)
     } else {
-        WordEntry(wordId, containerDictionaryId, word, translation, beenAsked, failed, passed, created, lastResult)
+        WordEntry(wordId, containerDictionaryId, word, translation, beenAsked, failed, passed, created, lastResult, lastGuess)
     }
 }

@@ -8,6 +8,7 @@
     android:layout_marginStart="@dimen/mtrl_card_spacing"
     android:layout_marginTop="@dimen/mtrl_card_spacing"
     android:layout_marginEnd="@dimen/mtrl_card_spacing"
+    android:background="?selectableItemBackground"
     tools:ignore="PrivateResource">
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -26,6 +27,7 @@
             android:text="@string/example_dictionary_name"
             android:textSize="@dimen/text_size_bigger"
             android:padding="@dimen/margin_normal"
+            android:background="?selectableItemBackground"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@+id/dictionary_options"
             app:layout_constraintStart_toStartOf="parent"

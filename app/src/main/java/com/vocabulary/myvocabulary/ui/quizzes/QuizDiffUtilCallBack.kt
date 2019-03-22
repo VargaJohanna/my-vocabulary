@@ -1,14 +1,15 @@
-package com.vocabulary.myvocabulary.utils
+package com.vocabulary.myvocabulary.ui.quizzes
 
 import androidx.recyclerview.widget.DiffUtil
-import com.vocabulary.myvocabulary.ui.dictionaries.Dictionary
 
-class DictionaryDiffUtilCallBack(
-        private val oldList: List<Dictionary>,
-        private val newList: List<Dictionary>
+class QuizDiffUtilCallBack(
+        private val oldList: List<QuizViewModel.FocusableWord>,
+        private val newList: List<QuizViewModel.FocusableWord>
 ) : DiffUtil.Callback() {
     override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
-        return oldList[oldItemPosition].dictionaryId == newList[newItemPosition].dictionaryId
+        return (oldList[oldItemPosition].word.wordId == newList[newItemPosition].word.wordId
+                && oldList[oldItemPosition].isFocused == newList[newItemPosition].isFocused)
+
     }
 
     override fun getOldListSize(): Int {
@@ -22,4 +23,5 @@ class DictionaryDiffUtilCallBack(
     override fun areContentsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
         return oldList[oldItemPosition] == newList[newItemPosition]
     }
+
 }
