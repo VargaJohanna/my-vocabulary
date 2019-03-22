@@ -18,4 +18,8 @@
     <dimen name="padding_large">16dp</dimen>
     <dimen name="padding_extreme_large">30dp</dimen>
     <dimen name="fab_size">56dp</dimen>
+    <dimen name="standard_75">75dp</dimen>
+    <dimen name="standard_150">150dp</dimen>
+    <dimen name="result_icon_size">20dp</dimen>
+    <dimen name="radius_label">5dp</dimen>
 </resources>

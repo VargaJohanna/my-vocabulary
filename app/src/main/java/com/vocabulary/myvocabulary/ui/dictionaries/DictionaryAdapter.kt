@@ -7,7 +7,6 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.vocabulary.myvocabulary.R
 import com.vocabulary.myvocabulary.ext.display
-import com.vocabulary.myvocabulary.utils.DictionaryDiffUtilCallBack
 import kotlinx.android.synthetic.main.row_dictionary.view.*
 
 class DictionaryAdapter(

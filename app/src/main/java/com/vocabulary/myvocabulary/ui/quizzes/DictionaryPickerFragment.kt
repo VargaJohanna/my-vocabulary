@@ -56,7 +56,7 @@ class DictionaryPickerFragment: Fragment(), DictionaryAdapter.ItemClickListener 
     }
 
     private fun showOptionsDialog(dictionaryId: Long) {
-        var selectedOption = ""
+        var selectedOption = 0
         val inflater = requireActivity().layoutInflater
         val dialogView: View = inflater.inflate(R.layout.dialog_direction_option_picker, null)
         val radioGroup: RadioGroup = dialogView.radioGroup
@@ -66,18 +66,13 @@ class DictionaryPickerFragment: Fragment(), DictionaryAdapter.ItemClickListener 
         val dialogBuilder = AlertDialog.Builder(requireActivity(), R.style.ThemeOverlay_MaterialComponents_Dialog_Alert)
         optionsDialog = dialogBuilder.create().apply {
             setView(dialogView)
-            radioGroup.setOnCheckedChangeListener { radioGroup, checkedId ->
+            radioGroup.setOnCheckedChangeListener { _, checkedId ->
                 errorMessage.show(false)
-                val clickedButton = radioGroup.findViewById<RadioButton>(checkedId)
-                selectedOption = clickedButton.text.toString()
+                selectedOption = if (checkedId == R.id.word_radio) 0 else 1
             }
             doItButton.setOnClickListener {
-                if(selectedOption.isNotEmpty()) {
-                    startQuiz(selectedOption, dictionaryId)
-                    dismiss()
-                } else {
-                    errorMessage.show(true)
-                }
+                startQuiz(selectedOption, dictionaryId)
+                dismiss()
             }
             cancelButton.setOnClickListener {
                 dismiss()
@@ -87,7 +82,7 @@ class DictionaryPickerFragment: Fragment(), DictionaryAdapter.ItemClickListener 
         }
     }
 
-    private fun startQuiz(selectedOption: String, dictionaryId: Long) {
+    private fun startQuiz(selectedOption: Int, dictionaryId: Long) {
         val action = DictionaryPickerFragmentDirections.actionDictionaryPickerFragmentToQuizFragment(dictionaryId, selectedOption)
         findNavController().navigate(action)
     }
