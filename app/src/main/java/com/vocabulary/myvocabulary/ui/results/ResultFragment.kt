@@ -89,14 +89,24 @@ class ResultFragment : Fragment() {
 
     private fun setStartOverOnClickListener(startOverFab: FloatingActionButton) {
         startOverFab.setOnClickListener {
-            val action = ResultFragmentDirections.fromResultToQuiz(ResultFragmentArgs.fromBundle(arguments!!).dictionaryId, resultViewModel.directionResult.toInt(), false)
+            val action = ResultFragmentDirections.fromResultToQuiz(
+                    ResultFragmentArgs.fromBundle(arguments!!).dictionaryId,
+                    resultViewModel.directionResult.toInt(),
+                    false,
+                    ResultFragmentArgs.fromBundle(arguments!!).quizType
+            )
             findNavController().navigate(action)
         }
     }
 
     private fun setFailedOnlyOnClickListener(startOverFab: FloatingActionButton) {
         startOverFab.setOnClickListener {
-            val action = ResultFragmentDirections.fromResultToQuiz(ResultFragmentArgs.fromBundle(arguments!!).dictionaryId, resultViewModel.directionResult.toInt(), true)
+            val action = ResultFragmentDirections.fromResultToQuiz(
+                    ResultFragmentArgs.fromBundle(arguments!!).dictionaryId,
+                    resultViewModel.directionResult.toInt(),
+                    true,
+                    ResultFragmentArgs.fromBundle(arguments!!).quizType
+                    )
             findNavController().navigate(action)
         }
     }

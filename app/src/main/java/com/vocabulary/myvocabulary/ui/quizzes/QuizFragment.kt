@@ -62,7 +62,11 @@ class QuizFragment : Fragment() {
             if (quizViewModel.listIsNotFinished()) {
                 quizViewModel.nextClicked()
             } else {
-                val action = QuizFragmentDirections.toResultFragment(quizViewModel.dictionaryId, quizViewModel.optionType)
+                val action = QuizFragmentDirections.toResultFragment(
+                        quizViewModel.dictionaryId,
+                        quizViewModel.optionType,
+                        QuizFragmentArgs.fromBundle(arguments!!).quizType
+                        )
                 findNavController().navigate(action)
             }
         }

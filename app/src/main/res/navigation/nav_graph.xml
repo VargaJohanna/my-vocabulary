@@ -27,7 +27,11 @@
         tools:layout="@layout/fragment_quiz_list" >
         <action
             android:id="@+id/to_dictionaryPickerFragment"
-            app:destination="@id/dictionaryPickerFragment" />
+            app:destination="@id/dictionaryPickerFragment">
+            <argument
+                android:name="quizType"
+                app:argType="integer" />
+        </action>
     </fragment>
     <fragment
         android:id="@+id/homeFragment"
@@ -58,6 +62,9 @@
         android:name="com.vocabulary.myvocabulary.ui.quizzes.DictionaryPickerFragment"
         android:label="DictionaryPickerFragment"
         tools:layout="@layout/fragment_choose_dictionary">
+        <argument
+            android:name="quizType"
+            app:argType="integer" />
         <action
             android:id="@+id/action_dictionaryPickerFragment_to_quizFragment"
             app:destination="@id/quizFragment"
@@ -67,6 +74,9 @@
                 app:argType="long" />
             <argument
                 android:name="quizOption"
+                app:argType="integer" />
+            <argument
+                android:name="quizType"
                 app:argType="integer" />
         </action>
     </fragment>
@@ -85,6 +95,9 @@
             android:name="failedOnly"
             app:argType="boolean"
             android:defaultValue="false" />
+        <argument
+            android:name="quizType"
+            app:argType="integer" />
         <action
             android:id="@+id/to_resultFragment"
             app:destination="@id/resultFragment">
@@ -93,6 +106,9 @@
                 app:argType="long" />
             <argument
                 android:name="directionType"
+                app:argType="integer" />
+            <argument
+                android:name="quizType"
                 app:argType="integer" />
         </action>
     </fragment>
@@ -106,6 +122,9 @@
             app:argType="long" />
         <argument
             android:name="directionType"
+            app:argType="integer" />
+        <argument
+            android:name="quizType"
             app:argType="integer" />
         <action
             android:id="@+id/from_result_to_quizListFragment"
@@ -123,6 +142,9 @@
             <argument
                 android:name="failedOnly"
                 app:argType="boolean"/>
+            <argument
+                android:name="quizType"
+                app:argType="integer" />
         </action>
     </fragment>
 </navigation>

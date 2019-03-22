@@ -83,7 +83,11 @@ class DictionaryPickerFragment: Fragment(), DictionaryAdapter.ItemClickListener 
     }
 
     private fun startQuiz(selectedOption: Int, dictionaryId: Long) {
-        val action = DictionaryPickerFragmentDirections.actionDictionaryPickerFragmentToQuizFragment(dictionaryId, selectedOption)
+        val action = DictionaryPickerFragmentDirections.actionDictionaryPickerFragmentToQuizFragment(
+                dictionaryId,
+                selectedOption,
+                DictionaryPickerFragmentArgs.fromBundle(arguments!!).quizType
+                )
         findNavController().navigate(action)
     }
 
