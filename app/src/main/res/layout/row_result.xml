@@ -101,8 +101,8 @@
 
     <ImageView
         android:id="@+id/passed_icon"
-        android:layout_width="20dp"
-        android:layout_height="20dp"
+        android:layout_width="@dimen/result_icon_size"
+        android:layout_height="@dimen/result_icon_size"
         android:layout_marginStart="@dimen/margin_normal"
         android:layout_marginTop="@dimen/margin_normal"
         android:layout_marginEnd="@dimen/margin_normal"
@@ -118,8 +118,8 @@
     <ImageView
         android:visibility="gone"
         android:id="@+id/failed_icon"
-        android:layout_width="20dp"
-        android:layout_height="20dp"
+        android:layout_width="@dimen/result_icon_size"
+        android:layout_height="@dimen/result_icon_size"
         android:layout_marginStart="@dimen/margin_normal"
         android:layout_marginTop="@dimen/margin_normal"
         android:layout_marginEnd="@dimen/margin_normal"

@@ -12,7 +12,6 @@ import io.reactivex.Observable
 import io.reactivex.subjects.BehaviorSubject
 import kotlinx.android.synthetic.main.row_quiz.view.*
 
-
 class QuizAdapter(
         private var wordList: MutableList<QuizViewModel.FocusableWord>,
         private var askDirection: QuizDirectionType
