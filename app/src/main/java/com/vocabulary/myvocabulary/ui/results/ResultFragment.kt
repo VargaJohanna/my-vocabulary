@@ -66,10 +66,8 @@ class ResultFragment : Fragment() {
 
     private fun setRetryFabOnClickListener(restartFab: FloatingActionButton, failedOnlyContainer: LinearLayout, startOverFabContainer: LinearLayout) {
         restartFab.setOnClickListener {
-            when (isFabOpen) {
-                true -> closeFabMenu(failedOnlyContainer, startOverFabContainer)
-                else -> showFabMenu(failedOnlyContainer, startOverFabContainer)
-            }
+            if (isFabOpen) closeFabMenu(failedOnlyContainer, startOverFabContainer)
+            else showFabMenu(failedOnlyContainer, startOverFabContainer)
         }
     }
 
@@ -81,23 +79,23 @@ class ResultFragment : Fragment() {
         startOverFabContainer.animate().translationY(0f)
     }
 
-    private fun showFabMenu(failedOnlyFab: LinearLayout, startOverFab: LinearLayout) {
+    private fun showFabMenu(failedOnlyFabContainer: LinearLayout, startOverFabContainer: LinearLayout) {
         isFabOpen = true
-        failedOnlyFab.display(true)
-        startOverFab.display(true)
-        failedOnlyFab.animate().translationY(-resources.getDimension(R.dimen.standard_75))
-        startOverFab.animate().translationY(-resources.getDimension(R.dimen.standard_150))
+        failedOnlyFabContainer.display(!resultViewModel.isAllPassed)
+        startOverFabContainer.display(true)
+        failedOnlyFabContainer.animate().translationY(-resources.getDimension(R.dimen.standard_150))
+        startOverFabContainer.animate().translationY(-resources.getDimension(R.dimen.standard_75))
     }
 
     private fun setStartOverOnClickListener(startOverFab: FloatingActionButton) {
         startOverFab.setOnClickListener {
-            val action = ResultFragmentDirections.fromResultToQuiz(resultViewModel.dictionaryId, resultViewModel.directionResult.toInt(), false)
+            val action = ResultFragmentDirections.fromResultToQuiz(ResultFragmentArgs.fromBundle(arguments!!).dictionaryId, resultViewModel.directionResult.toInt(), false)
             findNavController().navigate(action)
         }
     }
     private fun setFailedOnlyOnClickListener(startOverFab: FloatingActionButton) {
         startOverFab.setOnClickListener {
-            val action = ResultFragmentDirections.fromResultToQuiz(resultViewModel.dictionaryId, resultViewModel.directionResult.toInt(), true)
+            val action = ResultFragmentDirections.fromResultToQuiz(ResultFragmentArgs.fromBundle(arguments!!).dictionaryId, resultViewModel.directionResult.toInt(), true)
             findNavController().navigate(action)
         }
     }
