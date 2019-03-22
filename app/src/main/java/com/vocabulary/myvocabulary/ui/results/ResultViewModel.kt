@@ -30,13 +30,13 @@ class ResultViewModel(
         add(disposable)
     }
 
-    fun getGuessResult(){
+    fun getGuessResult() {
         disposables += Observable.fromIterable(guessedWordMap.entries)
                 .flatMapSingle { entry ->
                     wordRepository.getWordById(entry.key)
                             .map {
-                                when(evaluateGuess(it)) {
-                                    true -> it.copy(lastResult = evaluateGuess(it), lastGuess = entry.value, beenAsked = it.beenAsked + 1,  passed = it.passed + 1)
+                                when (evaluateGuess(it)) {
+                                    true -> it.copy(lastResult = evaluateGuess(it), lastGuess = entry.value, beenAsked = it.beenAsked + 1, passed = it.passed + 1)
                                     false -> it.copy(lastResult = evaluateGuess(it), lastGuess = entry.value, beenAsked = it.beenAsked + 1, failed = it.failed + 1)
                                 }
                             }
