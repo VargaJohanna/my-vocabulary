@@ -83,6 +83,6 @@ class ResultFragment : Fragment() {
         failedOnlyFab.display(true)
         startOverFab.display(true)
         failedOnlyFab.animate().translationY(-resources.getDimension(R.dimen.standard_75))
-        startOverFab.animate().translationY(-resources.getDimension(R.dimen.standard_160))
+        startOverFab.animate().translationY(-resources.getDimension(R.dimen.standard_150))
     }
 }
