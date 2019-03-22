@@ -93,6 +93,7 @@ class ResultFragment : Fragment() {
             findNavController().navigate(action)
         }
     }
+
     private fun setFailedOnlyOnClickListener(startOverFab: FloatingActionButton) {
         startOverFab.setOnClickListener {
             val action = ResultFragmentDirections.fromResultToQuiz(ResultFragmentArgs.fromBundle(arguments!!).dictionaryId, resultViewModel.directionResult.toInt(), true)
