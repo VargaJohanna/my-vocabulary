@@ -31,7 +31,7 @@ class QuizFragment : Fragment() {
         parametersOf(
                 QuizFragmentArgs.fromBundle(arguments!!).quizOption,
                 QuizFragmentArgs.fromBundle(arguments!!).dictionaryIdForQuiz
-                )
+        )
     }
     private val quizViewModel: QuizViewModel by viewModel {
         parametersOf(
@@ -44,7 +44,7 @@ class QuizFragment : Fragment() {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val quizAdapter = QuizAdapter(emptyList<QuizViewModel.FocusableWord>().toMutableList(), quizViewModel.directionType)
-        if(savedInstanceState == null) {
+        if (savedInstanceState == null) {
             resultViewModel.resetGuessedWordCollections()
         }
         return inflater.inflate(R.layout.fragment_quiz, container, false).apply {
@@ -58,7 +58,7 @@ class QuizFragment : Fragment() {
 
     private fun setNextFabOnClickListener(fab: FloatingActionButton) {
         fab.setOnClickListener {
-            if(quizViewModel.getListIsFinished().not()) {
+            if (quizViewModel.getListIsFinished().not()) {
                 quizViewModel.nextClicked()
             } else {
                 val action = QuizFragmentDirections.toResultFragment(quizViewModel.dictionaryId, quizViewModel.optionType)
@@ -69,7 +69,7 @@ class QuizFragment : Fragment() {
 
     private fun setNextButtonIconUpdateListener(fab: FloatingActionButton) {
         quizViewModel.getUpdateIcon().observe(requireActivity(), Observer {
-            if(it) {
+            if (it) {
                 fab.setImageDrawable(resources.getDrawable(R.drawable.ic_tick_icon, requireActivity().theme))
             } else {
                 fab.setImageDrawable(resources.getDrawable(R.drawable.ic_arrow_right, requireActivity().theme))
@@ -97,7 +97,7 @@ class QuizFragment : Fragment() {
         disposables += guessedWord
                 .subscribeOn(rxSchedulers.io())
                 .observeOn(rxSchedulers.main())
-                .subscribe{
+                .subscribe {
                     resultViewModel.guessedWordMap[it.wordId] = it.guess
                 }
     }

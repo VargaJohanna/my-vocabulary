@@ -48,7 +48,7 @@ class QuizAdapter(
                     wordList[position] = wordList[position].copy(isFocused = false)
                 }
             }
-            itemView.solution.addTextChangedListener(object :TextWatcher{
+            itemView.solution.addTextChangedListener(object : TextWatcher {
                 override fun afterTextChanged(p0: Editable) {
                     setGuessedWord(QuizViewModel.GuessedWord(wordObject.word.wordId, p0.toString(), wordObject.word.word))
                     guessEntered = p0.isNotEmpty()

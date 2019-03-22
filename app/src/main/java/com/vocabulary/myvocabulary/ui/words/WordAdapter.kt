@@ -20,12 +20,12 @@ class WordAdapter(private var wordList: List<Word>, private val itemClickListene
         holder.bind(wordList[position])
     }
 
-    inner class WordViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView){
+    inner class WordViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         init {
-            itemView.word.setOnClickListener{
+            itemView.word.setOnClickListener {
                 itemClickListener.onItemClick(wordList[adapterPosition])
             }
-            itemView.translation.setOnClickListener{
+            itemView.translation.setOnClickListener {
                 itemClickListener.onItemClick(wordList[adapterPosition])
             }
 

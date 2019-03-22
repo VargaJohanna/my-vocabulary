@@ -63,7 +63,7 @@ class ResultFragment : Fragment() {
 
     private fun setRetryFabOnClickListener(restartFab: FloatingActionButton, failedOnlyContainer: LinearLayout, startOverFabContainer: LinearLayout) {
         restartFab.setOnClickListener {
-            when(isFabOpen) {
+            when (isFabOpen) {
                 true -> closeFabMenu(failedOnlyContainer, startOverFabContainer)
                 else -> showFabMenu(failedOnlyContainer, startOverFabContainer)
             }
