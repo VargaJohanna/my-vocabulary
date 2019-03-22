@@ -1,9 +1,10 @@
 package com.vocabulary.myvocabulary.ui.results
 
-import android.util.Log
+import android.os.UserManager
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
@@ -28,42 +29,36 @@ class ResultAdapter(
 
     override fun onBindViewHolder(holder: ResultViewHolder, position: Int) {
         holder.bind(resultList[position])
-        Log.d(javaClass.name, "START BINDING")
     }
 
     inner class ResultViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         fun bind(word: Word) {
-            when (directionType) {
-                QuizDirectionType.AskWord -> itemView.result_question.text = word.word
-                else -> itemView.result_question.text = word.translation
-            }
-            when {
-                word.lastGuess.isEmpty() -> itemView.guess.text = "--"
-                else -> itemView.guess.text = word.lastGuess
-            }
+            setQuestionText(word, itemView.result_question)
+            setGuessText(word, itemView.guess)
 
-            when {
-                word.lastResult -> {
-                    itemView.materialCardView.setBackgroundColor(ContextCompat.getColor(itemView.context, R.color.light_green))
-                    itemView.passed_icon.show(true)
-                    itemView.failed_icon.show(false)
-                    itemView.correct_solution.display(false)
+            setItemViewAppearance(itemView, word)
 
-                }
-                else -> {
-                    itemView.materialCardView.setBackgroundColor(ContextCompat.getColor(itemView.context, R.color.light_error))
-                    itemView.passed_icon.show(false)
-                    itemView.failed_icon.show(true)
-                    itemView.guess.show(true)
+        }
 
-                    itemView.guess.setTextColor(ContextCompat.getColor(itemView.context, R.color.error))
-                    itemView.correct_solution.display(true)
-                    when (directionType) {
-                        QuizDirectionType.AskWord -> itemView.correct_solution.text = word.translation
-                        else -> itemView.correct_solution.text = word.word
-                    }
-                }
-            }
+        private fun setItemViewAppearance(itemView: View, word: Word) {
+            itemView.materialCardView.setBackgroundColor(ContextCompat.getColor(itemView.context,
+                    if(word.lastResult) R.color.light_green
+                    else R.color.light_error))
+
+            itemView.passed_icon.show(word.lastResult)
+            itemView.failed_icon.show(!word.lastResult)
+            itemView.correct_solution.display(!word.lastResult)
+            itemView.guess.setTextColor(ContextCompat.getColor(itemView.context, if (!word.lastResult) R.color.error else R.color.secondary_text))
+            itemView.correct_solution.text = if (directionType == QuizDirectionType.AskWord) word.translation else word.word
+
+        }
+
+        private fun setGuessText(word: Word, guess: TextView) {
+            guess.text = if(word.lastGuess.isEmpty()) "--" else word.lastGuess
+        }
+
+        private fun setQuestionText(word: Word, resultQuestion: TextView) {
+            resultQuestion.text = if (directionType == QuizDirectionType.AskWord) word.word else word.translation
         }
     }
 

@@ -2,6 +2,7 @@ package com.vocabulary.myvocabulary.ui.results
 
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import com.vocabulary.myvocabulary.ext.plusAssign
 import com.vocabulary.myvocabulary.room.wordData.WordRepository
 import com.vocabulary.myvocabulary.rx.RxSchedulers
 import com.vocabulary.myvocabulary.ui.quizzes.QuizDirectionType
@@ -16,18 +17,14 @@ class ResultViewModel(
         private val rxSchedulers: RxSchedulers
 ) : ViewModel() {
     private val disposables = CompositeDisposable()
-    var guessedWordMap: MutableMap<Long, String> = emptyMap<Long, String>().toMutableMap()
-    private var _liveGuessedWordList: MutableList<Word> = emptyList<Word>().toMutableList()
+    var guessedWordMap: MutableMap<Long, String> = mutableMapOf()
+    private var _liveGuessedWordList: MutableList<Word> = mutableListOf()
     private val liveGuessedWordList: MutableLiveData<List<Word>> = MutableLiveData()
     var directionResult: QuizDirectionType = QuizDirectionType.AskWord
 
     override fun onCleared() {
         disposables.clear()
         super.onCleared()
-    }
-
-    operator fun CompositeDisposable.plusAssign(disposable: Disposable) {
-        add(disposable)
     }
 
     fun getGuessResult() {
@@ -44,12 +41,9 @@ class ResultViewModel(
                                 wordRepository.updateWord(it)
                             }
                 }.toList()
-                .map {
-                    it
-                }
                 .subscribeOn(rxSchedulers.io())
                 .observeOn(rxSchedulers.main())
-                .subscribe { t -> liveGuessedWordList.postValue(t) }
+                .subscribe { guessList -> liveGuessedWordList.postValue(guessList) }
     }
 
     fun getLiveGuessedList() = liveGuessedWordList
@@ -63,8 +57,8 @@ class ResultViewModel(
     }
 
     fun resetGuessedWordCollections() {
-        guessedWordMap = emptyMap<Long, String>().toMutableMap()
-        _liveGuessedWordList = emptyList<Word>().toMutableList()
+        guessedWordMap = mutableMapOf()
+        _liveGuessedWordList = mutableListOf()
         liveGuessedWordList.postValue(_liveGuessedWordList)
     }
 

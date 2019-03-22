@@ -3,6 +3,7 @@ package com.vocabulary.myvocabulary.ui.dictionaries
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import com.vocabulary.myvocabulary.ext.plusAssign
 import com.vocabulary.myvocabulary.room.dictionaryData.DictionaryRepository
 import com.vocabulary.myvocabulary.rx.RxSchedulers
 import com.vocabulary.myvocabulary.utils.Event
@@ -69,10 +70,6 @@ class DictionaryListViewModel(
     override fun onCleared() {
         disposables.clear()
         super.onCleared()
-    }
-
-    operator fun CompositeDisposable.plusAssign(disposable: Disposable) {
-        add(disposable)
     }
 
     fun createDictionaryObject(dictionaryName: String): Dictionary = Dictionary(dictionaryName = dictionaryName,

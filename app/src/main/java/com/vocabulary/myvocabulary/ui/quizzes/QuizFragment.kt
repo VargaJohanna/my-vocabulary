@@ -12,13 +12,13 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.vocabulary.myvocabulary.R
+import com.vocabulary.myvocabulary.ext.plusAssign
 import com.vocabulary.myvocabulary.ext.show
 import com.vocabulary.myvocabulary.rx.RxSchedulers
 import com.vocabulary.myvocabulary.ui.results.ResultViewModel
 import com.vocabulary.myvocabulary.utils.ItemDecorator
 import io.reactivex.Observable
 import io.reactivex.disposables.CompositeDisposable
-import io.reactivex.disposables.Disposable
 import kotlinx.android.synthetic.main.fragment_quiz.view.*
 import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.sharedViewModel
@@ -43,7 +43,7 @@ class QuizFragment : Fragment() {
     private val disposables = CompositeDisposable()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        val quizAdapter = QuizAdapter(emptyList<QuizViewModel.FocusableWord>().toMutableList(), quizViewModel.directionType)
+        val quizAdapter = QuizAdapter(mutableListOf(), quizViewModel.directionType)
         if (savedInstanceState == null) {
             resultViewModel.resetGuessedWordCollections()
         }
@@ -58,7 +58,7 @@ class QuizFragment : Fragment() {
 
     private fun setNextFabOnClickListener(fab: FloatingActionButton) {
         fab.setOnClickListener {
-            if (quizViewModel.getListIsFinished().not()) {
+            if (quizViewModel.listIsNotFinished()) {
                 quizViewModel.nextClicked()
             } else {
                 val action = QuizFragmentDirections.toResultFragment(quizViewModel.dictionaryId, quizViewModel.optionType)
@@ -69,11 +69,8 @@ class QuizFragment : Fragment() {
 
     private fun setNextButtonIconUpdateListener(fab: FloatingActionButton) {
         quizViewModel.getUpdateIcon().observe(requireActivity(), Observer {
-            if (it) {
-                fab.setImageDrawable(resources.getDrawable(R.drawable.ic_tick_icon, requireActivity().theme))
-            } else {
-                fab.setImageDrawable(resources.getDrawable(R.drawable.ic_arrow_right, requireActivity().theme))
-            }
+            fab.setImageDrawable(resources
+                    .getDrawable(if (it) R.drawable.ic_tick_icon else R.drawable.ic_arrow_right, requireActivity().theme))
         })
     }
 
@@ -100,9 +97,5 @@ class QuizFragment : Fragment() {
                 .subscribe {
                     resultViewModel.guessedWordMap[it.wordId] = it.guess
                 }
-    }
-
-    operator fun CompositeDisposable.plusAssign(disposable: Disposable) {
-        add(disposable)
     }
 }

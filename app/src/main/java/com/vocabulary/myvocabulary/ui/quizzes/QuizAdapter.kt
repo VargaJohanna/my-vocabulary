@@ -5,6 +5,7 @@ import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.EditText
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.vocabulary.myvocabulary.ext.convertDpToPx
@@ -33,20 +34,10 @@ class QuizAdapter(
 
     inner class QuizViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         fun bind(wordObject: QuizViewModel.FocusableWord, position: Int) {
-            when (position) {
-                0 -> setMarginParameters(itemView)
-            }
-            when (position) {
-                wordList.size - 1 -> {
-                    itemView.solution.isEnabled = true
-                    itemView.solution.requestFocus()
-                    wordList[position] = wordList[position].copy(isFocused = false)
-                }
-                else -> {
-                    itemView.solution.isEnabled = false
-                    wordList[position] = wordList[position].copy(isFocused = false)
-                }
-            }
+            addExtraMarginForFirstElement(position, itemView)
+
+            makeLastElementEditable(position, itemView.solution)
+
             itemView.solution.addTextChangedListener(object : TextWatcher {
                 override fun afterTextChanged(p0: Editable) {
                     setGuessedWord(QuizViewModel.GuessedWord(wordObject.word.wordId, p0.toString(), wordObject.word.word))
@@ -59,15 +50,33 @@ class QuizAdapter(
                 override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
                 }
             })
-            when {
-                !guessEntered -> setGuessedWord(QuizViewModel.GuessedWord(wordObject.word.wordId, "", wordObject.word.word))
-            }
+            if (!guessEntered) setGuessedWord(QuizViewModel.GuessedWord(wordObject.word.wordId, "", wordObject.word.word))
             guessEntered = false
+
+            addElevationToEachItem(itemView, position)
+
+            if (askDirection == QuizDirectionType.AskWord) itemView.question.text = wordObject.word.word
+            else itemView.question.text = wordObject.word.translation
+        }
+
+        private fun addElevationToEachItem(itemView: View, position: Int) {
             itemView.elevation = (position * 2).toFloat()
-            when (askDirection) {
-                QuizDirectionType.AskWord -> itemView.question.text = wordObject.word.word
-                else -> itemView.question.text = wordObject.word.translation
-            }
+        }
+
+        fun setGuessedWord(guessedWord: QuizViewModel.GuessedWord) {
+            _guessedWord.onNext(guessedWord)
+        }
+    }
+
+    private fun makeLastElementEditable(position: Int, solution: EditText) {
+        if (position == wordList.size - 1) {
+            solution.isEnabled = true
+            solution.requestFocus()
+            wordList[position] = wordList[position].copy(isFocused = false)
+        }
+        else {
+            solution.isEnabled = false
+            wordList[position] = wordList[position].copy(isFocused = false)
         }
     }
 
@@ -77,21 +86,19 @@ class QuizAdapter(
         diffResult.dispatchUpdatesTo(this)
     }
 
-    fun setMarginParameters(itemView: View) {
-        val params = ViewGroup.MarginLayoutParams(
-                ViewGroup.LayoutParams.WRAP_CONTENT,
-                ViewGroup.LayoutParams.WRAP_CONTENT
-        )
-        params.setMargins(
-                8f.convertDpToPx(itemView.context),
-                150,
-                8f.convertDpToPx(itemView.context)
-                , 0
-        )
-        itemView.layoutParams = params
-    }
-
-    fun setGuessedWord(guessedWord: QuizViewModel.GuessedWord) {
-        _guessedWord.onNext(guessedWord)
+    fun addExtraMarginForFirstElement(position: Int, itemView: View) {
+        if (position == 0) {
+            val params = ViewGroup.MarginLayoutParams(
+                    ViewGroup.LayoutParams.WRAP_CONTENT,
+                    ViewGroup.LayoutParams.WRAP_CONTENT
+            )
+            params.setMargins(
+                    8f.convertDpToPx(itemView.context),
+                    150,
+                    8f.convertDpToPx(itemView.context)
+                    , 0
+            )
+            itemView.layoutParams = params
+        }
     }
 }

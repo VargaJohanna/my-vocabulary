@@ -1,15 +1,8 @@
 package com.vocabulary.myvocabulary.ui.quizzes
 
-sealed class QuizDirectionType(
-        val id: Int
-) {
-    object AskWord : QuizDirectionType(
-            id = 0
-    )
-
-    object AskTranslation : QuizDirectionType(
-            id = 1
-    )
+sealed class QuizDirectionType {
+    object AskWord : QuizDirectionType()
+    object AskTranslation : QuizDirectionType()
 }
 
 fun Int.toDirectionType():QuizDirectionType {
