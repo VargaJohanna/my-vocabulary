@@ -33,11 +33,62 @@
         android:layout_height="wrap_content"
         android:layout_gravity="end|bottom"
         android:layout_margin="@dimen/margin_medium"
-        android:src="@drawable/ic_retry_icon"
+        android:src="@drawable/ic_retry"
         android:tint="@color/icons"
         app:fabSize="normal"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
+
+    <LinearLayout
+        android:id="@+id/failed_only_container"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="end|bottom"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+        <TextView
+            android:background="@drawable/border_style"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/result_failed_ones_only_label"
+            android:layout_gravity="center_vertical"/>
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/failed_only_fab"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="end|bottom"
+            android:layout_margin="@dimen/margin_medium"
+            android:src="@drawable/ic_failed_only"
+            android:tint="@color/icons"
+            app:fabSize="normal"/>
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/start_over_container"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="end|bottom"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+        <TextView
+            android:background="@drawable/border_style"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/result_start_over_label"
+            android:layout_gravity="center_vertical"/>
+
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/start_over_fab"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="end|bottom"
+            android:layout_margin="@dimen/margin_medium"
+            android:src="@drawable/ic_redo"
+            android:tint="@color/icons"
+            app:fabSize="normal" />
+    </LinearLayout>
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/result_exit_fab"

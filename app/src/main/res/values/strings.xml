@@ -41,5 +41,7 @@
     <string name="result_fragment_title">Results</string>
     <string name="tick_description">Correct answer icon</string>
     <string name="wrong_answer_icon_description">Wrong answer icon</string>
+    <string name="result_failed_ones_only_label">Failed ones only</string>
+    <string name="result_start_over_label">Start over</string>
 
 </resources>
