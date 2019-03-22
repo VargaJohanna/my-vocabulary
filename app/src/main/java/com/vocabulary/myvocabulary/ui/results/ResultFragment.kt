@@ -16,6 +16,7 @@ import com.vocabulary.myvocabulary.R
 import com.vocabulary.myvocabulary.ext.display
 import com.vocabulary.myvocabulary.ext.show
 import com.vocabulary.myvocabulary.ui.quizzes.toDirectionType
+import com.vocabulary.myvocabulary.ui.quizzes.toInt
 import kotlinx.android.synthetic.main.fragment_result.view.*
 import org.koin.androidx.viewmodel.ext.sharedViewModel
 import org.koin.core.parameter.parametersOf
@@ -23,7 +24,7 @@ import org.koin.core.parameter.parametersOf
 class ResultFragment : Fragment() {
     private val resultViewModel: ResultViewModel by sharedViewModel {
         parametersOf(
-                ResultFragmentArgs.fromBundle(arguments!!).dictionaryIdForResult
+                ResultFragmentArgs.fromBundle(arguments!!).dictionaryId
         )
     }
     private var isFabOpen = false
@@ -37,6 +38,8 @@ class ResultFragment : Fragment() {
             generateWordList(resultAdapter, result_recycler_view)
             setExitFabOnClickListener(result_exit_fab)
             setRetryFabOnClickListener(result_restart_fab, failed_only_container, start_over_container)
+            setStartOverOnClickListener(start_over_fab)
+            setFailedOnlyOnClickListener(failed_only_fab)
         }
     }
 
@@ -70,12 +73,12 @@ class ResultFragment : Fragment() {
         }
     }
 
-    private fun closeFabMenu(failedOnlyFab: LinearLayout, startOverFab: LinearLayout) {
+    private fun closeFabMenu(failedOnlyContainer: LinearLayout, startOverFabContainer: LinearLayout) {
         isFabOpen = false
-        failedOnlyFab.display(false)
-        startOverFab.display(false)
-        failedOnlyFab.animate().translationY(0f)
-        startOverFab.animate().translationY(0f)
+        failedOnlyContainer.display(false)
+        startOverFabContainer.display(false)
+        failedOnlyContainer.animate().translationY(0f)
+        startOverFabContainer.animate().translationY(0f)
     }
 
     private fun showFabMenu(failedOnlyFab: LinearLayout, startOverFab: LinearLayout) {
@@ -84,5 +87,18 @@ class ResultFragment : Fragment() {
         startOverFab.display(true)
         failedOnlyFab.animate().translationY(-resources.getDimension(R.dimen.standard_75))
         startOverFab.animate().translationY(-resources.getDimension(R.dimen.standard_150))
+    }
+
+    private fun setStartOverOnClickListener(startOverFab: FloatingActionButton) {
+        startOverFab.setOnClickListener {
+            val action = ResultFragmentDirections.fromResultToQuiz(resultViewModel.dictionaryId, resultViewModel.directionResult.toInt(), false)
+            findNavController().navigate(action)
+        }
+    }
+    private fun setFailedOnlyOnClickListener(startOverFab: FloatingActionButton) {
+        startOverFab.setOnClickListener {
+            val action = ResultFragmentDirections.fromResultToQuiz(resultViewModel.dictionaryId, resultViewModel.directionResult.toInt(), true)
+            findNavController().navigate(action)
+        }
     }
 }

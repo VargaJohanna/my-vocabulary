@@ -60,9 +60,10 @@
         tools:layout="@layout/fragment_choose_dictionary">
         <action
             android:id="@+id/action_dictionaryPickerFragment_to_quizFragment"
-            app:destination="@id/quizFragment">
+            app:destination="@id/quizFragment"
+            app:launchSingleTop="true">
             <argument
-                android:name="dictionaryIdForQuiz"
+                android:name="dictionaryId"
                 app:argType="long" />
             <argument
                 android:name="quizOption"
@@ -75,16 +76,20 @@
         android:label="QuizFragment"
         tools:layout="@layout/fragment_quiz">
         <argument
-            android:name="dictionaryIdForQuiz"
+            android:name="dictionaryId"
             app:argType="long" />
         <argument
             android:name="quizOption"
             app:argType="integer" />
+        <argument
+            android:name="failedOnly"
+            app:argType="boolean"
+            android:defaultValue="false" />
         <action
             android:id="@+id/to_resultFragment"
             app:destination="@id/resultFragment">
             <argument
-                android:name="dictionaryIdForResult"
+                android:name="dictionaryId"
                 app:argType="long" />
             <argument
                 android:name="directionType"
@@ -96,14 +101,28 @@
         android:name="com.vocabulary.myvocabulary.ui.results.ResultFragment"
         android:label="ResultFragment"
         tools:layout="@layout/fragment_result">
-        <action
-            android:id="@+id/from_result_to_quizListFragment"
-            app:destination="@id/quizListFragment" />
         <argument
-            android:name="dictionaryIdForResult"
+            android:name="dictionaryId"
             app:argType="long" />
         <argument
             android:name="directionType"
             app:argType="integer" />
+        <action
+            android:id="@+id/from_result_to_quizListFragment"
+            app:destination="@id/quizListFragment" />
+        <action
+            android:id="@+id/from_result_to_quiz"
+            app:destination="@id/quizFragment"
+            app:launchSingleTop="true">
+            <argument
+                android:name="dictionaryId"
+                app:argType="long" />
+            <argument
+                android:name="quizOption"
+                app:argType="integer" />
+            <argument
+                android:name="failedOnly"
+                app:argType="boolean"/>
+        </action>
     </fragment>
 </navigation>
