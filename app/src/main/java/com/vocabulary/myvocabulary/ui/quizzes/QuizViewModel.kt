@@ -8,69 +8,56 @@ import com.vocabulary.myvocabulary.room.wordData.WordRepository
 import com.vocabulary.myvocabulary.rx.RxSchedulers
 import com.vocabulary.myvocabulary.ui.words.Word
 import io.reactivex.disposables.CompositeDisposable
+import org.koin.core.KoinComponent
+import org.koin.core.inject
+import org.koin.core.parameter.parametersOf
 
 
 class QuizViewModel(
         val dictionaryId: Long,
         val optionType: Int,
         private val failedOnly: Boolean,
+        quizType: Int,
         private val wordRepository: WordRepository,
         private val rxSchedulers: RxSchedulers
-) : ViewModel() {
+) : ViewModel(), KoinComponent {
+    private val quizRepository : QuizRepository by inject{
+        parametersOf(dictionaryId, failedOnly, quizType)
+    }
     private val disposables = CompositeDisposable()
-    private val liveWordList: MutableLiveData<List<FocusableWord>> = MutableLiveData()
-    private var focusableWordList: MutableList<FocusableWord> = mutableListOf()
-    private val updateIcon: MutableLiveData<Boolean> = MutableLiveData()
+//    private val liveWordList: MutableLiveData<List<FocusableWord>> = MutableLiveData()
+//    private var focusableWordList: MutableList<FocusableWord> = mutableListOf()
+//    private val updateIcon: MutableLiveData<Boolean> = MutableLiveData()
     private var lastIndexOfSubList: Int = 1
-    private var listIsFinished = false
+//    private var listIsFinished = false
     val directionType = optionType.toDirectionType()
-
-    init {
-        observeList()
-    }
-
-    private fun observeList() {
-        disposables += wordRepository.getObservableWordList(dictionaryId)
-                .subscribeOn(rxSchedulers.io())
-                .observeOn(rxSchedulers.main())
-                .subscribe {
-                    it.forEachIndexed { index: Int, word: Word ->
-                        if (failedOnly) {
-                            if (!word.lastResult) focusableWordList.add(FocusableWord(word, index == 0))
-                        } else focusableWordList.add(FocusableWord(word, index == 0))
-                    }
-                    liveWordList.postValue(focusableWordList.subList(0, 1))
-                    updateIcon.postValue(focusableWordList.size == 1)
-                    listIsFinished = focusableWordList.size == 1
-
-                }
-    }
-
-    fun getLiveWordList(): LiveData<List<FocusableWord>> = liveWordList
+    
+    fun getLiveWordList(): LiveData<List<FocusableWord>> = quizRepository.liveWordList
 
     override fun onCleared() {
         disposables.clear()
+        quizRepository.disposables.clear()
         super.onCleared()
     }
 
     fun nextClicked() {
-        if (lastIndexOfSubList < focusableWordList.size) {
+        if (lastIndexOfSubList < quizRepository.focusableWordList.size) {
             lastIndexOfSubList += 1
             setFocusableValue(lastIndexOfSubList)
-            listIsFinished = lastIndexOfSubList == focusableWordList.size
+            quizRepository.listIsFinished = lastIndexOfSubList == quizRepository.focusableWordList.size
 
-            liveWordList.postValue(focusableWordList.subList(0, lastIndexOfSubList))
-            updateIcon.postValue(lastIndexOfSubList == focusableWordList.size)
+            quizRepository.liveWordList.postValue(quizRepository.focusableWordList.subList(0, lastIndexOfSubList))
+            quizRepository.updateIcon.postValue(lastIndexOfSubList == quizRepository.focusableWordList.size)
         }
     }
 
-    fun listIsNotFinished() = !listIsFinished
-    fun getUpdateIcon(): LiveData<Boolean> = updateIcon
+    fun listIsNotFinished() = !quizRepository.listIsFinished
+    fun getUpdateIcon(): LiveData<Boolean> = quizRepository.updateIcon
 
     private fun setFocusableValue(position: Int) {
-        focusableWordList.subList(0, lastIndexOfSubList).forEachIndexed { index, focusableWord ->
+        quizRepository.focusableWordList.subList(0, lastIndexOfSubList).forEachIndexed { index, focusableWord ->
             val focused = index == position - 1 || index == position - 2
-            focusableWordList.subList(0, lastIndexOfSubList)[index] = focusableWord.copy(isFocused = focused)
+            quizRepository.focusableWordList.subList(0, lastIndexOfSubList)[index] = focusableWord.copy(isFocused = focused)
         }
     }
 
