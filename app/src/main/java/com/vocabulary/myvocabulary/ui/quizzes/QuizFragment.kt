@@ -37,7 +37,8 @@ class QuizFragment : Fragment() {
         parametersOf(
                 QuizFragmentArgs.fromBundle(arguments!!).dictionaryId,
                 QuizFragmentArgs.fromBundle(arguments!!).quizOption,
-                QuizFragmentArgs.fromBundle(arguments!!).failedOnly
+                QuizFragmentArgs.fromBundle(arguments!!).failedOnly,
+                QuizFragmentArgs.fromBundle(arguments!!).quizType
         )
     }
 
