@@ -31,7 +31,7 @@ class QuizViewModel(
     private var lastIndexOfSubList: Int = 1
 //    private var listIsFinished = false
     val directionType = optionType.toDirectionType()
-    
+
     fun getLiveWordList(): LiveData<List<FocusableWord>> = quizRepository.liveWordList
 
     override fun onCleared() {
