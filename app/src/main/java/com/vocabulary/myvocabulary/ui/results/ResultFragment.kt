@@ -91,7 +91,6 @@ class ResultFragment : Fragment() {
 
     private fun setStartOverOnClickListener(startOverFab: FloatingActionButton) {
         startOverFab.setOnClickListener {
-            resultViewModel.resetQuizList()
             val action = ResultFragmentDirections.fromResultToQuiz(
                     args.dictionaryId,
                     resultViewModel.directionResult.toInt(),

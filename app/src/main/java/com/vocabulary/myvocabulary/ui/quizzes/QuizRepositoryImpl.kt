@@ -22,8 +22,8 @@ class QuizRepositoryImpl(
                 .subscribeOn(rxSchedulers.io())
                 .firstOrError()
                 .observeOn(rxSchedulers.main())
-                .subscribe {
-                   t ->_quizList.onNext(t)
+                .subscribe { t ->
+                    _quizList.onNext(t)
                 }
     }
 
@@ -32,7 +32,18 @@ class QuizRepositoryImpl(
         disposables += wordRepository.getObservableWordList(dictionaryId)
                 .subscribeOn(rxSchedulers.io())
                 .map { it.shuffled() }
-                .map { it.take(10) }
+                .map { it.take(5) }
+                .firstOrError()
+                .observeOn(rxSchedulers.main())
+                .subscribe { t -> _quizList.onNext(t) }
+    }
+
+    override fun resetWeakestFive(dictionaryId: Long) {
+        disposables.clear()
+        disposables += wordRepository.getObservableWordList(dictionaryId)
+                .subscribeOn(rxSchedulers.io())
+                .map { list -> list.sortedWith(compareBy { it.failed }).reversed() }
+                .map { it.take(5) }
                 .firstOrError()
                 .observeOn(rxSchedulers.main())
                 .subscribe { t -> _quizList.onNext(t) }

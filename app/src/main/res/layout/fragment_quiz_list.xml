@@ -67,13 +67,13 @@
         android:layout_marginTop="@dimen/margin_medium"
         android:layout_marginEnd="@dimen/margin_medium"
         android:layout_marginBottom="@dimen/margin_medium"
-        app:cardBackgroundColor="@color/light_error"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/full_quiz_card">
 
         <TextView
             style="@style/QuizCardTextStyle"
+            android:background="?selectableItemBackground"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/quiz_list_weaknesses" />

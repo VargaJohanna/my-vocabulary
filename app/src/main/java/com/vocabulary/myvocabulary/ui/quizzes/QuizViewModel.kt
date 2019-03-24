@@ -84,7 +84,7 @@ class QuizViewModel(
         when (quizType.toQuizType()) {
             QuizTypes.FullQuiz -> quizRepository.resetFullQuizList(dictionaryId)
             QuizTypes.QuickQuiz -> quizRepository.resetQuickQuizList(dictionaryId)
-//            QuizTypes.WeakestTenQuiz -> observeWeakestList(dictionaryId, failedOnly)
+            QuizTypes.WeakestQuiz -> quizRepository.resetWeakestFive(dictionaryId)
         }
     }
 

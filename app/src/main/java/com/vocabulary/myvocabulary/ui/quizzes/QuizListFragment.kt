@@ -23,7 +23,7 @@ class QuizListFragment : Fragment() {
             }
 
             weakness_quiz_card.setOnClickListener {
-                val action = QuizListFragmentDirections.toDictionaryPickerFragment(QuizTypes.WeakestTenQuiz.toInt())
+                val action = QuizListFragmentDirections.toDictionaryPickerFragment(QuizTypes.WeakestQuiz.toInt())
                 findNavController().navigate(action)
             }
         }

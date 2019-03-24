@@ -9,4 +9,5 @@ interface QuizRepository {
     val quizList: Observable<List<Word>>
     fun resetFullQuizList(dictionaryId: Long)
     fun resetQuickQuizList(dictionaryId: Long)
+    fun resetWeakestFive(dictionaryId: Long)
 }

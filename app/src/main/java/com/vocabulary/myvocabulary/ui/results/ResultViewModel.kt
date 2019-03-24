@@ -80,13 +80,4 @@ class ResultViewModel(
     private fun setAllPassedValue(lastResult: Boolean) {
         isAllPassed = lastResult
     }
-
-    fun resetQuizList() {
-        when (quizType.toQuizType()) {
-            QuizTypes.FullQuiz -> quizRepository.resetFullQuizList(dictionaryId)
-            QuizTypes.QuickQuiz -> quizRepository.resetQuickQuizList(dictionaryId)
-//            QuizTypes.WeakestTenQuiz -> observeWeakestList(dictionaryId, failedOnly)
-        }
-    }
-
 }
