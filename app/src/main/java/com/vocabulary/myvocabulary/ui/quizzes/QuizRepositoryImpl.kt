@@ -1,6 +1,5 @@
 package com.vocabulary.myvocabulary.ui.quizzes
 
-import androidx.lifecycle.MutableLiveData
 import com.vocabulary.myvocabulary.ext.plusAssign
 import com.vocabulary.myvocabulary.room.wordData.WordRepository
 import com.vocabulary.myvocabulary.rx.RxSchedulers
