@@ -46,6 +46,7 @@ class QuizViewModel(
                         }
                     }
                     if (focusableWordList.isNotEmpty()) {
+                        focusableWordList.shuffle()
                         liveWordList.postValue(focusableWordList.subList(0, 1))
                         updateIcon.postValue(focusableWordList.size == 1)
                         listIsFinished = focusableWordList.size == 1
