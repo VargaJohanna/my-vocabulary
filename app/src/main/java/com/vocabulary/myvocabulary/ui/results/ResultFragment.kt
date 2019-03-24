@@ -26,7 +26,7 @@ class ResultFragment : Fragment() {
     private val args by navArgs<ResultFragmentArgs>()
     private val resultViewModel: ResultViewModel by sharedViewModel {
         parametersOf(
-                args.dictionaryId, args.quizType
+                args.dictionaryId
         )
     }
     private var isFabOpen = false
