@@ -17,6 +17,7 @@ class QuizRepositoryImpl(
     private val disposables = CompositeDisposable()
 
     override fun resetFullQuizList(dictionaryId: Long) {
+        disposables.clear()
         disposables += wordRepository.getObservableWordList(dictionaryId)
                 .subscribeOn(rxSchedulers.io())
                 .observeOn(rxSchedulers.main())
