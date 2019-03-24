@@ -9,40 +9,47 @@ import com.vocabulary.myvocabulary.rx.RxSchedulers
 import com.vocabulary.myvocabulary.ui.words.Word
 import io.reactivex.disposables.CompositeDisposable
 
-
 class QuizViewModel(
         val dictionaryId: Long,
         val optionType: Int,
-        private val failedOnly: Boolean,
+        failedOnly: Boolean,
+        quizType: Int,
         private val wordRepository: WordRepository,
-        private val rxSchedulers: RxSchedulers
+        private val rxSchedulers: RxSchedulers,
+        private val quizRepository: QuizRepository
 ) : ViewModel() {
     private val disposables = CompositeDisposable()
-    private val liveWordList: MutableLiveData<List<FocusableWord>> = MutableLiveData()
-    private var focusableWordList: MutableList<FocusableWord> = mutableListOf()
-    private val updateIcon: MutableLiveData<Boolean> = MutableLiveData()
-    private var lastIndexOfSubList: Int = 1
+    private val updateIcon = MutableLiveData<Boolean>()
+    private var lastIndexOfSubList = 1
     private var listIsFinished = false
     val directionType = optionType.toDirectionType()
+    private val liveWordList = MutableLiveData<List<FocusableWord>>()
+    private var focusableWordList = mutableListOf<FocusableWord>()
 
     init {
-        observeList()
+        when (quizType.toQuizType()) {
+            QuizTypes.FullQuiz -> observeFullList(failedOnly)
+            QuizTypes.QuickQuiz -> observeQuickList(dictionaryId, failedOnly)
+            QuizTypes.WeakestTenQuiz -> observeWeakestList(dictionaryId, failedOnly)
+        }
     }
 
-    private fun observeList() {
-        disposables += wordRepository.getObservableWordList(dictionaryId)
+    private fun observeFullList(failedOnly: Boolean) {
+        disposables += quizRepository.fullQuizList
                 .subscribeOn(rxSchedulers.io())
                 .observeOn(rxSchedulers.main())
                 .subscribe {
                     it.forEachIndexed { index: Int, word: Word ->
-                        if (failedOnly) {
-                            if (!word.lastResult) focusableWordList.add(FocusableWord(word, index == 0))
-                        } else focusableWordList.add(FocusableWord(word, index == 0))
+                        val newFocusableWord = QuizViewModel.FocusableWord(word, index == 0)
+                        if (!focusableWordList.contains(newFocusableWord) && word.containerDictionaryId == dictionaryId) {
+                            if (!failedOnly || !word.lastResult) focusableWordList.add(newFocusableWord)
+                        }
                     }
-                    liveWordList.postValue(focusableWordList.subList(0, 1))
-                    updateIcon.postValue(focusableWordList.size == 1)
-                    listIsFinished = focusableWordList.size == 1
-
+                    if (focusableWordList.isNotEmpty()) {
+                        liveWordList.postValue(focusableWordList.subList(0, 1))
+                        updateIcon.postValue(focusableWordList.size == 1)
+                        listIsFinished = focusableWordList.size == 1
+                    }
                 }
     }
 
@@ -65,6 +72,7 @@ class QuizViewModel(
     }
 
     fun listIsNotFinished() = !listIsFinished
+
     fun getUpdateIcon(): LiveData<Boolean> = updateIcon
 
     private fun setFocusableValue(position: Int) {
@@ -72,6 +80,27 @@ class QuizViewModel(
             val focused = index == position - 1 || index == position - 2
             focusableWordList.subList(0, lastIndexOfSubList)[index] = focusableWord.copy(isFocused = focused)
         }
+    }
+
+    fun observeQuickList(dictionaryId: Long, failedOnly: Boolean) {
+        disposables += wordRepository.getObservableWordList(dictionaryId)
+                .subscribeOn(rxSchedulers.io())
+                .observeOn(rxSchedulers.main())
+                .subscribe {
+                    it.forEachIndexed { index: Int, word: Word ->
+                        if (!failedOnly || !word.lastResult) focusableWordList.add(QuizViewModel.FocusableWord(word, index == 0))
+                    }
+                    focusableWordList.random()
+                    if (focusableWordList.isNotEmpty()) {
+                        liveWordList.postValue(focusableWordList.subList(0, 1))
+                        updateIcon.postValue(focusableWordList.size == 1)
+                        listIsFinished = focusableWordList.size == 1
+                    }
+                }
+    }
+
+    fun observeWeakestList(dictionaryId: Long, failedOnly: Boolean) {
+
     }
 
     data class FocusableWord(
@@ -84,4 +113,9 @@ class QuizViewModel(
             val guess: String,
             val wordValue: String
     )
+
+    fun startNew() {
+        focusableWordList.clear()
+        quizRepository.resetFullQuizList(dictionaryId)
+    }
 }

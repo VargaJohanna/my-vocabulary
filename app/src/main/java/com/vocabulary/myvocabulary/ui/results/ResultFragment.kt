@@ -9,6 +9,7 @@ import android.widget.ProgressBar
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
+import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.floatingactionbutton.FloatingActionButton
@@ -22,15 +23,16 @@ import org.koin.androidx.viewmodel.ext.sharedViewModel
 import org.koin.core.parameter.parametersOf
 
 class ResultFragment : Fragment() {
+    private val args by navArgs<ResultFragmentArgs>()
     private val resultViewModel: ResultViewModel by sharedViewModel {
         parametersOf(
-                ResultFragmentArgs.fromBundle(arguments!!).dictionaryId
+                args.dictionaryId
         )
     }
     private var isFabOpen = false
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        resultViewModel.setDirection(ResultFragmentArgs.fromBundle(arguments!!).directionType.toDirectionType())
+        resultViewModel.setDirection(args.directionType.toDirectionType())
         val resultAdapter = ResultAdapter(emptyList(), resultViewModel.directionResult)
         resultViewModel.getGuessResult()
         return inflater.inflate(R.layout.fragment_result, container, false).apply {
@@ -89,14 +91,24 @@ class ResultFragment : Fragment() {
 
     private fun setStartOverOnClickListener(startOverFab: FloatingActionButton) {
         startOverFab.setOnClickListener {
-            val action = ResultFragmentDirections.fromResultToQuiz(ResultFragmentArgs.fromBundle(arguments!!).dictionaryId, resultViewModel.directionResult.toInt(), false)
+            val action = ResultFragmentDirections.fromResultToQuiz(
+                    args.dictionaryId,
+                    resultViewModel.directionResult.toInt(),
+                    false,
+                    args.quizType
+            )
             findNavController().navigate(action)
         }
     }
 
     private fun setFailedOnlyOnClickListener(startOverFab: FloatingActionButton) {
         startOverFab.setOnClickListener {
-            val action = ResultFragmentDirections.fromResultToQuiz(ResultFragmentArgs.fromBundle(arguments!!).dictionaryId, resultViewModel.directionResult.toInt(), true)
+            val action = ResultFragmentDirections.fromResultToQuiz(
+                    args.dictionaryId,
+                    resultViewModel.directionResult.toInt(),
+                    true,
+                    args.quizType
+            )
             findNavController().navigate(action)
         }
     }

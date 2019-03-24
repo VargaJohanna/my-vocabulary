@@ -10,6 +10,7 @@ import android.view.ViewGroup
 import android.widget.*
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
+import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.floatingactionbutton.FloatingActionButton
@@ -24,9 +25,10 @@ import org.koin.androidx.viewmodel.ext.viewModel
 import org.koin.core.parameter.parametersOf
 
 class WordListFragment : Fragment(), WordAdapter.WordItemClickListener {
+    private val args by navArgs<WordListFragmentArgs>()
     private val defaultWordList: DefaultWordList by inject()
     private val wordViewModel: WordListViewModel by viewModel {
-        parametersOf(WordListFragmentArgs.fromBundle(arguments!!).dictionaryId)
+        parametersOf(args.dictionaryId)
     }
     private var createDialog: AlertDialog? = null
     private var renameDialog: AlertDialog? = null
@@ -47,7 +49,7 @@ class WordListFragment : Fragment(), WordAdapter.WordItemClickListener {
             setDefaultWordDatabase()
             observeWordList(wordAdapter, word_list_progress_bar)
             setFabOnClickListener(word_fab)
-            word_list_title.text = WordListFragmentArgs.fromBundle(arguments!!).dictonaryName
+            word_list_title.text = args.dictonaryName
         }
     }
 

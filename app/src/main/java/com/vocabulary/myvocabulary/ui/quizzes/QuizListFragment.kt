@@ -13,7 +13,18 @@ class QuizListFragment : Fragment() {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return inflater.inflate(R.layout.fragment_quiz_list, container, false).apply {
             full_quiz_card.setOnClickListener {
-                findNavController().navigate(R.id.to_dictionaryPickerFragment)
+                val action = QuizListFragmentDirections.toDictionaryPickerFragment(QuizTypes.FullQuiz.toInt())
+                findNavController().navigate(action)
+            }
+
+            quick_quiz_card.setOnClickListener {
+                val action = QuizListFragmentDirections.toDictionaryPickerFragment(QuizTypes.QuickQuiz.toInt())
+                findNavController().navigate(action)
+            }
+
+            weakness_quiz_card.setOnClickListener {
+                val action = QuizListFragmentDirections.toDictionaryPickerFragment(QuizTypes.WeakestTenQuiz.toInt())
+                findNavController().navigate(action)
             }
         }
     }

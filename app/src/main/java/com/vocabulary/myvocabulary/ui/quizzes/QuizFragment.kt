@@ -8,6 +8,7 @@ import android.widget.ProgressBar
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
+import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.floatingactionbutton.FloatingActionButton
@@ -27,17 +28,19 @@ import org.koin.core.parameter.parametersOf
 
 class QuizFragment : Fragment() {
     private val rxSchedulers: RxSchedulers by inject()
+    private val args by navArgs<QuizFragmentArgs>()
     private val resultViewModel: ResultViewModel by sharedViewModel {
         parametersOf(
-                QuizFragmentArgs.fromBundle(arguments!!).dictionaryId,
-                QuizFragmentArgs.fromBundle(arguments!!).quizOption
+                args.dictionaryId,
+                args.quizOption
         )
     }
     private val quizViewModel: QuizViewModel by viewModel {
         parametersOf(
-                QuizFragmentArgs.fromBundle(arguments!!).dictionaryId,
-                QuizFragmentArgs.fromBundle(arguments!!).quizOption,
-                QuizFragmentArgs.fromBundle(arguments!!).failedOnly
+                args.dictionaryId,
+                args.quizOption,
+                args.failedOnly,
+                args.quizType
         )
     }
 
@@ -48,6 +51,7 @@ class QuizFragment : Fragment() {
         if (savedInstanceState == null) {
             resultViewModel.resetGuessedWordCollections()
         }
+        quizViewModel.startNew()
         return inflater.inflate(R.layout.fragment_quiz, container, false).apply {
             generateWordList(quizAdapter, quiz_recycler_view)
             observeWordList(quizAdapter, quiz_progress_bar)
@@ -62,7 +66,11 @@ class QuizFragment : Fragment() {
             if (quizViewModel.listIsNotFinished()) {
                 quizViewModel.nextClicked()
             } else {
-                val action = QuizFragmentDirections.toResultFragment(quizViewModel.dictionaryId, quizViewModel.optionType)
+                val action = QuizFragmentDirections.toResultFragment(
+                        quizViewModel.dictionaryId,
+                        quizViewModel.optionType,
+                        args.quizType
+                )
                 findNavController().navigate(action)
             }
         }
