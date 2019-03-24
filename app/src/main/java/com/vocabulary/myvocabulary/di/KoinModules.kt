@@ -39,7 +39,7 @@ val viewModelModule = module {
                 get(),
                 get())
     }
-    viewModel { (dictionaryId: Long, quizType: Int) -> ResultViewModel(dictionaryId, quizType, get(), get(), get()) }
+    viewModel { (dictionaryId: Long) -> ResultViewModel(dictionaryId, get(), get(), get()) }
 }
 
 val schedulerModule = module {
