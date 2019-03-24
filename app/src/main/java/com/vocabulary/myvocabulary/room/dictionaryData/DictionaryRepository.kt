@@ -5,7 +5,7 @@ import io.reactivex.Observable
 import io.reactivex.Single
 
 
-interface DictionaryRepository {
+interface  DictionaryRepository {
     val allDictionaries: Observable<List<Dictionary>>
     val numberOfDictionaries: Observable<Int>
     fun createDictionary(dictionary: Dictionary): Long
