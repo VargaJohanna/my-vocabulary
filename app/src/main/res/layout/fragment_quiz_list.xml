@@ -25,13 +25,13 @@
         android:layout_marginStart="@dimen/margin_medium"
         android:layout_marginTop="@dimen/margin_medium"
         android:layout_marginEnd="@dimen/margin_medium"
-        app:cardBackgroundColor="@color/light_error"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/quiz_list_title">
 
         <TextView
             style="@style/QuizCardTextStyle"
+            android:background="?selectableItemBackground"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/quiz_list_quick_one" />

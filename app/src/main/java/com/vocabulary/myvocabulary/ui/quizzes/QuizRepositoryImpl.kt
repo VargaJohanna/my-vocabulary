@@ -9,17 +9,12 @@ import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.subjects.BehaviorSubject
 
 class QuizRepositoryImpl(
-        private val dictionaryId: Long,
         private val wordRepository: WordRepository,
         private val rxSchedulers: RxSchedulers
 ) : QuizRepository {
-    override var isQuizFinished = false
     override val _quizList: BehaviorSubject<List<Word>> = BehaviorSubject.create<List<Word>>()
     override val quizList: Observable<List<Word>> = _quizList
-//    private val _quickQuizList = BehaviorSubject.create<List<Word>>()
-//    override val quickQuizList: Observable<List<Word>> = _quickQuizList
     private val disposables = CompositeDisposable()
-    override var currentQuizList = mutableListOf<Word>()
 
     override fun resetFullQuizList(dictionaryId: Long) {
         disposables.clear()

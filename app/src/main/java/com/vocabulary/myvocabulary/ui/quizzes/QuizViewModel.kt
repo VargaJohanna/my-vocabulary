@@ -4,25 +4,19 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.vocabulary.myvocabulary.ext.plusAssign
-import com.vocabulary.myvocabulary.room.wordData.WordRepository
 import com.vocabulary.myvocabulary.rx.RxSchedulers
 import com.vocabulary.myvocabulary.ui.words.Word
 import io.reactivex.disposables.CompositeDisposable
-import org.koin.core.KoinComponent
-import org.koin.core.inject
-import org.koin.core.parameter.parametersOf
 
 class QuizViewModel(
         val dictionaryId: Long,
         val optionType: Int,
         failedOnly: Boolean,
         private val quizType: Int,
-        private val wordRepository: WordRepository,
-        private val rxSchedulers: RxSchedulers
-) : ViewModel(), KoinComponent {
-    private val quizRepository: QuizRepository by inject {
-        parametersOf(dictionaryId)
-    }
+        private val rxSchedulers: RxSchedulers,
+        private val quizRepository: QuizRepository
+) : ViewModel() {
+
     private val disposables = CompositeDisposable()
     private val updateIcon = MutableLiveData<Boolean>()
     private var lastIndexOfSubList = 1
@@ -85,6 +79,15 @@ class QuizViewModel(
         }
     }
 
+    fun startNew() {
+        focusableWordList.clear()
+        when (quizType.toQuizType()) {
+            QuizTypes.FullQuiz -> quizRepository.resetFullQuizList(dictionaryId)
+            QuizTypes.QuickQuiz -> quizRepository.resetQuickQuizList(dictionaryId)
+//            QuizTypes.WeakestTenQuiz -> observeWeakestList(dictionaryId, failedOnly)
+        }
+    }
+
     data class FocusableWord(
             val word: Word,
             val isFocused: Boolean
@@ -95,17 +98,4 @@ class QuizViewModel(
             val guess: String,
             val wordValue: String
     )
-
-    fun startNew() {
-        focusableWordList.clear()
-        when (quizType.toQuizType()) {
-            QuizTypes.FullQuiz -> quizRepository.resetFullQuizList(dictionaryId)
-            QuizTypes.QuickQuiz -> quizRepository.resetQuickQuizList(dictionaryId)
-//            QuizTypes.WeakestTenQuiz -> observeWeakestList(dictionaryId, failedOnly)
-        }
-    }
-
-    fun resetFocusableList() {
-//        focusableWordList.clear()
-    }
 }
