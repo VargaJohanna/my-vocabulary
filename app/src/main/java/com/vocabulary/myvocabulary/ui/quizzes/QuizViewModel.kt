@@ -9,8 +9,6 @@ import com.vocabulary.myvocabulary.rx.RxSchedulers
 import com.vocabulary.myvocabulary.ui.words.Word
 import io.reactivex.disposables.CompositeDisposable
 import org.koin.core.KoinComponent
-import org.koin.core.inject
-import org.koin.core.parameter.parametersOf
 
 
 class QuizViewModel(
@@ -19,11 +17,9 @@ class QuizViewModel(
         private val failedOnly: Boolean,
         val quizType: Int,
         private val wordRepository: WordRepository,
-        private val rxSchedulers: RxSchedulers
+        private val rxSchedulers: RxSchedulers,
+        private val quizRepository: QuizRepository
 ) : ViewModel(), KoinComponent {
-    val quizRepository: QuizRepository by inject {
-        parametersOf(failedOnly, quizType)
-    }
     private val disposables = CompositeDisposable()
     private val updateIcon: MutableLiveData<Boolean> = MutableLiveData()
     private var lastIndexOfSubList: Int = 1

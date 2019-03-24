@@ -49,7 +49,7 @@ class QuizFragment : Fragment() {
         if (savedInstanceState == null) {
             resultViewModel.resetGuessedWordCollections()
         }
-       quizViewModel.startNew()
+        quizViewModel.startNew()
         return inflater.inflate(R.layout.fragment_quiz, container, false).apply {
             generateWordList(quizAdapter, quiz_recycler_view)
             observeWordList(quizAdapter, quiz_progress_bar)
@@ -68,7 +68,7 @@ class QuizFragment : Fragment() {
                         quizViewModel.dictionaryId,
                         quizViewModel.optionType,
                         QuizFragmentArgs.fromBundle(arguments!!).quizType
-                        )
+                )
                 findNavController().navigate(action)
             }
         }

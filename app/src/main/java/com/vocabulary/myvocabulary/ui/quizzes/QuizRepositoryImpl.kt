@@ -9,8 +9,6 @@ import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.subjects.BehaviorSubject
 
 class QuizRepositoryImpl(
-        private val failedOnly: Boolean,
-        quizType: Int,
         private val wordRepository: WordRepository,
         private val rxSchedulers: RxSchedulers
 ) : QuizRepository {
