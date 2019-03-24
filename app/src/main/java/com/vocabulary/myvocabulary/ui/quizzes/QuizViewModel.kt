@@ -8,32 +8,26 @@ import com.vocabulary.myvocabulary.room.wordData.WordRepository
 import com.vocabulary.myvocabulary.rx.RxSchedulers
 import com.vocabulary.myvocabulary.ui.words.Word
 import io.reactivex.disposables.CompositeDisposable
-import org.koin.core.KoinComponent
-
 
 class QuizViewModel(
         val dictionaryId: Long,
         val optionType: Int,
-        private val failedOnly: Boolean,
-        val quizType: Int,
+        failedOnly: Boolean,
+        quizType: Int,
         private val wordRepository: WordRepository,
         private val rxSchedulers: RxSchedulers,
         private val quizRepository: QuizRepository
-) : ViewModel(), KoinComponent {
+) : ViewModel() {
     private val disposables = CompositeDisposable()
-    private val updateIcon: MutableLiveData<Boolean> = MutableLiveData()
-    private var lastIndexOfSubList: Int = 1
+    private val updateIcon = MutableLiveData<Boolean>()
+    private var lastIndexOfSubList = 1
     private var listIsFinished = false
     val directionType = optionType.toDirectionType()
-    private val liveWordList: MutableLiveData<List<FocusableWord>> = MutableLiveData()
-    private var focusableWordList: MutableList<FocusableWord> = mutableListOf()
+    private val liveWordList = MutableLiveData<List<FocusableWord>>()
+    private var focusableWordList = mutableListOf<FocusableWord>()
 
     init {
-        observeList(quizType.toQuizType())
-    }
-
-    private fun observeList(quizType: QuizTypes) {
-        when (quizType) {
+        when (quizType.toQuizType()) {
             QuizTypes.FullQuiz -> observeFullList(failedOnly)
             QuizTypes.QuickQuiz -> observeQuickList(dictionaryId, failedOnly)
             QuizTypes.WeakestTenQuiz -> observeWeakestList(dictionaryId, failedOnly)
@@ -78,6 +72,7 @@ class QuizViewModel(
     }
 
     fun listIsNotFinished() = !listIsFinished
+
     fun getUpdateIcon(): LiveData<Boolean> = updateIcon
 
     private fun setFocusableValue(position: Int) {
@@ -120,8 +115,7 @@ class QuizViewModel(
     )
 
     fun startNew() {
-        quizRepository.startNewQuiz(dictionaryId)
         focusableWordList.clear()
-        quizRepository.getFullQuizList()
+        quizRepository.resetFullQuizList(dictionaryId)
     }
 }
