@@ -15,9 +15,8 @@ class QuizRepositoryImpl(
     private val _fullQuizList = BehaviorSubject.create<List<Word>>()
     override val fullQuizList: Observable<List<Word>> = _fullQuizList
     private val disposables = CompositeDisposable()
-    private var dictionaryId: Long = 0
 
-    override fun getFullQuizList() {
+    override fun resetFullQuizList(dictionaryId: Long) {
         disposables += wordRepository.getObservableWordList(dictionaryId)
                 .subscribeOn(rxSchedulers.io())
                 .observeOn(rxSchedulers.main())
@@ -25,10 +24,4 @@ class QuizRepositoryImpl(
                     _fullQuizList.onNext(it)
                 }
     }
-
-    override fun startNewQuiz(dictionaryId: Long) {
-        this.dictionaryId = dictionaryId
-        disposables.clear()
-    }
-
 }
