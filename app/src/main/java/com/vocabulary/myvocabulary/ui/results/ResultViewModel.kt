@@ -41,7 +41,6 @@ class ResultViewModel(
                                 }
                             }
                             .doOnSuccess {
-                                //                                quizRepository.currentQuizList.add(it)
                                 wordRepository.updateWord(it)
                             }
                 }.toList()
