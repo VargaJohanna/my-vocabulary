@@ -24,7 +24,7 @@ val repositoryModule = module {
     single { get<AppDatabase>().wordDao() }
     single<DictionaryRepository> { DictionaryRepositoryImpl(get(), get()) }
     single<WordRepository> { WordRepositoryImpl(get()) }
-    single<QuizRepository> { QuizRepositoryImpl(get(), get())}
+    single<QuizRepository> { (dictionaryId: Long) -> QuizRepositoryImpl(dictionaryId, get(), get())}
 }
 
 val viewModelModule = module {
@@ -36,9 +36,8 @@ val viewModelModule = module {
             failedOnly,
             quizType,
             get(),
-            get(),
             get()) }
-    viewModel { (dictionaryId: Long) -> ResultViewModel(dictionaryId, get(), get()) }
+    viewModel { (dictionaryId: Long, quizType: Int) -> ResultViewModel(dictionaryId, quizType, get(), get(), get()) }
 }
 
 val schedulerModule = module {
