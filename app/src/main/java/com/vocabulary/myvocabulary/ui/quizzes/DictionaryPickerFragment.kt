@@ -9,6 +9,7 @@ import android.widget.*
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
+import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.vocabulary.myvocabulary.R
@@ -23,6 +24,7 @@ import org.koin.androidx.viewmodel.ext.viewModel
 class DictionaryPickerFragment: Fragment(), DictionaryAdapter.ItemClickListener {
     private val viewModel: DictionaryListViewModel by viewModel()
     private var optionsDialog: AlertDialog? = null
+    private val args by navArgs<DictionaryPickerFragmentArgs>()
 
     override fun onItemClick(dictionary: Dictionary) {
         showOptionsDialog(dictionary.dictionaryId)
@@ -83,7 +85,11 @@ class DictionaryPickerFragment: Fragment(), DictionaryAdapter.ItemClickListener 
     }
 
     private fun startQuiz(selectedOption: Int, dictionaryId: Long) {
-        val action = DictionaryPickerFragmentDirections.actionDictionaryPickerFragmentToQuizFragment(dictionaryId, selectedOption)
+        val action = DictionaryPickerFragmentDirections.actionDictionaryPickerFragmentToQuizFragment(
+                dictionaryId,
+                selectedOption,
+                args.quizType
+                )
         findNavController().navigate(action)
     }
 
