@@ -26,7 +26,7 @@ class ResultFragment : Fragment() {
     private val args by navArgs<ResultFragmentArgs>()
     private val resultViewModel: ResultViewModel by sharedViewModel {
         parametersOf(
-                args.dictionaryId
+                args.dictionaryId, args.quizType
         )
     }
     private var isFabOpen = false
@@ -91,6 +91,7 @@ class ResultFragment : Fragment() {
 
     private fun setStartOverOnClickListener(startOverFab: FloatingActionButton) {
         startOverFab.setOnClickListener {
+            resultViewModel.resetQuizList()
             val action = ResultFragmentDirections.fromResultToQuiz(
                     args.dictionaryId,
                     resultViewModel.directionResult.toInt(),
