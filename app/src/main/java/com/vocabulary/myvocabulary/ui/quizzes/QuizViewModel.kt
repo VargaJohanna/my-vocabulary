@@ -21,7 +21,7 @@ class QuizViewModel(
         private val wordRepository: WordRepository,
         private val rxSchedulers: RxSchedulers
 ) : ViewModel(), KoinComponent {
-    val quizRepository : QuizRepository by inject{
+    val quizRepository: QuizRepository by inject {
         parametersOf(failedOnly, quizType)
     }
     private val disposables = CompositeDisposable()
@@ -37,7 +37,7 @@ class QuizViewModel(
     }
 
     private fun observeList(quizType: QuizTypes) {
-        when(quizType) {
+        when (quizType) {
             QuizTypes.FullQuiz -> observeFullList(failedOnly)
             QuizTypes.QuickQuiz -> observeQuickList(dictionaryId, failedOnly)
             QuizTypes.WeakestTenQuiz -> observeWeakestList(dictionaryId, failedOnly)
@@ -51,11 +51,11 @@ class QuizViewModel(
                 .subscribe {
                     it.forEachIndexed { index: Int, word: Word ->
                         val newFocusableWord = QuizViewModel.FocusableWord(word, index == 0)
-                        if(!focusableWordList.contains(newFocusableWord) && word.containerDictionaryId == dictionaryId) {
-                            if(!failedOnly || !word.lastResult) focusableWordList.add(newFocusableWord)
+                        if (!focusableWordList.contains(newFocusableWord) && word.containerDictionaryId == dictionaryId) {
+                            if (!failedOnly || !word.lastResult) focusableWordList.add(newFocusableWord)
                         }
                     }
-                    if(focusableWordList.isNotEmpty()) {
+                    if (focusableWordList.isNotEmpty()) {
                         liveWordList.postValue(focusableWordList.subList(0, 1))
                         updateIcon.postValue(focusableWordList.size == 1)
                         listIsFinished = focusableWordList.size == 1
@@ -97,10 +97,10 @@ class QuizViewModel(
                 .observeOn(rxSchedulers.main())
                 .subscribe {
                     it.forEachIndexed { index: Int, word: Word ->
-                        if(!failedOnly || !word.lastResult) focusableWordList.add(QuizViewModel.FocusableWord(word, index == 0))
+                        if (!failedOnly || !word.lastResult) focusableWordList.add(QuizViewModel.FocusableWord(word, index == 0))
                     }
                     focusableWordList.random()
-                    if(focusableWordList.isNotEmpty()) {
+                    if (focusableWordList.isNotEmpty()) {
                         liveWordList.postValue(focusableWordList.subList(0, 1))
                         updateIcon.postValue(focusableWordList.size == 1)
                         listIsFinished = focusableWordList.size == 1
