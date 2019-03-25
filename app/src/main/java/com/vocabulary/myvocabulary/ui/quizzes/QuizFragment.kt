@@ -52,7 +52,6 @@ class QuizFragment : Fragment() {
             resultViewModel.resetGuessedWordCollections()
         }
         quizViewModel.startNew()
-//        requireActivity().onBackPressed()
         return inflater.inflate(R.layout.fragment_quiz, container, false).apply {
             generateWordList(quizAdapter, quiz_recycler_view)
             observeWordList(quizAdapter, quiz_progress_bar)
