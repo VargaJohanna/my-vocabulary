@@ -107,4 +107,5 @@ class QuizFragment : Fragment() {
                     resultViewModel.guessedWordMap[it.wordId] = it.guess
                 }
     }
+
 }
