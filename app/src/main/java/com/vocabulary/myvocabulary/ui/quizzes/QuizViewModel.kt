@@ -79,11 +79,6 @@ class QuizViewModel(
         }
     }
 
-    fun startNew() {
-        focusableWordList.clear()
-        quizRepository.resetQuizList(dictionaryId, quizType.toQuizType())
-    }
-
     data class FocusableWord(
             val word: Word,
             val isFocused: Boolean

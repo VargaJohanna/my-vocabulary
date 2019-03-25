@@ -51,7 +51,6 @@ class QuizFragment : Fragment() {
         if (savedInstanceState == null) {
             resultViewModel.resetGuessedWordCollections()
         }
-        quizViewModel.startNew()
         return inflater.inflate(R.layout.fragment_quiz, container, false).apply {
             generateWordList(quizAdapter, quiz_recycler_view)
             observeWordList(quizAdapter, quiz_progress_bar)
