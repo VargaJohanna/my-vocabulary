@@ -6,6 +6,7 @@ import com.vocabulary.myvocabulary.ext.plusAssign
 import com.vocabulary.myvocabulary.room.wordData.WordRepository
 import com.vocabulary.myvocabulary.rx.RxSchedulers
 import com.vocabulary.myvocabulary.ui.quizzes.QuizDirectionType
+import com.vocabulary.myvocabulary.ui.quizzes.QuizRepository
 import com.vocabulary.myvocabulary.ui.words.Word
 import io.reactivex.Observable
 import io.reactivex.disposables.CompositeDisposable
@@ -13,7 +14,8 @@ import io.reactivex.disposables.CompositeDisposable
 class ResultViewModel(
         val dictionaryId: Long,
         private val wordRepository: WordRepository,
-        private val rxSchedulers: RxSchedulers
+        private val rxSchedulers: RxSchedulers,
+        val quizRepository: QuizRepository
 ) : ViewModel() {
     private val disposables = CompositeDisposable()
     var guessedWordMap: MutableMap<Long, String> = mutableMapOf()
@@ -32,7 +34,7 @@ class ResultViewModel(
                 .flatMapSingle { entry ->
                     wordRepository.getWordById(entry.key)
                             .map {
-                                if(!evaluateGuess(it)) setAllPassedValue(false)
+                                if (!evaluateGuess(it)) setAllPassedValue(false)
                                 when (evaluateGuess(it)) {
                                     true -> it.copy(lastResult = evaluateGuess(it), lastGuess = entry.value, beenAsked = it.beenAsked + 1, passed = it.passed + 1)
                                     false -> it.copy(lastResult = evaluateGuess(it), lastGuess = entry.value, beenAsked = it.beenAsked + 1, failed = it.failed + 1)
@@ -44,7 +46,10 @@ class ResultViewModel(
                 }.toList()
                 .subscribeOn(rxSchedulers.io())
                 .observeOn(rxSchedulers.main())
-                .subscribe { guessList -> liveGuessedWordList.postValue(guessList) }
+                .subscribe { guessList ->
+                    liveGuessedWordList.postValue(guessList)
+                    quizRepository.updateQuizList(guessList)
+                }
     }
 
     fun getLiveGuessedList() = liveGuessedWordList
@@ -71,5 +76,4 @@ class ResultViewModel(
     private fun setAllPassedValue(lastResult: Boolean) {
         isAllPassed = lastResult
     }
-
 }

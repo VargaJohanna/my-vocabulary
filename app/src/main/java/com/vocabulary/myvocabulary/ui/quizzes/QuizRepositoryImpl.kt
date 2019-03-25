@@ -12,17 +12,52 @@ class QuizRepositoryImpl(
         private val wordRepository: WordRepository,
         private val rxSchedulers: RxSchedulers
 ) : QuizRepository {
-    private val _fullQuizList = BehaviorSubject.create<List<Word>>()
-    override val fullQuizList: Observable<List<Word>> = _fullQuizList
+    private val _quizList: BehaviorSubject<List<Word>> = BehaviorSubject.create<List<Word>>()
+    override val quizList: Observable<List<Word>> = _quizList
     private val disposables = CompositeDisposable()
 
-    override fun resetFullQuizList(dictionaryId: Long) {
+    override fun resetQuizList(dictionaryId: Long, quizType: QuizTypes) {
+        when (quizType) {
+            QuizTypes.FullQuiz -> resetFullQuizList(dictionaryId)
+            QuizTypes.QuickQuiz -> resetQuickQuizList(dictionaryId)
+            QuizTypes.WeakestQuiz -> resetWeakestFive(dictionaryId)
+        }
+    }
+
+    private fun resetFullQuizList(dictionaryId: Long) {
         disposables.clear()
         disposables += wordRepository.getObservableWordList(dictionaryId)
                 .subscribeOn(rxSchedulers.io())
+                .firstOrError()
                 .observeOn(rxSchedulers.main())
-                .subscribe {
-                    _fullQuizList.onNext(it)
+                .subscribe { t ->
+                    _quizList.onNext(t)
                 }
+    }
+
+    private fun resetQuickQuizList(dictionaryId: Long) {
+        disposables.clear()
+        disposables += wordRepository.getObservableWordList(dictionaryId)
+                .subscribeOn(rxSchedulers.io())
+                .map { it.shuffled() }
+                .map { it.take(5) }
+                .firstOrError()
+                .observeOn(rxSchedulers.main())
+                .subscribe { t -> _quizList.onNext(t) }
+    }
+
+    private fun resetWeakestFive(dictionaryId: Long) {
+        disposables.clear()
+        disposables += wordRepository.getObservableWordList(dictionaryId)
+                .subscribeOn(rxSchedulers.io())
+                .map { list -> list.sortedWith(compareBy { it.failed }).reversed() }
+                .map { it.take(5) }
+                .firstOrError()
+                .observeOn(rxSchedulers.main())
+                .subscribe { t -> _quizList.onNext(t) }
+    }
+
+    override fun updateQuizList(list: List<Word>) {
+        _quizList.onNext(list)
     }
 }
