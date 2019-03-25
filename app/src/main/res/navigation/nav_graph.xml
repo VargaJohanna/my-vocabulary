@@ -12,7 +12,11 @@
         <action
             android:id="@+id/action_dictionary_to_wordList"
             app:destination="@id/wordListFragment"
-            app:launchSingleTop="true">
+            app:enterAnim="@anim/nav_default_enter_anim"
+            app:exitAnim="@anim/nav_default_exit_anim"
+            app:launchSingleTop="true"
+            app:popEnterAnim="@anim/nav_default_enter_anim"
+            app:popExitAnim="@anim/nav_default_exit_anim">
             <argument
                 android:name="dictionaryId"
                 app:argType="long" />
@@ -29,7 +33,11 @@
         <action
             android:id="@+id/to_dictionaryPickerFragment"
             app:destination="@id/dictionaryPickerFragment"
-            app:launchSingleTop="true">
+            app:enterAnim="@anim/nav_default_enter_anim"
+            app:exitAnim="@anim/nav_default_exit_anim"
+            app:launchSingleTop="true"
+            app:popEnterAnim="@anim/nav_default_enter_anim"
+            app:popExitAnim="@anim/nav_default_pop_exit_anim">
             <argument
                 android:name="quizType"
                 app:argType="integer" />
@@ -43,13 +51,19 @@
         <action
             android:id="@+id/action_homeFragment_to_dictionaryListFragment"
             app:destination="@id/dictionaryListFragment"
-            app:enterAnim="@anim/nav_default_pop_enter_anim"
-            app:launchSingleTop="true" />
+            app:enterAnim="@anim/nav_default_enter_anim"
+            app:exitAnim="@anim/nav_default_exit_anim"
+            app:launchSingleTop="true"
+            app:popEnterAnim="@anim/nav_default_enter_anim"
+            app:popExitAnim="@anim/nav_default_exit_anim" />
         <action
             android:id="@+id/action_homeFragment_to_quizListFragment"
             app:destination="@id/quizListFragment"
-            app:enterAnim="@anim/nav_default_pop_enter_anim"
-            app:launchSingleTop="true" />
+            app:enterAnim="@anim/nav_default_enter_anim"
+            app:exitAnim="@anim/nav_default_exit_anim"
+            app:launchSingleTop="true"
+            app:popEnterAnim="@anim/nav_default_enter_anim"
+            app:popExitAnim="@anim/nav_default_exit_anim" />
     </fragment>
     <fragment
         android:id="@+id/wordListFragment"
@@ -74,7 +88,11 @@
         <action
             android:id="@+id/action_dictionaryPickerFragment_to_quizFragment"
             app:destination="@id/quizFragment"
+            app:enterAnim="@anim/nav_default_enter_anim"
+            app:exitAnim="@anim/nav_default_exit_anim"
             app:launchSingleTop="true"
+            app:popEnterAnim="@anim/nav_default_enter_anim"
+            app:popExitAnim="@anim/nav_default_exit_anim"
             app:popUpToInclusive="false">
             <argument
                 android:name="dictionaryId"
@@ -108,7 +126,11 @@
         <action
             android:id="@+id/to_resultFragment"
             app:destination="@id/resultFragment"
+            app:enterAnim="@anim/nav_default_enter_anim"
+            app:exitAnim="@anim/nav_default_exit_anim"
             app:launchSingleTop="true"
+            app:popEnterAnim="@anim/nav_default_enter_anim"
+            app:popExitAnim="@anim/nav_default_exit_anim"
             app:popUpTo="@+id/quizFragment"
             app:popUpToInclusive="true">
             <argument
@@ -139,13 +161,21 @@
         <action
             android:id="@+id/from_result_to_quizListFragment"
             app:destination="@id/quizListFragment"
+            app:enterAnim="@anim/nav_default_enter_anim"
+            app:exitAnim="@anim/nav_default_exit_anim"
             app:launchSingleTop="true"
+            app:popEnterAnim="@anim/nav_default_enter_anim"
+            app:popExitAnim="@anim/nav_default_exit_anim"
             app:popUpTo="@+id/quizListFragment"
             app:popUpToInclusive="true" />
         <action
             android:id="@+id/from_result_to_quiz"
             app:destination="@id/quizFragment"
+            app:enterAnim="@anim/nav_default_enter_anim"
+            app:exitAnim="@anim/nav_default_exit_anim"
             app:launchSingleTop="true"
+            app:popEnterAnim="@anim/nav_default_enter_anim"
+            app:popExitAnim="@anim/nav_default_exit_anim"
             app:popUpTo="@+id/resultFragment"
             app:popUpToInclusive="true">
             <argument
