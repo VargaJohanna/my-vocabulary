@@ -12,7 +12,7 @@ class QuizRepositoryImpl(
         private val wordRepository: WordRepository,
         private val rxSchedulers: RxSchedulers
 ) : QuizRepository {
-    override val _quizList: BehaviorSubject<List<Word>> = BehaviorSubject.create<List<Word>>()
+    private val _quizList: BehaviorSubject<List<Word>> = BehaviorSubject.create<List<Word>>()
     override val quizList: Observable<List<Word>> = _quizList
     private val disposables = CompositeDisposable()
 
@@ -55,5 +55,9 @@ class QuizRepositoryImpl(
                 .firstOrError()
                 .observeOn(rxSchedulers.main())
                 .subscribe { t -> _quizList.onNext(t) }
+    }
+
+    override fun updateQuizList(list: List<Word>) {
+        _quizList.onNext(list)
     }
 }
