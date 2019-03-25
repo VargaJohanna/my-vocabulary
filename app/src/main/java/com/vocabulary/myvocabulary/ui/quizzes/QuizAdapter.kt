@@ -99,6 +99,18 @@ class QuizAdapter(
                     , 0
             )
             itemView.layoutParams = params
+        } else {
+            val params = ViewGroup.MarginLayoutParams(
+                    ViewGroup.LayoutParams.WRAP_CONTENT,
+                    ViewGroup.LayoutParams.WRAP_CONTENT
+            )
+            params.setMargins(
+                    8f.convertDpToPx(itemView.context),
+                    0,
+                    8f.convertDpToPx(itemView.context)
+                    , 0
+            )
+            itemView.layoutParams = params
         }
     }
 }
