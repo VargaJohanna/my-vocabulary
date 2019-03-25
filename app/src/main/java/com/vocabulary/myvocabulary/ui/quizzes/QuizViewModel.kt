@@ -81,11 +81,7 @@ class QuizViewModel(
 
     fun startNew() {
         focusableWordList.clear()
-        when (quizType.toQuizType()) {
-            QuizTypes.FullQuiz -> quizRepository.resetFullQuizList(dictionaryId)
-            QuizTypes.QuickQuiz -> quizRepository.resetQuickQuizList(dictionaryId)
-            QuizTypes.WeakestQuiz -> quizRepository.resetWeakestFive(dictionaryId)
-        }
+        quizRepository.resetQuizList(dictionaryId, quizType.toQuizType())
     }
 
     data class FocusableWord(

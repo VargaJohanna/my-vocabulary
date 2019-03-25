@@ -16,7 +16,15 @@ class QuizRepositoryImpl(
     override val quizList: Observable<List<Word>> = _quizList
     private val disposables = CompositeDisposable()
 
-    override fun resetFullQuizList(dictionaryId: Long) {
+    override fun resetQuizList(dictionaryId: Long, quizType: QuizTypes) {
+        when (quizType) {
+            QuizTypes.FullQuiz -> resetFullQuizList(dictionaryId)
+            QuizTypes.QuickQuiz -> resetQuickQuizList(dictionaryId)
+            QuizTypes.WeakestQuiz -> resetWeakestFive(dictionaryId)
+        }
+    }
+
+    private fun resetFullQuizList(dictionaryId: Long) {
         disposables.clear()
         disposables += wordRepository.getObservableWordList(dictionaryId)
                 .subscribeOn(rxSchedulers.io())
@@ -27,7 +35,7 @@ class QuizRepositoryImpl(
                 }
     }
 
-    override fun resetQuickQuizList(dictionaryId: Long) {
+    private fun resetQuickQuizList(dictionaryId: Long) {
         disposables.clear()
         disposables += wordRepository.getObservableWordList(dictionaryId)
                 .subscribeOn(rxSchedulers.io())
@@ -38,7 +46,7 @@ class QuizRepositoryImpl(
                 .subscribe { t -> _quizList.onNext(t) }
     }
 
-    override fun resetWeakestFive(dictionaryId: Long) {
+    private fun resetWeakestFive(dictionaryId: Long) {
         disposables.clear()
         disposables += wordRepository.getObservableWordList(dictionaryId)
                 .subscribeOn(rxSchedulers.io())
