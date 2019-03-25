@@ -48,7 +48,7 @@ class ResultViewModel(
                 .observeOn(rxSchedulers.main())
                 .subscribe { guessList ->
                     liveGuessedWordList.postValue(guessList)
-                    quizRepository._quizList.onNext(guessList)
+                    quizRepository.updateQuizList(guessList)
                 }
     }
 
