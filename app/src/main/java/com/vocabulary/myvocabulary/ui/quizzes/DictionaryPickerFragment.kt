@@ -85,6 +85,7 @@ class DictionaryPickerFragment: Fragment(), DictionaryAdapter.ItemClickListener 
     }
 
     private fun startQuiz(selectedOption: Int, dictionaryId: Long) {
+        viewModel.startNew(dictionaryId, args.quizType.toQuizType())
         val action = DictionaryPickerFragmentDirections.actionDictionaryPickerFragmentToQuizFragment(
                 dictionaryId,
                 selectedOption,
