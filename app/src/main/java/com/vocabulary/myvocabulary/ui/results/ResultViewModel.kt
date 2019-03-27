@@ -7,6 +7,7 @@ import com.vocabulary.myvocabulary.room.wordData.WordRepository
 import com.vocabulary.myvocabulary.rx.RxSchedulers
 import com.vocabulary.myvocabulary.ui.quizzes.QuizDirectionType
 import com.vocabulary.myvocabulary.ui.quizzes.QuizRepository
+import com.vocabulary.myvocabulary.ui.quizzes.QuizTypes
 import com.vocabulary.myvocabulary.ui.words.Word
 import io.reactivex.Observable
 import io.reactivex.disposables.CompositeDisposable
@@ -75,5 +76,9 @@ class ResultViewModel(
 
     private fun setAllPassedValue(lastResult: Boolean) {
         isAllPassed = lastResult
+    }
+
+    fun startNew(dictionaryId: Long, quizType: QuizTypes) {
+        quizRepository.resetQuizList(dictionaryId, quizType)
     }
 }

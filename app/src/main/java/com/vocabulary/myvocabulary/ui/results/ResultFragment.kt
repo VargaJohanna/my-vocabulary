@@ -20,6 +20,7 @@ import com.vocabulary.myvocabulary.ext.display
 import com.vocabulary.myvocabulary.ext.show
 import com.vocabulary.myvocabulary.ui.quizzes.toDirectionType
 import com.vocabulary.myvocabulary.ui.quizzes.toInt
+import com.vocabulary.myvocabulary.ui.quizzes.toQuizType
 import kotlinx.android.synthetic.main.fragment_result.view.*
 import org.koin.androidx.viewmodel.ext.sharedViewModel
 import org.koin.core.parameter.parametersOf
@@ -96,6 +97,9 @@ class ResultFragment : Fragment() {
 
     private fun setStartOverOnClickListener(startOverFab: FloatingActionButton) {
         startOverFab.setOnClickListener {
+            resultViewModel.resetGuessedWordCollections()
+            resultViewModel.startNew(args.dictionaryId, args.quizType.toQuizType())
+
             val action = ResultFragmentDirections.fromResultToQuiz(
                     args.dictionaryId,
                     resultViewModel.directionResult.toInt(),
