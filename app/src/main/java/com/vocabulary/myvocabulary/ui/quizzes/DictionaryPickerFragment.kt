@@ -70,7 +70,7 @@ class DictionaryPickerFragment: Fragment(), DictionaryAdapter.ItemClickListener 
         val doItButton: Button = dialogView.lets_do_it_button
         val cancelButton: Button = dialogView.cancel_direction_picker_dialog
         val errorMessage: TextView = dialogView.option_picker_error
-        val dialogBuilder = AlertDialog.Builder(requireActivity(), R.style.ThemeOverlay_MaterialComponents_Dialog_Alert)
+        val dialogBuilder = AlertDialog.Builder(requireActivity())
         optionsDialog = dialogBuilder.create().apply {
             setView(dialogView)
             radioGroup.setOnCheckedChangeListener { _, checkedId ->

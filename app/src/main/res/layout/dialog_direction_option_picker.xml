@@ -7,6 +7,7 @@
 
     <Button
         android:id="@+id/lets_do_it_button"
+        style="@style/Widget.MaterialComponents.Button.TextButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_margin="@dimen/margin_medium"
@@ -19,6 +20,7 @@
 
     <Button
         android:id="@+id/cancel_direction_picker_dialog"
+        style="@style/Widget.MaterialComponents.Button.TextButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_margin="@dimen/margin_medium"
