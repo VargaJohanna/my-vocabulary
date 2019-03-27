@@ -16,16 +16,13 @@ import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.vocabulary.myvocabulary.R
 import com.vocabulary.myvocabulary.ext.show
-import com.vocabulary.myvocabulary.room.dictionaryData.DefaultDictionaryData
 import kotlinx.android.synthetic.main.dialog_create_dictionary.view.*
-import kotlinx.android.synthetic.main.fragment_dictionary_list.view.*
 import kotlinx.android.synthetic.main.dialog_rename_dictionary.view.*
-import org.koin.android.ext.android.inject
+import kotlinx.android.synthetic.main.fragment_dictionary_list.view.*
 import org.koin.androidx.viewmodel.ext.viewModel
 
 class DictionaryListFragment : Fragment(), DictionaryAdapter.ItemClickListener {
     private val viewModel: DictionaryListViewModel by viewModel()
-    private val defaultDictionaryData: DefaultDictionaryData by inject()
     private var createDialog: AlertDialog? = null
     private var renameDialog: AlertDialog? = null
     private var popUp: PopupMenu? = null
@@ -41,7 +38,6 @@ class DictionaryListFragment : Fragment(), DictionaryAdapter.ItemClickListener {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val dictionaryAdapter = DictionaryAdapter(ArrayList(), this, true)
-        setDefaultDatabase()
 
         return inflater.inflate(R.layout.fragment_dictionary_list, container, false).apply {
             generateDictionaryList(dictionaryAdapter, dictionary_recycler_view)
@@ -77,14 +73,6 @@ class DictionaryListFragment : Fragment(), DictionaryAdapter.ItemClickListener {
             dictionaryAdapter.updateList(it)
             progressBar.show(false)
 
-        })
-    }
-
-    private fun setDefaultDatabase() {
-        viewModel.getNumberOfDictionaries().observe(this, Observer {
-            if (it == 0) {
-                viewModel.insertDefaultDictionary(defaultDictionaryData.getDefaultDictionary())
-            }
         })
     }
 
