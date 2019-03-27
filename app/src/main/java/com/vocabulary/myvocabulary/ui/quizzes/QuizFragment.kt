@@ -5,6 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ProgressBar
+import androidx.appcompat.widget.Toolbar
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
@@ -57,6 +58,8 @@ class QuizFragment : Fragment() {
             observeGuessedWord(quizAdapter.guessedWord)
             setNextButtonIconUpdateListener(quiz_next_fab)
             setNextFabOnClickListener(quiz_next_fab)
+            setToolBarTitle(quiz_toolbar)
+            quiz_toolbar.setNavigationOnClickListener { findNavController().popBackStack() }
         }
     }
 
@@ -68,7 +71,8 @@ class QuizFragment : Fragment() {
                 val action = QuizFragmentDirections.toResultFragment(
                         quizViewModel.dictionaryId,
                         quizViewModel.optionType,
-                        args.quizType
+                        args.quizType,
+                        args.dictionaryName
                 )
                 findNavController().navigate(action)
             }
@@ -107,4 +111,11 @@ class QuizFragment : Fragment() {
                 }
     }
 
+    private fun setToolBarTitle(toolbar: Toolbar) {
+        when(args.quizType.toQuizType()) {
+            QuizTypes.QuickQuiz -> toolbar.title = "${getString(R.string.quiz_list_quick_one)} from ${args.dictionaryName}"
+            QuizTypes.FullQuiz -> toolbar.title = "${getString(R.string.quiz_list_ask_me_everything)} from ${args.dictionaryName}"
+            QuizTypes.WeakestQuiz -> toolbar.title = "${getString(R.string.quiz_list_weaknesses)} from ${args.dictionaryName}"
+        }
+    }
 }

@@ -104,7 +104,8 @@ class ResultFragment : Fragment() {
                     args.dictionaryId,
                     resultViewModel.directionResult.toInt(),
                     false,
-                    args.quizType
+                    args.quizType,
+                    args.dictionaryName
             )
             findNavController().navigate(action)
         }
@@ -116,7 +117,8 @@ class ResultFragment : Fragment() {
                     args.dictionaryId,
                     resultViewModel.directionResult.toInt(),
                     true,
-                    args.quizType
+                    args.quizType,
+                    args.dictionaryName
             )
             findNavController().navigate(action)
         }

@@ -30,6 +30,7 @@ class DictionaryPickerFragment: Fragment(), DictionaryAdapter.ItemClickListener 
 
     override fun onItemClick(dictionary: Dictionary) {
         showOptionsDialog(dictionary.dictionaryId)
+        viewModel.setDictionaryTitle(dictionary.dictionaryName)
     }
 
     override fun onOptionsClick(dictionary: Dictionary, view: View) {
@@ -43,14 +44,6 @@ class DictionaryPickerFragment: Fragment(), DictionaryAdapter.ItemClickListener 
             observeList(dictionaryAdapter, progress_bar_dictionary_picker)
             setToolBarTitle(dictionary_picker_toolbar)
             dictionary_picker_toolbar.setNavigationOnClickListener { findNavController().popBackStack() }
-        }
-    }
-
-    private fun setToolBarTitle(toolbar: Toolbar) {
-        when(args.quizType.toQuizType()) {
-            QuizTypes.QuickQuiz -> toolbar.title = getString(R.string.quiz_list_quick_one)
-            QuizTypes.FullQuiz -> toolbar.title = getString(R.string.quiz_list_ask_me_everything)
-            QuizTypes.WeakestQuiz -> toolbar.title = getString(R.string.quiz_list_weaknesses)
         }
     }
 
@@ -101,9 +94,18 @@ class DictionaryPickerFragment: Fragment(), DictionaryAdapter.ItemClickListener 
         val action = DictionaryPickerFragmentDirections.actionDictionaryPickerFragmentToQuizFragment(
                 dictionaryId,
                 selectedOption,
-                args.quizType
+                args.quizType,
+                viewModel.getDictionaryName()
                 )
         findNavController().navigate(action)
+    }
+
+    private fun setToolBarTitle(toolbar: Toolbar) {
+        when(args.quizType.toQuizType()) {
+            QuizTypes.QuickQuiz -> toolbar.title = getString(R.string.quiz_list_quick_one)
+            QuizTypes.FullQuiz -> toolbar.title = getString(R.string.quiz_list_ask_me_everything)
+            QuizTypes.WeakestQuiz -> toolbar.title = getString(R.string.quiz_list_weaknesses)
+        }
     }
 
     override fun onStop() {
