@@ -69,6 +69,7 @@
 
     <Button
         android:id="@+id/create_and_close_button"
+        style="@style/Widget.MaterialComponents.Button.TextButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_margin="@dimen/margin_medium"
@@ -79,6 +80,7 @@
 
     <Button
         android:id="@+id/create_and_keep_adding_button"
+        style="@style/Widget.MaterialComponents.Button.TextButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_margin="@dimen/margin_medium"
@@ -87,9 +89,9 @@
         app:layout_constraintEnd_toStartOf="@+id/create_and_close_button"
         app:layout_constraintTop_toBottomOf="@+id/word_translation_error" />
 
-    <TextView
+    <Button
         android:id="@+id/cancel_word_adding_button"
-        style="@style/TextButton"
+        style="@style/Widget.MaterialComponents.Button.TextButton"
         android:layout_width="wrap_content"
         android:layout_height="0dp"
         android:layout_marginStart="@dimen/margin_large"

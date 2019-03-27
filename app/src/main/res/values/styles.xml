@@ -6,6 +6,13 @@
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
+        <item name="android:alertDialogTheme">@style/AlertDialogTheme.Light</item>
+    </style>
+
+    <style name="AlertDialogTheme.Light" parent="ThemeOverlay.MaterialComponents.Dialog.Alert">
+        <item name="android:buttonBarButtonStyle">
+            @style/Widget.MaterialComponents.Button.TextButton.Dialog
+        </item>
     </style>
 
     <style name="MainButtonStyle" parent="AppTheme">
