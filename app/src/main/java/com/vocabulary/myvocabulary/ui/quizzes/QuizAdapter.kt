@@ -1,13 +1,17 @@
 package com.vocabulary.myvocabulary.ui.quizzes
 
+import android.graphics.Color
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.animation.AnimationUtils
 import android.widget.EditText
+import android.widget.TextView
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
+import com.vocabulary.myvocabulary.R
 import com.vocabulary.myvocabulary.ext.convertDpToPx
 import io.reactivex.Observable
 import io.reactivex.subjects.BehaviorSubject
@@ -36,7 +40,7 @@ class QuizAdapter(
         fun bind(wordObject: QuizViewModel.FocusableWord, position: Int) {
             addExtraMarginForFirstElement(position, itemView)
 
-            makeLastElementEditable(position, itemView.solution)
+            makeLastElementEditable(position, itemView.solution, itemView.question)
 
             itemView.solution.addTextChangedListener(object : TextWatcher {
                 override fun afterTextChanged(p0: Editable) {
@@ -57,6 +61,7 @@ class QuizAdapter(
 
             if (askDirection == QuizDirectionType.AskWord) itemView.question.text = wordObject.word.word
             else itemView.question.text = wordObject.word.translation
+            setAnimation(itemView)
         }
 
         private fun addElevationToEachItem(itemView: View, position: Int) {
@@ -68,7 +73,7 @@ class QuizAdapter(
         }
     }
 
-    private fun makeLastElementEditable(position: Int, solution: EditText) {
+    private fun makeLastElementEditable(position: Int, solution: EditText, question: TextView) {
         if (position == wordList.size - 1) {
             solution.isEnabled = true
             solution.requestFocus()
@@ -112,5 +117,10 @@ class QuizAdapter(
             )
             itemView.layoutParams = params
         }
+    }
+
+    fun setAnimation(view: View) {
+        val animation = AnimationUtils.loadAnimation(view.context, R.anim.slide_up)
+        view.startAnimation(animation)
     }
 }

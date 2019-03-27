@@ -5,7 +5,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ProgressBar
-import androidx.appcompat.widget.Toolbar
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
@@ -94,7 +93,10 @@ class QuizFragment : Fragment() {
 
     private fun generateWordList(quizAdapter: QuizAdapter, recyclerView: RecyclerView) {
         recyclerView.apply {
-            layoutManager = LinearLayoutManager(requireContext(), RecyclerView.VERTICAL, false)
+            layoutManager = object : LinearLayoutManager(requireContext()) {
+                override fun canScrollVertically(): Boolean = false
+            }
+
             addItemDecoration(ItemDecorator(-120))
             adapter = quizAdapter
         }
