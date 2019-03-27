@@ -26,6 +26,8 @@ class QuizListFragment : Fragment() {
                 val action = QuizListFragmentDirections.toDictionaryPickerFragment(QuizTypes.WeakestQuiz.toInt())
                 findNavController().navigate(action)
             }
+
+            quiz_list_toolbar.setNavigationOnClickListener { findNavController().popBackStack() }
         }
     }
 }
