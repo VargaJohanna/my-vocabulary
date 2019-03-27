@@ -25,6 +25,7 @@ class DictionaryListViewModel(
     private val liveNumberOfDictionaries: MutableLiveData<Int> = MutableLiveData()
     private val _newlyCreatedItemDetails = MutableLiveData<Event<DictionaryDetails>>()
     val newlyCreatedItemDetails: LiveData<Event<DictionaryDetails>> = _newlyCreatedItemDetails
+    private lateinit var dictionaryName: String
 
     init {
         observeList()
@@ -94,4 +95,10 @@ class DictionaryListViewModel(
     fun startNew(dictionaryId: Long, quizType: QuizTypes) {
         quizRepository.resetQuizList(dictionaryId, quizType)
     }
+
+    fun setDictionaryTitle(title: String) {
+        dictionaryName = title
+    }
+
+    fun getDictionaryName() = dictionaryName
 }

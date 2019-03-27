@@ -4,19 +4,19 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <TextView
-        android:id="@+id/quiz_list_title"
-        style="@style/TitleStyle"
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/quiz_list_toolbar"
+        app:title="@string/quizzes_toolbar"
+        android:theme="@style/ToolbarColoredBackArrow"
+        app:popupTheme="@style/AppTheme"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginStart="@dimen/margin_normal"
-        android:layout_marginTop="@dimen/margin_extra_large"
-        android:layout_marginEnd="@dimen/margin_normal"
-        android:text="@string/quiz_list_choose_a_quiz_type"
-        android:gravity="center"
+        android:layout_margin="0dp"
+        android:fitsSystemWindows="true"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:navigationIcon="@drawable/ic_arrow_back"
+        app:layout_constraintTop_toTopOf="parent"/>
 
     <com.google.android.material.card.MaterialCardView
         android:id="@+id/quick_quiz_card"
@@ -27,7 +27,7 @@
         android:layout_marginEnd="@dimen/margin_medium"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/quiz_list_title">
+        app:layout_constraintTop_toBottomOf="@+id/quiz_list_toolbar">
 
         <TextView
             style="@style/QuizCardTextStyle"

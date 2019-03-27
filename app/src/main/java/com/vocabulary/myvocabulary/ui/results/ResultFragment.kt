@@ -9,6 +9,7 @@ import android.widget.LinearLayout
 import android.widget.ProgressBar
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
+import androidx.navigation.findNavController
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -45,9 +46,10 @@ class ResultFragment : Fragment() {
             setRetryFabOnClickListener(result_restart_fab, failed_only_container, start_over_container)
             setStartOverOnClickListener(start_over_fab)
             setFailedOnlyOnClickListener(failed_only_fab)
-            if(savedInstanceState == null) {
+            if (savedInstanceState == null) {
                 showSuccessAnimation(success_animation)
             }
+            result_toolbar.setNavigationOnClickListener { findNavController().popBackStack() }
         }
     }
 
@@ -123,9 +125,9 @@ class ResultFragment : Fragment() {
     }
 
     private fun showSuccessAnimation(animationView: LottieAnimationView) {
-        if(resultViewModel.isAllPassed) {
+        if (resultViewModel.isAllPassed) {
             animationView.show(true)
-            animationView.addAnimatorListener(object : Animator.AnimatorListener{
+            animationView.addAnimatorListener(object : Animator.AnimatorListener {
                 override fun onAnimationRepeat(p0: Animator?) {
                 }
 

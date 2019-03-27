@@ -94,7 +94,7 @@ class QuizAdapter(
             )
             params.setMargins(
                     8f.convertDpToPx(itemView.context),
-                    150,
+                    270,
                     8f.convertDpToPx(itemView.context)
                     , 0
             )
