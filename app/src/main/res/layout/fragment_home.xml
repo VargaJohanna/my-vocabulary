@@ -6,6 +6,21 @@
     android:layout_height="match_parent"
     android:layout_gravity="center">
 
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/main_toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:title="@string/my_vocabulary_app_title"
+        app:titleTextColor="@color/primary_light"
+        android:textAlignment="center"
+        style="@style/HeaderStyle"
+        android:fitsSystemWindows="true"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+    </androidx.appcompat.widget.Toolbar>
+
     <Button
         android:id="@+id/dictionary_button"
         style="@style/Widget.MaterialComponents.Button"
@@ -24,7 +39,7 @@
         app:layout_constraintBottom_toTopOf="@+id/quiz_button"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintStart_toStartOf="@+id/main_toolbar"
         app:layout_constraintTop_toTopOf="@+id/guideline2" />
 
     <Button
