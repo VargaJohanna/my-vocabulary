@@ -15,7 +15,7 @@ class ResultViewModel(
         val dictionaryId: Long,
         private val wordRepository: WordRepository,
         private val rxSchedulers: RxSchedulers,
-        val quizRepository: QuizRepository
+        private val quizRepository: QuizRepository
 ) : ViewModel() {
     private val disposables = CompositeDisposable()
     var guessedWordMap: MutableMap<Long, String> = mutableMapOf()
@@ -66,7 +66,7 @@ class ResultViewModel(
         guessedWordMap = mutableMapOf()
         _liveGuessedWordList = mutableListOf()
         liveGuessedWordList.postValue(_liveGuessedWordList)
-        isAllPassed = true
+        setAllPassedValue(true)
     }
 
     fun setDirection(direction: QuizDirectionType) {
