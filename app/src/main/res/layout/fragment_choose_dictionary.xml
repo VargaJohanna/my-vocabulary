@@ -4,6 +4,19 @@
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/dictionary_picker_toolbar"
+        android:theme="@style/ToolbarColoredBackArrow"
+        app:popupTheme="@style/AppTheme"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="0dp"
+        android:fitsSystemWindows="true"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:navigationIcon="@drawable/ic_arrow_back"
+        app:layout_constraintTop_toTopOf="parent"/>
+
     <TextView
         android:id="@+id/quiz_dictionary_picker_title"
         style="@style/TitleStyle"
@@ -16,7 +29,7 @@
         android:gravity="center"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toBottomOf="@+id/dictionary_picker_toolbar" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/quiz_dictionary_picker_recycler_view"
