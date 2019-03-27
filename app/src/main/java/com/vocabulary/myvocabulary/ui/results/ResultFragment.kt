@@ -123,23 +123,23 @@ class ResultFragment : Fragment() {
     }
 
     private fun showSuccessAnimation(animationView: LottieAnimationView) {
-        if(resultViewModel.isAllPassed) animationView.show(true)
+        if(resultViewModel.isAllPassed) {
+            animationView.show(true)
+            animationView.addAnimatorListener(object : Animator.AnimatorListener{
+                override fun onAnimationRepeat(p0: Animator?) {
+                }
 
-        animationView.addAnimatorListener(object : Animator.AnimatorListener{
-            override fun onAnimationRepeat(p0: Animator?) {
-            }
+                override fun onAnimationEnd(p0: Animator?) {
+                    animationView.show(false)
+                }
 
-            override fun onAnimationEnd(p0: Animator?) {
-                animationView.show(false)
-            }
+                override fun onAnimationCancel(p0: Animator?) {
+                }
 
-            override fun onAnimationCancel(p0: Animator?) {
-            }
+                override fun onAnimationStart(p0: Animator?) {
+                }
 
-            override fun onAnimationStart(p0: Animator?) {
-            }
-
-        })
-
+            })
+        }
     }
 }
