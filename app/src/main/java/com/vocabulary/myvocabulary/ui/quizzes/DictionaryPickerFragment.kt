@@ -94,8 +94,7 @@ class DictionaryPickerFragment: Fragment(), DictionaryAdapter.ItemClickListener 
         val action = DictionaryPickerFragmentDirections.actionDictionaryPickerFragmentToQuizFragment(
                 dictionaryId,
                 selectedOption,
-                args.quizType,
-                viewModel.getDictionaryName()
+                args.quizType
                 )
         findNavController().navigate(action)
     }

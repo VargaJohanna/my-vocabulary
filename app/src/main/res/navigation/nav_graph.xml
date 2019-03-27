@@ -122,9 +122,6 @@
         <argument
             android:name="quizType"
             app:argType="integer" />
-        <argument
-            android:name="dictionaryName"
-            app:argType="string" />
         <action
             android:id="@+id/to_resultFragment"
             app:destination="@id/resultFragment"
@@ -144,9 +141,6 @@
             <argument
                 android:name="quizType"
                 app:argType="integer" />
-            <argument
-                android:name="dictionaryName"
-                app:argType="string" />
         </action>
     </fragment>
     <fragment
@@ -163,9 +157,6 @@
         <argument
             android:name="quizType"
             app:argType="integer" />
-        <argument
-            android:name="dictionaryName"
-            app:argType="string" />
         <action
             android:id="@+id/from_result_to_quizListFragment"
             app:destination="@id/quizListFragment"
@@ -198,9 +189,6 @@
             <argument
                 android:name="quizType"
                 app:argType="integer" />
-            <argument
-                android:name="dictionaryName"
-                app:argType="string" />
         </action>
     </fragment>
 </navigation>

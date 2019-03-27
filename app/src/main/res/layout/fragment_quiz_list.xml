@@ -6,6 +6,7 @@
 
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/quiz_list_toolbar"
+        app:title="@string/quizzes_toolbar"
         android:theme="@style/ToolbarColoredBackArrow"
         app:popupTheme="@style/AppTheme"
         android:layout_width="match_parent"
