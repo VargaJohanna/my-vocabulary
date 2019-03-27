@@ -6,8 +6,10 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
+import androidx.appcompat.widget.Toolbar
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
+import androidx.navigation.findNavController
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -28,6 +30,7 @@ class DictionaryPickerFragment: Fragment(), DictionaryAdapter.ItemClickListener 
 
     override fun onItemClick(dictionary: Dictionary) {
         showOptionsDialog(dictionary.dictionaryId)
+        viewModel.setDictionaryTitle(dictionary.dictionaryName)
     }
 
     override fun onOptionsClick(dictionary: Dictionary, view: View) {
@@ -39,6 +42,8 @@ class DictionaryPickerFragment: Fragment(), DictionaryAdapter.ItemClickListener 
         return inflater.inflate(R.layout.fragment_choose_dictionary, container, false).apply {
             generateDictionaryList(dictionaryAdapter, quiz_dictionary_picker_recycler_view)
             observeList(dictionaryAdapter, progress_bar_dictionary_picker)
+            setToolBarTitle(dictionary_picker_toolbar)
+            dictionary_picker_toolbar.setNavigationOnClickListener { findNavController().popBackStack() }
         }
     }
 
@@ -92,6 +97,14 @@ class DictionaryPickerFragment: Fragment(), DictionaryAdapter.ItemClickListener 
                 args.quizType
                 )
         findNavController().navigate(action)
+    }
+
+    private fun setToolBarTitle(toolbar: Toolbar) {
+        when(args.quizType.toQuizType()) {
+            QuizTypes.QuickQuiz -> toolbar.title = getString(R.string.quiz_list_quick_one)
+            QuizTypes.FullQuiz -> toolbar.title = getString(R.string.quiz_list_ask_me_everything)
+            QuizTypes.WeakestQuiz -> toolbar.title = getString(R.string.quiz_list_weaknesses)
+        }
     }
 
     override fun onStop() {

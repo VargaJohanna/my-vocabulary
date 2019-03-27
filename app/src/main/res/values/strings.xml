@@ -43,5 +43,9 @@
     <string name="wrong_answer_icon_description">Wrong answer icon</string>
     <string name="result_failed_ones_only_label">Failed Ones Only</string>
     <string name="result_start_over_label">Start Over</string>
+    <string name="my_vocabulary_app_title">My Vocabulary</string>
+    <string name="quiz_toolbar">Quiz Time</string>
+    <string name="dictionaries_toolbar">Dictionaries</string>
+    <string name="quizzes_toolbar">Quizzes</string>
 
 </resources>

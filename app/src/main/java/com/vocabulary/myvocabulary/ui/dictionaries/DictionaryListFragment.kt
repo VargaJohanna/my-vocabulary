@@ -10,6 +10,7 @@ import android.view.ViewGroup
 import android.widget.*
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
+import androidx.navigation.findNavController
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -43,6 +44,7 @@ class DictionaryListFragment : Fragment(), DictionaryAdapter.ItemClickListener {
             generateDictionaryList(dictionaryAdapter, dictionary_recycler_view)
             observeList(dictionaryAdapter, progress_bar)
             setFabOnClickListener(dictionary_fab)
+            dictionary_list_toolbar.setNavigationOnClickListener { findNavController().popBackStack() }
         }
     }
 
