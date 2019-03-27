@@ -8,6 +8,7 @@
 
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/dictionary_list_toolbar"
+        app:title="@string/dictionaries_toolbar"
         android:theme="@style/ToolbarColoredBackArrow"
         app:popupTheme="@style/AppTheme"
         android:layout_width="match_parent"

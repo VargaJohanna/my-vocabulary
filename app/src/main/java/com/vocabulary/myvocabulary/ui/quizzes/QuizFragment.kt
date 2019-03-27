@@ -58,7 +58,6 @@ class QuizFragment : Fragment() {
             observeGuessedWord(quizAdapter.guessedWord)
             setNextButtonIconUpdateListener(quiz_next_fab)
             setNextFabOnClickListener(quiz_next_fab)
-            setToolBarTitle(quiz_toolbar)
             quiz_toolbar.setNavigationOnClickListener { findNavController().popBackStack() }
         }
     }
@@ -71,8 +70,7 @@ class QuizFragment : Fragment() {
                 val action = QuizFragmentDirections.toResultFragment(
                         quizViewModel.dictionaryId,
                         quizViewModel.optionType,
-                        args.quizType,
-                        args.dictionaryName
+                        args.quizType
                 )
                 findNavController().navigate(action)
             }
@@ -109,13 +107,5 @@ class QuizFragment : Fragment() {
                 .subscribe {
                     resultViewModel.guessedWordMap[it.wordId] = it.guess
                 }
-    }
-
-    private fun setToolBarTitle(toolbar: Toolbar) {
-        when(args.quizType.toQuizType()) {
-            QuizTypes.QuickQuiz -> toolbar.title = "${getString(R.string.quiz_list_quick_one)} from ${args.dictionaryName}"
-            QuizTypes.FullQuiz -> toolbar.title = "${getString(R.string.quiz_list_ask_me_everything)} from ${args.dictionaryName}"
-            QuizTypes.WeakestQuiz -> toolbar.title = "${getString(R.string.quiz_list_weaknesses)} from ${args.dictionaryName}"
-        }
     }
 }
