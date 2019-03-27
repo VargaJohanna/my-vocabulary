@@ -19,9 +19,10 @@
 
     <Button
         android:id="@+id/create_dictionary_button"
+        style="@style/Widget.MaterialComponents.Button.TextButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_margin="@dimen/margin_medium"
+        android:layout_margin="@dimen/margin_normal"
         android:text="@string/create_button_label"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -29,9 +30,10 @@
 
     <Button
         android:id="@+id/cancel_dictionary_creation"
+        style="@style/Widget.MaterialComponents.Button.TextButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_margin="@dimen/margin_medium"
+        android:layout_margin="@dimen/margin_normal"
         android:text="@string/cancel_button_label"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/create_dictionary_button"

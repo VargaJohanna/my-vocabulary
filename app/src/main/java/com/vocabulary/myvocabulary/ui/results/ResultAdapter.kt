@@ -1,6 +1,5 @@
 package com.vocabulary.myvocabulary.ui.results
 
-import android.os.UserManager
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -42,7 +41,7 @@ class ResultAdapter(
 
         private fun setItemViewAppearance(itemView: View, word: Word) {
             itemView.materialCardView.setBackgroundColor(ContextCompat.getColor(itemView.context,
-                    if(word.lastResult) R.color.light_green
+                    if (word.lastResult) R.color.light_green
                     else R.color.light_error))
 
             itemView.passed_icon.show(word.lastResult)
@@ -54,7 +53,7 @@ class ResultAdapter(
         }
 
         private fun setGuessText(word: Word, guess: TextView) {
-            guess.text = if(word.lastGuess.isEmpty()) "--" else word.lastGuess
+            guess.text = if (word.lastGuess.isEmpty()) "--" else word.lastGuess
         }
 
         private fun setQuestionText(word: Word, resultQuestion: TextView) {

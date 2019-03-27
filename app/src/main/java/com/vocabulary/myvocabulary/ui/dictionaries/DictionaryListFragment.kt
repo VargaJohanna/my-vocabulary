@@ -92,7 +92,7 @@ class DictionaryListFragment : Fragment(), DictionaryAdapter.ItemClickListener {
         val cancelButton: Button = dialogView.cancel_dictionary_creation
         val errorMessage: TextView = dialogView.dictionary_name_error
 
-        val dialogBuilder = AlertDialog.Builder(requireActivity(), R.style.ThemeOverlay_MaterialComponents_Dialog_Alert)
+        val dialogBuilder = AlertDialog.Builder(requireActivity())
         createDialog = dialogBuilder.create().apply {
             setView(dialogView)
             errorMessage.show(false)
@@ -149,7 +149,7 @@ class DictionaryListFragment : Fragment(), DictionaryAdapter.ItemClickListener {
     }
 
     private fun showDeleteDialog(dictionary: Dictionary) {
-        AlertDialog.Builder(requireActivity(), R.style.ThemeOverlay_MaterialComponents_Dialog_Alert).apply {
+        AlertDialog.Builder(requireActivity()).apply {
             setTitle(R.string.dialog_delete_dictionary_title)
             setMessage("Are you sure you want to delete \"${dictionary.dictionaryName}\" ?")
             setPositiveButton("Delete") { _, _ ->
@@ -166,7 +166,7 @@ class DictionaryListFragment : Fragment(), DictionaryAdapter.ItemClickListener {
         val renameButton: Button = dialogView.rename_dictionary_button
         val cancelButton: Button = dialogView.cancel_dictionary_rename_dialog
         val errorMessage: TextView = dialogView.dictionary_name_error_rename
-        val dialogBuilder = AlertDialog.Builder(requireActivity(), R.style.ThemeOverlay_MaterialComponents_Dialog_Alert)
+        val dialogBuilder = AlertDialog.Builder(requireActivity())
         renameDialog = dialogBuilder.create().apply {
             setView(dialogView)
             errorMessage.show(false)

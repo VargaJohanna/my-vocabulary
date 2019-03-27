@@ -7,8 +7,7 @@ class QuizDiffUtilCallBack(
         private val newList: List<QuizViewModel.FocusableWord>
 ) : DiffUtil.Callback() {
     override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
-        return (oldList[oldItemPosition].word.wordId == newList[newItemPosition].word.wordId
-                && oldList[oldItemPosition].isFocused == newList[newItemPosition].isFocused)
+        return (oldList[oldItemPosition].word.wordId == newList[newItemPosition].word.wordId)
 
     }
 
@@ -21,7 +20,7 @@ class QuizDiffUtilCallBack(
     }
 
     override fun areContentsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
-        return oldList[oldItemPosition] == newList[newItemPosition]
+        return oldList[oldItemPosition].word.wordId == newList[newItemPosition].word.wordId
     }
 
 }
