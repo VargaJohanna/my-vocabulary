@@ -9,6 +9,7 @@ import android.widget.LinearLayout
 import android.widget.ProgressBar
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
+import androidx.navigation.findNavController
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -48,6 +49,7 @@ class ResultFragment : Fragment() {
             if(savedInstanceState == null) {
                 showSuccessAnimation(success_animation)
             }
+            result_toolbar.setNavigationOnClickListener { findNavController().popBackStack() }
         }
     }
 
