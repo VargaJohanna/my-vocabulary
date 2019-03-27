@@ -126,6 +126,7 @@
         app:layout_constraintTop_toTopOf="parent"
         app:lottie_autoPlay="true"
         app:lottie_fileName="star-success.json"
-        app:lottie_loop="true" />
+        app:lottie_loop="false"
+        android:visibility="invisible"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

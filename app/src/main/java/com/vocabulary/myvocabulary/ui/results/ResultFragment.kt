@@ -1,5 +1,6 @@
 package com.vocabulary.myvocabulary.ui.results
 
+import android.animation.Animator
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -12,6 +13,7 @@ import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.airbnb.lottie.LottieAnimationView
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.vocabulary.myvocabulary.R
 import com.vocabulary.myvocabulary.ext.display
@@ -42,6 +44,9 @@ class ResultFragment : Fragment() {
             setRetryFabOnClickListener(result_restart_fab, failed_only_container, start_over_container)
             setStartOverOnClickListener(start_over_fab)
             setFailedOnlyOnClickListener(failed_only_fab)
+            if(savedInstanceState == null) {
+                showSuccessAnimation(success_animation)
+            }
         }
     }
 
@@ -111,5 +116,26 @@ class ResultFragment : Fragment() {
             )
             findNavController().navigate(action)
         }
+    }
+
+    private fun showSuccessAnimation(animationView: LottieAnimationView) {
+        if(resultViewModel.isAllPassed) animationView.show(true)
+
+        animationView.addAnimatorListener(object : Animator.AnimatorListener{
+            override fun onAnimationRepeat(p0: Animator?) {
+            }
+
+            override fun onAnimationEnd(p0: Animator?) {
+                animationView.show(false)
+            }
+
+            override fun onAnimationCancel(p0: Animator?) {
+            }
+
+            override fun onAnimationStart(p0: Animator?) {
+            }
+
+        })
+
     }
 }
