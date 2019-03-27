@@ -10,6 +10,7 @@ import android.view.ViewGroup
 import android.widget.*
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
+import androidx.navigation.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -45,7 +46,8 @@ class WordListFragment : Fragment(), WordAdapter.WordItemClickListener {
             generateWordList(wordAdapter, word_recycler_view)
             observeWordList(wordAdapter, word_list_progress_bar)
             setFabOnClickListener(word_fab)
-            word_list_title.text = args.dictonaryName
+            word_list_toolbar.title = args.dictonaryName
+            word_list_toolbar.setNavigationOnClickListener { findNavController().popBackStack() }
         }
     }
 
