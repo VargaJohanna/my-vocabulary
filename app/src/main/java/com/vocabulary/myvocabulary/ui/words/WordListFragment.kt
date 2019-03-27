@@ -83,7 +83,7 @@ class WordListFragment : Fragment(), WordAdapter.WordItemClickListener {
         val errorMessageWord: TextView = dialogView.word_name_error
         val errorMessageTranslation: TextView = dialogView.word_translation_error
 
-        val dialogBuilder = AlertDialog.Builder(requireActivity(), R.style.ThemeOverlay_MaterialComponents_Dialog_Alert)
+        val dialogBuilder = AlertDialog.Builder(requireActivity())
         createDialog = dialogBuilder.create().apply {
             setView(dialogView)
             editTextWord.requestFocus()
@@ -187,7 +187,7 @@ class WordListFragment : Fragment(), WordAdapter.WordItemClickListener {
     }
 
     private fun showDeleteWordDialog(word: Word) {
-        AlertDialog.Builder(requireActivity(), R.style.ThemeOverlay_MaterialComponents_Dialog_Alert).apply {
+        AlertDialog.Builder(requireActivity()).apply {
             setTitle(R.string.dialog_delete_word_title)
             setMessage("Are you sure you want to delete\n\"${word.word} - ${word.translation}\" ?")
             setPositiveButton("Delete") { _, _ ->
@@ -207,7 +207,7 @@ class WordListFragment : Fragment(), WordAdapter.WordItemClickListener {
         val errorMessageWord: TextView = dialogView.word_rename_error
         val errorMessageTranslation: TextView = dialogView.rename_translation_error
 
-        val dialogBuilder = AlertDialog.Builder(requireActivity(), R.style.ThemeOverlay_MaterialComponents_Dialog_Alert)
+        val dialogBuilder = AlertDialog.Builder(requireActivity())
         renameDialog = dialogBuilder.create().apply {
             setView(dialogView)
             editTextWord.requestFocus()

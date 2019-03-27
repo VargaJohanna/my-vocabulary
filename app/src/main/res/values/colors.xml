@@ -9,8 +9,8 @@
   <color name="icons">#FFFFFF</color>
   <color name="divider">#E7E7E7</color>
   <color name="error">#cc0000</color>
-  <color name="light_error">#80cc0000</color>
+  <color name="light_error">#73cc0000</color>
   <color name="green">#2ecc71</color>
-  <color name="light_green">#802ecc71</color>
+  <color name="light_green">#732ecc71</color>
 
 </resources>
