@@ -34,12 +34,15 @@
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/quiz_dictionary_picker_recycler_view"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="0dp"
         android:layout_marginStart="@dimen/margin_zero"
+        android:layout_marginTop="@dimen/margin_normal"
         android:layout_marginEnd="@dimen/margin_zero"
-        android:layout_marginTop="@dimen/margin_medium"
         android:layout_marginBottom="@dimen/margin_normal"
+        android:clipToPadding="false"
         android:overScrollMode="never"
+        android:paddingBottom="@dimen/padding_recycler_view_bottom"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/quiz_dictionary_picker_title">

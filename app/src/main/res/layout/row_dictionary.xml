@@ -19,14 +19,11 @@
             android:id="@+id/dictionary_name"
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:layout_marginStart="@dimen/margin_normal"
-            android:layout_marginTop="@dimen/margin_normal"
-            android:layout_marginEnd="@dimen/margin_normal"
-            android:layout_marginBottom="@dimen/margin_normal"
+            android:layout_margin="@dimen/margin_normal"
             android:gravity="center"
             android:text="@string/example_dictionary_name"
             android:textSize="@dimen/text_size_bigger"
-            android:padding="@dimen/margin_normal"
+            android:padding="@dimen/margin_medium"
             android:background="?selectableItemBackground"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@+id/dictionary_options"
@@ -37,10 +34,7 @@
             android:id="@+id/dictionary_options"
             android:layout_width="0dp"
             android:layout_height="0dp"
-            android:layout_marginStart="@dimen/margin_normal"
-            android:layout_marginTop="@dimen/margin_normal"
-            android:layout_marginEnd="@dimen/margin_normal"
-            android:layout_marginBottom="@dimen/margin_normal"
+            android:layout_margin="@dimen/margin_normal"
             android:text="@string/row_dictionary_options_dots"
             android:gravity="center"
             android:textAppearance="?android:textAppearanceLarge"
@@ -55,5 +49,13 @@
             android:layout_height="wrap_content"
             android:orientation="vertical"
             app:layout_constraintGuide_percent="0.90" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/divider"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 </com.google.android.material.card.MaterialCardView>
