@@ -47,5 +47,6 @@
     <string name="quiz_toolbar">Quiz Time</string>
     <string name="dictionaries_toolbar">Dictionaries</string>
     <string name="quizzes_toolbar">Quizzes</string>
+    <string name="dictionary_menu_start_quiz">Start Quiz</string>
 
 </resources>
