@@ -9,7 +9,7 @@
         android:id="@+id/quiz_type_title"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="@dimen/margin_normal"
+        android:layout_margin="@dimen/margin_medium"
         android:text="@string/quiz_list_choose_a_quiz_type"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -66,7 +66,7 @@
         android:layout_marginBottom="@dimen/margin_medium"
         android:paddingStart="@dimen/padding_small"
         android:paddingEnd="@dimen/padding_small"
-        android:text="@string/dialog_option_picker_error"
+        android:text="@string/dialog_quiz_type_error"
         android:visibility="invisible"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -79,13 +79,13 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="@string/dialog_pick_direction"
-        android:layout_margin="@dimen/margin_normal"
+        android:layout_margin="@dimen/margin_medium"
         app:layout_constraintTop_toBottomOf="@+id/from_dictionary_quiz_type_error"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"/>
 
     <RadioGroup
-        android:id="@+id/from_dictionary_radioGroup"
+        android:id="@+id/direction_radioGroup"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/margin_medium"
@@ -130,7 +130,7 @@
         android:visibility="invisible"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/from_dictionary_radioGroup"
+        app:layout_constraintTop_toBottomOf="@+id/direction_radioGroup"
         tools:visibility="visible" />
 
     <Button

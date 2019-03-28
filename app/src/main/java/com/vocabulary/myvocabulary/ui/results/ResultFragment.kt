@@ -70,7 +70,7 @@ class ResultFragment : Fragment() {
 
     private fun setExitFabOnClickListener(fab: FloatingActionButton) {
         fab.setOnClickListener {
-            findNavController().navigate(R.id.from_result_to_quizListFragment)
+            findNavController().navigate(R.id.from_result_to_home)
         }
     }
 
