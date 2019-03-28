@@ -50,5 +50,11 @@
     <string name="quizzes_toolbar">Quizzes</string>
     <string name="dictionary_menu_start_quiz">Start Quiz</string>
     <string name="word_details_toolbar">Word Details</string>
+    <string name="meaning_colon">Meaning:</string>
+    <string name="expression_colon">Expression:</string>
+    <string name="word_detail_attempts_so_far">Attempts so far:</string>
+    <string name="passed_colon">Passed:</string>
+    <string name="failed_colon">Failed:</string>
+    <string name="last_result_colon">Last Result:</string>
 
 </resources>
