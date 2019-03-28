@@ -37,6 +37,7 @@
     <string name="dialog_pick_direction">"Choose what should be asked"</string>
     <string name="dialog_lets_do_it">"Let's do it"</string>
     <string name="dialog_option_picker_error">"Please select one of the options!"</string>
+    <string name="dialog_quiz_type_error">"Please select one of the quiz types!"</string>
     <string name="quiz_hint_enter_solution">Enter solution</string>
     <string name="result_fragment_title">Results</string>
     <string name="tick_description">Correct answer icon</string>
@@ -48,5 +49,6 @@
     <string name="dictionaries_toolbar">Dictionaries</string>
     <string name="quizzes_toolbar">Quizzes</string>
     <string name="dictionary_menu_start_quiz">Start Quiz</string>
+    <string name="start_quiz_dialog">Start Quiz</string>
 
 </resources>
