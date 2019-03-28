@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <TextView
+        android:id="@+id/quiz_type_title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/margin_normal"
+        android:text="@string/quiz_list_choose_a_quiz_type"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
+
+    <RadioGroup
+        android:id="@+id/quiz_type_radioGroup"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/margin_medium"
+        android:layout_marginTop="@dimen/margin_medium"
+        android:layout_marginEnd="@dimen/margin_medium"
+        android:orientation="vertical"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/quiz_type_title">
+
+        <RadioButton
+            android:id="@+id/quick_quiz_radio"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/margin_medium"
+            android:padding="@dimen/padding_normal"
+            android:text="@string/quiz_list_quick_one"
+            android:textSize="@dimen/text_size_normal" />
+
+        <RadioButton
+            android:id="@+id/full_quiz_radio"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/margin_medium"
+            android:padding="@dimen/padding_normal"
+            android:text="@string/quiz_list_ask_me_everything"
+            android:textSize="@dimen/text_size_normal" />
+
+        <RadioButton
+            android:id="@+id/weakness_quiz_radio"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/margin_medium"
+            android:padding="@dimen/padding_normal"
+            android:text="@string/quiz_list_weaknesses"
+            android:textSize="@dimen/text_size_normal" />
+    </RadioGroup>
+
+    <TextView
+        android:id="@+id/from_dictionary_quiz_type_error"
+        style="@style/ErrorMessage"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/margin_medium"
+        android:layout_marginTop="@dimen/margin_medium"
+        android:layout_marginEnd="@dimen/margin_medium"
+        android:layout_marginBottom="@dimen/margin_medium"
+        android:paddingStart="@dimen/padding_small"
+        android:paddingEnd="@dimen/padding_small"
+        android:text="@string/dialog_option_picker_error"
+        android:visibility="invisible"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/quiz_type_radioGroup"
+        tools:visibility="visible" />
+
+
+    <TextView
+        android:id="@+id/direction_picker_title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/dialog_pick_direction"
+        android:layout_margin="@dimen/margin_normal"
+        app:layout_constraintTop_toBottomOf="@+id/from_dictionary_quiz_type_error"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
+
+    <RadioGroup
+        android:id="@+id/from_dictionary_radioGroup"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/margin_medium"
+        android:layout_marginTop="@dimen/margin_medium"
+        android:layout_marginEnd="@dimen/margin_medium"
+        android:orientation="vertical"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/direction_picker_title">
+
+        <RadioButton
+            android:id="@+id/from_dictionary_word_radio"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/margin_medium"
+            android:padding="@dimen/padding_normal"
+            android:text="@string/word_list_meaning"
+            android:textSize="@dimen/text_size_normal" />
+
+        <RadioButton
+            android:id="@+id/from_dictionary_translation_radio"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/margin_medium"
+            android:padding="@dimen/padding_normal"
+            android:text="@string/word_list_expression"
+            android:textSize="@dimen/text_size_normal" />
+    </RadioGroup>
+
+    <TextView
+        android:id="@+id/from_dictionary_option_picker_error"
+        style="@style/ErrorMessage"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/margin_medium"
+        android:layout_marginTop="@dimen/margin_medium"
+        android:layout_marginEnd="@dimen/margin_medium"
+        android:layout_marginBottom="@dimen/margin_medium"
+        android:paddingStart="@dimen/padding_small"
+        android:paddingEnd="@dimen/padding_small"
+        android:text="@string/dialog_option_picker_error"
+        android:visibility="invisible"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/from_dictionary_radioGroup"
+        tools:visibility="visible" />
+
+    <Button
+        android:id="@+id/from_dictionary_lets_do_it"
+        style="@style/Widget.MaterialComponents.Button.TextButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/margin_normal"
+        android:text="@string/dialog_lets_do_it"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/from_dictionary_option_picker_error" />
+
+    <Button
+        android:id="@+id/from_dictionary_cancel"
+        style="@style/Widget.MaterialComponents.Button.TextButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/margin_normal"
+        android:text="@string/cancel_button_label"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/from_dictionary_lets_do_it"
+        app:layout_constraintTop_toBottomOf="@+id/from_dictionary_option_picker_error" />
+</androidx.constraintlayout.widget.ConstraintLayout>
