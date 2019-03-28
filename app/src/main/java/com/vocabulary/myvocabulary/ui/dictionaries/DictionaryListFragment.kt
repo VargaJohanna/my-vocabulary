@@ -214,7 +214,7 @@ class DictionaryListFragment : Fragment(), DictionaryAdapter.ItemClickListener {
             setView(dialogView)
             directionRadioGroup.setOnCheckedChangeListener { _, checkedId ->
                 directionErrorMessage.show(false)
-                selectedDirection = if (checkedId == R.id.word_radio) 0 else 1
+                selectedDirection = if (checkedId == R.id.from_dictionary_word_radio) 0 else 1
             }
             quizTypeRadioGroup.setOnCheckedChangeListener { _, checkedTypeId ->
                 quizTypeErrorMessage.show(false)

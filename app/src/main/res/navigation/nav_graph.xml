@@ -98,6 +98,24 @@
         <argument
             android:name="dictionaryName"
             app:argType="string" />
+        <action
+            android:id="@+id/from_wordList_to_quiz"
+            app:destination="@id/quizFragment"
+            app:enterAnim="@anim/nav_default_enter_anim"
+            app:exitAnim="@anim/nav_default_exit_anim"
+            app:launchSingleTop="true"
+            app:popEnterAnim="@anim/nav_default_enter_anim"
+            app:popExitAnim="@anim/nav_default_exit_anim">
+            <argument
+                android:name="dictionaryId"
+                app:argType="long" />
+            <argument
+                android:name="quizOption"
+                app:argType="integer" />
+            <argument
+                android:name="quizType"
+                app:argType="integer" />
+        </action>
     </fragment>
     <fragment
         android:id="@+id/dictionaryPickerFragment"
