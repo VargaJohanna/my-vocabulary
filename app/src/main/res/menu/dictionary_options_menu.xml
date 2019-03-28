@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item
+        android:id="@+id/menu_dictionary_start_quiz"
+        android:title="@string/dictionary_menu_start_quiz"/>
+    <item
         android:id="@+id/menu_dictionary_update"
         android:title="@string/dictionary_menu_rename" />
     <item
