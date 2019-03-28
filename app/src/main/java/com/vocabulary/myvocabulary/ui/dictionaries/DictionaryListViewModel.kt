@@ -41,13 +41,6 @@ class DictionaryListViewModel(
                 }
     }
 
-    fun insertDefaultDictionary(dictionary: Dictionary) {
-        disposables += Single.fromCallable { dictionaryRepository.createDictionary(dictionary) }
-                .subscribeOn(rxSchedulers.io())
-                .observeOn(rxSchedulers.main())
-                .subscribe()
-    }
-
     private fun observeList() {
         disposables += dictionaryRepository.allDictionaries
                 .subscribeOn(rxSchedulers.io())
