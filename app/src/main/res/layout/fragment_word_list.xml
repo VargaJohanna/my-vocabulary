@@ -19,17 +19,17 @@
             android:layout_height="wrap_content"
             android:layout_margin="0dp"
             android:fitsSystemWindows="true"
-            app:navigationIcon="@drawable/ic_arrow_back"/>
+            app:navigationIcon="@drawable/ic_arrow_back" />
     </com.google.android.material.appbar.AppBarLayout>
 
     <TextView
         android:id="@+id/word_column_title"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/margin_medium"
-        android:layout_marginBottom="@dimen/margin_normal"
         android:layout_marginStart="@dimen/margin_normal"
+        android:layout_marginTop="@dimen/margin_medium"
         android:layout_marginEnd="@dimen/margin_normal"
+        android:layout_marginBottom="@dimen/margin_normal"
         android:gravity="center"
         android:text="@string/word_list_meaning"
         android:textSize="@dimen/text_size_bigger"
@@ -41,8 +41,8 @@
         android:id="@+id/translation_column_title"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/margin_medium"
         android:layout_marginStart="@dimen/margin_normal"
+        android:layout_marginTop="@dimen/margin_medium"
         android:layout_marginEnd="@dimen/margin_normal"
         android:gravity="center"
         android:text="@string/word_list_expression"
@@ -67,9 +67,9 @@
         android:layout_marginTop="@dimen/margin_normal"
         android:layout_marginEnd="@dimen/margin_small"
         android:layout_marginBottom="@dimen/margin_normal"
+        android:clipToPadding="false"
         android:overScrollMode="never"
         android:paddingBottom="@dimen/padding_recycler_view_bottom"
-        android:clipToPadding="false"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
