@@ -57,7 +57,11 @@
         <item name="android:gravity">center</item>
     </style>
     
-    <style name="WordDetailText">
+    <style name="WordDetail">
         <item name="android:textSize">@dimen/text_size_normal</item>
+    </style>
+
+    <style name="WordDetailText" parent="WordDetail">
+        <item name="android:textStyle">bold</item>
     </style>
 </resources>

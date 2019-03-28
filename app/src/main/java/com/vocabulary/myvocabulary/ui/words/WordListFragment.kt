@@ -38,7 +38,15 @@ class WordListFragment : Fragment(), WordAdapter.WordItemClickListener {
     private var popUp: PopupMenu? = null
 
     override fun onItemClick(word: Word) {
-        //Open word detail fragment
+        val action = WordListFragmentDirections.fromWordListToWordDetails(
+                word.word,
+                word.translation,
+                word.beenAsked,
+                word.failed,
+                word.passed,
+                word.lastResult
+        )
+        findNavController().navigate(action)
     }
 
     override fun onOptionsClick(word: Word, view: View) {
