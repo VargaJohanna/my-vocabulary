@@ -21,7 +21,7 @@
                 android:name="dictionaryId"
                 app:argType="long" />
             <argument
-                android:name="dictonaryName"
+                android:name="dictionaryName"
                 app:argType="string" />
         </action>
         <action
@@ -96,7 +96,7 @@
             android:name="dictionaryId"
             app:argType="long" />
         <argument
-            android:name="dictonaryName"
+            android:name="dictionaryName"
             app:argType="string" />
     </fragment>
     <fragment

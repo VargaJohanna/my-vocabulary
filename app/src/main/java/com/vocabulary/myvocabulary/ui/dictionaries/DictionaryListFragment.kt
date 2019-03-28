@@ -238,7 +238,7 @@ class DictionaryListFragment : Fragment(), DictionaryAdapter.ItemClickListener {
             cancelButton.setOnClickListener {
                 dismiss()
             }
-            setTitle("${getString(R.string.start_quiz_dialog)} of \"${dictionary.dictionaryName}\"")
+            setTitle("${getString(R.string.dictionary_menu_start_quiz)} of \"${dictionary.dictionaryName}\"")
             show()
         }
     }

@@ -56,11 +56,4 @@
         <item name="android:textSize">@dimen/text_size_large</item>
         <item name="android:gravity">center</item>
     </style>
-
-    <style name="ToolbarColoredBackArrow" parent="AppTheme">
-        <item name="android:textColorPrimary">@color/icons</item>
-        <item name="android:background">@color/colorPrimaryDark</item>
-
-    </style>
-
 </resources>

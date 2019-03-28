@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/start_quiz_from_word_list"
+        android:icon="@drawable/ic_refresh_icon"
+        android:title="@string/dictionary_menu_start_quiz" />
+
+</menu>
