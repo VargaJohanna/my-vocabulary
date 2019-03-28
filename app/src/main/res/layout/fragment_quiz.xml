@@ -4,20 +4,28 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <androidx.appcompat.widget.Toolbar
-        android:id="@+id/quiz_toolbar"
-        app:title="@string/quiz_toolbar"
-        android:theme="@style/ToolbarColoredBackArrow"
-        app:popupTheme="@style/AppTheme"
+    <com.google.android.material.appbar.AppBarLayout
+        android:id="@+id/app_bar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="0dp"
         android:fitsSystemWindows="true"
         app:layout_constraintEnd_toEndOf="parent"
-        android:elevation="3dp"
         app:layout_constraintStart_toStartOf="parent"
-        app:navigationIcon="@drawable/ic_arrow_back"
-        app:layout_constraintTop_toTopOf="parent"/>
+        app:layout_constraintTop_toTopOf="parent">
+
+        <androidx.appcompat.widget.Toolbar
+            android:id="@+id/quiz_toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="0dp"
+            android:elevation="3dp"
+            android:fitsSystemWindows="true"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:navigationIcon="@drawable/ic_arrow_back"
+            app:title="@string/quiz_toolbar" />
+    </com.google.android.material.appbar.AppBarLayout>
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/quiz_recycler_view"
@@ -31,7 +39,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/quiz_toolbar" />
+        app:layout_constraintTop_toBottomOf="@+id/app_bar" />
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/quiz_next_fab"
@@ -50,8 +58,8 @@
         style="@style/ProgressBarStyle"
         android:layout_width="@dimen/progressbar_size"
         android:layout_height="@dimen/progressbar_size"
-        android:layout_marginBottom="@dimen/margin_normal"
         android:layout_gravity="center"
+        android:layout_marginBottom="@dimen/margin_normal"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"

@@ -6,6 +6,8 @@ import androidx.lifecycle.ViewModel
 import com.vocabulary.myvocabulary.ext.plusAssign
 import com.vocabulary.myvocabulary.room.wordData.WordRepository
 import com.vocabulary.myvocabulary.rx.RxSchedulers
+import com.vocabulary.myvocabulary.ui.quizzes.QuizRepository
+import com.vocabulary.myvocabulary.ui.quizzes.QuizTypes
 import io.reactivex.Completable
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.Disposable
@@ -14,7 +16,9 @@ import java.util.*
 class WordListViewModel(
         val dictionaryId: Long,
         private val wordRepository: WordRepository,
-        private val rxSchedulers: RxSchedulers
+        private val rxSchedulers: RxSchedulers,
+        private val quizRepository: QuizRepository
+
 ) : ViewModel() {
     private val disposables = CompositeDisposable()
     private val liveWordList: MutableLiveData<List<Word>> = MutableLiveData()
@@ -73,5 +77,9 @@ class WordListViewModel(
             wordRepository.deleteWord(word)
         }.subscribeOn(rxSchedulers.io())
                 .subscribe()
+    }
+
+    fun startNew(dictionaryId: Long, quizType: QuizTypes) {
+        quizRepository.resetQuizList(dictionaryId, quizType)
     }
 }

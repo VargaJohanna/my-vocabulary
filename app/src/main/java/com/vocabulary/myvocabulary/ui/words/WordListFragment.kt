@@ -5,19 +5,23 @@ import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.LayoutInflater
+import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.navigation.findNavController
+import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.vocabulary.myvocabulary.R
 import com.vocabulary.myvocabulary.ext.show
+import com.vocabulary.myvocabulary.ui.quizzes.toQuizType
 import kotlinx.android.synthetic.main.dialog_create_word.view.*
+import kotlinx.android.synthetic.main.dialog_start_quiz.view.*
 import kotlinx.android.synthetic.main.dialog_rename_word.view.*
 import kotlinx.android.synthetic.main.fragment_word_list.view.*
 import org.koin.androidx.viewmodel.ext.viewModel
@@ -30,6 +34,7 @@ class WordListFragment : Fragment(), WordAdapter.WordItemClickListener {
     }
     private var createDialog: AlertDialog? = null
     private var renameDialog: AlertDialog? = null
+    private var startQuizDialog: AlertDialog? = null
     private var popUp: PopupMenu? = null
 
     override fun onItemClick(word: Word) {
@@ -46,8 +51,17 @@ class WordListFragment : Fragment(), WordAdapter.WordItemClickListener {
             generateWordList(wordAdapter, word_recycler_view)
             observeWordList(wordAdapter, word_list_progress_bar)
             setFabOnClickListener(word_fab)
-            word_list_toolbar.title = args.dictonaryName
-            word_list_toolbar.setNavigationOnClickListener { findNavController().popBackStack() }
+            word_list_toolbar.inflateMenu(R.menu.word_list_menu)
+            word_list_toolbar.setOnMenuItemClickListener { item: MenuItem? ->
+                when(item?.itemId){
+                    R.id.start_quiz_from_word_list -> showStartQuizDialog(wordViewModel.dictionaryId)
+                }
+                true
+            }
+            word_list_toolbar.title = args.dictionaryName
+            word_list_toolbar.setNavigationOnClickListener {
+                findNavController().popBackStack()
+            }
         }
     }
 
@@ -74,7 +88,7 @@ class WordListFragment : Fragment(), WordAdapter.WordItemClickListener {
 
     private fun openCreateDialog() {
         val inflater = requireActivity().layoutInflater
-        val dialogView: View = inflater.inflate(R.layout.dialog_create_word, null)
+        val dialogView: View = inflater.inflate(R.layout.dialog_create_word,null)
         val editTextWord: EditText = dialogView.new_word_edit
         val editTextTranslation: EditText = dialogView.new_translation_edit
         val saveButton: Button = dialogView.create_and_close_button
@@ -168,6 +182,7 @@ class WordListFragment : Fragment(), WordAdapter.WordItemClickListener {
     override fun onStop() {
         createDialog?.dismiss()
         renameDialog?.dismiss()
+        startQuizDialog?.dismiss()
         popUp?.dismiss()
         super.onStop()
     }
@@ -257,6 +272,61 @@ class WordListFragment : Fragment(), WordAdapter.WordItemClickListener {
             errorMessageWord.show(false)
             errorMessageTranslation.show(true)
         }
+    }
+
+    private fun showStartQuizDialog(dictionaryId: Long) {
+        var selectedDirection = -1
+        var selectedQuizType = -1
+        val inflater = requireActivity().layoutInflater
+        val dialogView: View = inflater.inflate(R.layout.dialog_start_quiz, null)
+        val directionRadioGroup: RadioGroup = dialogView.direction_radioGroup
+        val quizTypeRadioGroup: RadioGroup = dialogView.quiz_type_radioGroup
+        val doItButton: Button = dialogView.from_dictionary_lets_do_it
+        val cancelButton: Button = dialogView.from_dictionary_cancel
+        val directionErrorMessage: TextView = dialogView.from_dictionary_option_picker_error
+        val quizTypeErrorMessage: TextView = dialogView.from_dictionary_quiz_type_error
+        val dialogBuilder = AlertDialog.Builder(requireActivity())
+        startQuizDialog = dialogBuilder.create().apply {
+            setView(dialogView)
+            directionRadioGroup.setOnCheckedChangeListener { _, checkedId ->
+                directionErrorMessage.show(false)
+                selectedDirection = if (checkedId == R.id.from_dictionary_word_radio) 0 else 1
+            }
+            quizTypeRadioGroup.setOnCheckedChangeListener { _, checkedTypeId ->
+                quizTypeErrorMessage.show(false)
+                selectedQuizType = when (checkedTypeId) {
+                    R.id.quick_quiz_radio -> 0
+                    R.id.full_quiz_radio -> 1
+                    R.id.weakness_quiz_radio -> 2
+                    else -> throw IllegalStateException("Unknown quiz type: $this")
+                }
+            }
+
+            doItButton.setOnClickListener {
+                if (selectedDirection == -1 || selectedQuizType == -1) {
+                    if (selectedDirection == -1) directionErrorMessage.show(true)
+                    if (selectedQuizType == -1) quizTypeErrorMessage.show(true)
+                } else {
+                    startQuiz(selectedDirection, dictionaryId, selectedQuizType)
+                    dismiss()
+                }
+            }
+            cancelButton.setOnClickListener {
+                dismiss()
+            }
+            setTitle("${getString(R.string.dictionary_menu_start_quiz)} of \"${args.dictionaryName}\"")
+            show()
+        }
+    }
+
+    private fun startQuiz(selectedOption: Int, dictionaryId: Long, selectedQuiz: Int) {
+        wordViewModel.startNew(dictionaryId, selectedQuiz.toQuizType())
+        val action = WordListFragmentDirections.fromWordListToQuiz(
+                dictionaryId,
+                selectedOption,
+                selectedQuiz
+        )
+        findNavController().navigate(action)
     }
 
 }
