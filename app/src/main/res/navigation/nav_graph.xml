@@ -116,6 +116,33 @@
                 android:name="quizType"
                 app:argType="integer" />
         </action>
+        <action
+            android:id="@+id/from_wordList_to_wordDetails"
+            app:destination="@id/wordDetailsFragment"
+            app:enterAnim="@anim/nav_default_enter_anim"
+            app:exitAnim="@anim/nav_default_exit_anim"
+            app:launchSingleTop="true"
+            app:popEnterAnim="@anim/nav_default_enter_anim"
+            app:popExitAnim="@anim/nav_default_exit_anim">
+            <argument
+                android:name="word"
+                app:argType="string" />
+            <argument
+                android:name="translation"
+                app:argType="string" />
+            <argument
+                android:name="beenAsked"
+                app:argType="integer" />
+            <argument
+                android:name="failed"
+                app:argType="integer" />
+            <argument
+                android:name="passed"
+                app:argType="integer" />
+            <argument
+                android:name="lastResult"
+                app:argType="boolean" />
+        </action>
     </fragment>
     <fragment
         android:id="@+id/dictionaryPickerFragment"
@@ -225,5 +252,29 @@
             app:destination="@id/homeFragment"
             app:launchSingleTop="true"
             app:popUpTo="@+id/homeFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/wordDetailsFragment"
+        android:name="com.vocabulary.myvocabulary.ui.words.WordDetailsFragment"
+        android:label="WordDetailsFragment"
+        tools:layout="@layout/fragment_word_details">
+        <argument
+            android:name="word"
+            app:argType="string" />
+        <argument
+            android:name="translation"
+            app:argType="string" />
+        <argument
+            android:name="beenAsked"
+            app:argType="integer" />
+        <argument
+            android:name="failed"
+            app:argType="integer" />
+        <argument
+            android:name="passed"
+            app:argType="integer" />
+        <argument
+            android:name="lastResult"
+            app:argType="boolean" />
     </fragment>
 </navigation>
