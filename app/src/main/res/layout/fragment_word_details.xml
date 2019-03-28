@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
+
     <com.google.android.material.appbar.AppBarLayout
         android:id="@+id/app_bar"
         android:layout_width="match_parent"
@@ -18,9 +19,9 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_margin="0dp"
-            app:title="@string/word_details_toolbar"
             android:fitsSystemWindows="true"
-            app:navigationIcon="@drawable/ic_arrow_back" />
+            app:navigationIcon="@drawable/ic_arrow_back"
+            app:title="@string/word_details_toolbar" />
     </com.google.android.material.appbar.AppBarLayout>
 
     <TextView
@@ -28,17 +29,17 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="@dimen/margin_normal"
-        android:text="Meaning:"
-        app:layout_constraintTop_toBottomOf="@id/app_bar"
+        android:text="@string/meaning_colon"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"/>
+        app:layout_constraintTop_toBottomOf="@id/app_bar" />
 
     <com.google.android.material.card.MaterialCardView
         android:id="@+id/word_card_view"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="@dimen/margin_normal"
         android:layout_gravity="center_horizontal"
+        android:layout_margin="@dimen/margin_normal"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/word_title">
 
@@ -55,6 +56,22 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             tools:text="cat" />
+
+        <TextView
+            android:id="@+id/word_options"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="end"
+            android:layout_margin="@dimen/margin_normal"
+            android:layout_marginBottom="@dimen/margin_normal"
+            android:gravity="center_vertical"
+            android:paddingStart="@dimen/padding_normal"
+            android:paddingEnd="@dimen/padding_normal"
+            android:text="@string/row_dictionary_options_dots"
+            android:textAppearance="?android:textAppearanceLarge"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
     </com.google.android.material.card.MaterialCardView>
 
     <TextView
@@ -62,17 +79,17 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="@dimen/margin_normal"
-        android:text="Expression:"
-        app:layout_constraintTop_toBottomOf="@id/word_card_view"
+        android:text="@string/expression_colon"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"/>
+        app:layout_constraintTop_toBottomOf="@id/word_card_view" />
 
     <com.google.android.material.card.MaterialCardView
         android:id="@+id/translation_card_view"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="@dimen/margin_normal"
         android:layout_gravity="center_horizontal"
+        android:layout_margin="@dimen/margin_normal"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/tranlsation_title">
 
@@ -89,97 +106,115 @@
             app:layout_constraintStart_toEndOf="@id/guideline"
             app:layout_constraintTop_toTopOf="parent"
             tools:text="cica" />
+
+        <TextView
+            android:id="@+id/translation_options"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="end"
+            android:layout_margin="@dimen/margin_normal"
+            android:layout_marginBottom="@dimen/margin_normal"
+            android:gravity="center_vertical"
+            android:paddingStart="@dimen/padding_normal"
+            android:paddingEnd="@dimen/padding_normal"
+            android:text="@string/row_dictionary_options_dots"
+            android:textAppearance="?android:textAppearanceLarge"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
     </com.google.android.material.card.MaterialCardView>
 
     <com.google.android.material.card.MaterialCardView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/margin_large"
-        android:layout_marginBottom="@dimen/margin_normal"
         android:layout_marginStart="@dimen/margin_normal"
+        android:layout_marginTop="@dimen/margin_large"
         android:layout_marginEnd="@dimen/margin_normal"
+        android:layout_marginBottom="@dimen/margin_normal"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/translation_card_view">
+
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
+
             <TextView
                 android:id="@+id/been_asked_text"
                 style="@style/WordDetailText"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:gravity="start"
                 android:layout_margin="@dimen/margin_medium"
+                android:gravity="start"
                 android:padding="@dimen/padding_normal"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
+                android:text="@string/word_detail_attempts_so_far"
                 app:layout_constraintEnd_toStartOf="@id/been_asked_value"
-                android:text="Attempts so far:"/>
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
 
             <TextView
                 android:id="@+id/been_asked_value"
                 style="@style/WordDetail"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:gravity="end"
                 android:layout_margin="@dimen/margin_medium"
+                android:gravity="end"
                 android:padding="@dimen/padding_normal"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintStart_toEndOf="@id/been_asked_text"
                 app:layout_constraintEnd_toEndOf="parent"
-                tools:text="30"/>
+                app:layout_constraintStart_toEndOf="@id/been_asked_text"
+                app:layout_constraintTop_toTopOf="parent"
+                tools:text="30" />
 
             <TextView
                 android:id="@+id/passed_text"
                 style="@style/WordDetailText"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:gravity="start"
                 android:layout_margin="@dimen/margin_medium"
+                android:gravity="start"
                 android:padding="@dimen/padding_normal"
-                app:layout_constraintTop_toBottomOf="@+id/been_asked_text"
-                app:layout_constraintStart_toStartOf="parent"
+                android:text="@string/passed_colon"
                 app:layout_constraintEnd_toStartOf="@id/passed_value"
-                android:text="Passed:"/>
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/been_asked_text" />
 
             <TextView
                 android:id="@+id/passed_value"
                 style="@style/WordDetail"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:gravity="end"
                 android:layout_margin="@dimen/margin_medium"
+                android:gravity="end"
                 android:padding="@dimen/padding_normal"
-                app:layout_constraintTop_toBottomOf="@+id/been_asked_value"
-                app:layout_constraintStart_toEndOf="@id/passed_text"
                 app:layout_constraintEnd_toEndOf="parent"
-                tools:text="25"/>
+                app:layout_constraintStart_toEndOf="@id/passed_text"
+                app:layout_constraintTop_toBottomOf="@+id/been_asked_value"
+                tools:text="25" />
 
             <TextView
                 android:id="@+id/failed_text"
                 style="@style/WordDetailText"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:gravity="start"
                 android:layout_margin="@dimen/margin_medium"
+                android:gravity="start"
                 android:padding="@dimen/padding_normal"
-                app:layout_constraintTop_toBottomOf="@+id/passed_text"
-                app:layout_constraintStart_toStartOf="parent"
+                android:text="@string/failed_colon"
                 app:layout_constraintEnd_toStartOf="@id/failed_value"
-                android:text="Failed:"/>
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/passed_text" />
 
             <TextView
                 android:id="@+id/failed_value"
                 style="@style/WordDetail"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:gravity="end"
                 android:layout_margin="@dimen/margin_medium"
+                android:gravity="end"
                 android:padding="@dimen/padding_normal"
-                app:layout_constraintTop_toBottomOf="@+id/passed_value"
-                app:layout_constraintStart_toEndOf="@id/failed_text"
                 app:layout_constraintEnd_toEndOf="parent"
-                tools:text="5"/>
+                app:layout_constraintStart_toEndOf="@id/failed_text"
+                app:layout_constraintTop_toBottomOf="@+id/passed_value"
+                tools:text="5" />
 
             <TextView
                 android:id="@+id/last_result_text"
@@ -190,7 +225,7 @@
                 android:layout_marginBottom="8dp"
                 android:gravity="start"
                 android:padding="@dimen/padding_normal"
-                android:text="Last Result:"
+                android:text="@string/last_result_colon"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toStartOf="@id/last_result_value"
                 app:layout_constraintStart_toStartOf="parent"
