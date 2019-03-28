@@ -9,7 +9,6 @@ import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
-import androidx.appcompat.widget.Toolbar
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.navigation.findNavController
@@ -20,10 +19,9 @@ import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.vocabulary.myvocabulary.R
 import com.vocabulary.myvocabulary.ext.show
-import com.vocabulary.myvocabulary.ui.dictionaries.DictionaryListFragmentDirections
 import com.vocabulary.myvocabulary.ui.quizzes.toQuizType
 import kotlinx.android.synthetic.main.dialog_create_word.view.*
-import kotlinx.android.synthetic.main.dialog_quiz_type_and_direction_picker.view.*
+import kotlinx.android.synthetic.main.dialog_start_quiz.view.*
 import kotlinx.android.synthetic.main.dialog_rename_word.view.*
 import kotlinx.android.synthetic.main.fragment_word_list.view.*
 import org.koin.androidx.viewmodel.ext.viewModel
@@ -90,7 +88,7 @@ class WordListFragment : Fragment(), WordAdapter.WordItemClickListener {
 
     private fun openCreateDialog() {
         val inflater = requireActivity().layoutInflater
-        val dialogView: View = inflater.inflate(R.layout.dialog_create_word, null)
+        val dialogView: View = inflater.inflate(R.layout.dialog_create_word,null)
         val editTextWord: EditText = dialogView.new_word_edit
         val editTextTranslation: EditText = dialogView.new_translation_edit
         val saveButton: Button = dialogView.create_and_close_button
@@ -280,7 +278,7 @@ class WordListFragment : Fragment(), WordAdapter.WordItemClickListener {
         var selectedDirection = -1
         var selectedQuizType = -1
         val inflater = requireActivity().layoutInflater
-        val dialogView: View = inflater.inflate(R.layout.dialog_quiz_type_and_direction_picker, null)
+        val dialogView: View = inflater.inflate(R.layout.dialog_start_quiz, null)
         val directionRadioGroup: RadioGroup = dialogView.direction_radioGroup
         val quizTypeRadioGroup: RadioGroup = dialogView.quiz_type_radioGroup
         val doItButton: Button = dialogView.from_dictionary_lets_do_it
