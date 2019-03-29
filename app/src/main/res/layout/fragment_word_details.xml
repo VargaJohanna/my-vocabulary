@@ -25,7 +25,7 @@
     </com.google.android.material.appbar.AppBarLayout>
 
 
-    <ImageView
+    <ImageButton
         android:id="@+id/word_edit"
         android:layout_width="40dp"
         android:layout_height="40dp"
@@ -34,6 +34,7 @@
         android:padding="@dimen/padding_normal"
         android:tint="@color/primary_text"
         android:src="@drawable/ic_edit"
+        android:background="@null"
         app:layout_constraintBottom_toTopOf="@+id/word_card_view"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/app_bar" />
@@ -209,7 +210,6 @@
                 android:gravity="start"
                 android:padding="@dimen/padding_normal"
                 android:text="@string/last_result_colon"
-                app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toStartOf="@id/last_result_value"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/failed_text" />
@@ -223,11 +223,40 @@
                 android:layout_marginBottom="8dp"
                 android:gravity="end"
                 android:padding="@dimen/padding_normal"
-                app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toEndOf="@id/last_result_text"
                 app:layout_constraintTop_toBottomOf="@+id/failed_value"
                 tools:text="Passed" />
+
+            <TextView
+                android:id="@+id/created_text"
+                style="@style/WordDetailText"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_margin="@dimen/margin_normal"
+                android:layout_marginBottom="8dp"
+                android:gravity="start"
+                android:padding="@dimen/padding_normal"
+                android:text="@string/details_created"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@id/created_value"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/last_result_text" />
+
+            <TextView
+                android:id="@+id/created_value"
+                style="@style/WordDetail"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_margin="@dimen/margin_normal"
+                android:layout_marginBottom="8dp"
+                android:gravity="end"
+                android:padding="@dimen/padding_normal"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@id/created_text"
+                app:layout_constraintTop_toBottomOf="@+id/last_result_value"
+                tools:text="03 March 2019" />
         </androidx.constraintlayout.widget.ConstraintLayout>
     </com.google.android.material.card.MaterialCardView>
 

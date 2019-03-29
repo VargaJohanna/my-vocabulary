@@ -1,6 +1,7 @@
 package com.vocabulary.myvocabulary.ui.words
 
 import android.app.AlertDialog
+import android.os.Build
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
@@ -20,6 +21,10 @@ import kotlinx.android.synthetic.main.dialog_rename_word.view.*
 import kotlinx.android.synthetic.main.fragment_word_details.view.*
 import org.koin.androidx.viewmodel.ext.viewModel
 import org.koin.core.parameter.parametersOf
+import java.text.SimpleDateFormat
+import java.time.ZoneId
+import java.time.format.DateTimeFormatter
+import java.util.*
 
 class WordDetailsFragment : Fragment() {
     private val args by navArgs<WordDetailsFragmentArgs>()
@@ -45,7 +50,7 @@ class WordDetailsFragment : Fragment() {
         view.passed_value.text = wordDetailViewModel.currentWordObject.passed.toString()
         view.failed_value.text = wordDetailViewModel.currentWordObject.failed.toString()
         view.last_result_value.text = if (wordDetailViewModel.currentWordObject.lastResult) requireActivity().getString(R.string.passed) else requireActivity().getString(R.string.failed)
-
+        view.created_value.text = formatDate(wordDetailViewModel.currentWordObject.created)
     }
 
     private fun setWordEditButtonClickListener(wordView: TextView, translationView: TextView, wordEdit: ImageView) {
@@ -134,6 +139,16 @@ class WordDetailsFragment : Fragment() {
                 errorMessage.show(false)
             }
         })
+    }
+
+    private fun formatDate(date: Date): String {
+        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val formatter = DateTimeFormatter.ofPattern("dd-MMMM-yyyy")
+            date.toInstant().atZone(ZoneId.systemDefault()).toLocalDate().format(formatter).toString()
+        } else {
+            val dateFormat = SimpleDateFormat.getDateInstance()
+            dateFormat.format(date).toString()
+        }
     }
 
     override fun onStop() {
