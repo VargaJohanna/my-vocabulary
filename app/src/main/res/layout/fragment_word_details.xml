@@ -36,6 +36,20 @@
         android:src="@drawable/ic_edit"
         android:background="@null"
         app:layout_constraintBottom_toTopOf="@+id/word_card_view"
+        app:layout_constraintEnd_toStartOf="@id/word_delete"
+        app:layout_constraintTop_toBottomOf="@+id/app_bar" />
+
+    <ImageButton
+        android:id="@+id/word_delete"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_gravity="end"
+        android:layout_margin="@dimen/margin_small"
+        android:padding="@dimen/padding_normal"
+        android:tint="@color/primary_text"
+        android:src="@drawable/ic_delete"
+        android:background="@null"
+        app:layout_constraintBottom_toTopOf="@+id/word_card_view"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/app_bar" />
 

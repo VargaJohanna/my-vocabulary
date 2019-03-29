@@ -8,12 +8,10 @@ import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
-import android.widget.EditText
-import android.widget.ImageView
-import android.widget.TextView
+import android.widget.*
 import androidx.fragment.app.Fragment
 import androidx.navigation.findNavController
+import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.vocabulary.myvocabulary.R
 import com.vocabulary.myvocabulary.ext.show
@@ -40,6 +38,13 @@ class WordDetailsFragment : Fragment() {
             setView(this)
             word_details_toolbar.setNavigationOnClickListener { findNavController().popBackStack() }
             setWordEditButtonClickListener(details_word, details_translation, word_edit)
+            setWordDeleteButtonClickListener(word_delete)
+        }
+    }
+
+    private fun setWordDeleteButtonClickListener(delete: ImageButton) {
+        delete.setOnClickListener {
+            showDeleteWordDialog()
         }
     }
 
@@ -148,6 +153,18 @@ class WordDetailsFragment : Fragment() {
         } else {
             val dateFormat = SimpleDateFormat.getDateInstance()
             dateFormat.format(date).toString()
+        }
+    }
+
+    private fun showDeleteWordDialog() {
+        AlertDialog.Builder(requireActivity()).apply {
+            setTitle(R.string.dialog_delete_word_title)
+            setMessage("Are you sure you want to delete\n\"${wordDetailViewModel.currentWordObject.word} - ${wordDetailViewModel.currentWordObject.translation}\" ?")
+            setPositiveButton("Delete") { _, _ ->
+                wordViewModel.deleteWord(wordDetailViewModel.currentWordObject)
+                findNavController().popBackStack()
+            }
+            show()
         }
     }
 
