@@ -39,9 +39,10 @@ val viewModelModule = module {
                 get())
     }
     viewModel { (dictionaryId: Long) -> ResultViewModel(dictionaryId, get(), get(), get()) }
-    viewModel { WordDetailsViewModel() }
+    viewModel { WordDetailsViewModel(get(), get()) }
 }
 
 val schedulerModule = module {
     factory<RxSchedulers> { SchedulersImpl() }
 }
+
