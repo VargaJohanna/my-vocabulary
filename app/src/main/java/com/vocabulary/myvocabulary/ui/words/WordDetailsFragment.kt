@@ -16,6 +16,7 @@ import androidx.navigation.fragment.navArgs
 import com.vocabulary.myvocabulary.R
 import com.vocabulary.myvocabulary.ext.show
 import kotlinx.android.synthetic.main.dialog_rename_word.view.*
+import kotlinx.android.synthetic.main.fragment_word_details.*
 import kotlinx.android.synthetic.main.fragment_word_details.view.*
 import org.koin.androidx.viewmodel.ext.viewModel
 import org.koin.core.parameter.parametersOf
@@ -31,11 +32,15 @@ class WordDetailsFragment : Fragment() {
     }
     private val wordDetailViewModel: WordDetailsViewModel by viewModel()
     private var wordEditDialog: AlertDialog? = null
+    private lateinit var wordCurrent: Word
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        wordDetailViewModel.currentWordObject = args.wordObject
+        wordDetailViewModel.getWordById(args.wordId)
+        wordDetailViewModel.getCurrentWord().observe(requireActivity(), androidx.lifecycle.Observer {
+            wordCurrent = it
+            setView(it)
+        })
         return inflater.inflate(R.layout.fragment_word_details, container, false).apply {
-            setView(this)
             word_details_toolbar.setNavigationOnClickListener { findNavController().popBackStack() }
             setWordEditButtonClickListener(details_word, details_translation, word_edit)
             setWordDeleteButtonClickListener(word_delete)
@@ -48,20 +53,19 @@ class WordDetailsFragment : Fragment() {
         }
     }
 
-    private fun setView(view: View) {
-        view.details_word.text = wordDetailViewModel.currentWordObject.word
-        view.details_translation.text = wordDetailViewModel.currentWordObject.translation
-        view.been_asked_value.text = wordDetailViewModel.currentWordObject.beenAsked.toString()
-        view.passed_value.text = wordDetailViewModel.currentWordObject.passed.toString()
-        view.failed_value.text = wordDetailViewModel.currentWordObject.failed.toString()
-        view.last_result_value.text = if (wordDetailViewModel.currentWordObject.lastResult) requireActivity().getString(R.string.passed) else requireActivity().getString(R.string.failed)
-        view.created_value.text = formatDate(wordDetailViewModel.currentWordObject.created)
+    private fun setView(word: Word) {
+        details_word.text = word.word
+        details_translation.text = word.translation
+        been_asked_value.text = word.beenAsked.toString()
+        passed_value.text = word.passed.toString()
+        failed_value.text = word.failed.toString()
+        last_result_value.text = if (word.lastResult) requireActivity().getString(R.string.passed) else requireActivity().getString(R.string.failed)
+        created_value.text = formatDate(word.created)
     }
 
     private fun setWordEditButtonClickListener(wordView: TextView, translationView: TextView, wordEdit: ImageView) {
         wordEdit.setOnClickListener {
-            openWordEditDialog(wordView, translationView, wordDetailViewModel.currentWordObject)
-
+            openWordEditDialog(wordView, translationView, wordCurrent)
         }
     }
 
@@ -115,7 +119,7 @@ class WordDetailsFragment : Fragment() {
         if (inputWord.isNotEmpty() && inputTranslation.isNotEmpty()) {
             errorMessageWord.show(false)
             errorMessageTranslation.show(false)
-            wordDetailViewModel.currentWordObject = word.copy(word = inputWord, translation = inputTranslation)
+            wordCurrent = word.copy(word = inputWord, translation = inputTranslation)
             wordViewModel.updateWord(word.copy(word = inputWord, translation = inputTranslation))
             alertDialog.dismiss()
         } else if (inputWord.isEmpty() && inputTranslation.isEmpty()) {
@@ -159,9 +163,9 @@ class WordDetailsFragment : Fragment() {
     private fun showDeleteWordDialog() {
         AlertDialog.Builder(requireActivity()).apply {
             setTitle(R.string.dialog_delete_word_title)
-            setMessage("Are you sure you want to delete\n\"${wordDetailViewModel.currentWordObject.word} - ${wordDetailViewModel.currentWordObject.translation}\" ?")
-            setPositiveButton("Delete") { _, _ ->
-                wordViewModel.deleteWord(wordDetailViewModel.currentWordObject)
+            setMessage("Are you sure you want to delete\n\"${wordCurrent.word} - ${wordCurrent.translation}\" ?")
+            setPositiveButton(getString(R.string.delete_dialog_title)) { _, _ ->
+                wordViewModel.deleteWord(wordCurrent)
                 findNavController().popBackStack()
             }
             show()

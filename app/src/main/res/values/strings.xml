@@ -59,5 +59,6 @@
     <string name="passed">Passed</string>
     <string name="failed">Failed</string>
     <string name="details_created">Created:</string>
+    <string name="delete_dialog_title">Delete</string>
 
 </resources>

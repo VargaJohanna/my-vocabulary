@@ -128,8 +128,8 @@
                 android:name="dictionaryId"
                 app:argType="long" />
             <argument
-                android:name="wordObject"
-                app:argType="com.vocabulary.myvocabulary.ui.words.Word" />
+                android:name="wordId"
+                app:argType="long" />
         </action>
     </fragment>
     <fragment
@@ -250,7 +250,7 @@
             android:name="dictionaryId"
             app:argType="long" />
         <argument
-            android:name="wordObject"
-            app:argType="com.vocabulary.myvocabulary.ui.words.Word" />
+            android:name="wordId"
+            app:argType="long" />
     </fragment>
 </navigation>
