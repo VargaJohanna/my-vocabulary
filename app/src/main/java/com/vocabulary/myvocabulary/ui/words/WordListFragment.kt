@@ -9,9 +9,9 @@ import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
+import androidx.appcompat.widget.Toolbar
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
-import androidx.navigation.findNavController
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -21,8 +21,8 @@ import com.vocabulary.myvocabulary.R
 import com.vocabulary.myvocabulary.ext.show
 import com.vocabulary.myvocabulary.ui.quizzes.toQuizType
 import kotlinx.android.synthetic.main.dialog_create_word.view.*
-import kotlinx.android.synthetic.main.dialog_start_quiz.view.*
 import kotlinx.android.synthetic.main.dialog_rename_word.view.*
+import kotlinx.android.synthetic.main.dialog_start_quiz.view.*
 import kotlinx.android.synthetic.main.fragment_word_list.view.*
 import org.koin.androidx.viewmodel.ext.viewModel
 import org.koin.core.parameter.parametersOf
@@ -38,14 +38,7 @@ class WordListFragment : Fragment(), WordAdapter.WordItemClickListener {
     private var popUp: PopupMenu? = null
 
     override fun onItemClick(word: Word) {
-        val action = WordListFragmentDirections.fromWordListToWordDetails(
-                word.word,
-                word.translation,
-                word.beenAsked,
-                word.failed,
-                word.passed,
-                word.lastResult
-        )
+        val action = WordListFragmentDirections.fromWordListToWordDetails(wordViewModel.dictionaryId, word)
         findNavController().navigate(action)
     }
 
@@ -59,17 +52,21 @@ class WordListFragment : Fragment(), WordAdapter.WordItemClickListener {
             generateWordList(wordAdapter, word_recycler_view)
             observeWordList(wordAdapter, word_list_progress_bar)
             setFabOnClickListener(word_fab)
-            word_list_toolbar.inflateMenu(R.menu.word_list_menu)
-            word_list_toolbar.setOnMenuItemClickListener { item: MenuItem? ->
-                when(item?.itemId){
-                    R.id.start_quiz_from_word_list -> showStartQuizDialog(wordViewModel.dictionaryId)
-                }
-                true
+            setToolbarMenu(word_list_toolbar)
+        }
+    }
+
+    private fun setToolbarMenu(toolbar: Toolbar) {
+        toolbar.inflateMenu(R.menu.word_list_menu)
+        toolbar.setOnMenuItemClickListener { item: MenuItem? ->
+            when (item?.itemId) {
+                R.id.start_quiz_from_word_list -> showStartQuizDialog(wordViewModel.dictionaryId)
             }
-            word_list_toolbar.title = args.dictionaryName
-            word_list_toolbar.setNavigationOnClickListener {
-                findNavController().popBackStack()
-            }
+            true
+        }
+        toolbar.title = args.dictionaryName
+        toolbar.setNavigationOnClickListener {
+            findNavController().popBackStack()
         }
     }
 
@@ -96,7 +93,7 @@ class WordListFragment : Fragment(), WordAdapter.WordItemClickListener {
 
     private fun openCreateDialog() {
         val inflater = requireActivity().layoutInflater
-        val dialogView: View = inflater.inflate(R.layout.dialog_create_word,null)
+        val dialogView: View = inflater.inflate(R.layout.dialog_create_word, null)
         val editTextWord: EditText = dialogView.new_word_edit
         val editTextTranslation: EditText = dialogView.new_translation_edit
         val saveButton: Button = dialogView.create_and_close_button

@@ -24,15 +24,30 @@
             app:title="@string/word_details_toolbar" />
     </com.google.android.material.appbar.AppBarLayout>
 
+
+    <ImageView
+        android:id="@+id/word_edit"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_gravity="end"
+        android:layout_margin="@dimen/margin_small"
+        android:padding="@dimen/padding_normal"
+        android:tint="@color/primary_text"
+        android:src="@drawable/ic_edit"
+        app:layout_constraintBottom_toTopOf="@+id/word_card_view"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/app_bar" />
+
     <TextView
         android:id="@+id/word_title"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_margin="@dimen/margin_normal"
+        android:layout_marginBottom="8dp"
         android:text="@string/meaning_colon"
+        app:layout_constraintBottom_toBottomOf="@+id/word_edit"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/app_bar" />
+        app:layout_constraintStart_toStartOf="parent" />
 
     <com.google.android.material.card.MaterialCardView
         android:id="@+id/word_card_view"
@@ -41,7 +56,7 @@
         android:layout_gravity="center_horizontal"
         android:layout_margin="@dimen/margin_normal"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/word_title">
+        app:layout_constraintTop_toBottomOf="@+id/word_edit">
 
         <TextView
             android:id="@+id/details_word"
@@ -56,26 +71,10 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             tools:text="cat" />
-
-        <TextView
-            android:id="@+id/word_options"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="end"
-            android:layout_margin="@dimen/margin_normal"
-            android:layout_marginBottom="@dimen/margin_normal"
-            android:gravity="center_vertical"
-            android:paddingStart="@dimen/padding_normal"
-            android:paddingEnd="@dimen/padding_normal"
-            android:text="@string/row_dictionary_options_dots"
-            android:textAppearance="?android:textAppearanceLarge"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
     </com.google.android.material.card.MaterialCardView>
 
     <TextView
-        android:id="@+id/tranlsation_title"
+        android:id="@+id/translation_title"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="@dimen/margin_normal"
@@ -91,7 +90,7 @@
         android:layout_gravity="center_horizontal"
         android:layout_margin="@dimen/margin_normal"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tranlsation_title">
+        app:layout_constraintTop_toBottomOf="@+id/translation_title">
 
         <TextView
             android:id="@+id/details_translation"
@@ -106,22 +105,6 @@
             app:layout_constraintStart_toEndOf="@id/guideline"
             app:layout_constraintTop_toTopOf="parent"
             tools:text="cica" />
-
-        <TextView
-            android:id="@+id/translation_options"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="end"
-            android:layout_margin="@dimen/margin_normal"
-            android:layout_marginBottom="@dimen/margin_normal"
-            android:gravity="center_vertical"
-            android:paddingStart="@dimen/padding_normal"
-            android:paddingEnd="@dimen/padding_normal"
-            android:text="@string/row_dictionary_options_dots"
-            android:textAppearance="?android:textAppearanceLarge"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
     </com.google.android.material.card.MaterialCardView>
 
     <com.google.android.material.card.MaterialCardView
@@ -143,7 +126,7 @@
                 style="@style/WordDetailText"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_margin="@dimen/margin_medium"
+                android:layout_margin="@dimen/margin_normal"
                 android:gravity="start"
                 android:padding="@dimen/padding_normal"
                 android:text="@string/word_detail_attempts_so_far"
@@ -156,7 +139,7 @@
                 style="@style/WordDetail"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_margin="@dimen/margin_medium"
+                android:layout_margin="@dimen/margin_normal"
                 android:gravity="end"
                 android:padding="@dimen/padding_normal"
                 app:layout_constraintEnd_toEndOf="parent"
@@ -169,7 +152,7 @@
                 style="@style/WordDetailText"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_margin="@dimen/margin_medium"
+                android:layout_margin="@dimen/margin_normal"
                 android:gravity="start"
                 android:padding="@dimen/padding_normal"
                 android:text="@string/passed_colon"
@@ -182,7 +165,7 @@
                 style="@style/WordDetail"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_margin="@dimen/margin_medium"
+                android:layout_margin="@dimen/margin_normal"
                 android:gravity="end"
                 android:padding="@dimen/padding_normal"
                 app:layout_constraintEnd_toEndOf="parent"
@@ -195,7 +178,7 @@
                 style="@style/WordDetailText"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_margin="@dimen/margin_medium"
+                android:layout_margin="@dimen/margin_normal"
                 android:gravity="start"
                 android:padding="@dimen/padding_normal"
                 android:text="@string/failed_colon"
@@ -208,7 +191,7 @@
                 style="@style/WordDetail"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_margin="@dimen/margin_medium"
+                android:layout_margin="@dimen/margin_normal"
                 android:gravity="end"
                 android:padding="@dimen/padding_normal"
                 app:layout_constraintEnd_toEndOf="parent"
@@ -221,7 +204,7 @@
                 style="@style/WordDetailText"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_margin="@dimen/margin_medium"
+                android:layout_margin="@dimen/margin_normal"
                 android:layout_marginBottom="8dp"
                 android:gravity="start"
                 android:padding="@dimen/padding_normal"
@@ -236,7 +219,7 @@
                 style="@style/WordDetail"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_margin="@dimen/margin_medium"
+                android:layout_margin="@dimen/margin_normal"
                 android:layout_marginBottom="8dp"
                 android:gravity="end"
                 android:padding="@dimen/padding_normal"
