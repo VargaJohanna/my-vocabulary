@@ -22,12 +22,9 @@ class WordListViewModel(
 ) : ViewModel() {
     private val disposables = CompositeDisposable()
     private val liveWordList: MutableLiveData<List<Word>> = MutableLiveData()
-    private val defaultWordId = 1L
-    private val isDefaultWordInDictionary: MutableLiveData<Boolean> = MutableLiveData()
 
     init {
         observeList()
-        observeIfWordInDictionary()
     }
 
     fun insertWord(word: Word) {
@@ -43,15 +40,6 @@ class WordListViewModel(
                 .observeOn(rxSchedulers.main())
                 .subscribe { liveWordList.postValue(it) }
     }
-
-    private fun observeIfWordInDictionary() {
-        disposables += wordRepository.getIsWordInDictionary(defaultWordId)
-                .subscribeOn(rxSchedulers.io())
-                .observeOn(rxSchedulers.main())
-                .subscribe { isDefaultWordInDictionary.postValue(it) }
-    }
-
-    fun isDefaultWordSet(): LiveData<Boolean> = isDefaultWordInDictionary
 
     fun getLiveWordList(): LiveData<List<Word>> = liveWordList
 

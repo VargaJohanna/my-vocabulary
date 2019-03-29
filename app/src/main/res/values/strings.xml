@@ -56,5 +56,7 @@
     <string name="passed_colon">Passed:</string>
     <string name="failed_colon">Failed:</string>
     <string name="last_result_colon">Last Result:</string>
+    <string name="passed">Passed</string>
+    <string name="failed">Failed</string>
 
 </resources>

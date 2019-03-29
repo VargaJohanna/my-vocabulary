@@ -125,23 +125,11 @@
             app:popEnterAnim="@anim/nav_default_enter_anim"
             app:popExitAnim="@anim/nav_default_exit_anim">
             <argument
-                android:name="word"
-                app:argType="string" />
+                android:name="dictionaryId"
+                app:argType="long" />
             <argument
-                android:name="translation"
-                app:argType="string" />
-            <argument
-                android:name="beenAsked"
-                app:argType="integer" />
-            <argument
-                android:name="failed"
-                app:argType="integer" />
-            <argument
-                android:name="passed"
-                app:argType="integer" />
-            <argument
-                android:name="lastResult"
-                app:argType="boolean" />
+                android:name="wordObject"
+                app:argType="com.vocabulary.myvocabulary.ui.words.Word" />
         </action>
     </fragment>
     <fragment
@@ -259,22 +247,10 @@
         android:label="WordDetailsFragment"
         tools:layout="@layout/fragment_word_details">
         <argument
-            android:name="word"
-            app:argType="string" />
+            android:name="dictionaryId"
+            app:argType="long" />
         <argument
-            android:name="translation"
-            app:argType="string" />
-        <argument
-            android:name="beenAsked"
-            app:argType="integer" />
-        <argument
-            android:name="failed"
-            app:argType="integer" />
-        <argument
-            android:name="passed"
-            app:argType="integer" />
-        <argument
-            android:name="lastResult"
-            app:argType="boolean" />
+            android:name="wordObject"
+            app:argType="com.vocabulary.myvocabulary.ui.words.Word" />
     </fragment>
 </navigation>
