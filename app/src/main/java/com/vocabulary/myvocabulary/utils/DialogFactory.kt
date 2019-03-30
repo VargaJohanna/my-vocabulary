@@ -9,10 +9,13 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.RadioGroup
 import android.widget.TextView
+import androidx.navigation.fragment.findNavController
 import com.vocabulary.myvocabulary.R
 import com.vocabulary.myvocabulary.ext.show
 import com.vocabulary.myvocabulary.ui.dictionaries.Dictionary
+import com.vocabulary.myvocabulary.ui.dictionaries.DictionaryListFragmentDirections
 import com.vocabulary.myvocabulary.ui.words.Word
+import kotlinx.android.synthetic.main.dialog_create_dictionary.view.*
 import kotlinx.android.synthetic.main.dialog_create_word.view.*
 import kotlinx.android.synthetic.main.dialog_rename_dictionary.view.*
 import kotlinx.android.synthetic.main.dialog_rename_word.view.*
@@ -261,6 +264,39 @@ class DialogFactory {
                     errorMessage.show(true)
                 }
             }
+        }
+    }
+
+    fun openDictionaryCreateDialog(
+            activity: Activity,
+            createClick: (nameToCreate: String) -> Unit
+    ): AlertDialog {
+        val inflater = activity.layoutInflater
+        val dialogView: View = inflater.inflate(R.layout.dialog_create_dictionary, null)
+        val editText: EditText = dialogView.new_dictionary_edit
+        val createButton: Button = dialogView.create_dictionary_button
+        val cancelButton: Button = dialogView.cancel_dictionary_creation
+        val errorMessage: TextView = dialogView.dictionary_name_error
+
+        val dialogBuilder = AlertDialog.Builder(activity)
+        return dialogBuilder.create().apply {
+            setView(dialogView)
+            errorMessage.show(false)
+            setupTextChangedListener(editText, errorMessage)
+            createButton.setOnClickListener {
+                if (editText.text.toString().isNotEmpty()) {
+                    errorMessage.show(false)
+                    createClick(editText.text.toString())
+
+                } else {
+                    errorMessage.show(true)
+                }
+            }
+            cancelButton.setOnClickListener {
+                errorMessage.show(false)
+                dismiss()
+            }
+            setTitle(activity.getString(R.string.create_new_dictionary_dialog_title))
         }
     }
 }
