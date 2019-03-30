@@ -20,10 +20,12 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.vocabulary.myvocabulary.R
 import com.vocabulary.myvocabulary.ext.show
 import com.vocabulary.myvocabulary.ui.quizzes.toQuizType
+import com.vocabulary.myvocabulary.utils.DialogFactory
 import kotlinx.android.synthetic.main.dialog_create_word.view.*
 import kotlinx.android.synthetic.main.dialog_rename_word.view.*
 import kotlinx.android.synthetic.main.dialog_start_quiz.view.*
 import kotlinx.android.synthetic.main.fragment_word_list.view.*
+import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.viewModel
 import org.koin.core.parameter.parametersOf
 
@@ -32,6 +34,7 @@ class WordListFragment : Fragment(), WordAdapter.WordItemClickListener {
     private val wordViewModel: WordListViewModel by viewModel {
         parametersOf(args.dictionaryId)
     }
+    private val dialogFactory: DialogFactory by inject()
     private var createDialog: AlertDialog? = null
     private var renameDialog: AlertDialog? = null
     private var startQuizDialog: AlertDialog? = null
@@ -218,65 +221,14 @@ class WordListFragment : Fragment(), WordAdapter.WordItemClickListener {
     }
 
     private fun showEditDialog(word: Word) {
-        val inflater = requireActivity().layoutInflater
-        val dialogView: View = inflater.inflate(R.layout.dialog_rename_word, null)
-        val editTextWord: EditText = dialogView.rename_word_edit
-        val editTextTranslation: EditText = dialogView.rename_translation_edit
-        val saveButton: Button = dialogView.rename_and_close_button
-        val cancelButton: TextView = dialogView.cancel_word_rename_button
-        val errorMessageWord: TextView = dialogView.word_rename_error
-        val errorMessageTranslation: TextView = dialogView.rename_translation_error
-
-        val dialogBuilder = AlertDialog.Builder(requireActivity())
-        renameDialog = dialogBuilder.create().apply {
-            setView(dialogView)
-            editTextWord.requestFocus()
-            errorMessageWord.show(false)
-            errorMessageTranslation.show(false)
-            setupTextChangedListener(editTextWord, errorMessageWord)
-            setupTextChangedListener(editTextTranslation, errorMessageTranslation)
-            editTextWord.setText(word.word)
-            editTextTranslation.setText(word.translation)
-            saveButton.setOnClickListener {
-                updateWord(word,
-                        editTextWord,
-                        editTextTranslation,
-                        errorMessageWord,
-                        errorMessageTranslation,
-                        this)
-            }
-            cancelButton.setOnClickListener {
-                dismiss()
-            }
-            setTitle(R.string.edit_word_dialog_title)
-            show()
+        renameDialog = dialogFactory.openEditDialog(
+                requireActivity(),
+                word) {
+            wordInput, translationInput ->
+            wordViewModel.updateWord(word.copy(word = wordInput, translation = translationInput))
+            renameDialog?.dismiss()
         }
-    }
-
-    private fun updateWord(word: Word,
-                           editTextWord: EditText,
-                           editTextTranslation: EditText,
-                           errorMessageWord: TextView,
-                           errorMessageTranslation: TextView,
-                           alertDialog: AlertDialog) {
-        val inputWord = editTextWord.text.toString().trim()
-        val inputTranslation = editTextTranslation.text.toString().trim()
-
-        if (inputWord.isNotEmpty() && inputTranslation.isNotEmpty()) {
-            errorMessageWord.show(false)
-            errorMessageTranslation.show(false)
-            wordViewModel.updateWord(word.copy(word = inputWord, translation = inputTranslation))
-            alertDialog.dismiss()
-        } else if (inputWord.isEmpty() && inputTranslation.isEmpty()) {
-            errorMessageWord.show(true)
-            errorMessageTranslation.show(true)
-        } else if (inputWord.isEmpty()) {
-            errorMessageWord.show(true)
-            errorMessageTranslation.show(false)
-        } else if (inputTranslation.isEmpty()) {
-            errorMessageWord.show(false)
-            errorMessageTranslation.show(true)
-        }
+        renameDialog?.show()
     }
 
     private fun showStartQuizDialog(dictionaryId: Long) {
