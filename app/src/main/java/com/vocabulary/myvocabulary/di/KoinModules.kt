@@ -14,6 +14,7 @@ import com.vocabulary.myvocabulary.ui.quizzes.QuizViewModel
 import com.vocabulary.myvocabulary.ui.results.ResultViewModel
 import com.vocabulary.myvocabulary.ui.words.WordDetailsViewModel
 import com.vocabulary.myvocabulary.ui.words.WordListViewModel
+import com.vocabulary.myvocabulary.utils.DialogFactory
 import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.dsl.module
 
@@ -44,5 +45,9 @@ val viewModelModule = module {
 
 val schedulerModule = module {
     factory<RxSchedulers> { SchedulersImpl() }
+}
+
+val factoryModule = module {
+    single { DialogFactory() }
 }
 

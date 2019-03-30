@@ -15,7 +15,6 @@ class WordDetailsViewModel(
 
     private val disposables = CompositeDisposable()
     private val currentWordLive: MutableLiveData<Word> = MutableLiveData()
-    lateinit var currentWord: Word
 
     fun getWordById(id: Long) {
         disposables += wordRepository.getWordById(id)
