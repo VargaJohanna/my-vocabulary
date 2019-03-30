@@ -60,7 +60,13 @@ class WordDetailsFragment : Fragment() {
 
     private fun setWordDeleteButtonClickListener(delete: ImageButton) {
         delete.setOnClickListener {
-            showDeleteWordDialog()
+            dialogFactory.openDeleteWordDialog(
+                    requireActivity(),
+                    wordCurrent
+            ) {
+                wordViewModel.deleteWord(it)
+                findNavController().popBackStack()
+            }.show()
         }
     }
 
@@ -88,18 +94,6 @@ class WordDetailsFragment : Fragment() {
         } else {
             val dateFormat = SimpleDateFormat.getDateInstance()
             dateFormat.format(date).toString()
-        }
-    }
-
-    private fun showDeleteWordDialog() {
-        AlertDialog.Builder(requireActivity()).apply {
-            setTitle(R.string.dialog_delete_word_title)
-            setMessage("Are you sure you want to delete\n\"${wordCurrent.word} - ${wordCurrent.translation}\" ?")
-            setPositiveButton(getString(R.string.delete_dialog_title)) { _, _ ->
-                wordViewModel.deleteWord(wordCurrent)
-                findNavController().popBackStack()
-            }
-            show()
         }
     }
 

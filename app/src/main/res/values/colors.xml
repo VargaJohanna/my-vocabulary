@@ -6,7 +6,7 @@
   <color name="colorAccent">#FFC107</color>
   <color name="primary_text">#000000</color>
   <color name="secondary_text">#000000</color>
-  <color name="icons">#000000</color>
+  <color name="icons">#ffffff</color>
   <color name="divider">#E7E7E7</color>
   <color name="error">#c41c00</color>
   <color name="light_error">#99ff8a50</color>
