@@ -18,14 +18,16 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.vocabulary.myvocabulary.R
 import com.vocabulary.myvocabulary.ext.show
 import com.vocabulary.myvocabulary.ui.quizzes.toQuizType
+import com.vocabulary.myvocabulary.utils.DialogFactory
 import kotlinx.android.synthetic.main.dialog_create_dictionary.view.*
-import kotlinx.android.synthetic.main.dialog_start_quiz.view.*
 import kotlinx.android.synthetic.main.dialog_rename_dictionary.view.*
 import kotlinx.android.synthetic.main.fragment_dictionary_list.view.*
+import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.viewModel
 
 class DictionaryListFragment : Fragment(), DictionaryAdapter.ItemClickListener {
     private val viewModel: DictionaryListViewModel by viewModel()
+    private val dialogFactory: DialogFactory by inject()
     private var createDialog: AlertDialog? = null
     private var renameDialog: AlertDialog? = null
     private var startQuizDialog: AlertDialog? = null
@@ -198,48 +200,14 @@ class DictionaryListFragment : Fragment(), DictionaryAdapter.ItemClickListener {
         }
     }
     private fun showStartQuizDialog(dictionary: Dictionary) {
-        var selectedDirection = -1
-        var selectedQuizType = -1
-        val inflater = requireActivity().layoutInflater
-        val dialogView: View = inflater.inflate(R.layout.dialog_start_quiz, null)
-        val directionRadioGroup: RadioGroup = dialogView.direction_radioGroup
-        val quizTypeRadioGroup: RadioGroup = dialogView.quiz_type_radioGroup
-        val doItButton: Button = dialogView.from_dictionary_lets_do_it
-        val cancelButton: Button = dialogView.from_dictionary_cancel
-        val directionErrorMessage: TextView = dialogView.from_dictionary_option_picker_error
-        val quizTypeErrorMessage: TextView = dialogView.from_dictionary_quiz_type_error
-        val dialogBuilder = AlertDialog.Builder(requireActivity())
-        startQuizDialog = dialogBuilder.create().apply {
-            setView(dialogView)
-            directionRadioGroup.setOnCheckedChangeListener { _, checkedId ->
-                directionErrorMessage.show(false)
-                selectedDirection = if (checkedId == R.id.from_dictionary_word_radio) 0 else 1
-            }
-            quizTypeRadioGroup.setOnCheckedChangeListener { _, checkedTypeId ->
-                quizTypeErrorMessage.show(false)
-                selectedQuizType = when (checkedTypeId) {
-                    R.id.quick_quiz_radio -> 0
-                    R.id.full_quiz_radio -> 1
-                    R.id.weakness_quiz_radio -> 2
-                    else -> throw IllegalStateException("Unknown quiz type: $this")
-                }
-            }
-
-            doItButton.setOnClickListener {
-                if(selectedDirection == -1 || selectedQuizType == -1) {
-                    if(selectedDirection == -1) directionErrorMessage.show(true)
-                    if(selectedQuizType == -1) quizTypeErrorMessage.show(true)
-                } else {
-                    startQuiz(selectedDirection, dictionary.dictionaryId, selectedQuizType)
-                    dismiss()
-                }
-            }
-            cancelButton.setOnClickListener {
-                dismiss()
-            }
-            setTitle("${getString(R.string.dictionary_menu_start_quiz)} of \"${dictionary.dictionaryName}\"")
-            show()
+        startQuizDialog = dialogFactory.openStartQuizDialog(
+                dictionary.dictionaryId,
+                requireActivity(),
+                dictionary.dictionaryName){selectedDirection: Int, id: Long, selectedQuizType: Int ->
+            startQuiz(selectedDirection, id, selectedQuizType)
+            startQuizDialog?.dismiss()
         }
+        startQuizDialog?.show()
     }
 
     private fun startQuiz(selectedOption: Int, dictionaryId: Long, selectedQuiz: Int) {
