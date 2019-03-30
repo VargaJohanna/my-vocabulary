@@ -105,7 +105,7 @@ class WordListFragment : Fragment(), WordAdapter.WordItemClickListener {
     }
 
     private fun openCreateDialog() {
-        createDialog = dialogFactory.openWordCreateDialog(
+        createDialog = dialogFactory.buildWordCreateDialog(
                 requireActivity(),
                 createClick = { wordText, translationText ->
                     wordViewModel.insertWord(wordViewModel.createWordObject(wordText, translationText))
@@ -117,7 +117,7 @@ class WordListFragment : Fragment(), WordAdapter.WordItemClickListener {
     }
 
     private fun showDeleteWordDialog(word: Word) {
-        dialogFactory.openDeleteWordDialog(
+        dialogFactory.buildDeleteWordDialog(
                 requireActivity(),
                 getString(R.string.dialog_delete_word_title),
                 "Are you sure you want to delete\n\"${word.word} - ${word.translation}\" ?") {
@@ -126,7 +126,7 @@ class WordListFragment : Fragment(), WordAdapter.WordItemClickListener {
     }
 
     private fun showEditDialog(word: Word) {
-        renameDialog = dialogFactory.openWordEditDialog(
+        renameDialog = dialogFactory.buildWordEditDialog(
                 requireActivity(),
                 word) { wordInput, translationInput ->
             wordViewModel.updateWord(word.copy(word = wordInput, translation = translationInput))
@@ -136,7 +136,7 @@ class WordListFragment : Fragment(), WordAdapter.WordItemClickListener {
     }
 
     private fun showStartQuizDialog(dictionaryId: Long) {
-        startQuizDialog = dialogFactory.openStartQuizDialog(
+        startQuizDialog = dialogFactory.buildStartQuizDialog(
                 dictionaryId,
                 requireActivity(),
                 args.dictionaryName) { selectedDirection: Int, id: Long, selectedQuizType: Int ->

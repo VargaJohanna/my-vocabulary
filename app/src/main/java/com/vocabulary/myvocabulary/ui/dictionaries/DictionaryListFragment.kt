@@ -68,7 +68,7 @@ class DictionaryListFragment : Fragment(), DictionaryAdapter.ItemClickListener {
 
     private fun setFabOnClickListener(fab: FloatingActionButton) {
         fab.setOnClickListener {
-            createDialog = dialogFactory.openDictionaryCreateDialog(
+            createDialog = dialogFactory.buildDictionaryCreateDialog(
                     requireActivity()
             ) { nameToCreate ->
                 viewModel.insertDictionary(viewModel.createDictionaryObject(nameToCreate))
@@ -101,7 +101,7 @@ class DictionaryListFragment : Fragment(), DictionaryAdapter.ItemClickListener {
     }
 
     private fun showRenameDialog(dictionary: Dictionary) {
-        renameDialog = dialogFactory.openDictionaryRenameDialog(
+        renameDialog = dialogFactory.buildDictionaryRenameDialog(
                 requireActivity(),
                 dictionary) { renameTo ->
             viewModel.renameDictionary(dictionary.copy(dictionaryName = renameTo))
@@ -111,7 +111,7 @@ class DictionaryListFragment : Fragment(), DictionaryAdapter.ItemClickListener {
     }
 
     private fun showDeleteDialog(dictionary: Dictionary) {
-        dialogFactory.openDeleteWordDialog(
+        dialogFactory.buildDeleteWordDialog(
                 requireActivity(),
                 getString(R.string.dialog_delete_dictionary_title),
                 "Are you sure you want to delete \"${dictionary.dictionaryName}\" ?"
@@ -121,7 +121,7 @@ class DictionaryListFragment : Fragment(), DictionaryAdapter.ItemClickListener {
     }
 
     private fun showStartQuizDialog(dictionary: Dictionary) {
-        startQuizDialog = dialogFactory.openStartQuizDialog(
+        startQuizDialog = dialogFactory.buildStartQuizDialog(
                 dictionary.dictionaryId,
                 requireActivity(),
                 dictionary.dictionaryName) { selectedDirection: Int, id: Long, selectedQuizType: Int ->
