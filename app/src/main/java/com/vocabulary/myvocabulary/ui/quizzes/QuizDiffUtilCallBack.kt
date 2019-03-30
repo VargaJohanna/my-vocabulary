@@ -8,7 +8,7 @@ class QuizDiffUtilCallBack(
 ) : DiffUtil.Callback() {
     override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
         return (oldList[oldItemPosition].word.wordId == newList[newItemPosition].word.wordId
-                && oldList[oldItemPosition].isFocused == newList[newItemPosition].isFocused)
+                || oldList[oldItemPosition].isFocused == newList[newItemPosition].isFocused)
 
     }
 
