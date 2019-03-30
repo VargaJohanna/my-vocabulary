@@ -156,14 +156,13 @@ class DictionaryListFragment : Fragment(), DictionaryAdapter.ItemClickListener {
     }
 
     private fun showDeleteDialog(dictionary: Dictionary) {
-        AlertDialog.Builder(requireActivity()).apply {
-            setTitle(R.string.dialog_delete_dictionary_title)
-            setMessage("Are you sure you want to delete \"${dictionary.dictionaryName}\" ?")
-            setPositiveButton("Delete") { _, _ ->
-                viewModel.deleteDictionary(dictionary)
-            }
-            show()
-        }
+        dialogFactory.openDeleteWordDialog(
+                requireActivity(),
+                getString(R.string.dialog_delete_dictionary_title),
+                "Are you sure you want to delete \"${dictionary.dictionaryName}\" ?"
+        ) {
+            viewModel.deleteDictionary(dictionary)
+        }.show()
     }
 
     private fun showRenameDialog(dictionary: Dictionary) {

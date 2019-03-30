@@ -2,8 +2,6 @@ package com.vocabulary.myvocabulary.ui.words
 
 import android.app.AlertDialog
 import android.os.Bundle
-import android.text.Editable
-import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.View
@@ -21,7 +19,6 @@ import com.vocabulary.myvocabulary.R
 import com.vocabulary.myvocabulary.ext.show
 import com.vocabulary.myvocabulary.ui.quizzes.toQuizType
 import com.vocabulary.myvocabulary.utils.DialogFactory
-import kotlinx.android.synthetic.main.dialog_create_word.view.*
 import kotlinx.android.synthetic.main.fragment_word_list.view.*
 import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.viewModel
@@ -107,7 +104,7 @@ class WordListFragment : Fragment(), WordAdapter.WordItemClickListener {
     }
 
     private fun openCreateDialog() {
-        createDialog = dialogFactory.openCreateDialog(
+        createDialog = dialogFactory.openWordCreateDialog(
                 requireActivity(),
                 createClick = { wordText, translationText ->
             wordViewModel.insertWord(wordViewModel.createWordObject(wordText, translationText))
@@ -121,9 +118,9 @@ class WordListFragment : Fragment(), WordAdapter.WordItemClickListener {
     private fun showDeleteWordDialog(word: Word) {
         dialogFactory.openDeleteWordDialog(
                 requireActivity(),
-                word
-        ) {
-            wordViewModel.deleteWord(it)
+                getString(R.string.dialog_delete_word_title),
+                "Are you sure you want to delete\n\"${word.word} - ${word.translation}\" ?") {
+            wordViewModel.deleteWord(word)
         }.show()
     }
 

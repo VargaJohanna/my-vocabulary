@@ -88,14 +88,15 @@ class DialogFactory {
 
     fun openDeleteWordDialog(
             activity: Activity,
-            word: Word,
-            deleteClick: (word: Word) -> Unit
+            title: String,
+            message: String,
+            deleteClick: () -> Unit
     ): AlertDialog.Builder {
         return AlertDialog.Builder(activity).apply {
-            setTitle(R.string.dialog_delete_word_title)
-            setMessage("Are you sure you want to delete\n\"${word.word} - ${word.translation}\" ?")
+            setTitle(title)
+            setMessage(message)
             setPositiveButton(R.string.delete_dialog_title) { _, _ ->
-                deleteClick(word)
+                deleteClick()
             }
         }
     }
@@ -148,7 +149,7 @@ class DialogFactory {
         }
     }
 
-    fun openCreateDialog(
+    fun openWordCreateDialog(
             activity: Activity,
             createClick: (wordText: String, translationText: String) -> Unit,
             addMoreClick: (wordText: String, translationText: String) -> Unit
