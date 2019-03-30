@@ -1,6 +1,5 @@
 package com.vocabulary.myvocabulary.ui.quizzes
 
-import android.graphics.Color
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.LayoutInflater
@@ -8,7 +7,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.animation.AnimationUtils
 import android.widget.EditText
-import android.widget.TextView
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.vocabulary.myvocabulary.R
@@ -38,9 +36,10 @@ class QuizAdapter(
 
     inner class QuizViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         fun bind(wordObject: QuizViewModel.FocusableWord, position: Int) {
+            guessEntered = false
             addExtraMarginForFirstElement(position, itemView)
 
-            makeLastElementEditable(position, itemView.solution, itemView.question)
+            makeLastElementEditable(position, itemView.solution)
 
             itemView.solution.addTextChangedListener(object : TextWatcher {
                 override fun afterTextChanged(p0: Editable) {
@@ -55,7 +54,6 @@ class QuizAdapter(
                 }
             })
             if (!guessEntered) setGuessedWord(QuizViewModel.GuessedWord(wordObject.word.wordId, "", wordObject.word.word))
-            guessEntered = false
 
             addElevationToEachItem(itemView, position)
 
@@ -73,13 +71,12 @@ class QuizAdapter(
         }
     }
 
-    private fun makeLastElementEditable(position: Int, solution: EditText, question: TextView) {
+    private fun makeLastElementEditable(position: Int, solution: EditText) {
         if (position == wordList.size - 1) {
             solution.isEnabled = true
             solution.requestFocus()
             wordList[position] = wordList[position].copy(isFocused = false)
-        }
-        else {
+        } else {
             solution.isEnabled = false
             wordList[position] = wordList[position].copy(isFocused = false)
         }

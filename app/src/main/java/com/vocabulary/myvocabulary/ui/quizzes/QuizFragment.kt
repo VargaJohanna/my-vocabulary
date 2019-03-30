@@ -5,6 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ProgressBar
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
@@ -86,8 +87,14 @@ class QuizFragment : Fragment() {
     private fun observeWordList(quizAdapter: QuizAdapter, progressBar: ProgressBar) {
         progressBar.show(true)
         quizViewModel.getLiveWordList().observe(requireActivity(), Observer {
-            quizAdapter.updateList(it)
-            progressBar.show(false)
+            if (it.isEmpty()) {
+                Toast.makeText(requireActivity(), "This dictionary is empty.", Toast.LENGTH_LONG).show()
+                findNavController().popBackStack()
+            } else {
+                quizAdapter.updateList(it)
+                progressBar.show(false)
+            }
+
         })
     }
 
