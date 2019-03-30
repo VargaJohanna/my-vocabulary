@@ -11,14 +11,16 @@ import android.widget.RadioGroup
 import android.widget.TextView
 import com.vocabulary.myvocabulary.R
 import com.vocabulary.myvocabulary.ext.show
+import com.vocabulary.myvocabulary.ui.dictionaries.Dictionary
 import com.vocabulary.myvocabulary.ui.words.Word
 import kotlinx.android.synthetic.main.dialog_create_word.view.*
+import kotlinx.android.synthetic.main.dialog_rename_dictionary.view.*
 import kotlinx.android.synthetic.main.dialog_rename_word.view.*
 import kotlinx.android.synthetic.main.dialog_start_quiz.view.*
 
 class DialogFactory {
 
-    fun openEditDialog(
+    fun openWordEditDialog(
             activity: Activity,
             word: Word,
             saveClick: (word: String, translation: String) -> Unit
@@ -227,6 +229,38 @@ class DialogFactory {
                 dismiss()
             }
             setTitle(R.string.create_new_word_dialog_title)
+        }
+    }
+
+    fun openDictionaryRenameDialog(
+            activity: Activity,
+            dictionary: Dictionary,
+            renameClick : (renameTo: String) -> Unit): AlertDialog {
+        val inflater = activity.layoutInflater
+        val dialogView: View = inflater.inflate(R.layout.dialog_rename_dictionary, null)
+        val editText: EditText = dialogView.rename_dictionary_edit
+        val renameButton: Button = dialogView.rename_dictionary_button
+        val cancelButton: Button = dialogView.cancel_dictionary_rename_dialog
+        val errorMessage: TextView = dialogView.dictionary_name_error_rename
+        val dialogBuilder = AlertDialog.Builder(activity)
+        return dialogBuilder.create().apply {
+            setView(dialogView)
+            errorMessage.show(false)
+            setupTextChangedListener(editText, errorMessage)
+            cancelButton.setOnClickListener {
+                errorMessage.show(false)
+                dismiss()
+            }
+            setTitle("Renaming \"${dictionary.dictionaryName}\" dictionary")
+            renameButton.setOnClickListener {
+                if (editText.text.toString().isNotEmpty()) {
+                    errorMessage.show(false)
+                    renameClick(editText.text.toString())
+
+                } else {
+                    errorMessage.show(true)
+                }
+            }
         }
     }
 }

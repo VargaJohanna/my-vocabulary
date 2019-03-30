@@ -166,38 +166,15 @@ class DictionaryListFragment : Fragment(), DictionaryAdapter.ItemClickListener {
     }
 
     private fun showRenameDialog(dictionary: Dictionary) {
-        val inflater = requireActivity().layoutInflater
-        val dialogView: View = inflater.inflate(R.layout.dialog_rename_dictionary, null)
-        val editText: EditText = dialogView.rename_dictionary_edit
-        val renameButton: Button = dialogView.rename_dictionary_button
-        val cancelButton: Button = dialogView.cancel_dictionary_rename_dialog
-        val errorMessage: TextView = dialogView.dictionary_name_error_rename
-        val dialogBuilder = AlertDialog.Builder(requireActivity())
-        renameDialog = dialogBuilder.create().apply {
-            setView(dialogView)
-            errorMessage.show(false)
-            setupTextChangedListener(editText, errorMessage)
-            cancelButton.setOnClickListener {
-                errorMessage.show(false)
-                dismiss()
-            }
-            setTitle("Renaming \"${dictionary.dictionaryName}\" dictionary")
-            renameButton.setOnClickListener {
-                renameDictionary(editText.text.toString(), this, errorMessage, dictionary)
-            }
-            show()
+        renameDialog = dialogFactory.openDictionaryRenameDialog(
+                requireActivity(),
+                dictionary) { renameTo ->
+            viewModel.renameDictionary(dictionary.copy(dictionaryName = renameTo))
+            renameDialog?.dismiss()
         }
+        renameDialog?.show()
     }
 
-    private fun renameDictionary(inputText: String, optionDialog: AlertDialog, errorMessage: TextView, dictionary: Dictionary) {
-        if (inputText.isNotEmpty()) {
-            errorMessage.show(false)
-            viewModel.renameDictionary(dictionary.copy(dictionaryName = inputText))
-            optionDialog.dismiss()
-        } else {
-            errorMessage.show(true)
-        }
-    }
     private fun showStartQuizDialog(dictionary: Dictionary) {
         startQuizDialog = dialogFactory.openStartQuizDialog(
                 dictionary.dictionaryId,

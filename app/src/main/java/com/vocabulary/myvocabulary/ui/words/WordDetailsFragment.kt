@@ -73,7 +73,7 @@ class WordDetailsFragment : Fragment() {
 
     private fun setWordEditButtonClickListener(wordView: TextView, translationView: TextView, wordEdit: ImageView) {
         wordEdit.setOnClickListener {
-            wordEditDialog = dialogFactory.openEditDialog(
+            wordEditDialog = dialogFactory.openWordEditDialog(
                     requireActivity(),
                     wordCurrent
             ) { word, otherWord ->

@@ -125,7 +125,7 @@ class WordListFragment : Fragment(), WordAdapter.WordItemClickListener {
     }
 
     private fun showEditDialog(word: Word) {
-        renameDialog = dialogFactory.openEditDialog(
+        renameDialog = dialogFactory.openWordEditDialog(
                 requireActivity(),
                 word) { wordInput, translationInput ->
             wordViewModel.updateWord(word.copy(word = wordInput, translation = translationInput))
