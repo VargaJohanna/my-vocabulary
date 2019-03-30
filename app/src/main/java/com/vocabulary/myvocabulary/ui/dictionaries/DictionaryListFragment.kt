@@ -2,12 +2,11 @@ package com.vocabulary.myvocabulary.ui.dictionaries
 
 import android.app.AlertDialog
 import android.os.Bundle
-import android.text.Editable
-import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.*
+import android.widget.PopupMenu
+import android.widget.ProgressBar
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.navigation.findNavController
@@ -18,14 +17,14 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.vocabulary.myvocabulary.R
 import com.vocabulary.myvocabulary.ext.show
 import com.vocabulary.myvocabulary.ui.quizzes.toQuizType
-import kotlinx.android.synthetic.main.dialog_create_dictionary.view.*
-import kotlinx.android.synthetic.main.dialog_start_quiz.view.*
-import kotlinx.android.synthetic.main.dialog_rename_dictionary.view.*
+import com.vocabulary.myvocabulary.utils.DialogFactory
 import kotlinx.android.synthetic.main.fragment_dictionary_list.view.*
+import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.viewModel
 
 class DictionaryListFragment : Fragment(), DictionaryAdapter.ItemClickListener {
     private val viewModel: DictionaryListViewModel by viewModel()
+    private val dialogFactory: DialogFactory by inject()
     private var createDialog: AlertDialog? = null
     private var renameDialog: AlertDialog? = null
     private var startQuizDialog: AlertDialog? = null
@@ -51,21 +50,6 @@ class DictionaryListFragment : Fragment(), DictionaryAdapter.ItemClickListener {
         }
     }
 
-    private fun createPopUpMenu(dictionary: Dictionary, view: View) {
-        popUp = PopupMenu(requireActivity(), view).apply {
-            inflate(R.menu.dictionary_options_menu)
-            setOnMenuItemClickListener {
-                when (it.itemId) {
-                    R.id.menu_dictionary_update -> showRenameDialog(dictionary)
-                    R.id.menu_dictionary_delete -> showDeleteDialog(dictionary)
-                    R.id.menu_dictionary_start_quiz -> showStartQuizDialog(dictionary)
-                }
-                true
-            }
-            show()
-        }
-    }
-
     private fun generateDictionaryList(dictionaryAdapter: DictionaryAdapter, recyclerView: RecyclerView) {
         recyclerView.apply {
             layoutManager = LinearLayoutManager(requireContext(), RecyclerView.VERTICAL, false)
@@ -84,162 +68,67 @@ class DictionaryListFragment : Fragment(), DictionaryAdapter.ItemClickListener {
 
     private fun setFabOnClickListener(fab: FloatingActionButton) {
         fab.setOnClickListener {
-            openCreateDialog()
+            createDialog = dialogFactory.buildDictionaryCreateDialog(
+                    requireActivity()
+            ) { nameToCreate ->
+                viewModel.insertDictionary(viewModel.createDictionaryObject(nameToCreate))
+                viewModel.newlyCreatedItemDetails.observe(requireActivity(), Observer { event ->
+                    event.getContentIfNotHandled()?.let {
+                        val action = DictionaryListFragmentDirections.actionDictionaryToWordList(it.dictionaryId, it.dictionaryName)
+                        findNavController().navigate(action)
+                        createDialog?.dismiss()
+                    }
+                })
+            }
+            createDialog?.show()
         }
     }
 
-    private fun openCreateDialog() {
-        val inflater = requireActivity().layoutInflater
-        val dialogView: View = inflater.inflate(R.layout.dialog_create_dictionary, null)
-        val editText: EditText = dialogView.new_dictionary_edit
-        val createButton: Button = dialogView.create_dictionary_button
-        val cancelButton: Button = dialogView.cancel_dictionary_creation
-        val errorMessage: TextView = dialogView.dictionary_name_error
 
-        val dialogBuilder = AlertDialog.Builder(requireActivity())
-        createDialog = dialogBuilder.create().apply {
-            setView(dialogView)
-            errorMessage.show(false)
-            setupTextChangedListener(editText, errorMessage)
-            createButton.setOnClickListener {
-                createDictionary(editText.text.toString(), this, errorMessage)
-            }
-            cancelButton.setOnClickListener {
-                errorMessage.show(false)
-                dismiss()
-            }
-            setTitle(R.string.create_new_dictionary_dialog_title)
-            show()
-        }
-    }
-
-    private fun setupTextChangedListener(editText: EditText, errorMessage: TextView) {
-        editText.addTextChangedListener(object : TextWatcher {
-            override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
-                errorMessage.show(false)
-            }
-
-            override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
-                errorMessage.show(false)
-            }
-
-            override fun afterTextChanged(p0: Editable?) {
-                errorMessage.show(false)
-            }
-        })
-    }
-
-    private fun createDictionary(inputText: String, optionDialog: AlertDialog, errorMessage: TextView) {
-        if (inputText.isNotEmpty()) {
-            errorMessage.show(false)
-            viewModel.insertDictionary(viewModel.createDictionaryObject(inputText))
-            viewModel.newlyCreatedItemDetails.observe(requireActivity(), Observer { event ->
-                event.getContentIfNotHandled()?.let {
-                    val action = DictionaryListFragmentDirections.actionDictionaryToWordList(it.dictionaryId, it.dictionaryName)
-                    findNavController().navigate(action)
-                    optionDialog.dismiss()
+    private fun createPopUpMenu(dictionary: Dictionary, view: View) {
+        popUp = PopupMenu(requireActivity(), view).apply {
+            inflate(R.menu.dictionary_options_menu)
+            setOnMenuItemClickListener {
+                when (it.itemId) {
+                    R.id.menu_dictionary_update -> showRenameDialog(dictionary)
+                    R.id.menu_dictionary_delete -> showDeleteDialog(dictionary)
+                    R.id.menu_dictionary_start_quiz -> showStartQuizDialog(dictionary)
                 }
-            })
-        } else {
-            errorMessage.show(true)
-        }
-    }
-
-    override fun onStop() {
-        createDialog?.dismiss()
-        renameDialog?.dismiss()
-        startQuizDialog?.dismiss()
-        popUp?.dismiss()
-        super.onStop()
-    }
-
-    private fun showDeleteDialog(dictionary: Dictionary) {
-        AlertDialog.Builder(requireActivity()).apply {
-            setTitle(R.string.dialog_delete_dictionary_title)
-            setMessage("Are you sure you want to delete \"${dictionary.dictionaryName}\" ?")
-            setPositiveButton("Delete") { _, _ ->
-                viewModel.deleteDictionary(dictionary)
+                true
             }
             show()
         }
     }
 
     private fun showRenameDialog(dictionary: Dictionary) {
-        val inflater = requireActivity().layoutInflater
-        val dialogView: View = inflater.inflate(R.layout.dialog_rename_dictionary, null)
-        val editText: EditText = dialogView.rename_dictionary_edit
-        val renameButton: Button = dialogView.rename_dictionary_button
-        val cancelButton: Button = dialogView.cancel_dictionary_rename_dialog
-        val errorMessage: TextView = dialogView.dictionary_name_error_rename
-        val dialogBuilder = AlertDialog.Builder(requireActivity())
-        renameDialog = dialogBuilder.create().apply {
-            setView(dialogView)
-            errorMessage.show(false)
-            setupTextChangedListener(editText, errorMessage)
-            cancelButton.setOnClickListener {
-                errorMessage.show(false)
-                dismiss()
-            }
-            setTitle("Renaming \"${dictionary.dictionaryName}\" dictionary")
-            renameButton.setOnClickListener {
-                renameDictionary(editText.text.toString(), this, errorMessage, dictionary)
-            }
-            show()
+        renameDialog = dialogFactory.buildDictionaryRenameDialog(
+                requireActivity(),
+                dictionary) { renameTo ->
+            viewModel.renameDictionary(dictionary.copy(dictionaryName = renameTo))
+            renameDialog?.dismiss()
         }
+        renameDialog?.show()
     }
 
-    private fun renameDictionary(inputText: String, optionDialog: AlertDialog, errorMessage: TextView, dictionary: Dictionary) {
-        if (inputText.isNotEmpty()) {
-            errorMessage.show(false)
-            viewModel.renameDictionary(dictionary.copy(dictionaryName = inputText))
-            optionDialog.dismiss()
-        } else {
-            errorMessage.show(true)
-        }
+    private fun showDeleteDialog(dictionary: Dictionary) {
+        dialogFactory.buildDeleteWordDialog(
+                requireActivity(),
+                getString(R.string.dialog_delete_dictionary_title),
+                "Are you sure you want to delete \"${dictionary.dictionaryName}\" ?"
+        ) {
+            viewModel.deleteDictionary(dictionary)
+        }.show()
     }
+
     private fun showStartQuizDialog(dictionary: Dictionary) {
-        var selectedDirection = -1
-        var selectedQuizType = -1
-        val inflater = requireActivity().layoutInflater
-        val dialogView: View = inflater.inflate(R.layout.dialog_start_quiz, null)
-        val directionRadioGroup: RadioGroup = dialogView.direction_radioGroup
-        val quizTypeRadioGroup: RadioGroup = dialogView.quiz_type_radioGroup
-        val doItButton: Button = dialogView.from_dictionary_lets_do_it
-        val cancelButton: Button = dialogView.from_dictionary_cancel
-        val directionErrorMessage: TextView = dialogView.from_dictionary_option_picker_error
-        val quizTypeErrorMessage: TextView = dialogView.from_dictionary_quiz_type_error
-        val dialogBuilder = AlertDialog.Builder(requireActivity())
-        startQuizDialog = dialogBuilder.create().apply {
-            setView(dialogView)
-            directionRadioGroup.setOnCheckedChangeListener { _, checkedId ->
-                directionErrorMessage.show(false)
-                selectedDirection = if (checkedId == R.id.from_dictionary_word_radio) 0 else 1
-            }
-            quizTypeRadioGroup.setOnCheckedChangeListener { _, checkedTypeId ->
-                quizTypeErrorMessage.show(false)
-                selectedQuizType = when (checkedTypeId) {
-                    R.id.quick_quiz_radio -> 0
-                    R.id.full_quiz_radio -> 1
-                    R.id.weakness_quiz_radio -> 2
-                    else -> throw IllegalStateException("Unknown quiz type: $this")
-                }
-            }
-
-            doItButton.setOnClickListener {
-                if(selectedDirection == -1 || selectedQuizType == -1) {
-                    if(selectedDirection == -1) directionErrorMessage.show(true)
-                    if(selectedQuizType == -1) quizTypeErrorMessage.show(true)
-                } else {
-                    startQuiz(selectedDirection, dictionary.dictionaryId, selectedQuizType)
-                    dismiss()
-                }
-            }
-            cancelButton.setOnClickListener {
-                dismiss()
-            }
-            setTitle("${getString(R.string.dictionary_menu_start_quiz)} of \"${dictionary.dictionaryName}\"")
-            show()
+        startQuizDialog = dialogFactory.buildStartQuizDialog(
+                dictionary.dictionaryId,
+                requireActivity(),
+                dictionary.dictionaryName) { selectedDirection: Int, id: Long, selectedQuizType: Int ->
+            startQuiz(selectedDirection, id, selectedQuizType)
+            startQuizDialog?.dismiss()
         }
+        startQuizDialog?.show()
     }
 
     private fun startQuiz(selectedOption: Int, dictionaryId: Long, selectedQuiz: Int) {
@@ -250,5 +139,13 @@ class DictionaryListFragment : Fragment(), DictionaryAdapter.ItemClickListener {
                 selectedQuiz
         )
         findNavController().navigate(action)
+    }
+
+    override fun onStop() {
+        createDialog?.dismiss()
+        renameDialog?.dismiss()
+        startQuizDialog?.dismiss()
+        popUp?.dismiss()
+        super.onStop()
     }
 }
