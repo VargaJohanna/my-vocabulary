@@ -1,12 +1,15 @@
 package com.vocabulary.myvocabulary.ui.results
 
 import android.animation.Animator
+import android.app.Activity
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.inputmethod.InputMethodManager
 import android.widget.LinearLayout
 import android.widget.ProgressBar
+import androidx.core.content.getSystemService
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.navigation.findNavController
@@ -36,6 +39,7 @@ class ResultFragment : Fragment() {
     private var isFabOpen = false
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+        hideKeyboard()
         resultViewModel.setDirection(args.directionType.toDirectionType())
         val resultAdapter = ResultAdapter(emptyList(), resultViewModel.directionResult)
         resultViewModel.getGuessResult()
@@ -143,5 +147,12 @@ class ResultFragment : Fragment() {
 
             })
         }
+    }
+
+    private fun hideKeyboard() {
+        val imm: InputMethodManager = requireActivity().getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager
+        val view: View? = requireActivity().currentFocus
+        if(view == null) View(requireActivity())
+        imm.hideSoftInputFromWindow(view?.windowToken, 0)
     }
 }
