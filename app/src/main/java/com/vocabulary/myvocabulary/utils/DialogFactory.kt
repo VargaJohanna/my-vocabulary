@@ -21,7 +21,7 @@ import kotlinx.android.synthetic.main.dialog_start_quiz.view.*
 
 class DialogFactory {
 
-    fun openWordEditDialog(
+    fun buildWordEditDialog(
             activity: Activity,
             word: Word,
             saveClick: (word: String, translation: String) -> Unit
@@ -89,7 +89,7 @@ class DialogFactory {
         })
     }
 
-    fun openDeleteWordDialog(
+    fun buildDeleteWordDialog(
             activity: Activity,
             title: String,
             message: String,
@@ -104,7 +104,7 @@ class DialogFactory {
         }
     }
 
-    fun openStartQuizDialog(
+    fun buildStartQuizDialog(
             dictionaryId: Long,
             activity: Activity,
             dictionaryName: String,
@@ -152,7 +152,7 @@ class DialogFactory {
         }
     }
 
-    fun openWordCreateDialog(
+    fun buildWordCreateDialog(
             activity: Activity,
             createClick: (wordText: String, translationText: String) -> Unit,
             addMoreClick: (wordText: String, translationText: String) -> Unit
@@ -233,7 +233,7 @@ class DialogFactory {
         }
     }
 
-    fun openDictionaryRenameDialog(
+    fun buildDictionaryRenameDialog(
             activity: Activity,
             dictionary: Dictionary,
             renameClick: (renameTo: String) -> Unit): AlertDialog {
@@ -265,7 +265,7 @@ class DialogFactory {
         }
     }
 
-    fun openDictionaryCreateDialog(
+    fun buildDictionaryCreateDialog(
             activity: Activity,
             createClick: (nameToCreate: String) -> Unit
     ): AlertDialog {
