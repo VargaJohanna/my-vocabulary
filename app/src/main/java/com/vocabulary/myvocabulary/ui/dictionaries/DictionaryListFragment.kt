@@ -2,12 +2,11 @@ package com.vocabulary.myvocabulary.ui.dictionaries
 
 import android.app.AlertDialog
 import android.os.Bundle
-import android.text.Editable
-import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.*
+import android.widget.PopupMenu
+import android.widget.ProgressBar
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.navigation.findNavController
@@ -19,8 +18,6 @@ import com.vocabulary.myvocabulary.R
 import com.vocabulary.myvocabulary.ext.show
 import com.vocabulary.myvocabulary.ui.quizzes.toQuizType
 import com.vocabulary.myvocabulary.utils.DialogFactory
-import kotlinx.android.synthetic.main.dialog_create_dictionary.view.*
-import kotlinx.android.synthetic.main.dialog_rename_dictionary.view.*
 import kotlinx.android.synthetic.main.fragment_dictionary_list.view.*
 import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.viewModel
@@ -73,8 +70,7 @@ class DictionaryListFragment : Fragment(), DictionaryAdapter.ItemClickListener {
         fab.setOnClickListener {
             createDialog = dialogFactory.openDictionaryCreateDialog(
                     requireActivity()
-            ) {
-                nameToCreate ->
+            ) { nameToCreate ->
                 viewModel.insertDictionary(viewModel.createDictionaryObject(nameToCreate))
                 viewModel.newlyCreatedItemDetails.observe(requireActivity(), Observer { event ->
                     event.getContentIfNotHandled()?.let {
@@ -128,7 +124,7 @@ class DictionaryListFragment : Fragment(), DictionaryAdapter.ItemClickListener {
         startQuizDialog = dialogFactory.openStartQuizDialog(
                 dictionary.dictionaryId,
                 requireActivity(),
-                dictionary.dictionaryName){selectedDirection: Int, id: Long, selectedQuizType: Int ->
+                dictionary.dictionaryName) { selectedDirection: Int, id: Long, selectedQuizType: Int ->
             startQuiz(selectedDirection, id, selectedQuizType)
             startQuizDialog?.dismiss()
         }

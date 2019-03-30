@@ -6,7 +6,8 @@ import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
-import android.widget.*
+import android.widget.PopupMenu
+import android.widget.ProgressBar
 import androidx.appcompat.widget.Toolbar
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
@@ -107,9 +108,9 @@ class WordListFragment : Fragment(), WordAdapter.WordItemClickListener {
         createDialog = dialogFactory.openWordCreateDialog(
                 requireActivity(),
                 createClick = { wordText, translationText ->
-            wordViewModel.insertWord(wordViewModel.createWordObject(wordText, translationText))
-            createDialog?.dismiss()
-        }, addMoreClick = {wordText, translationText ->
+                    wordViewModel.insertWord(wordViewModel.createWordObject(wordText, translationText))
+                    createDialog?.dismiss()
+                }, addMoreClick = { wordText, translationText ->
             wordViewModel.insertWord(wordViewModel.createWordObject(wordText, translationText))
         })
         createDialog?.show()
@@ -138,7 +139,7 @@ class WordListFragment : Fragment(), WordAdapter.WordItemClickListener {
         startQuizDialog = dialogFactory.openStartQuizDialog(
                 dictionaryId,
                 requireActivity(),
-                args.dictionaryName){selectedDirection: Int, id: Long, selectedQuizType: Int ->
+                args.dictionaryName) { selectedDirection: Int, id: Long, selectedQuizType: Int ->
             startQuiz(selectedDirection, id, selectedQuizType)
             startQuizDialog?.dismiss()
         }
