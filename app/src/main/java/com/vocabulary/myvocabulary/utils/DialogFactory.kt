@@ -9,11 +9,9 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.RadioGroup
 import android.widget.TextView
-import androidx.navigation.fragment.findNavController
 import com.vocabulary.myvocabulary.R
 import com.vocabulary.myvocabulary.ext.show
 import com.vocabulary.myvocabulary.ui.dictionaries.Dictionary
-import com.vocabulary.myvocabulary.ui.dictionaries.DictionaryListFragmentDirections
 import com.vocabulary.myvocabulary.ui.words.Word
 import kotlinx.android.synthetic.main.dialog_create_dictionary.view.*
 import kotlinx.android.synthetic.main.dialog_create_word.view.*
@@ -111,7 +109,7 @@ class DialogFactory {
             activity: Activity,
             dictionaryName: String,
             doItClick: (selectedDirection: Int, dictionaryId: Long, selectedQuizType: Int) -> Unit
-            ): AlertDialog {
+    ): AlertDialog {
         var selectedDirection = -1
         var selectedQuizType = -1
         val inflater = activity.layoutInflater
@@ -238,7 +236,7 @@ class DialogFactory {
     fun openDictionaryRenameDialog(
             activity: Activity,
             dictionary: Dictionary,
-            renameClick : (renameTo: String) -> Unit): AlertDialog {
+            renameClick: (renameTo: String) -> Unit): AlertDialog {
         val inflater = activity.layoutInflater
         val dialogView: View = inflater.inflate(R.layout.dialog_rename_dictionary, null)
         val editText: EditText = dialogView.rename_dictionary_edit
