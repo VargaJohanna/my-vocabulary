@@ -36,14 +36,14 @@
         android:src="@drawable/ic_dictionary_background_1000"
         android:scaleType="fitXY"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintBottom_toTopOf="@id/quiz_image"
+        app:layout_constraintEnd_toStartOf="@id/quiz_image"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintTop_toBottomOf="@id/app_bar"/>
     <Button
         android:id="@+id/dictionary_button"
         style="?android:attr/borderlessButtonStyle"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
         android:background="?selectableItemBackground"
         android:backgroundTint="#00ffffff"
         android:gravity="center"
@@ -51,8 +51,8 @@
         android:textColor="@color/primary_text"
         android:textSize="@dimen/text_size_large"
         android:textStyle="bold"
-        app:layout_constraintBottom_toTopOf="@+id/quiz_button"
-        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/quiz_button"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/app_bar" />
 
@@ -62,16 +62,16 @@
         android:layout_height="0dp"
         android:src="@drawable/ic_clean_question_button_1000"
         android:scaleType="fitXY"
-        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintStart_toEndOf="@id/dictionary_image"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/dictionary_image"/>
+        app:layout_constraintTop_toBottomOf="@id/app_bar"/>
 
     <Button
         android:id="@+id/quiz_button"
         style="?android:attr/borderlessButtonStyle"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
         android:backgroundTint="#00ffffff"
         android:background="?selectableItemBackground"
         android:text="@string/quizzes_button"
@@ -80,7 +80,7 @@
         android:textStyle="bold"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/dictionary_image" />
+        app:layout_constraintStart_toEndOf="@id/dictionary_button"
+        app:layout_constraintTop_toBottomOf="@+id/app_bar" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
