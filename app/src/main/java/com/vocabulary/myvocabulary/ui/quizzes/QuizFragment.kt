@@ -87,7 +87,7 @@ class QuizFragment : Fragment() {
     private fun observeWordList(quizAdapter: QuizAdapter, progressBar: ProgressBar) {
         progressBar.show(true)
         quizViewModel.getLiveWordList().observe(requireActivity(), Observer {
-            if (it.isEmpty()) {
+            if (it.isEmpty() && !quizViewModel.failedOnly) {
                 Toast.makeText(requireActivity(), "This dictionary is empty.", Toast.LENGTH_LONG).show()
                 findNavController().popBackStack()
             } else {
