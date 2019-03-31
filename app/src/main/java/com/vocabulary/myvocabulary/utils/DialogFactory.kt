@@ -315,8 +315,8 @@ class DialogFactory {
 
     fun showOptionsDialog(
             activity: Activity,
-            doItClick :(selectedOption: Int) -> Unit
-            ): AlertDialog {
+            doItClick: (selectedOption: Int) -> Unit
+    ): AlertDialog {
         var selectedOption = -1
         val inflater = activity.layoutInflater
         val dialogView: View = inflater.inflate(R.layout.dialog_direction_option_picker, null)

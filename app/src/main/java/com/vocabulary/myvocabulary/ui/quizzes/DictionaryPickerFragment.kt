@@ -5,7 +5,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.*
+import android.widget.ProgressBar
 import androidx.appcompat.widget.Toolbar
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
@@ -20,12 +20,11 @@ import com.vocabulary.myvocabulary.ui.dictionaries.Dictionary
 import com.vocabulary.myvocabulary.ui.dictionaries.DictionaryAdapter
 import com.vocabulary.myvocabulary.ui.dictionaries.DictionaryListViewModel
 import com.vocabulary.myvocabulary.utils.DialogFactory
-import kotlinx.android.synthetic.main.dialog_direction_option_picker.view.*
 import kotlinx.android.synthetic.main.fragment_choose_dictionary.view.*
 import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.viewModel
 
-class DictionaryPickerFragment: Fragment(), DictionaryAdapter.ItemClickListener {
+class DictionaryPickerFragment : Fragment(), DictionaryAdapter.ItemClickListener {
     private val viewModel: DictionaryListViewModel by viewModel()
     private val dialogFactory: DialogFactory by inject()
     private var optionsDialog: AlertDialog? = null
@@ -34,8 +33,8 @@ class DictionaryPickerFragment: Fragment(), DictionaryAdapter.ItemClickListener 
     override fun onItemClick(dictionary: Dictionary) {
         optionsDialog = dialogFactory.showOptionsDialog(
                 requireActivity()
-        ) {
-            selectedOption -> startQuiz(selectedOption, dictionary.dictionaryId)
+        ) { selectedOption ->
+            startQuiz(selectedOption, dictionary.dictionaryId)
         }
         optionsDialog?.show()
         viewModel.setDictionaryTitle(dictionary.dictionaryName)
@@ -76,12 +75,12 @@ class DictionaryPickerFragment: Fragment(), DictionaryAdapter.ItemClickListener 
                 dictionaryId,
                 selectedOption,
                 args.quizType
-                )
+        )
         findNavController().navigate(action)
     }
 
     private fun setToolBarTitle(toolbar: Toolbar) {
-        when(args.quizType.toQuizType()) {
+        when (args.quizType.toQuizType()) {
             QuizTypes.QuickQuiz -> toolbar.title = getString(R.string.quiz_list_quick_one)
             QuizTypes.FullQuiz -> toolbar.title = getString(R.string.quiz_list_ask_me_everything)
             QuizTypes.WeakestQuiz -> toolbar.title = getString(R.string.quiz_list_weaknesses)
