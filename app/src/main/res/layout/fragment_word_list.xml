@@ -34,8 +34,9 @@
         android:gravity="center"
         android:text="@string/word_list_meaning"
         android:textSize="@dimen/text_size_bigger"
-        app:layout_constraintEnd_toStartOf="@+id/guideline"
-        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintStart_toStartOf="@+id/guideline"
         app:layout_constraintTop_toBottomOf="@+id/app_bar" />
 
     <TextView
@@ -48,9 +49,8 @@
         android:gravity="center"
         android:text="@string/word_list_expression"
         android:textSize="@dimen/text_size_bigger"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="1.0"
-        app:layout_constraintStart_toStartOf="@+id/guideline"
+        app:layout_constraintEnd_toStartOf="@+id/guideline"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/app_bar" />
 
     <androidx.constraintlayout.widget.Guideline
