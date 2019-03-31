@@ -19,17 +19,25 @@ import com.vocabulary.myvocabulary.ext.show
 import com.vocabulary.myvocabulary.ui.dictionaries.Dictionary
 import com.vocabulary.myvocabulary.ui.dictionaries.DictionaryAdapter
 import com.vocabulary.myvocabulary.ui.dictionaries.DictionaryListViewModel
+import com.vocabulary.myvocabulary.utils.DialogFactory
 import kotlinx.android.synthetic.main.dialog_direction_option_picker.view.*
 import kotlinx.android.synthetic.main.fragment_choose_dictionary.view.*
+import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.viewModel
 
 class DictionaryPickerFragment: Fragment(), DictionaryAdapter.ItemClickListener {
     private val viewModel: DictionaryListViewModel by viewModel()
+    private val dialogFactory: DialogFactory by inject()
     private var optionsDialog: AlertDialog? = null
     private val args by navArgs<DictionaryPickerFragmentArgs>()
 
     override fun onItemClick(dictionary: Dictionary) {
-        showOptionsDialog(dictionary.dictionaryId)
+        optionsDialog = dialogFactory.showOptionsDialog(
+                requireActivity()
+        ) {
+            selectedOption -> startQuiz(selectedOption, dictionary.dictionaryId)
+        }
+        optionsDialog?.show()
         viewModel.setDictionaryTitle(dictionary.dictionaryName)
     }
 
@@ -59,33 +67,6 @@ class DictionaryPickerFragment: Fragment(), DictionaryAdapter.ItemClickListener 
         recyclerView.apply {
             layoutManager = LinearLayoutManager(requireContext(), RecyclerView.VERTICAL, false)
             adapter = dictionaryAdapter
-        }
-    }
-
-    private fun showOptionsDialog(dictionaryId: Long) {
-        var selectedOption = 0
-        val inflater = requireActivity().layoutInflater
-        val dialogView: View = inflater.inflate(R.layout.dialog_direction_option_picker, null)
-        val radioGroup: RadioGroup = dialogView.radioGroup
-        val doItButton: Button = dialogView.lets_do_it_button
-        val cancelButton: Button = dialogView.cancel_direction_picker_dialog
-        val errorMessage: TextView = dialogView.option_picker_error
-        val dialogBuilder = AlertDialog.Builder(requireActivity())
-        optionsDialog = dialogBuilder.create().apply {
-            setView(dialogView)
-            radioGroup.setOnCheckedChangeListener { _, checkedId ->
-                errorMessage.show(false)
-                selectedOption = if (checkedId == R.id.word_radio) 0 else 1
-            }
-            doItButton.setOnClickListener {
-                startQuiz(selectedOption, dictionaryId)
-                dismiss()
-            }
-            cancelButton.setOnClickListener {
-                dismiss()
-            }
-            setTitle(R.string.dialog_pick_direction)
-            show()
         }
     }
 
