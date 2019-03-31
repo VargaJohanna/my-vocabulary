@@ -297,4 +297,18 @@ class DialogFactory {
             setTitle(activity.getString(R.string.create_new_dictionary_dialog_title))
         }
     }
+
+    fun buildInfoDialog(
+            activity: Activity,
+            title: String,
+            message: String
+    ): AlertDialog.Builder {
+        return AlertDialog.Builder(activity).apply {
+            setTitle(title)
+            setMessage(message)
+            setPositiveButton(activity.getString(R.string.info_dialog)) { dialog, _ ->
+                dialog.dismiss()
+            }
+        }
+    }
 }

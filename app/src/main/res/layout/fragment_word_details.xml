@@ -16,6 +16,7 @@
 
         <androidx.appcompat.widget.Toolbar
             android:id="@+id/word_details_toolbar"
+            app:titleTextColor="@color/icons"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_margin="0dp"
@@ -27,8 +28,8 @@
 
     <ImageButton
         android:id="@+id/word_edit"
-        android:layout_width="@dimen/eidt_icon_size"
-        android:layout_height="@dimen/eidt_icon_size"
+        android:layout_width="@dimen/edit_icon_size"
+        android:layout_height="@dimen/edit_icon_size"
         android:layout_gravity="end"
         android:layout_margin="@dimen/margin_small"
         android:padding="@dimen/padding_normal"
@@ -41,8 +42,8 @@
 
     <ImageButton
         android:id="@+id/word_delete"
-        android:layout_width="@dimen/eidt_icon_size"
-        android:layout_height="@dimen/eidt_icon_size"
+        android:layout_width="@dimen/edit_icon_size"
+        android:layout_height="@dimen/edit_icon_size"
         android:layout_gravity="end"
         android:layout_margin="@dimen/margin_small"
         android:padding="@dimen/padding_normal"
