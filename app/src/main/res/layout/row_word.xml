@@ -24,10 +24,11 @@
             android:textSize="@dimen/text_size_medium"
             android:background="?selectableItemBackground"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@id/guideline"
-            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/word_options"
+            app:layout_constraintStart_toEndOf="@id/guideline"
             app:layout_constraintTop_toTopOf="parent"
-            tools:text="cat" />
+            tools:text="polip"
+             />
 
         <androidx.constraintlayout.widget.Guideline
             android:id="@+id/guideline"
@@ -58,10 +59,10 @@
             android:textSize="@dimen/text_size_medium"
             android:background="?selectableItemBackground"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@+id/word_options"
-            app:layout_constraintStart_toEndOf="@id/guideline"
+            app:layout_constraintEnd_toStartOf="@id/guideline"
+            app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            tools:text="cica" />
+            tools:text="pulpo"/>
 
         <TextView
             android:id="@+id/word_options"

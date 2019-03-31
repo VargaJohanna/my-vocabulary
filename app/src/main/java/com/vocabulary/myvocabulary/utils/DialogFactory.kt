@@ -37,7 +37,7 @@ class DialogFactory {
         val dialogBuilder = AlertDialog.Builder(activity)
         return dialogBuilder.create().apply {
             setView(dialogView)
-            editTextWord.requestFocus()
+            editTextTranslation.requestFocus()
             errorMessageWord.show(false)
             errorMessageTranslation.show(false)
             setupTextChangedListener(editTextWord, errorMessageWord)
@@ -171,7 +171,7 @@ class DialogFactory {
         val dialogBuilder = AlertDialog.Builder(activity)
         return dialogBuilder.create().apply {
             setView(dialogView)
-            editTextWord.requestFocus()
+            editTextTranslation.requestFocus()
             errorMessageWord.show(false)
             errorMessageTranslation.show(false)
             setupTextChangedListener(editTextWord, errorMessageWord)
@@ -187,7 +187,7 @@ class DialogFactory {
                             editTextTranslation.text.toString().trim())
                     editTextWord.setText("")
                     editTextTranslation.setText("")
-                    editTextWord.requestFocus()
+                    editTextTranslation.requestFocus()
 
                 } else if (inputWord.isEmpty() && inputTranslation.isEmpty()) {
                     errorMessageWord.show(true)
@@ -212,7 +212,7 @@ class DialogFactory {
                     )
                     editTextWord.setText("")
                     editTextTranslation.setText("")
-                    editTextWord.requestFocus()
+                    editTextTranslation.requestFocus()
 
                 } else if (inputWord.isEmpty() && inputTranslation.isEmpty()) {
                     errorMessageWord.show(true)
