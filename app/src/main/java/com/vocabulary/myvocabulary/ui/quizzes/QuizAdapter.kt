@@ -1,6 +1,5 @@
 package com.vocabulary.myvocabulary.ui.quizzes
 
-import android.graphics.Color
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.LayoutInflater

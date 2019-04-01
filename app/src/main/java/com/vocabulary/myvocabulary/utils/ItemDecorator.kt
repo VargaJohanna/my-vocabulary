@@ -1,6 +1,5 @@
 package com.vocabulary.myvocabulary.utils
 
-import android.graphics.Canvas
 import android.graphics.Rect
 import android.view.View
 import androidx.recyclerview.widget.RecyclerView
@@ -12,7 +11,7 @@ class ItemDecorator(private val intSpace: Int) : RecyclerView.ItemDecoration() {
         val currentItemPosition = parent.indexOfChild(view)
         val previousItem = parent.getChildAt(currentItemPosition - 1)
 
-        if(currentItemPosition != 0) {
+        if (currentItemPosition != 0) {
             previousHeight = previousItem.height
             view.minimumHeight = previousHeight
 
