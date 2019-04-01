@@ -13,7 +13,6 @@ class ItemDecorator(private val intSpace: Int) : RecyclerView.ItemDecoration() {
 
         if (currentItemPosition != 0) {
             previousHeight = previousItem.height
-            view.minimumHeight = previousHeight
 
         } else {
             previousHeight = 120 + intSpace

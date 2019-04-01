@@ -11,6 +11,7 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.vocabulary.myvocabulary.R
 import com.vocabulary.myvocabulary.ext.convertDpToPx
+import com.vocabulary.myvocabulary.ext.show
 import io.reactivex.Observable
 import io.reactivex.subjects.BehaviorSubject
 import kotlinx.android.synthetic.main.row_quiz.view.*
@@ -36,30 +37,54 @@ class QuizAdapter(
 
     inner class QuizViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         fun bind(wordObject: QuizViewModel.FocusableWord, position: Int) {
-            guessEntered = false
             addExtraMarginForFirstElement(position, itemView)
-
             makeLastElementEditable(position, itemView.solution)
-
-            itemView.solution.addTextChangedListener(object : TextWatcher {
-                override fun afterTextChanged(p0: Editable) {
-                    setGuessedWord(QuizViewModel.GuessedWord(wordObject.word.wordId, p0.toString(), wordObject.word.word))
-                    guessEntered = p0.isNotEmpty()
-                }
-
-                override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
-                }
-
-                override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
-                }
-            })
-            if (!guessEntered) setGuessedWord(QuizViewModel.GuessedWord(wordObject.word.wordId, "", wordObject.word.word))
-
             addElevationToEachItem(itemView, position)
+            hideContentOfItems(itemView, position)
+            setAnimationForLastItem(itemView, position)
+
+            saveGuessedWord(wordObject, itemView, position)
 
             if (askDirection == QuizDirectionType.AskWord) itemView.question.text = wordObject.word.word
             else itemView.question.text = wordObject.word.translation
-            setAnimation(itemView)
+
+        }
+
+        private fun saveGuessedWord(wordObject: QuizViewModel.FocusableWord,itemView: View, position: Int) {
+            if(position == wordList.size - 1) {
+                guessEntered = false
+                itemView.solution.addTextChangedListener(object : TextWatcher {
+                    override fun afterTextChanged(p0: Editable) {
+                        setGuessedWord(QuizViewModel.GuessedWord(wordObject.word.wordId, p0.toString(), wordObject.word.word))
+                        guessEntered = p0.isNotEmpty()
+                    }
+
+                    override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
+                    }
+
+                    override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
+                    }
+                })
+                if (!guessEntered) setGuessedWord(QuizViewModel.GuessedWord(wordObject.word.wordId, "", wordObject.word.word))
+            }
+        }
+
+        private fun hideContentOfItems(itemView: View, position: Int) {
+            if (position != wordList.size - 1) {
+                itemView.question.setTextColor(itemView.context.resources.getColor(R.color.transparent))
+                itemView.solution.setTextColor(itemView.context.resources.getColor(R.color.transparent))
+                itemView.solution.setHintTextColor(itemView.context.resources.getColor(R.color.transparent))
+                itemView.solution.background.setTint(itemView.context.resources.getColor(R.color.transparent))
+                itemView.view.show(false)
+                itemView.setBackgroundColor(itemView.context.resources.getColor(R.color.light_grey))
+            } else {
+                itemView.question.setTextColor(itemView.context.resources.getColor(R.color.primary_text))
+                itemView.solution.setTextColor(itemView.context.resources.getColor(R.color.primary_text))
+                itemView.solution.setHintTextColor(itemView.context.resources.getColor(R.color.grey))
+                itemView.solution.background.setTint(itemView.context.resources.getColor(R.color.divider))
+                itemView.view.show(true)
+                itemView.setBackgroundColor(itemView.context.resources.getColor(R.color.icons))
+            }
         }
 
         private fun addElevationToEachItem(itemView: View, position: Int) {
@@ -116,8 +141,10 @@ class QuizAdapter(
         }
     }
 
-    fun setAnimation(view: View) {
-        val animation = AnimationUtils.loadAnimation(view.context, R.anim.slide_up)
-        view.startAnimation(animation)
+    fun setAnimationForLastItem(view: View, position: Int) {
+        if (position == wordList.size - 1) {
+            val animation = AnimationUtils.loadAnimation(view.context, R.anim.slide_up)
+            view.startAnimation(animation)
+        }
     }
 }
