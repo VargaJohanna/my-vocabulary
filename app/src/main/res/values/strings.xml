@@ -61,5 +61,6 @@
     <string name="details_created">Created:</string>
     <string name="delete_dialog_title">Delete</string>
     <string name="info_dialog">Got it</string>
+    <string name="empty_dictionary_notification">This dictionary is empty.</string>
 
 </resources>
