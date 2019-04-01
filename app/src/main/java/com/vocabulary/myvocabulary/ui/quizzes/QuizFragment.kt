@@ -104,7 +104,7 @@ class QuizFragment : Fragment() {
                 override fun canScrollVertically(): Boolean = false
             }
 
-            addItemDecoration(ItemDecorator(-120))
+            addItemDecoration(ItemDecorator(50))
             adapter = quizAdapter
         }
     }

@@ -1,5 +1,6 @@
 package com.vocabulary.myvocabulary.ui.quizzes
 
+import android.graphics.Color
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.LayoutInflater
@@ -7,6 +8,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.animation.AnimationUtils
 import android.widget.EditText
+import android.widget.TextView
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.vocabulary.myvocabulary.R
@@ -39,7 +41,7 @@ class QuizAdapter(
             guessEntered = false
             addExtraMarginForFirstElement(position, itemView)
 
-            makeLastElementEditable(position, itemView.solution)
+            makeLastElementEditable(position, itemView.solution, itemView.question, itemView)
 
             itemView.solution.addTextChangedListener(object : TextWatcher {
                 override fun afterTextChanged(p0: Editable) {
@@ -71,7 +73,7 @@ class QuizAdapter(
         }
     }
 
-    private fun makeLastElementEditable(position: Int, solution: EditText) {
+    private fun makeLastElementEditable(position: Int, solution: EditText, question: TextView, itemView: View) {
         if (position == wordList.size - 1) {
             solution.isEnabled = true
             solution.requestFocus()
