@@ -92,6 +92,4 @@ class DictionaryListViewModel(
     fun setDictionaryTitle(title: String) {
         dictionaryName = title
     }
-
-    fun getDictionaryName() = dictionaryName
 }
