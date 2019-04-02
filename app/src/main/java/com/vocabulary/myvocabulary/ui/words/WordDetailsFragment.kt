@@ -43,8 +43,8 @@ class WordDetailsFragment : Fragment() {
         })
         return inflater.inflate(R.layout.fragment_word_details, container, false).apply {
             word_details_toolbar.setNavigationOnClickListener { findNavController().popBackStack() }
-            setWordEditButtonClickListener(details_word, details_translation, word_edit)
-            setWordDeleteButtonClickListener(word_delete)
+            setWordEditButtonClickListener(details_word, details_translation, word_edit_button)
+            setWordDeleteButtonClickListener(word_delete_button)
         }
     }
 
@@ -63,7 +63,7 @@ class WordDetailsFragment : Fragment() {
             dialogFactory.buildDeleteWordDialog(
                     requireActivity(),
                     getString(R.string.dialog_delete_word_title),
-                    "Are you sure you want to delete\n\"${wordCurrent.word} - ${wordCurrent.translation}\" ?"
+                    "Are you sure you want to delete\n\"${wordCurrent.translation} - ${wordCurrent.word}\" ?"
             ) {
                 wordViewModel.deleteWord(wordCurrent)
                 findNavController().popBackStack()

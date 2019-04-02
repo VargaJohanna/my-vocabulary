@@ -5,7 +5,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ProgressBar
-import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
@@ -28,7 +27,6 @@ import org.koin.androidx.viewmodel.ext.viewModel
 import org.koin.core.parameter.parametersOf
 
 class QuizFragment : Fragment() {
-    private val rxSchedulers: RxSchedulers by inject()
     private val args by navArgs<QuizFragmentArgs>()
     private val resultViewModel: ResultViewModel by sharedViewModel {
         parametersOf(
@@ -44,18 +42,16 @@ class QuizFragment : Fragment() {
                 args.quizType
         )
     }
-
-    private val disposables = CompositeDisposable()
+    private lateinit var quizAdapter:QuizAdapter
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        val quizAdapter = QuizAdapter(mutableListOf(), quizViewModel.directionType)
+        quizAdapter = QuizAdapter(mutableListOf(), quizViewModel.directionType)
         if (savedInstanceState == null) {
             resultViewModel.resetGuessedWordCollections()
         }
         return inflater.inflate(R.layout.fragment_quiz, container, false).apply {
             generateWordList(quizAdapter, quiz_recycler_view)
             observeWordList(quizAdapter, quiz_progress_bar)
-            observeGuessedWord(quizAdapter.guessedWord)
             setNextButtonIconUpdateListener(quiz_next_fab)
             setNextFabOnClickListener(quiz_next_fab)
             quiz_toolbar.setNavigationOnClickListener { findNavController().popBackStack() }
@@ -64,6 +60,8 @@ class QuizFragment : Fragment() {
 
     private fun setNextFabOnClickListener(fab: FloatingActionButton) {
         fab.setOnClickListener {
+            resultViewModel.latestGuess(quizAdapter.lastGuess())
+
             if (quizViewModel.listIsNotFinished()) {
                 quizViewModel.nextClicked()
             } else {
@@ -87,14 +85,8 @@ class QuizFragment : Fragment() {
     private fun observeWordList(quizAdapter: QuizAdapter, progressBar: ProgressBar) {
         progressBar.show(true)
         quizViewModel.getLiveWordList().observe(requireActivity(), Observer {
-            if (it.isEmpty() && !quizViewModel.failedOnly) {
-                Toast.makeText(requireActivity(), "This dictionary is empty.", Toast.LENGTH_LONG).show()
-                findNavController().popBackStack()
-            } else {
-                quizAdapter.updateList(it)
-                progressBar.show(false)
-            }
-
+            quizAdapter.updateList(it)
+            progressBar.show(false)
         })
     }
 
@@ -104,17 +96,8 @@ class QuizFragment : Fragment() {
                 override fun canScrollVertically(): Boolean = false
             }
 
-            addItemDecoration(ItemDecorator(-120))
+            addItemDecoration(ItemDecorator(80))
             adapter = quizAdapter
         }
-    }
-
-    private fun observeGuessedWord(guessedWord: Observable<QuizViewModel.GuessedWord>) {
-        disposables += guessedWord
-                .subscribeOn(rxSchedulers.io())
-                .observeOn(rxSchedulers.main())
-                .subscribe {
-                    resultViewModel.guessedWordMap[it.wordId] = it.guess
-                }
     }
 }

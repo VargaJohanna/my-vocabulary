@@ -1,6 +1,6 @@
 <resources>
     <string name="app_name">My Vocabulary</string>
-    <string name="example_dictionary_name">Hungarian - English</string>
+    <string name="example_dictionary_name">Example Dictionary</string>
     <string name="dictionaries_button">DICTIONARIES</string>
     <string name="quizzes_button">QUIZZES</string>
     <string name="add_a_title">Add a title</string>
@@ -34,7 +34,7 @@
     <string name="quiz_list_ask_me_everything">Ask Me Everything</string>
     <string name="quiz_list_weaknesses">Weaknesses</string>
     <string name="quiz_dictionary_picker_title">Pick a dictionary</string>
-    <string name="dialog_pick_direction">"Choose what should be asked"</string>
+    <string name="dialog_pick_direction">"Choose what should be the question"</string>
     <string name="dialog_lets_do_it">"Let's do it"</string>
     <string name="dialog_option_picker_error">"Please select one of the options!"</string>
     <string name="dialog_quiz_type_error">"Please select one of the quiz types!"</string>
@@ -61,5 +61,6 @@
     <string name="details_created">Created:</string>
     <string name="delete_dialog_title">Delete</string>
     <string name="info_dialog">Got it</string>
+    <string name="empty_dictionary_notification">This dictionary is empty.</string>
 
 </resources>
