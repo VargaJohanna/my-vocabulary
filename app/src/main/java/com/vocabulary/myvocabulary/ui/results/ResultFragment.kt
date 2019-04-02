@@ -9,7 +9,6 @@ import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
 import android.widget.LinearLayout
 import android.widget.ProgressBar
-import androidx.core.content.getSystemService
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.navigation.findNavController
@@ -44,15 +43,12 @@ class ResultFragment : Fragment() {
         val resultAdapter = ResultAdapter(emptyList(), resultViewModel.directionResult)
         resultViewModel.getGuessResult()
         return inflater.inflate(R.layout.fragment_result, container, false).apply {
-            observeWordList(resultAdapter, result_progress_bar)
+            observeWordList(resultAdapter, result_progress_bar, success_animation, savedInstanceState)
             generateWordList(resultAdapter, result_recycler_view)
             setExitFabOnClickListener(result_exit_fab)
             setRetryFabOnClickListener(result_restart_fab, failed_only_container, start_over_container)
             setStartOverOnClickListener(start_over_fab)
             setFailedOnlyOnClickListener(failed_only_fab)
-            if (savedInstanceState == null) {
-                showSuccessAnimation(success_animation)
-            }
             result_toolbar.setNavigationOnClickListener { findNavController().popBackStack() }
         }
     }
@@ -64,11 +60,14 @@ class ResultFragment : Fragment() {
         }
     }
 
-    private fun observeWordList(resultAdapter: ResultAdapter, progressBar: ProgressBar) {
+    private fun observeWordList(resultAdapter: ResultAdapter, progressBar: ProgressBar, success_animation: LottieAnimationView, savedInstanceState: Bundle?) {
         progressBar.show(true)
         resultViewModel.getLiveGuessedList().observe(requireActivity(), Observer {
             resultAdapter.updateList(it)
             progressBar.show(false)
+            if (savedInstanceState == null && it.isNotEmpty()) {
+                showSuccessAnimation(success_animation)
+            }
         })
     }
 
@@ -152,7 +151,7 @@ class ResultFragment : Fragment() {
     private fun hideKeyboard() {
         val imm: InputMethodManager = requireActivity().getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager
         val view: View? = requireActivity().currentFocus
-        if(view == null) View(requireActivity())
+        if (view == null) View(requireActivity())
         imm.hideSoftInputFromWindow(view?.windowToken, 0)
     }
 }
