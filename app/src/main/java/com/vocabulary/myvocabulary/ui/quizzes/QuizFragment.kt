@@ -5,6 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ProgressBar
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
@@ -60,7 +61,12 @@ class QuizFragment : Fragment() {
 
     private fun setNextFabOnClickListener(fab: FloatingActionButton) {
         fab.setOnClickListener {
-            resultViewModel.latestGuess(quizAdapter.lastGuess())
+            if (quizAdapter.lastGuess() != null) {
+                resultViewModel.latestGuess(quizAdapter.lastGuess()!!)
+            } else {
+                Toast.makeText(requireActivity(), resources.getString(R.string.empty_dictionary_notification), Toast.LENGTH_SHORT).show()
+                findNavController().popBackStack()
+            }
 
             if (quizViewModel.listIsNotFinished()) {
                 quizViewModel.nextClicked()
@@ -96,7 +102,7 @@ class QuizFragment : Fragment() {
                 override fun canScrollVertically(): Boolean = false
             }
 
-            addItemDecoration(ItemDecorator(80))
+            addItemDecoration(ItemDecorator(65))
             adapter = quizAdapter
         }
     }
