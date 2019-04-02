@@ -56,7 +56,7 @@ class QuizFragment : Fragment() {
 
     private fun setNextFabOnClickListener(fab: FloatingActionButton) {
         fab.setOnClickListener {
-            resultViewModel.latestGuess(quizAdapter.lastGuess()!!)
+            resultViewModel.latestGuess(quizAdapter.lastGuess())
 
             if (quizViewModel.listIsNotFinished()) {
                 quizViewModel.nextClicked()
