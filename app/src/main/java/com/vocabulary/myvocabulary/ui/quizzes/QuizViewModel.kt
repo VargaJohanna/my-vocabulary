@@ -85,10 +85,4 @@ class QuizViewModel(
             val word: Word,
             val isFocused: Boolean
     )
-
-    data class GuessedWord(
-            val wordId: Long,
-            val guess: String,
-            val wordValue: String
-    )
 }
