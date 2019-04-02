@@ -11,14 +11,9 @@ class ItemDecorator(private val intSpace: Int) : RecyclerView.ItemDecoration() {
         val currentItemPosition = parent.indexOfChild(view)
         val previousItem = parent.getChildAt(currentItemPosition - 1)
 
-        if (currentItemPosition != 0) {
-            previousHeight = previousItem.height
+        previousHeight = (if (currentItemPosition != 0) previousItem.height else 120 + intSpace)
 
-        } else {
-            previousHeight = 120 + intSpace
-        }
-        val actual = -(previousHeight - intSpace)
-        outRect.top = actual
+        outRect.top = if(currentItemPosition != 0) -(previousHeight - intSpace) else 0
     }
 
 }

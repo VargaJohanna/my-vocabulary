@@ -8,6 +8,7 @@ import com.vocabulary.myvocabulary.rx.RxSchedulers
 import com.vocabulary.myvocabulary.ui.quizzes.QuizDirectionType
 import com.vocabulary.myvocabulary.ui.quizzes.QuizRepository
 import com.vocabulary.myvocabulary.ui.quizzes.QuizTypes
+import com.vocabulary.myvocabulary.ui.quizzes.QuizViewModel
 import com.vocabulary.myvocabulary.ui.words.Word
 import io.reactivex.Observable
 import io.reactivex.disposables.CompositeDisposable
@@ -19,7 +20,7 @@ class ResultViewModel(
         private val quizRepository: QuizRepository
 ) : ViewModel() {
     private val disposables = CompositeDisposable()
-    var guessedWordMap: MutableMap<Long, String> = mutableMapOf()
+    private val guessedWordMap: MutableMap<Long, String> = mutableMapOf()
     private var _liveGuessedWordList: MutableList<Word> = mutableListOf()
     private val liveGuessedWordList: MutableLiveData<List<Word>> = MutableLiveData()
     var directionResult: QuizDirectionType = QuizDirectionType.AskWord
@@ -64,7 +65,7 @@ class ResultViewModel(
     }
 
     fun resetGuessedWordCollections() {
-        guessedWordMap = mutableMapOf()
+        guessedWordMap.clear()
         _liveGuessedWordList = mutableListOf()
         liveGuessedWordList.postValue(_liveGuessedWordList)
         setAllPassedValue(true)
@@ -80,5 +81,9 @@ class ResultViewModel(
 
     fun startNew(dictionaryId: Long, quizType: QuizTypes) {
         quizRepository.resetQuizList(dictionaryId, quizType)
+    }
+
+    fun latestGuess(lastGuess: QuizViewModel.GuessedWord) {
+        guessedWordMap[lastGuess.wordId] = lastGuess.guess
     }
 }

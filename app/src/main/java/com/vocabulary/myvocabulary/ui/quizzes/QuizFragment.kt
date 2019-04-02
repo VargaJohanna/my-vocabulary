@@ -27,7 +27,6 @@ import org.koin.androidx.viewmodel.ext.viewModel
 import org.koin.core.parameter.parametersOf
 
 class QuizFragment : Fragment() {
-    private val rxSchedulers: RxSchedulers by inject()
     private val args by navArgs<QuizFragmentArgs>()
     private val resultViewModel: ResultViewModel by sharedViewModel {
         parametersOf(
@@ -43,18 +42,16 @@ class QuizFragment : Fragment() {
                 args.quizType
         )
     }
-
-    private val disposables = CompositeDisposable()
+    private lateinit var quizAdapter:QuizAdapter
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        val quizAdapter = QuizAdapter(mutableListOf(), quizViewModel.directionType)
+        quizAdapter = QuizAdapter(mutableListOf(), quizViewModel.directionType)
         if (savedInstanceState == null) {
             resultViewModel.resetGuessedWordCollections()
         }
         return inflater.inflate(R.layout.fragment_quiz, container, false).apply {
             generateWordList(quizAdapter, quiz_recycler_view)
             observeWordList(quizAdapter, quiz_progress_bar)
-            observeGuessedWord(quizAdapter.guessedWord)
             setNextButtonIconUpdateListener(quiz_next_fab)
             setNextFabOnClickListener(quiz_next_fab)
             quiz_toolbar.setNavigationOnClickListener { findNavController().popBackStack() }
@@ -63,6 +60,8 @@ class QuizFragment : Fragment() {
 
     private fun setNextFabOnClickListener(fab: FloatingActionButton) {
         fab.setOnClickListener {
+            resultViewModel.latestGuess(quizAdapter.lastGuess())
+
             if (quizViewModel.listIsNotFinished()) {
                 quizViewModel.nextClicked()
             } else {
@@ -100,14 +99,5 @@ class QuizFragment : Fragment() {
             addItemDecoration(ItemDecorator(80))
             adapter = quizAdapter
         }
-    }
-
-    private fun observeGuessedWord(guessedWord: Observable<QuizViewModel.GuessedWord>) {
-        disposables += guessedWord
-                .subscribeOn(rxSchedulers.io())
-                .observeOn(rxSchedulers.main())
-                .subscribe {
-                    resultViewModel.guessedWordMap[it.wordId] = it.guess
-                }
     }
 }
