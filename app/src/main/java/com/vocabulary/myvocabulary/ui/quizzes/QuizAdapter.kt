@@ -110,9 +110,11 @@ class QuizAdapter(
         }
     }
 
-    fun lastGuess(): GuessedWord {
-        return GuessedWord(wordList.last().word.wordId, lastGuess
-                ?: "")
+    fun lastGuess(): GuessedWord? {
+        return if(wordList.isNotEmpty()) {
+            GuessedWord(wordList.last().word.wordId, lastGuess
+                    ?: "")
+        } else null
     }
 
     private inner class GuessTextWatcher : TextWatcher {
