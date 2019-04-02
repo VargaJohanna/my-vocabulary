@@ -19,18 +19,7 @@ class QuizAdapter(
         private var askDirection: QuizDirectionType
 ) : RecyclerView.Adapter<QuizAdapter.QuizViewHolder>() {
     private var lastGuess: String? = null
-    private var watcher: TextWatcher = object : TextWatcher {
-        override fun afterTextChanged(p0: Editable) {
-            lastGuess = p0.toString()
-        }
-
-        override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
-        }
-
-        override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
-        }
-    }
-
+    private var watcher = GuessTextWatcher()
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): QuizViewHolder {
         val inflater = LayoutInflater.from(parent.context)
         return QuizViewHolder(inflater.inflate(com.vocabulary.myvocabulary.R.layout.row_quiz, parent, false))
@@ -47,13 +36,13 @@ class QuizAdapter(
             makeLastElementEditable(position, itemView.solution)
             addElevationToEachItem(itemView, position)
 
-            saveGuessedWord(itemView, position)
+            setTextWatcher(itemView, position)
 
             setContent(wordObject, itemView, position)
             setAnimationForLastItem(itemView, position)
         }
 
-        private fun saveGuessedWord(itemView: View, position: Int) {
+        private fun setTextWatcher(itemView: View, position: Int) {
             if (position == wordList.size - 1) {
                 itemView.solution.addTextChangedListener(watcher)
             } else {
@@ -62,26 +51,32 @@ class QuizAdapter(
         }
 
         private fun setContent(wordObject: QuizViewModel.FocusableWord, itemView: View, position: Int) {
-            if (position != wordList.size - 1) {
-                itemView.question.setTextColor(ContextCompat.getColor(itemView.context, R.color.transparent))
-                itemView.solution.setTextColor(ContextCompat.getColor(itemView.context, R.color.transparent))
-                itemView.solution.setHintTextColor(ContextCompat.getColor(itemView.context, R.color.transparent))
-                itemView.solution.background.setTint(ContextCompat.getColor(itemView.context, R.color.transparent))
-                itemView.view.show(false)
-                itemView.setBackgroundColor(ContextCompat.getColor(itemView.context, R.color.light_grey))
-            } else {
-                itemView.question.setTextColor(ContextCompat.getColor(itemView.context, R.color.primary_text))
-                itemView.solution.setTextColor(ContextCompat.getColor(itemView.context, R.color.primary_text))
-                itemView.solution.setHintTextColor(ContextCompat.getColor(itemView.context, R.color.grey))
-                itemView.solution.background.setTint(ContextCompat.getColor(itemView.context, R.color.divider))
-                itemView.view.show(true)
-                itemView.setBackgroundColor(ContextCompat.getColor(itemView.context, R.color.icons))
-                itemView.solution.setText("")
-                itemView.question.text = ""
-                if (askDirection == QuizDirectionType.AskWord) {
-                    itemView.question.text = wordObject.word.word
+            itemView.apply {
+                if (position != wordList.size - 1) {
+                    question.setTextColor(ContextCompat.getColor(context, R.color.transparent))
+                    view.show(false)
+                    setBackgroundColor(ContextCompat.getColor(context, R.color.light_grey))
+                    solution.apply {
+                        setTextColor(ContextCompat.getColor(context, R.color.transparent))
+                        setHintTextColor(ContextCompat.getColor(context, R.color.transparent))
+                        background.setTint(ContextCompat.getColor(context, R.color.transparent))
+                    }
                 } else {
-                    itemView.question.text = wordObject.word.translation
+                    question.setTextColor(ContextCompat.getColor(context, R.color.primary_text))
+                    view.show(true)
+                    setBackgroundColor(ContextCompat.getColor(context, R.color.icons))
+                    solution.setText("")
+                    question.text = ""
+                    if (askDirection == QuizDirectionType.AskWord) {
+                        question.text = wordObject.word.word
+                    } else {
+                        question.text = wordObject.word.translation
+                    }
+                    solution.apply {
+                        setTextColor(ContextCompat.getColor(context, R.color.primary_text))
+                        setHintTextColor(ContextCompat.getColor(context, R.color.grey))
+                        background.setTint(ContextCompat.getColor(context, R.color.divider))
+                    }
                 }
             }
         }
@@ -115,8 +110,20 @@ class QuizAdapter(
         }
     }
 
-    fun lastGuess(): QuizViewModel.GuessedWord {
-        return QuizViewModel.GuessedWord(wordList.last().word.wordId, lastGuess
-                ?: "", wordList.last().word.word)
+    fun lastGuess(): GuessedWord {
+        return GuessedWord(wordList.last().word.wordId, lastGuess
+                ?: "")
+    }
+
+    private inner class GuessTextWatcher : TextWatcher {
+        override fun afterTextChanged(p0: Editable?) {
+            lastGuess = p0.toString()
+        }
+
+        override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
+        }
+
+        override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
+        }
     }
 }

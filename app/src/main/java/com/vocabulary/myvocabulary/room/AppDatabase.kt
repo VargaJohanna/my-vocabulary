@@ -41,8 +41,8 @@ abstract class AppDatabase : RoomDatabase() {
                                 super.onCreate(db)
                                 ioThread {
                                     getInstance(context).dictionaryDao().insertDictionary(defaultDictionary)
-                                    for(item in listOfDefaultWords) {
-                                        getInstance(context).wordDao().insertWord(item)
+                                    listOfDefaultWords.forEach {
+                                        getInstance(context).wordDao().insertWord(it)
                                     }
                                 }
                             }
