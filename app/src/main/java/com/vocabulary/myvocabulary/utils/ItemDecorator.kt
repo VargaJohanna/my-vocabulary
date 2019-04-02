@@ -7,7 +7,7 @@ import androidx.recyclerview.widget.RecyclerView
 class ItemDecorator(private val intSpace: Int) : RecyclerView.ItemDecoration() {
 
     override fun getItemOffsets(outRect: Rect, view: View, parent: RecyclerView, state: RecyclerView.State) {
-        var previousHeight: Int
+        val previousHeight: Int
         val currentItemPosition = parent.indexOfChild(view)
         val previousItem = parent.getChildAt(currentItemPosition - 1)
 

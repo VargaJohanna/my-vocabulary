@@ -41,7 +41,9 @@ abstract class AppDatabase : RoomDatabase() {
                                 super.onCreate(db)
                                 ioThread {
                                     getInstance(context).dictionaryDao().insertDictionary(defaultDictionary)
-                                    getInstance(context).wordDao().insertWord(defaultWord)
+                                    for(item in listOfDefaultWords) {
+                                        getInstance(context).wordDao().insertWord(item)
+                                    }
                                 }
                             }
                         })
@@ -49,6 +51,17 @@ abstract class AppDatabase : RoomDatabase() {
                         .build()
 
         val defaultDictionary = Dictionary(dictionaryId = 1L, dictionaryName = "Example Dictionary", dictionaryCreated = Calendar.getInstance().time).toDictionaryEntry()
-        val defaultWord = Word(1, 1, "new", "novus", 0, 0, 0, Calendar.getInstance().time).toWordEntry()
+        val listOfDefaultWords = listOf(
+                Word(1, 1, "new", "novus", 0, 0, 0, Calendar.getInstance().time).toWordEntry(),
+                Word(2, 1, "body", "corpus", 0, 0, 0, Calendar.getInstance().time).toWordEntry(),
+                Word(3, 1, "day", "diem", 0, 0, 0, Calendar.getInstance().time).toWordEntry(),
+                Word(4, 1, "king", "rex", 0, 0, 0, Calendar.getInstance().time).toWordEntry(),
+                Word(5, 1, "god", "deus", 0, 0, 0, Calendar.getInstance().time).toWordEntry(),
+                Word(6, 1, "and", "et", 0, 0, 0, Calendar.getInstance().time).toWordEntry(),
+                Word(7, 1, "life", "vita", 0, 0, 0, Calendar.getInstance().time).toWordEntry(),
+                Word(8, 1, "peace", "pax", 0, 0, 0, Calendar.getInstance().time).toWordEntry(),
+                Word(9, 1, "house", "domo", 0, 0, 0, Calendar.getInstance().time).toWordEntry(),
+                Word(10, 1, "sea", "mare", 0, 0, 0, Calendar.getInstance().time).toWordEntry()
+        )
     }
 }
