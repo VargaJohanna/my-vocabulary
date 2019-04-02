@@ -5,6 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ProgressBar
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
@@ -13,15 +14,10 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.vocabulary.myvocabulary.R
-import com.vocabulary.myvocabulary.ext.plusAssign
 import com.vocabulary.myvocabulary.ext.show
-import com.vocabulary.myvocabulary.rx.RxSchedulers
 import com.vocabulary.myvocabulary.ui.results.ResultViewModel
 import com.vocabulary.myvocabulary.utils.ItemDecorator
-import io.reactivex.Observable
-import io.reactivex.disposables.CompositeDisposable
 import kotlinx.android.synthetic.main.fragment_quiz.view.*
-import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.sharedViewModel
 import org.koin.androidx.viewmodel.ext.viewModel
 import org.koin.core.parameter.parametersOf
@@ -42,7 +38,7 @@ class QuizFragment : Fragment() {
                 args.quizType
         )
     }
-    private lateinit var quizAdapter:QuizAdapter
+    private lateinit var quizAdapter: QuizAdapter
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         quizAdapter = QuizAdapter(mutableListOf(), quizViewModel.directionType)
@@ -85,8 +81,13 @@ class QuizFragment : Fragment() {
     private fun observeWordList(quizAdapter: QuizAdapter, progressBar: ProgressBar) {
         progressBar.show(true)
         quizViewModel.getLiveWordList().observe(requireActivity(), Observer {
-            quizAdapter.updateList(it)
-            progressBar.show(false)
+            if (quizViewModel.originalListSize != 0) {
+                quizAdapter.updateList(it)
+                progressBar.show(false)
+            } else {
+                Toast.makeText(requireActivity(), resources.getString(R.string.empty_dictionary_notification), Toast.LENGTH_SHORT).show()
+                findNavController().popBackStack()
+            }
         })
     }
 
@@ -96,7 +97,7 @@ class QuizFragment : Fragment() {
                 override fun canScrollVertically(): Boolean = false
             }
 
-            addItemDecoration(ItemDecorator(80))
+            addItemDecoration(ItemDecorator(65))
             adapter = quizAdapter
         }
     }

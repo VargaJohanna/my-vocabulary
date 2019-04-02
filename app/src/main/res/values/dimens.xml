@@ -24,4 +24,5 @@
     <dimen name="result_icon_size">20dp</dimen>
     <dimen name="radius_label">5dp</dimen>
     <dimen name="edit_icon_size">40dp</dimen>
+    <dimen name="information_icon_size">40dp</dimen>
 </resources>
