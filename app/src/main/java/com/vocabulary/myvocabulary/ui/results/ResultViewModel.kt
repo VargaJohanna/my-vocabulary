@@ -5,10 +5,7 @@ import androidx.lifecycle.ViewModel
 import com.vocabulary.myvocabulary.ext.plusAssign
 import com.vocabulary.myvocabulary.room.wordData.WordRepository
 import com.vocabulary.myvocabulary.rx.RxSchedulers
-import com.vocabulary.myvocabulary.ui.quizzes.QuizDirectionType
-import com.vocabulary.myvocabulary.ui.quizzes.QuizRepository
-import com.vocabulary.myvocabulary.ui.quizzes.QuizTypes
-import com.vocabulary.myvocabulary.ui.quizzes.QuizViewModel
+import com.vocabulary.myvocabulary.ui.quizzes.*
 import com.vocabulary.myvocabulary.ui.words.Word
 import io.reactivex.Observable
 import io.reactivex.disposables.CompositeDisposable
@@ -83,7 +80,7 @@ class ResultViewModel(
         quizRepository.resetQuizList(dictionaryId, quizType)
     }
 
-    fun latestGuess(lastGuess: QuizViewModel.GuessedWord) {
+    fun latestGuess(lastGuess: GuessedWord) {
         guessedWordMap[lastGuess.wordId] = lastGuess.guess
     }
 }
