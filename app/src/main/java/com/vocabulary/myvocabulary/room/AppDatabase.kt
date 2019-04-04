@@ -50,7 +50,7 @@ abstract class AppDatabase : RoomDatabase() {
                         .fallbackToDestructiveMigration()
                         .build()
 
-        val defaultDictionary = Dictionary(dictionaryId = 1L, dictionaryName = "Example Dictionary", dictionaryCreated = Calendar.getInstance().time).toDictionaryEntry()
+        val defaultDictionary = Dictionary(dictionaryId = 1L, dictionaryName = "Example Dictionary (Latin)", dictionaryCreated = Calendar.getInstance().time).toDictionaryEntry()
         val listOfDefaultWords = listOf(
                 Word(1, 1, "new", "novus", 0, 0, 0, Calendar.getInstance().time).toWordEntry(),
                 Word(2, 1, "body", "corpus", 0, 0, 0, Calendar.getInstance().time).toWordEntry(),
