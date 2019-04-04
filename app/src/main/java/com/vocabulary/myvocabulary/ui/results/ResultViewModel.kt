@@ -81,6 +81,6 @@ class ResultViewModel(
     }
 
     fun latestGuess(lastGuess: GuessedWord) {
-        guessedWordMap[lastGuess.wordId] = lastGuess.guess
+        guessedWordMap[lastGuess.wordId] = lastGuess.guess.trim()
     }
 }
