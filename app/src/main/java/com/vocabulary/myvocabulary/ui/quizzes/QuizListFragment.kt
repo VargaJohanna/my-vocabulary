@@ -23,8 +23,8 @@ class QuizListFragment : Fragment() {
             full_quiz_info_button.setOnClickListener {
                 dialogFactory.buildInfoDialog(
                         requireActivity(),
-                        "Ask Me Everything",
-                        "Asks all the expressions from the selected dictionary"
+                        getString(R.string.quiz_list_ask_me_everything),
+                        getString(R.string.quick_list_info)
                 ).show()
             }
 
@@ -36,8 +36,8 @@ class QuizListFragment : Fragment() {
             quick_info_button.setOnClickListener {
                 dialogFactory.buildInfoDialog(
                         requireActivity(),
-                        "Quick One",
-                        "Asks 5 random expressions from the selected dictionary"
+                        getString(R.string.quiz_list_quick_one),
+                        getString(R.string.ask_everything_info)
                 ).show()
             }
 
@@ -49,8 +49,8 @@ class QuizListFragment : Fragment() {
             weaknesses_info_button.setOnClickListener {
                 dialogFactory.buildInfoDialog(
                         requireActivity(),
-                        "Weaknesses",
-                        "Asks the 5 most failed expressions from the selected dictionary"
+                        getString(R.string.quiz_list_weaknesses),
+                        getString(R.string.weaknesses_info)
                 ).show()
             }
 
