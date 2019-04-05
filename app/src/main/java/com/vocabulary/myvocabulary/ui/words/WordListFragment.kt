@@ -120,7 +120,7 @@ class WordListFragment : Fragment(), WordAdapter.WordItemClickListener {
         dialogFactory.buildDeleteWordDialog(
                 requireActivity(),
                 getString(R.string.dialog_delete_word_title),
-                "Are you sure you want to delete\n\"${word.translation} - ${word.word}\" ?") {
+                "${getString(R.string.verify_deletion)}\n\"${word.translation} - ${word.word}\" ?") {
             wordViewModel.deleteWord(word)
         }.show()
     }

@@ -31,7 +31,7 @@ class DictionaryPickerFragment : Fragment(), DictionaryAdapter.ItemClickListener
     private val args by navArgs<DictionaryPickerFragmentArgs>()
 
     override fun onItemClick(dictionary: Dictionary) {
-        optionsDialog = dialogFactory.showOptionsDialog(
+        optionsDialog = dialogFactory.buildOptionsDialog(
                 requireActivity()
         ) { selectedOption ->
             startQuiz(selectedOption, dictionary.dictionaryId)

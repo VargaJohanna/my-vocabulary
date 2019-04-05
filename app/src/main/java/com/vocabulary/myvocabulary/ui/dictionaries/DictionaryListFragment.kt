@@ -114,7 +114,7 @@ class DictionaryListFragment : Fragment(), DictionaryAdapter.ItemClickListener {
         dialogFactory.buildDeleteWordDialog(
                 requireActivity(),
                 getString(R.string.dialog_delete_dictionary_title),
-                "Are you sure you want to delete \"${dictionary.dictionaryName}\" ?"
+                "${getString(R.string.verify_deletion)} \"${dictionary.dictionaryName}\" ?"
         ) {
             viewModel.deleteDictionary(dictionary)
         }.show()
