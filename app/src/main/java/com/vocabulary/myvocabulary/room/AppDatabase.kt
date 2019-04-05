@@ -6,6 +6,7 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 import androidx.sqlite.db.SupportSQLiteDatabase
+import com.vocabulary.myvocabulary.R
 import com.vocabulary.myvocabulary.room.dictionaryData.DictionaryDao
 import com.vocabulary.myvocabulary.room.dictionaryData.DictionaryEntry
 import com.vocabulary.myvocabulary.room.wordData.WordDao
@@ -40,28 +41,32 @@ abstract class AppDatabase : RoomDatabase() {
                             override fun onCreate(db: SupportSQLiteDatabase) {
                                 super.onCreate(db)
                                 ioThread {
-                                    getInstance(context).dictionaryDao().insertDictionary(defaultDictionary)
-                                    listOfDefaultWords.forEach {
+                                    getInstance(context).dictionaryDao().insertDictionary(getDefaultDictionary(context))
+                                    getListOfDefaultWords(context).forEach {
                                         getInstance(context).wordDao().insertWord(it)
                                     }
                                 }
                             }
+
+                            private fun getDefaultDictionary(context: Context): DictionaryEntry =
+                                    Dictionary(dictionaryId = 1L, dictionaryName = context.getString(R.string.example_dictionary_title), dictionaryCreated = Calendar.getInstance().time).toDictionaryEntry()
+
+                            private fun getListOfDefaultWords(context: Context): List<WordEntry> {
+                                return listOf(
+                                        Word(1, 1, context.getString(R.string.example_word_new), context.getString(R.string.example_translation_novus), 0, 0, 0, Calendar.getInstance().time).toWordEntry(),
+                                        Word(2, 1, context.getString(R.string.example_word_body), context.getString(R.string.example_translation_corpus), 0, 0, 0, Calendar.getInstance().time).toWordEntry(),
+                                        Word(3, 1, context.getString(R.string.example_word_day), context.getString(R.string.example_translation_diem), 0, 0, 0, Calendar.getInstance().time).toWordEntry(),
+                                        Word(4, 1, context.getString(R.string.example_word_king), context.getString(R.string.example_translation_rex), 0, 0, 0, Calendar.getInstance().time).toWordEntry(),
+                                        Word(5, 1, context.getString(R.string.example_word_god), context.getString(R.string.example_translation_deus), 0, 0, 0, Calendar.getInstance().time).toWordEntry(),
+                                        Word(6, 1, context.getString(R.string.example_word_and), context.getString(R.string.example_translation_et), 0, 0, 0, Calendar.getInstance().time).toWordEntry(),
+                                        Word(7, 1, context.getString(R.string.example_word_life), context.getString(R.string.example_translation_vita), 0, 0, 0, Calendar.getInstance().time).toWordEntry(),
+                                        Word(8, 1, context.getString(R.string.example_word_peace), context.getString(R.string.example_translation_pax), 0, 0, 0, Calendar.getInstance().time).toWordEntry(),
+                                        Word(9, 1, context.getString(R.string.example_word_house), context.getString(R.string.example_translation_domo), 0, 0, 0, Calendar.getInstance().time).toWordEntry(),
+                                        Word(10, 1, context.getString(R.string.example_word_sea), context.getString(R.string.example_translation_mare), 0, 0, 0, Calendar.getInstance().time).toWordEntry()
+                                )
+                            }
                         })
                         .fallbackToDestructiveMigration()
                         .build()
-
-        val defaultDictionary = Dictionary(dictionaryId = 1L, dictionaryName = "Example Dictionary (Latin)", dictionaryCreated = Calendar.getInstance().time).toDictionaryEntry()
-        val listOfDefaultWords = listOf(
-                Word(1, 1, "new", "novus", 0, 0, 0, Calendar.getInstance().time).toWordEntry(),
-                Word(2, 1, "body", "corpus", 0, 0, 0, Calendar.getInstance().time).toWordEntry(),
-                Word(3, 1, "day", "diem", 0, 0, 0, Calendar.getInstance().time).toWordEntry(),
-                Word(4, 1, "king", "rex", 0, 0, 0, Calendar.getInstance().time).toWordEntry(),
-                Word(5, 1, "god", "deus", 0, 0, 0, Calendar.getInstance().time).toWordEntry(),
-                Word(6, 1, "and", "et", 0, 0, 0, Calendar.getInstance().time).toWordEntry(),
-                Word(7, 1, "life", "vita", 0, 0, 0, Calendar.getInstance().time).toWordEntry(),
-                Word(8, 1, "peace", "pax", 0, 0, 0, Calendar.getInstance().time).toWordEntry(),
-                Word(9, 1, "house", "domo", 0, 0, 0, Calendar.getInstance().time).toWordEntry(),
-                Word(10, 1, "sea", "mare", 0, 0, 0, Calendar.getInstance().time).toWordEntry()
-        )
     }
 }
