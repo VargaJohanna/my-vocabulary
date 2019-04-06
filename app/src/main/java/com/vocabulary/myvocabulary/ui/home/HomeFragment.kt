@@ -14,6 +14,7 @@ class HomeFragment : Fragment() {
         return inflater.inflate(R.layout.fragment_home, container, false).apply {
             dictionary_button.setOnClickListener { it.findNavController().navigate(R.id.action_homeFragment_to_dictionaryListFragment) }
             quiz_button.setOnClickListener { it.findNavController().navigate(R.id.action_homeFragment_to_quizListFragment) }
+            about_button.setOnClickListener { it.findNavController().navigate(R.id.to_aboutFragment) }
         }
     }
 }
