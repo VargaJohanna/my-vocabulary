@@ -332,9 +332,8 @@ class DialogFactory {
                 selectedOption = if (checkedId == R.id.word_radio) 0 else 1
             }
             doItButton.setOnClickListener {
-                if (selectedOption == -1 || selectedOption == -1) {
-                    if (selectedOption == -1) errorMessage.show(true)
-                    if (selectedOption == -1) errorMessage.show(true)
+                if (selectedOption == -1) {
+                    errorMessage.show(true)
                 } else {
                     doItClick(selectedOption)
                 }
