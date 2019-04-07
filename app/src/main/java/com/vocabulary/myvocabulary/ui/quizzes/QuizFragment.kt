@@ -1,6 +1,7 @@
 package com.vocabulary.myvocabulary.ui.quizzes
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -88,6 +89,9 @@ class QuizFragment : Fragment() {
                 Toast.makeText(requireActivity(), resources.getString(R.string.empty_dictionary_notification), Toast.LENGTH_SHORT).show()
                 findNavController().popBackStack()
             }
+            Log.d("DEBUG", "observeWordList, ${quizViewModel.originalListSize}")
+            quizViewModel.originalListSize = 1
+
         })
     }
 
