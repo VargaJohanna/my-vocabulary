@@ -38,7 +38,7 @@ class WordListViewModel(
         disposables += wordRepository.getObservableWordList(dictionaryId)
                 .subscribeOn(rxSchedulers.io())
                 .observeOn(rxSchedulers.main())
-                .subscribe { liveWordList.postValue(it) }
+                .subscribe {t -> liveWordList.postValue(t) }
     }
 
     fun getLiveWordList(): LiveData<List<Word>> = liveWordList
@@ -67,7 +67,7 @@ class WordListViewModel(
                 .subscribe()
     }
 
-    fun startNew(dictionaryId: Long, quizType: QuizTypes) {
-        quizRepository.resetQuizList(dictionaryId, quizType)
+    fun startNew(dictionaryId: Long, quizType: QuizTypes): Completable {
+        return quizRepository.resetQuizList(dictionaryId, quizType).toCompletable()
     }
 }

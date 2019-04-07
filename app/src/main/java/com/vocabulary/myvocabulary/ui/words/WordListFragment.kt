@@ -17,9 +17,11 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.vocabulary.myvocabulary.R
+import com.vocabulary.myvocabulary.ext.plusAssign
 import com.vocabulary.myvocabulary.ext.show
 import com.vocabulary.myvocabulary.ui.quizzes.toQuizType
 import com.vocabulary.myvocabulary.utils.DialogFactory
+import io.reactivex.disposables.CompositeDisposable
 import kotlinx.android.synthetic.main.fragment_word_list.view.*
 import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.viewModel
@@ -35,6 +37,8 @@ class WordListFragment : Fragment(), WordAdapter.WordItemClickListener {
     private var renameDialog: AlertDialog? = null
     private var startQuizDialog: AlertDialog? = null
     private var popUp: PopupMenu? = null
+    private val disposables = CompositeDisposable()
+
 
     override fun onItemClick(word: Word) {
         val action = WordListFragmentDirections.fromWordListToWordDetails(wordViewModel.dictionaryId, word.wordId)
@@ -147,16 +151,18 @@ class WordListFragment : Fragment(), WordAdapter.WordItemClickListener {
     }
 
     private fun startQuiz(selectedOption: Int, dictionaryId: Long, selectedQuiz: Int) {
-        wordViewModel.startNew(dictionaryId, selectedQuiz.toQuizType())
-        val action = WordListFragmentDirections.fromWordListToQuiz(
-                dictionaryId,
-                selectedOption,
-                selectedQuiz
-        )
-        findNavController().navigate(action)
+        disposables += wordViewModel.startNew(dictionaryId, selectedQuiz.toQuizType()).subscribe {
+            val action = WordListFragmentDirections.fromWordListToQuiz(
+                    dictionaryId,
+                    selectedOption,
+                    selectedQuiz
+            )
+            findNavController().navigate(action)
+        }
     }
 
     override fun onStop() {
+        disposables.clear()
         createDialog?.dismiss()
         renameDialog?.dismiss()
         startQuizDialog?.dismiss()

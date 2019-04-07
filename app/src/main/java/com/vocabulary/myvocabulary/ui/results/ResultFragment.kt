@@ -20,10 +20,12 @@ import com.airbnb.lottie.LottieAnimationView
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.vocabulary.myvocabulary.R
 import com.vocabulary.myvocabulary.ext.display
+import com.vocabulary.myvocabulary.ext.plusAssign
 import com.vocabulary.myvocabulary.ext.show
 import com.vocabulary.myvocabulary.ui.quizzes.toDirectionType
 import com.vocabulary.myvocabulary.ui.quizzes.toInt
 import com.vocabulary.myvocabulary.ui.quizzes.toQuizType
+import io.reactivex.disposables.CompositeDisposable
 import kotlinx.android.synthetic.main.fragment_result.view.*
 import org.koin.androidx.viewmodel.ext.sharedViewModel
 import org.koin.core.parameter.parametersOf
@@ -36,6 +38,8 @@ class ResultFragment : Fragment() {
         )
     }
     private var isFabOpen = false
+    private val disposables = CompositeDisposable()
+
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         hideKeyboard()
@@ -103,15 +107,15 @@ class ResultFragment : Fragment() {
     private fun setStartOverOnClickListener(startOverFab: FloatingActionButton) {
         startOverFab.setOnClickListener {
             resultViewModel.resetGuessedWordCollections()
-            resultViewModel.startNew(args.dictionaryId, args.quizType.toQuizType())
-
-            val action = ResultFragmentDirections.fromResultToQuiz(
-                    args.dictionaryId,
-                    resultViewModel.directionResult.toInt(),
-                    false,
-                    args.quizType
-            )
-            findNavController().navigate(action)
+            disposables += resultViewModel.startNew(args.dictionaryId, args.quizType.toQuizType()).subscribe {
+                val action = ResultFragmentDirections.fromResultToQuiz(
+                        args.dictionaryId,
+                        resultViewModel.directionResult.toInt(),
+                        false,
+                        args.quizType
+                )
+                findNavController().navigate(action)
+            }
         }
     }
 
@@ -153,5 +157,10 @@ class ResultFragment : Fragment() {
         val view: View? = requireActivity().currentFocus
         if (view == null) View(requireActivity())
         imm.hideSoftInputFromWindow(view?.windowToken, 0)
+    }
+
+    override fun onStop() {
+        disposables.clear()
+        super.onStop()
     }
 }

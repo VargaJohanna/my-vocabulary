@@ -1,5 +1,6 @@
 package com.vocabulary.myvocabulary.ui.quizzes
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -28,6 +29,8 @@ class QuizViewModel(
 
     init {
         observeQuizList(failedOnly)
+        Log.d("DEBUG", "quizViewmodel init, $originalListSize")
+
     }
 
     private fun observeQuizList(failedOnly: Boolean) {
@@ -51,6 +54,7 @@ class QuizViewModel(
                     } else {
                         liveWordList.postValue(emptyList())
                     }
+                    Log.d("DEBUG", "observeQuizList, $originalListSize")
                 }
     }
 

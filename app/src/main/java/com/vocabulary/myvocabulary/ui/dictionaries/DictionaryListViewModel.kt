@@ -26,6 +26,7 @@ class DictionaryListViewModel(
     private val _newlyCreatedItemDetails = MutableLiveData<Event<DictionaryDetails>>()
     val newlyCreatedItemDetails: LiveData<Event<DictionaryDetails>> = _newlyCreatedItemDetails
     private lateinit var dictionaryName: String
+    val listIsReset: Completable? = null
 
     init {
         observeList()
@@ -59,10 +60,6 @@ class DictionaryListViewModel(
                 .subscribe { liveNumberOfDictionaries.postValue(it) }
     }
 
-    fun getNumberOfDictionaries(): LiveData<Int> {
-        return liveNumberOfDictionaries
-    }
-
     override fun onCleared() {
         disposables.clear()
         super.onCleared()
@@ -85,8 +82,8 @@ class DictionaryListViewModel(
                 .subscribe()
     }
 
-    fun startNew(dictionaryId: Long, quizType: QuizTypes) {
-        quizRepository.resetQuizList(dictionaryId, quizType)
+    fun startNew(dictionaryId: Long, quizType: QuizTypes): Completable {
+        return quizRepository.resetQuizList(dictionaryId, quizType).toCompletable()
     }
 
     fun setDictionaryTitle(title: String) {
