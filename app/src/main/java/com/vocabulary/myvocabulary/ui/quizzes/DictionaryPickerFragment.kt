@@ -15,11 +15,13 @@ import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.vocabulary.myvocabulary.R
+import com.vocabulary.myvocabulary.ext.plusAssign
 import com.vocabulary.myvocabulary.ext.show
 import com.vocabulary.myvocabulary.ui.dictionaries.Dictionary
 import com.vocabulary.myvocabulary.ui.dictionaries.DictionaryAdapter
 import com.vocabulary.myvocabulary.ui.dictionaries.DictionaryListViewModel
 import com.vocabulary.myvocabulary.utils.DialogFactory
+import io.reactivex.disposables.CompositeDisposable
 import kotlinx.android.synthetic.main.fragment_choose_dictionary.view.*
 import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.viewModel
@@ -29,6 +31,7 @@ class DictionaryPickerFragment : Fragment(), DictionaryAdapter.ItemClickListener
     private val dialogFactory: DialogFactory by inject()
     private var optionsDialog: AlertDialog? = null
     private val args by navArgs<DictionaryPickerFragmentArgs>()
+    private val disposables = CompositeDisposable()
 
     override fun onItemClick(dictionary: Dictionary) {
         optionsDialog = dialogFactory.buildOptionsDialog(
@@ -70,13 +73,14 @@ class DictionaryPickerFragment : Fragment(), DictionaryAdapter.ItemClickListener
     }
 
     private fun startQuiz(selectedOption: Int, dictionaryId: Long) {
-        viewModel.startNew(dictionaryId, args.quizType.toQuizType())
-        val action = DictionaryPickerFragmentDirections.actionDictionaryPickerFragmentToQuizFragment(
-                dictionaryId,
-                selectedOption,
-                args.quizType
-        )
-        findNavController().navigate(action)
+        disposables += viewModel.startNew(dictionaryId, args.quizType.toQuizType()).subscribe {
+            val action = DictionaryPickerFragmentDirections.actionDictionaryPickerFragmentToQuizFragment(
+                    dictionaryId,
+                    selectedOption,
+                    args.quizType
+            )
+            findNavController().navigate(action)
+        }
     }
 
     private fun setToolBarTitle(toolbar: Toolbar) {
@@ -89,6 +93,7 @@ class DictionaryPickerFragment : Fragment(), DictionaryAdapter.ItemClickListener
 
     override fun onStop() {
         optionsDialog?.dismiss()
+        disposables.clear()
         super.onStop()
     }
 }

@@ -24,7 +24,7 @@ val repositoryModule = module {
     single { get<AppDatabase>().wordDao() }
     single<DictionaryRepository> { DictionaryRepositoryImpl(get(), get()) }
     single<WordRepository> { WordRepositoryImpl(get()) }
-    single<QuizRepository> { QuizRepositoryImpl(get(), get()) }
+    single<QuizRepository> { QuizRepositoryImpl(get()) }
 }
 
 val viewModelModule = module {
