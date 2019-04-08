@@ -11,6 +11,7 @@ import io.reactivex.Observable
 import org.junit.Rule
 import org.junit.Test
 import java.util.*
+import java.util.Arrays.asList
 
 class DictionaryRepositoryImplTest {
     @Rule
@@ -49,10 +50,33 @@ class DictionaryRepositoryImplTest {
         verify(dictionaryDao).updateDictionary(dictionary.toDictionaryEntry())
     }
 
+    @Test
+    fun `should return a list of dictionaries`() {
+        val dictionaryRepository = givenDictionaryRepositoryWithDaoData()
+        val testObserver = dictionaryRepository.allDictionaries.test()
 
+        testObserver.assertValues(
+                asList(
+                        Dictionary(dictionaryName = "Test", dictionaryCreated = Date(12)),
+                        Dictionary(dictionaryName = "Test2", dictionaryCreated = Date(12))
+                )
+        )
+                .assertNotTerminated()
+                .assertNoErrors()
+                .dispose()
+    }
 
     private fun givenDictionaryRepository(): DictionaryRepository {
         whenever(dictionaryDao.getAllDictionaries()).thenReturn(Observable.never())
+        return DictionaryRepositoryImpl(dictionaryDao, TestScheduler())
+    }
+
+    private fun givenDictionaryRepositoryWithDaoData(): DictionaryRepository {
+        whenever(dictionaryDao.getAllDictionaries()).thenReturn(Observable.just(
+                asList(
+                        DictionaryEntry(dictionaryName = "Test", dictionaryCreated = Date(12)),
+                        DictionaryEntry(dictionaryName = "Test2", dictionaryCreated = Date(12)))
+        ))
         return DictionaryRepositoryImpl(dictionaryDao, TestScheduler())
     }
 }
