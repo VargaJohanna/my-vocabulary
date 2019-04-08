@@ -59,10 +59,6 @@ class DictionaryListViewModel(
                 .subscribe { liveNumberOfDictionaries.postValue(it) }
     }
 
-    fun getNumberOfDictionaries(): LiveData<Int> {
-        return liveNumberOfDictionaries
-    }
-
     override fun onCleared() {
         disposables.clear()
         super.onCleared()
@@ -85,8 +81,8 @@ class DictionaryListViewModel(
                 .subscribe()
     }
 
-    fun startNew(dictionaryId: Long, quizType: QuizTypes) {
-        quizRepository.resetQuizList(dictionaryId, quizType)
+    fun startNew(dictionaryId: Long, quizType: QuizTypes): Completable {
+        return quizRepository.resetQuizList(dictionaryId, quizType)
     }
 
     fun setDictionaryTitle(title: String) {

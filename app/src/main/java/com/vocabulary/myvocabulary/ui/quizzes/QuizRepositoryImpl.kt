@@ -1,60 +1,53 @@
 package com.vocabulary.myvocabulary.ui.quizzes
 
-import com.vocabulary.myvocabulary.ext.plusAssign
 import com.vocabulary.myvocabulary.room.wordData.WordRepository
 import com.vocabulary.myvocabulary.rx.RxSchedulers
 import com.vocabulary.myvocabulary.ui.words.Word
+import io.reactivex.Completable
 import io.reactivex.Observable
-import io.reactivex.disposables.CompositeDisposable
+import io.reactivex.Single
 import io.reactivex.subjects.BehaviorSubject
 
 class QuizRepositoryImpl(
-        private val wordRepository: WordRepository,
-        private val rxSchedulers: RxSchedulers
+        private val wordRepository: WordRepository
 ) : QuizRepository {
     private val _quizList: BehaviorSubject<List<Word>> = BehaviorSubject.create<List<Word>>()
     override val quizList: Observable<List<Word>> = _quizList
-    private val disposables = CompositeDisposable()
 
-    override fun resetQuizList(dictionaryId: Long, quizType: QuizTypes) {
-        when (quizType) {
+    override fun resetQuizList(dictionaryId: Long, quizType: QuizTypes): Completable {
+        return when (quizType) {
             QuizTypes.FullQuiz -> resetFullQuizList(dictionaryId)
             QuizTypes.QuickQuiz -> resetQuickQuizList(dictionaryId)
             QuizTypes.WeakestQuiz -> resetWeakestFive(dictionaryId)
-        }
+        }.toCompletable()
     }
 
-    private fun resetFullQuizList(dictionaryId: Long) {
-        disposables.clear()
-        disposables += wordRepository.getObservableWordList(dictionaryId)
-                .subscribeOn(rxSchedulers.io())
+    private fun resetFullQuizList(dictionaryId: Long): Single<List<Word>> {
+        return wordRepository.getObservableWordList(dictionaryId)
                 .firstOrError()
-                .observeOn(rxSchedulers.main())
-                .subscribe { t ->
-                    _quizList.onNext(t)
+                .doOnSuccess {
+                    _quizList.onNext(it)
                 }
     }
 
-    private fun resetQuickQuizList(dictionaryId: Long) {
-        disposables.clear()
-        disposables += wordRepository.getObservableWordList(dictionaryId)
-                .subscribeOn(rxSchedulers.io())
+    private fun resetQuickQuizList(dictionaryId: Long): Single<List<Word>> {
+        return wordRepository.getObservableWordList(dictionaryId)
+                .firstOrError()
                 .map { it.shuffled() }
                 .map { it.take(5) }
-                .firstOrError()
-                .observeOn(rxSchedulers.main())
-                .subscribe { t -> _quizList.onNext(t) }
+                .doOnSuccess {
+                    _quizList.onNext(it)
+                }
     }
 
-    private fun resetWeakestFive(dictionaryId: Long) {
-        disposables.clear()
-        disposables += wordRepository.getObservableWordList(dictionaryId)
-                .subscribeOn(rxSchedulers.io())
+    private fun resetWeakestFive(dictionaryId: Long): Single<List<Word>> {
+        return wordRepository.getObservableWordList(dictionaryId)
+                .firstOrError()
                 .map { list -> list.sortedWith(compareBy { it.failed }).reversed() }
                 .map { it.take(5) }
-                .firstOrError()
-                .observeOn(rxSchedulers.main())
-                .subscribe { t -> _quizList.onNext(t) }
+                .doOnSuccess {
+                    _quizList.onNext(it)
+                }
     }
 
     override fun updateQuizList(list: List<Word>) {

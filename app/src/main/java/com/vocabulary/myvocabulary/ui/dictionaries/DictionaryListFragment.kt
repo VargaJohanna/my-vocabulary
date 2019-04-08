@@ -15,9 +15,12 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.vocabulary.myvocabulary.R
+import com.vocabulary.myvocabulary.ext.plusAssign
 import com.vocabulary.myvocabulary.ext.show
+import com.vocabulary.myvocabulary.rx.RxSchedulers
 import com.vocabulary.myvocabulary.ui.quizzes.toQuizType
 import com.vocabulary.myvocabulary.utils.DialogFactory
+import io.reactivex.disposables.CompositeDisposable
 import kotlinx.android.synthetic.main.fragment_dictionary_list.view.*
 import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.viewModel
@@ -25,10 +28,12 @@ import org.koin.androidx.viewmodel.ext.viewModel
 class DictionaryListFragment : Fragment(), DictionaryAdapter.ItemClickListener {
     private val viewModel: DictionaryListViewModel by viewModel()
     private val dialogFactory: DialogFactory by inject()
+    private val rxSchedulers: RxSchedulers by inject()
     private var createDialog: AlertDialog? = null
     private var renameDialog: AlertDialog? = null
     private var startQuizDialog: AlertDialog? = null
     private var popUp: PopupMenu? = null
+    private val disposables = CompositeDisposable()
 
     override fun onItemClick(dictionary: Dictionary) {
         val action = DictionaryListFragmentDirections.actionDictionaryToWordList(dictionary.dictionaryId, dictionary.dictionaryName)
@@ -132,16 +137,21 @@ class DictionaryListFragment : Fragment(), DictionaryAdapter.ItemClickListener {
     }
 
     private fun startQuiz(selectedOption: Int, dictionaryId: Long, selectedQuiz: Int) {
-        viewModel.startNew(dictionaryId, selectedQuiz.toQuizType())
-        val action = DictionaryListFragmentDirections.fromDictionaryToQuiz(
-                dictionaryId,
-                selectedOption,
-                selectedQuiz
-        )
-        findNavController().navigate(action)
+        disposables += viewModel.startNew(dictionaryId, selectedQuiz.toQuizType())
+                .subscribeOn(rxSchedulers.io())
+                .observeOn(rxSchedulers.main())
+                .subscribe{
+            val action = DictionaryListFragmentDirections.fromDictionaryToQuiz(
+                    dictionaryId,
+                    selectedOption,
+                    selectedQuiz
+            )
+            findNavController().navigate(action)
+        }
     }
 
     override fun onStop() {
+        disposables.clear()
         createDialog?.dismiss()
         renameDialog?.dismiss()
         startQuizDialog?.dismiss()

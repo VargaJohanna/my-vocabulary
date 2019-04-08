@@ -1,6 +1,7 @@
 package com.vocabulary.myvocabulary.ui.quizzes
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -81,7 +82,7 @@ class QuizFragment : Fragment() {
     private fun observeWordList(quizAdapter: QuizAdapter, progressBar: ProgressBar) {
         progressBar.show(true)
         quizViewModel.getLiveWordList().observe(requireActivity(), Observer {
-            if (quizViewModel.originalListSize != 0) {
+            if (it.isNotEmpty()) {
                 quizAdapter.updateList(it)
                 progressBar.show(false)
             } else {
