@@ -19,6 +19,7 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.vocabulary.myvocabulary.R
 import com.vocabulary.myvocabulary.ext.plusAssign
 import com.vocabulary.myvocabulary.ext.show
+import com.vocabulary.myvocabulary.rx.RxSchedulers
 import com.vocabulary.myvocabulary.ui.quizzes.toQuizType
 import com.vocabulary.myvocabulary.utils.DialogFactory
 import io.reactivex.disposables.CompositeDisposable
@@ -33,6 +34,7 @@ class WordListFragment : Fragment(), WordAdapter.WordItemClickListener {
         parametersOf(args.dictionaryId)
     }
     private val dialogFactory: DialogFactory by inject()
+    private val rxSchedulers: RxSchedulers by inject()
     private var createDialog: AlertDialog? = null
     private var renameDialog: AlertDialog? = null
     private var startQuizDialog: AlertDialog? = null
@@ -151,7 +153,10 @@ class WordListFragment : Fragment(), WordAdapter.WordItemClickListener {
     }
 
     private fun startQuiz(selectedOption: Int, dictionaryId: Long, selectedQuiz: Int) {
-        disposables += wordViewModel.startNew(dictionaryId, selectedQuiz.toQuizType()).subscribe {
+        disposables += wordViewModel.startNew(dictionaryId, selectedQuiz.toQuizType())
+                .subscribeOn(rxSchedulers.io())
+                .observeOn(rxSchedulers.main())
+                .subscribe {
             val action = WordListFragmentDirections.fromWordListToQuiz(
                     dictionaryId,
                     selectedOption,

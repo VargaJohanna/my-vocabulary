@@ -24,7 +24,6 @@ class QuizViewModel(
     val directionType = optionType.toDirectionType()
     private val liveWordList = MutableLiveData<List<FocusableWord>>()
     private var focusableWordList = mutableListOf<FocusableWord>()
-    var originalListSize = 1
 
     init {
         observeQuizList(failedOnly)
@@ -35,7 +34,6 @@ class QuizViewModel(
                 .subscribeOn(rxSchedulers.io())
                 .observeOn(rxSchedulers.main())
                 .subscribe {
-                    originalListSize = it.size
                     focusableWordList.clear()
                     it.forEachIndexed { index: Int, word: Word ->
                         val newFocusableWord = QuizViewModel.FocusableWord(word, index == 0)

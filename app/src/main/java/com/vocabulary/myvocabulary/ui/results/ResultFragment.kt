@@ -22,11 +22,13 @@ import com.vocabulary.myvocabulary.R
 import com.vocabulary.myvocabulary.ext.display
 import com.vocabulary.myvocabulary.ext.plusAssign
 import com.vocabulary.myvocabulary.ext.show
+import com.vocabulary.myvocabulary.rx.RxSchedulers
 import com.vocabulary.myvocabulary.ui.quizzes.toDirectionType
 import com.vocabulary.myvocabulary.ui.quizzes.toInt
 import com.vocabulary.myvocabulary.ui.quizzes.toQuizType
 import io.reactivex.disposables.CompositeDisposable
 import kotlinx.android.synthetic.main.fragment_result.view.*
+import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.sharedViewModel
 import org.koin.core.parameter.parametersOf
 
@@ -37,6 +39,7 @@ class ResultFragment : Fragment() {
                 args.dictionaryId
         )
     }
+    private val rxSchedulers: RxSchedulers by inject()
     private var isFabOpen = false
     private val disposables = CompositeDisposable()
 
@@ -107,7 +110,10 @@ class ResultFragment : Fragment() {
     private fun setStartOverOnClickListener(startOverFab: FloatingActionButton) {
         startOverFab.setOnClickListener {
             resultViewModel.resetGuessedWordCollections()
-            disposables += resultViewModel.startNew(args.dictionaryId, args.quizType.toQuizType()).subscribe {
+            disposables += resultViewModel.startNew(args.dictionaryId, args.quizType.toQuizType())
+                    .subscribeOn(rxSchedulers.io())
+                    .observeOn(rxSchedulers.main())
+                    .subscribe {
                 val action = ResultFragmentDirections.fromResultToQuiz(
                         args.dictionaryId,
                         resultViewModel.directionResult.toInt(),

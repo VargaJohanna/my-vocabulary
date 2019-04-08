@@ -3,30 +3,28 @@ package com.vocabulary.myvocabulary.ui.quizzes
 import com.vocabulary.myvocabulary.room.wordData.WordRepository
 import com.vocabulary.myvocabulary.rx.RxSchedulers
 import com.vocabulary.myvocabulary.ui.words.Word
+import io.reactivex.Completable
 import io.reactivex.Observable
 import io.reactivex.Single
 import io.reactivex.subjects.BehaviorSubject
 
 class QuizRepositoryImpl(
-        private val wordRepository: WordRepository,
-        private val rxSchedulers: RxSchedulers
+        private val wordRepository: WordRepository
 ) : QuizRepository {
     private val _quizList: BehaviorSubject<List<Word>> = BehaviorSubject.create<List<Word>>()
     override val quizList: Observable<List<Word>> = _quizList
 
-    override fun resetQuizList(dictionaryId: Long, quizType: QuizTypes): Single<List<Word>> {
+    override fun resetQuizList(dictionaryId: Long, quizType: QuizTypes): Completable {
         return when (quizType) {
             QuizTypes.FullQuiz -> resetFullQuizList(dictionaryId)
             QuizTypes.QuickQuiz -> resetQuickQuizList(dictionaryId)
             QuizTypes.WeakestQuiz -> resetWeakestFive(dictionaryId)
-        }
+        }.toCompletable()
     }
 
     private fun resetFullQuizList(dictionaryId: Long): Single<List<Word>> {
         return wordRepository.getObservableWordList(dictionaryId)
-                .subscribeOn(rxSchedulers.io())
                 .firstOrError()
-                .observeOn(rxSchedulers.main())
                 .doOnSuccess {
                     _quizList.onNext(it)
                 }
@@ -34,11 +32,9 @@ class QuizRepositoryImpl(
 
     private fun resetQuickQuizList(dictionaryId: Long): Single<List<Word>> {
         return wordRepository.getObservableWordList(dictionaryId)
-                .subscribeOn(rxSchedulers.io())
                 .firstOrError()
                 .map { it.shuffled() }
                 .map { it.take(5) }
-                .observeOn(rxSchedulers.main())
                 .doOnSuccess {
                     _quizList.onNext(it)
                 }
@@ -46,11 +42,9 @@ class QuizRepositoryImpl(
 
     private fun resetWeakestFive(dictionaryId: Long): Single<List<Word>> {
         return wordRepository.getObservableWordList(dictionaryId)
-                .subscribeOn(rxSchedulers.io())
                 .firstOrError()
                 .map { list -> list.sortedWith(compareBy { it.failed }).reversed() }
                 .map { it.take(5) }
-                .observeOn(rxSchedulers.main())
                 .doOnSuccess {
                     _quizList.onNext(it)
                 }

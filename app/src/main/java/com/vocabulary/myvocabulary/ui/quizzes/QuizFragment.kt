@@ -82,15 +82,13 @@ class QuizFragment : Fragment() {
     private fun observeWordList(quizAdapter: QuizAdapter, progressBar: ProgressBar) {
         progressBar.show(true)
         quizViewModel.getLiveWordList().observe(requireActivity(), Observer {
-            if (quizViewModel.originalListSize != 0) {
+            if (it.isNotEmpty()) {
                 quizAdapter.updateList(it)
                 progressBar.show(false)
             } else {
                 Toast.makeText(requireActivity(), resources.getString(R.string.empty_dictionary_notification), Toast.LENGTH_SHORT).show()
                 findNavController().popBackStack()
             }
-            quizViewModel.originalListSize = 1
-
         })
     }
 
