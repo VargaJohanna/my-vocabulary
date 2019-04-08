@@ -47,17 +47,6 @@ class DictionaryListViewModel(
                 .subscribe { _liveDictionaryList.postValue(it) }
     }
 
-//    fun getDictionaryList(): LiveData<List<Dictionary>> {
-//        return liveDictionaryList
-//    }
-//
-//    private fun observeNumberOfDictionaries() {
-//        disposables += dictionaryRepository.numberOfDictionaries
-//                .subscribeOn(rxSchedulers.io())
-//                .observeOn(rxSchedulers.main())
-//                .subscribe { liveNumberOfDictionaries.postValue(it) }
-//    }
-
     override fun onCleared() {
         disposables.clear()
         super.onCleared()

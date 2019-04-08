@@ -11,8 +11,7 @@ import io.reactivex.disposables.CompositeDisposable
 class QuizViewModel(
         val dictionaryId: Long,
         val optionType: Int,
-        val failedOnly: Boolean,
-        private val quizType: Int,
+        failedOnly: Boolean,
         private val rxSchedulers: RxSchedulers,
         private val quizRepository: QuizRepository
 ) : ViewModel() {
