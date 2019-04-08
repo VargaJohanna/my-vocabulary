@@ -62,5 +62,30 @@
     <string name="delete_dialog_title">Delete</string>
     <string name="info_dialog">Got it</string>
     <string name="empty_dictionary_notification">This dictionary is empty.</string>
-
+    <string name="verify_deletion">Are you sure you want to delete</string>
+    <string name="quick_list_info">Asks all the expressions from the selected dictionary</string>
+    <string name="ask_everything_info">Asks 5 random expressions from the selected dictionary</string>
+    <string name="weaknesses_info">Asks the 5 most failed expressions from the selected dictionary</string>
+    <string name="renaming_dictionary_title">Renaming</string>
+    <string name="example_dictionary_title">Example Dictionary (Latin)</string>
+    <string name="example_word_new">new</string>
+    <string name="example_word_body">body</string>
+    <string name="example_word_day">day</string>
+    <string name="example_word_king">king</string>
+    <string name="example_word_god">god</string>
+    <string name="example_word_and">and</string>
+    <string name="example_word_life">life</string>
+    <string name="example_word_peace">peace</string>
+    <string name="example_word_house">house</string>
+    <string name="example_word_sea">sea</string>
+    <string name="example_translation_novus">novus</string>
+    <string name="example_translation_corpus">corpus</string>
+    <string name="example_translation_diem">diem</string>
+    <string name="example_translation_rex">rex</string>
+    <string name="example_translation_deus">deus</string>
+    <string name="example_translation_et">et</string>
+    <string name="example_translation_vita">vita</string>
+    <string name="example_translation_pax">pax</string>
+    <string name="example_translation_domo">domo</string>
+    <string name="example_translation_mare">mare</string>
 </resources>

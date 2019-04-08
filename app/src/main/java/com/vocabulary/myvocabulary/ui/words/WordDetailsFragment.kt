@@ -63,7 +63,7 @@ class WordDetailsFragment : Fragment() {
             dialogFactory.buildDeleteWordDialog(
                     requireActivity(),
                     getString(R.string.dialog_delete_word_title),
-                    "Are you sure you want to delete\n\"${wordCurrent.translation} - ${wordCurrent.word}\" ?"
+                    "${getString(R.string.verify_deletion)}\n\"${wordCurrent.translation} - ${wordCurrent.word}\" ?"
             ) {
                 wordViewModel.deleteWord(wordCurrent)
                 findNavController().popBackStack()

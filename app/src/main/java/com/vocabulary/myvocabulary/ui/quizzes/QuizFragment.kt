@@ -81,7 +81,7 @@ class QuizFragment : Fragment() {
     private fun observeWordList(quizAdapter: QuizAdapter, progressBar: ProgressBar) {
         progressBar.show(true)
         quizViewModel.getLiveWordList().observe(requireActivity(), Observer {
-            if (quizViewModel.originalListSize != 0) {
+            if (!quizViewModel.isDictionaryEmpty) {
                 quizAdapter.updateList(it)
                 progressBar.show(false)
             } else {
