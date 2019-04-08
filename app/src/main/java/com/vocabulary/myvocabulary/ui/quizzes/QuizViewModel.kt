@@ -22,9 +22,9 @@ class QuizViewModel(
     private var lastIndexOfSubList = 1
     private var listIsFinished = false
     val directionType = optionType.toDirectionType()
-    private val liveWordList = MutableLiveData<List<FocusableWord>>()
+    private val liveSubWordList = MutableLiveData<List<FocusableWord>>()
     private var focusableWordList = mutableListOf<FocusableWord>()
-    var originalListSize = 1
+    var isDictionaryEmpty = false
 
     init {
         observeQuizList(failedOnly)
@@ -35,7 +35,7 @@ class QuizViewModel(
                 .subscribeOn(rxSchedulers.io())
                 .observeOn(rxSchedulers.main())
                 .subscribe {
-                    originalListSize = it.size
+                    isDictionaryEmpty = it.isEmpty()
                     focusableWordList.clear()
                     it.forEachIndexed { index: Int, word: Word ->
                         val newFocusableWord = QuizViewModel.FocusableWord(word, index == 0)
@@ -45,16 +45,16 @@ class QuizViewModel(
                     }
                     if (focusableWordList.isNotEmpty()) {
                         focusableWordList.shuffle()
-                        liveWordList.postValue(focusableWordList.subList(0, 1))
+                        liveSubWordList.postValue(focusableWordList.subList(0, 1))
                         updateIcon.postValue(focusableWordList.size == 1)
                         listIsFinished = focusableWordList.size == 1
                     } else {
-                        liveWordList.postValue(emptyList())
+                        liveSubWordList.postValue(emptyList())
                     }
                 }
     }
 
-    fun getLiveWordList(): LiveData<List<FocusableWord>> = liveWordList
+    fun getLiveWordList(): LiveData<List<FocusableWord>> = liveSubWordList
 
     override fun onCleared() {
         disposables.clear()
@@ -67,7 +67,7 @@ class QuizViewModel(
             setFocusableValue(lastIndexOfSubList)
             listIsFinished = lastIndexOfSubList == focusableWordList.size
 
-            liveWordList.postValue(focusableWordList.subList(0, lastIndexOfSubList))
+            liveSubWordList.postValue(focusableWordList.subList(0, lastIndexOfSubList))
             updateIcon.postValue(lastIndexOfSubList == focusableWordList.size)
         }
     }

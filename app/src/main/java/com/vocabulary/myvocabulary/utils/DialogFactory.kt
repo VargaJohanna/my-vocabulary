@@ -149,7 +149,7 @@ class DialogFactory {
             cancelButton.setOnClickListener {
                 dismiss()
             }
-            setTitle("${activity.getString(R.string.dictionary_menu_start_quiz)} of \"$dictionaryName\"")
+            setTitle("${activity.getString(R.string.dictionary_menu_start_quiz)} \"$dictionaryName\"")
         }
     }
 
@@ -253,7 +253,7 @@ class DialogFactory {
                 errorMessage.show(false)
                 dismiss()
             }
-            setTitle("Renaming \"${dictionary.dictionaryName}\" dictionary")
+            setTitle("${activity.getString(R.string.renaming_dictionary_title)} \"${dictionary.dictionaryName}\"")
             renameButton.setOnClickListener {
                 if (editText.text.toString().isNotEmpty()) {
                     errorMessage.show(false)
@@ -313,7 +313,7 @@ class DialogFactory {
         }
     }
 
-    fun showOptionsDialog(
+    fun buildOptionsDialog(
             activity: Activity,
             doItClick: (selectedOption: Int) -> Unit
     ): AlertDialog {
@@ -332,9 +332,8 @@ class DialogFactory {
                 selectedOption = if (checkedId == R.id.word_radio) 0 else 1
             }
             doItButton.setOnClickListener {
-                if (selectedOption == -1 || selectedOption == -1) {
-                    if (selectedOption == -1) errorMessage.show(true)
-                    if (selectedOption == -1) errorMessage.show(true)
+                if (selectedOption == -1) {
+                    errorMessage.show(true)
                 } else {
                     doItClick(selectedOption)
                 }
