@@ -26,7 +26,6 @@ class DictionaryListViewModel(
     private val _newlyCreatedItemDetails = MutableLiveData<Event<DictionaryDetails>>()
     val newlyCreatedItemDetails: LiveData<Event<DictionaryDetails>> = _newlyCreatedItemDetails
     private lateinit var dictionaryName: String
-    val listIsReset: Completable? = null
 
     init {
         observeList()

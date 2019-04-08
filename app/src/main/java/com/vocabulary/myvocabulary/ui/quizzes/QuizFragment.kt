@@ -89,7 +89,6 @@ class QuizFragment : Fragment() {
                 Toast.makeText(requireActivity(), resources.getString(R.string.empty_dictionary_notification), Toast.LENGTH_SHORT).show()
                 findNavController().popBackStack()
             }
-            Log.d("DEBUG", "observeWordList, ${quizViewModel.originalListSize}")
             quizViewModel.originalListSize = 1
 
         })
