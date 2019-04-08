@@ -17,7 +17,7 @@ class DictionaryKtTest {
     }
 
     @Test
-    fun `should convert dictionary to dictionaryEntry with id is 2`() {
+    fun `should convert dictionary to dictionaryEntry with id 2`() {
         val dictionary = Dictionary(dictionaryId = 2L, dictionaryName = "Test", dictionaryCreated = Date(12))
 
         val result = dictionary.toDictionaryEntry()
