@@ -78,7 +78,7 @@ class ResultViewModel(
     }
 
     fun startNew(dictionaryId: Long, quizType: QuizTypes): Completable {
-        return quizRepository.resetQuizList(dictionaryId, quizType).toCompletable()
+        return quizRepository.resetQuizList(dictionaryId, quizType)
     }
 
     fun latestGuess(lastGuess: GuessedWord) {
