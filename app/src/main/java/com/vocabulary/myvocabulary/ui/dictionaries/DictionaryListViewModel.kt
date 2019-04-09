@@ -21,15 +21,14 @@ class DictionaryListViewModel(
 ) : ViewModel() {
 
     private val disposables = CompositeDisposable()
-    private val liveDictionaryList: MutableLiveData<List<Dictionary>> = MutableLiveData()
-    private val liveNumberOfDictionaries: MutableLiveData<Int> = MutableLiveData()
+    private val _liveDictionaryList: MutableLiveData<List<Dictionary>> = MutableLiveData()
+    val liveDictionaryList: LiveData<List<Dictionary>> = _liveDictionaryList
     private val _newlyCreatedItemDetails = MutableLiveData<Event<DictionaryDetails>>()
     val newlyCreatedItemDetails: LiveData<Event<DictionaryDetails>> = _newlyCreatedItemDetails
     private lateinit var dictionaryName: String
 
     init {
         observeList()
-        observeNumberOfDictionaries()
     }
 
     fun insertDictionary(dictionary: Dictionary) {
@@ -45,18 +44,7 @@ class DictionaryListViewModel(
         disposables += dictionaryRepository.allDictionaries
                 .subscribeOn(rxSchedulers.io())
                 .observeOn(rxSchedulers.main())
-                .subscribe { liveDictionaryList.postValue(it) }
-    }
-
-    fun getDictionaryList(): LiveData<List<Dictionary>> {
-        return liveDictionaryList
-    }
-
-    private fun observeNumberOfDictionaries() {
-        disposables += dictionaryRepository.numberOfDictionaries
-                .subscribeOn(rxSchedulers.io())
-                .observeOn(rxSchedulers.main())
-                .subscribe { liveNumberOfDictionaries.postValue(it) }
+                .subscribe { _liveDictionaryList.postValue(it) }
     }
 
     override fun onCleared() {

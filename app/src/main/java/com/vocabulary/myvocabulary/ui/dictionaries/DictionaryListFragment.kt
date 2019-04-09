@@ -64,7 +64,7 @@ class DictionaryListFragment : Fragment(), DictionaryAdapter.ItemClickListener {
 
     private fun observeList(dictionaryAdapter: DictionaryAdapter, progressBar: ProgressBar) {
         progressBar.show(true)
-        viewModel.getDictionaryList().observe(this, Observer {
+        viewModel.liveDictionaryList.observe(this, Observer {
             dictionaryAdapter.updateList(it)
             progressBar.show(false)
 

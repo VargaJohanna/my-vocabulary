@@ -34,8 +34,7 @@ class QuizFragment : Fragment() {
         parametersOf(
                 args.dictionaryId,
                 args.quizOption,
-                args.failedOnly,
-                args.quizType
+                args.failedOnly
         )
     }
     private lateinit var quizAdapter: QuizAdapter
