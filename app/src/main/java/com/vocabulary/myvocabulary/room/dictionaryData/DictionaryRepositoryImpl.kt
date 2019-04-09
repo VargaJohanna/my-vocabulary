@@ -17,6 +17,8 @@ class DictionaryRepositoryImpl(
     override val numberOfDictionaries: Observable<Int> = allDictionaries.map { it.size }
 
     init {
+        // Because DictionaryRepository is a singleton we don't need to dispose. It will stop when the application stops.
+        // (see in com/vocabulary/myvocabulary/di/KoinModules.kt)
         dictionaryDao.getAllDictionaries()
                 .map { list ->
                     list.map { it.toDictionary() }
