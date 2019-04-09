@@ -19,7 +19,6 @@ class DictionaryRepositoryImplTest {
     var mockito = InstantTaskExecutorRule()
     private val dictionaryDao = mock<DictionaryDao>()
 
-
     @Test
     fun `should create dictionary when createDictionary() is called`() {
         val dictionaryRepository = givenDictionaryRepository()
@@ -53,17 +52,42 @@ class DictionaryRepositoryImplTest {
     @Test
     fun `should return a list of dictionaries`() {
         val dictionaryRepository = givenDictionaryRepositoryWithDaoData()
+
         val testObserver = dictionaryRepository.allDictionaries.test()
 
         testObserver.assertValues(
                 asList(
-                        Dictionary(dictionaryName = "Test", dictionaryCreated = Date(12)),
-                        Dictionary(dictionaryName = "Test2", dictionaryCreated = Date(12))
+                        Dictionary(dictionaryId = 0L, dictionaryName = "Test", dictionaryCreated = Date(12)),
+                        Dictionary(dictionaryId = 1L, dictionaryName = "Test2", dictionaryCreated = Date(12))
                 )
         )
                 .assertNotTerminated()
                 .assertNoErrors()
                 .dispose()
+    }
+
+    @Test
+    fun `should find dictionary with given id when getDictionaryById() is called`() {
+        val dictionaryRepository = givenDictionaryRepositoryWithDaoData()
+        val dictionary = Dictionary(dictionaryId = 0L, dictionaryName = "Test", dictionaryCreated = Date(12))
+
+        val testObserver = dictionaryRepository.getDictionaryById(dictionary.dictionaryId).test()
+
+        testObserver.assertValues(dictionary)
+                .assertNoErrors()
+                .dispose()
+
+    }
+
+    @Test
+    fun `should not find dictionary with given id when getDictionaryById() is called`() {
+        val dictionaryRepository = givenDictionaryRepositoryWithDaoData()
+        val dictionary = Dictionary(dictionaryId = 5L, dictionaryName = "Test", dictionaryCreated = Date(12))
+
+        val testObserver = dictionaryRepository.getDictionaryById(dictionary.dictionaryId).test()
+
+        testObserver.assertNever(dictionary)
+
     }
 
     private fun givenDictionaryRepository(): DictionaryRepository {
@@ -74,8 +98,8 @@ class DictionaryRepositoryImplTest {
     private fun givenDictionaryRepositoryWithDaoData(): DictionaryRepository {
         whenever(dictionaryDao.getAllDictionaries()).thenReturn(Observable.just(
                 asList(
-                        DictionaryEntry(dictionaryName = "Test", dictionaryCreated = Date(12)),
-                        DictionaryEntry(dictionaryName = "Test2", dictionaryCreated = Date(12)))
+                        DictionaryEntry(dictionaryId = 0L, dictionaryName = "Test", dictionaryCreated = Date(12)),
+                        DictionaryEntry(dictionaryId = 1L, dictionaryName = "Test2", dictionaryCreated = Date(12)))
         ))
         return DictionaryRepositoryImpl(dictionaryDao, TestScheduler())
     }
