@@ -1,5 +1,6 @@
 package com.vocabulary.myvocabulary.ui.words
 
+import android.content.Context
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -13,17 +14,23 @@ import com.vocabulary.myvocabulary.ui.quizzes.QuizTypes
 import com.vocabulary.myvocabulary.utils.SortByOptions
 import io.reactivex.Completable
 import io.reactivex.disposables.CompositeDisposable
+import org.koin.core.KoinComponent
+import org.koin.core.inject
+import org.koin.core.parameter.parametersOf
 import java.util.*
 
 class WordListViewModel(
         val dictionaryId: Long,
+        context: Context,
         private val wordRepository: WordRepository,
         private val sortedListRepository: SortedListRepository,
-        private val sortByRepository: SortByRepository,
         private val rxSchedulers: RxSchedulers,
         private val quizRepository: QuizRepository
 
-) : ViewModel() {
+) : ViewModel(), KoinComponent {
+    private val sortByRepository: SortByRepository by inject {
+        parametersOf(context)
+    }
     private val disposables = CompositeDisposable()
     private val liveWordList: MutableLiveData<List<Word>> = MutableLiveData()
 
@@ -42,7 +49,7 @@ class WordListViewModel(
         disposables += sortedListRepository.getSortedWordList(dictionaryId)
                 .subscribeOn(rxSchedulers.io())
                 .observeOn(rxSchedulers.main())
-                .subscribe {t -> liveWordList.postValue(t) }
+                .subscribe { t -> liveWordList.postValue(t) }
     }
 
     fun getLiveWordList(): LiveData<List<Word>> = liveWordList
@@ -78,5 +85,5 @@ class WordListViewModel(
     fun setSortBy(sort: SortByOptions) {
         sortByRepository.reverseSortingDirection()
         sortByRepository.setSortBy(sort)
-        }
+    }
 }

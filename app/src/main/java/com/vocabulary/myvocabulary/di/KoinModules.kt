@@ -24,7 +24,7 @@ val repositoryModule = module {
     single<DictionaryRepository> { DictionaryRepositoryImpl(get(), get()) }
     single<WordRepository> { WordRepositoryImpl(get()) }
     single<QuizRepository> { QuizRepositoryImpl(get()) }
-    single<SortByRepository> { SortByRepositoryImpl() }
+    single<SortByRepository> { SortByRepositoryImpl(get()) }
     single<SortedListRepository> { SortedListRepositoryImpl(get(), get()) }
 }
 

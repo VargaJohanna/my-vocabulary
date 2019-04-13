@@ -3,6 +3,7 @@ package com.vocabulary.myvocabulary.room.wordData
 import com.vocabulary.myvocabulary.ui.words.Word
 import com.vocabulary.myvocabulary.utils.SortByDirection
 import com.vocabulary.myvocabulary.utils.SortByOptions
+import com.vocabulary.myvocabulary.utils.toSortByOption
 import io.reactivex.Observable
 import io.reactivex.functions.BiFunction
 import io.reactivex.functions.Function3
@@ -17,7 +18,7 @@ class SortedListRepositoryImpl(
                 wordRepository.getObservableWordList(dictionaryId),
                 sortByRepository.sortBy,
                 BiFunction { list, sort ->
-                    when (sort) {
+                    when (sort.toSortByOption()) {
                         SortByOptions.SortByTranslation -> {
                             if (sortByRepository.sortDirection == SortByDirection.SortDecrease) {
                                 list.sortedWith(compareBy { it.translation })
