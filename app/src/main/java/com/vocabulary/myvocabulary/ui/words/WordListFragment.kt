@@ -2,13 +2,11 @@ package com.vocabulary.myvocabulary.ui.words
 
 import android.app.AlertDialog
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.MenuItem
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import android.widget.PopupMenu
 import android.widget.ProgressBar
 import androidx.appcompat.widget.Toolbar
+import androidx.core.view.forEach
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
@@ -42,7 +40,6 @@ class WordListFragment : Fragment(), WordAdapter.WordItemClickListener {
     private var popUp: PopupMenu? = null
     private val disposables = CompositeDisposable()
 
-
     override fun onItemClick(word: Word) {
         val action = WordListFragmentDirections.fromWordListToWordDetails(wordViewModel.dictionaryId, word.wordId)
         findNavController().navigate(action)
@@ -65,13 +62,24 @@ class WordListFragment : Fragment(), WordAdapter.WordItemClickListener {
     private fun setToolbarMenu(toolbar: Toolbar) {
         toolbar.apply {
             inflateMenu(R.menu.word_list_menu)
+            var itemList = mutableListOf<MenuItem>()
+
             setOnMenuItemClickListener { item: MenuItem? ->
+                menu.getItem(0).subMenu.forEach {
+                    it.setIcon(R.drawable.ic_empty_icon)
+                }
                 when (item?.itemId) {
                     R.id.start_quiz_from_word_list -> showStartQuizDialog(wordViewModel.dictionaryId)
 
-                    R.id.sort_by_translation -> wordViewModel.setSortBy(SortByOptions.SortByTranslation)
-                    R.id.sort_by_word -> wordViewModel.setSortBy(SortByOptions.SortByWord)
-                    R.id.sort_by_date -> wordViewModel.setSortBy(SortByOptions.SortByDate)
+                    R.id.sort_by_translation -> {
+                        wordViewModel.setSortBy(SortByOptions.SortByTranslation)
+                    }
+                    R.id.sort_by_word -> {
+                        wordViewModel.setSortBy(SortByOptions.SortByWord)
+                    }
+                    R.id.sort_by_date -> {
+                        wordViewModel.setSortBy(SortByOptions.SortByDate)
+                    }
                 }
                 true
             }
