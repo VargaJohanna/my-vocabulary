@@ -68,7 +68,10 @@ class WordListFragment : Fragment(), WordAdapter.WordItemClickListener {
             setOnMenuItemClickListener { item: MenuItem? ->
                 when (item?.itemId) {
                     R.id.start_quiz_from_word_list -> showStartQuizDialog(wordViewModel.dictionaryId)
-//                    R.id.sort_by_translation -> wordViewModel.sortListBy(SortByOptions.SortByTranslation)
+
+                    R.id.sort_by_translation -> wordViewModel.setSortBy(SortByOptions.SortByTranslation)
+                    R.id.sort_by_word -> wordViewModel.setSortBy(SortByOptions.SortByWord)
+                    R.id.sort_by_date -> wordViewModel.setSortBy(SortByOptions.SortByDate)
                 }
                 true
             }
@@ -163,13 +166,13 @@ class WordListFragment : Fragment(), WordAdapter.WordItemClickListener {
                 .subscribeOn(rxSchedulers.io())
                 .observeOn(rxSchedulers.main())
                 .subscribe {
-            val action = WordListFragmentDirections.fromWordListToQuiz(
-                    dictionaryId,
-                    selectedOption,
-                    selectedQuiz
-            )
-            findNavController().navigate(action)
-        }
+                    val action = WordListFragmentDirections.fromWordListToQuiz(
+                            dictionaryId,
+                            selectedOption,
+                            selectedQuiz
+                    )
+                    findNavController().navigate(action)
+                }
     }
 
     override fun onStop() {
