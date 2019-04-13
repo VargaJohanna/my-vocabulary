@@ -30,7 +30,7 @@ import org.koin.core.parameter.parametersOf
 class WordListFragment : Fragment(), WordAdapter.WordItemClickListener {
     private val args by navArgs<WordListFragmentArgs>()
     private val wordViewModel: WordListViewModel by viewModel {
-        parametersOf(args.dictionaryId)
+        parametersOf(args.dictionaryId, requireActivity())
     }
     private val dialogFactory: DialogFactory by inject()
     private val rxSchedulers: RxSchedulers by inject()
