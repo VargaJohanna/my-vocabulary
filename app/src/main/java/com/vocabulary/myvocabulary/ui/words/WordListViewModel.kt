@@ -4,11 +4,13 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.vocabulary.myvocabulary.ext.plusAssign
+import com.vocabulary.myvocabulary.room.wordData.SortByRepository
 import com.vocabulary.myvocabulary.room.wordData.SortedListRepository
 import com.vocabulary.myvocabulary.room.wordData.WordRepository
 import com.vocabulary.myvocabulary.rx.RxSchedulers
 import com.vocabulary.myvocabulary.ui.quizzes.QuizRepository
 import com.vocabulary.myvocabulary.ui.quizzes.QuizTypes
+import com.vocabulary.myvocabulary.utils.SortByOptions
 import io.reactivex.Completable
 import io.reactivex.disposables.CompositeDisposable
 import java.util.*
@@ -17,6 +19,7 @@ class WordListViewModel(
         val dictionaryId: Long,
         private val wordRepository: WordRepository,
         private val sortedListRepository: SortedListRepository,
+        private val sortByRepository: SortByRepository,
         private val rxSchedulers: RxSchedulers,
         private val quizRepository: QuizRepository
 
@@ -71,4 +74,9 @@ class WordListViewModel(
     fun startNew(dictionaryId: Long, quizType: QuizTypes): Completable {
         return quizRepository.resetQuizList(dictionaryId, quizType)
     }
+
+    fun setSortBy(sort: SortByOptions) {
+        sortByRepository.reverseSortingDirection()
+        sortByRepository.setSortBy(sort)
+        }
 }

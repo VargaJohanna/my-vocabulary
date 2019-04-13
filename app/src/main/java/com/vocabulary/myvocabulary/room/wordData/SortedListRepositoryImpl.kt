@@ -1,9 +1,11 @@
 package com.vocabulary.myvocabulary.room.wordData
 
 import com.vocabulary.myvocabulary.ui.words.Word
+import com.vocabulary.myvocabulary.utils.SortByDirection
 import com.vocabulary.myvocabulary.utils.SortByOptions
 import io.reactivex.Observable
 import io.reactivex.functions.BiFunction
+import io.reactivex.functions.Function3
 
 class SortedListRepositoryImpl(
         private val wordRepository: WordRepository,
@@ -17,19 +19,26 @@ class SortedListRepositoryImpl(
                 BiFunction { list, sort ->
                     when (sort) {
                         SortByOptions.SortByTranslation -> {
-                            list
-                                    .sortedWith(compareBy { it.translation })
-                                    .sortedWith(compareBy { it.translation }).reversed()
+                            if (sortByRepository.sortDirection == SortByDirection.SortDecrease) {
+                                list.sortedWith(compareBy { it.translation })
+                            } else {
+                                list.sortedWith(compareBy { it.translation }).reversed()
+                            }
                         }
                         SortByOptions.SortByWord -> {
-                            list
-                                    .sortedWith(compareBy { it.word })
-                                    .sortedWith(compareBy { it.translation }).reversed()
+                            if (sortByRepository.sortDirection == SortByDirection.SortDecrease) {
+                                list.sortedWith(compareBy { it.word })
+                            } else {
+                                list.sortedWith(compareBy { it.word }).reversed()
+                            }
                         }
                         SortByOptions.SortByDate -> {
-                            list
-                                    .sortedWith(compareBy { it.created }).reversed()
-                                    .sortedWith(compareBy { it.translation }).sortedWith(compareBy { it.translation })
+                            if (sortByRepository.sortDirection == SortByDirection.SortDecrease) {
+                                list.sortedWith(compareBy { it.created }).reversed()
+                            } else {
+                                list.sortedWith(compareBy { it.word })
+                            }
+
                         }
                     }
                 }
