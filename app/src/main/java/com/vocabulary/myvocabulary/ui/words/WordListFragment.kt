@@ -22,6 +22,7 @@ import com.vocabulary.myvocabulary.ext.show
 import com.vocabulary.myvocabulary.rx.RxSchedulers
 import com.vocabulary.myvocabulary.ui.quizzes.toQuizType
 import com.vocabulary.myvocabulary.utils.DialogFactory
+import com.vocabulary.myvocabulary.utils.SortByOptions
 import io.reactivex.disposables.CompositeDisposable
 import kotlinx.android.synthetic.main.fragment_word_list.view.*
 import org.koin.android.ext.android.inject
@@ -62,16 +63,20 @@ class WordListFragment : Fragment(), WordAdapter.WordItemClickListener {
     }
 
     private fun setToolbarMenu(toolbar: Toolbar) {
-        toolbar.inflateMenu(R.menu.word_list_menu)
-        toolbar.setOnMenuItemClickListener { item: MenuItem? ->
-            when (item?.itemId) {
-                R.id.start_quiz_from_word_list -> showStartQuizDialog(wordViewModel.dictionaryId)
+        toolbar.apply {
+            inflateMenu(R.menu.word_list_menu)
+            setOnMenuItemClickListener { item: MenuItem? ->
+                when (item?.itemId) {
+                    R.id.start_quiz_from_word_list -> showStartQuizDialog(wordViewModel.dictionaryId)
+//                    R.id.sort_by_translation -> wordViewModel.sortListBy(SortByOptions.SortByTranslation)
+                }
+                true
             }
-            true
-        }
-        toolbar.title = args.dictionaryName
-        toolbar.setNavigationOnClickListener {
-            findNavController().popBackStack()
+            title = args.dictionaryName
+            setNavigationOnClickListener {
+                findNavController().popBackStack()
+            }
+
         }
     }
 
@@ -99,6 +104,7 @@ class WordListFragment : Fragment(), WordAdapter.WordItemClickListener {
     private fun createPopUpMenu(word: Word, view: View) {
         popUp = PopupMenu(requireActivity(), view).apply {
             inflate(R.menu.word_options_menu)
+
             setOnMenuItemClickListener {
                 when (it.itemId) {
                     R.id.menu_word_edit -> showEditDialog(word)

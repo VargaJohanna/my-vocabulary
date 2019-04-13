@@ -1,8 +1,45 @@
 <?xml version="1.0" encoding="utf-8"?>
-<menu xmlns:android="http://schemas.android.com/apk/res/android">
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
     <item
-        android:id="@+id/start_quiz_from_word_list"
-        android:icon="@drawable/ic_refresh_icon"
-        android:title="@string/dictionary_menu_start_quiz" />
+        android:id="@+id/options"
+        android:title=""
+        android:icon="@drawable/ic_more_vert"
+        app:showAsAction="ifRoom"
+        android:orderInCategory="1">
+        <menu>
+            <item
+                android:id="@+id/start_quiz_from_word_list"
+                android:title="@string/dictionary_menu_start_quiz"
+                app:showAsAction="ifRoom|collapseActionView"/>
+        </menu>
+    </item>
+
+    <item
+        android:id="@+id/sort_by"
+        android:title=""
+        android:icon="@drawable/ic_sort"
+        app:showAsAction="ifRoom"
+        android:orderInCategory="0">
+        <menu>
+            <item
+                android:id="@+id/sort_by_translation"
+                android:title="@string/word_list_expression"
+                app:showAsAction="ifRoom|collapseActionView"/>
+
+            <item
+                android:id="@+id/sort_by_word"
+                android:title="@string/word_list_meaning"
+                app:showAsAction="ifRoom|collapseActionView"/>
+
+            <item
+                android:id="@+id/sort_by_date"
+                android:title="@string/sort_by_date"
+                app:showAsAction="ifRoom|collapseActionView"/>
+        </menu>
+    </item>
+
+
 
 </menu>

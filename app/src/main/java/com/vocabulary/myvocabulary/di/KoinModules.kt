@@ -3,8 +3,7 @@ package com.vocabulary.myvocabulary.di
 import com.vocabulary.myvocabulary.room.AppDatabase
 import com.vocabulary.myvocabulary.room.dictionaryData.DictionaryRepository
 import com.vocabulary.myvocabulary.room.dictionaryData.DictionaryRepositoryImpl
-import com.vocabulary.myvocabulary.room.wordData.WordRepository
-import com.vocabulary.myvocabulary.room.wordData.WordRepositoryImpl
+import com.vocabulary.myvocabulary.room.wordData.*
 import com.vocabulary.myvocabulary.rx.RxSchedulers
 import com.vocabulary.myvocabulary.rx.SchedulersImpl
 import com.vocabulary.myvocabulary.ui.dictionaries.DictionaryListViewModel
@@ -25,11 +24,13 @@ val repositoryModule = module {
     single<DictionaryRepository> { DictionaryRepositoryImpl(get(), get()) }
     single<WordRepository> { WordRepositoryImpl(get()) }
     single<QuizRepository> { QuizRepositoryImpl(get()) }
+    single<SortByRepository> { SortByRepositoryImpl() }
+    single<SortedListRepository> { SortedListRepositoryImpl(get(), get()) }
 }
 
 val viewModelModule = module {
     viewModel { DictionaryListViewModel(get(), get(), get()) }
-    viewModel { (dictionaryId: Long) -> WordListViewModel(dictionaryId, get(), get(), get()) }
+    viewModel { (dictionaryId: Long) -> WordListViewModel(dictionaryId, get(), get(), get(), get()) }
     viewModel { (dictionaryId: Long, optionType: Int, failedOnly: Boolean) ->
         QuizViewModel(
                 dictionaryId,
