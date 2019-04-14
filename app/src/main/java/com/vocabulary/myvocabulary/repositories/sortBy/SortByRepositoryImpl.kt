@@ -1,20 +1,17 @@
 package com.vocabulary.myvocabulary.repositories.sortBy
 
-import android.content.Context
 import android.content.SharedPreferences
-import android.preference.PreferenceManager
 import com.f2prateek.rx.preferences2.RxSharedPreferences
 import io.reactivex.Observable
 
 
 class SortByRepositoryImpl(
-        context: Context
+        private val preferences: SharedPreferences,
+        rxPreferences: RxSharedPreferences
 ) : SortByRepository {
     override var wordDescending: Boolean = false
     override var translationDescending: Boolean = false
     override var dateDescending: Boolean = true
-    private val preferences: SharedPreferences = PreferenceManager.getDefaultSharedPreferences(context)
-    private val rxPreferences = RxSharedPreferences.create(preferences)
     override var sortDirection: Observable<Boolean> = rxPreferences.getBoolean(SORT_DIRECTION_KEY, false).asObservable()
     override var defaultSortBy: Int = 2
     override val sortBy: Observable<Int> = rxPreferences.getInteger(SORT_KEY, defaultSortBy).asObservable()

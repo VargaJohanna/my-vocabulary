@@ -1,5 +1,7 @@
 package com.vocabulary.myvocabulary.di
 
+import android.preference.PreferenceManager
+import com.f2prateek.rx.preferences2.RxSharedPreferences
 import com.vocabulary.myvocabulary.repositories.AppDatabase
 import com.vocabulary.myvocabulary.repositories.dictionary.DictionaryRepository
 import com.vocabulary.myvocabulary.repositories.dictionary.DictionaryRepositoryImpl
@@ -28,7 +30,10 @@ val repositoryModule = module {
     single<DictionaryRepository> { DictionaryRepositoryImpl(get(), get()) }
     single<WordRepository> { WordRepositoryImpl(get()) }
     single<QuizRepository> { QuizRepositoryImpl(get()) }
-    single<SortByRepository> { SortByRepositoryImpl(get()) }
+    single<SortByRepository> {
+        val preferences = PreferenceManager.getDefaultSharedPreferences(get())
+        SortByRepositoryImpl(preferences,
+        RxSharedPreferences.create(preferences))}
     single<SortedListRepository> { SortedListRepositoryImpl(get(), get()) }
 }
 
