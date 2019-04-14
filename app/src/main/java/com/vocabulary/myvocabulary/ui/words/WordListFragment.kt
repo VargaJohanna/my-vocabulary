@@ -98,10 +98,12 @@ class WordListFragment : Fragment(), WordAdapter.WordItemClickListener {
     }
 
     private fun navigationIconsSet(menu: Menu) {
-        when (wordViewModel.currentSortByData.sortByOption) {
-            SortByOptions.SortByDate -> setIcons(menu, R.id.sort_by_date, wordViewModel.currentSortByData.dateDescending)
-            SortByOptions.SortByWord -> setIcons(menu, R.id.sort_by_word, wordViewModel.currentSortByData.wordDescending)
-            SortByOptions.SortByTranslation -> setIcons(menu, R.id.sort_by_translation, wordViewModel.currentSortByData.translationDescending)
+        wordViewModel.currentSortByData.let {
+            when (it.sortByOption) {
+                SortByOptions.SortByDate -> setIcons(menu, R.id.sort_by_date, it.dateDescending)
+                SortByOptions.SortByWord -> setIcons(menu, R.id.sort_by_word, it.wordDescending)
+                SortByOptions.SortByTranslation -> setIcons(menu, R.id.sort_by_translation, it.translationDescending)
+            }
         }
     }
 
