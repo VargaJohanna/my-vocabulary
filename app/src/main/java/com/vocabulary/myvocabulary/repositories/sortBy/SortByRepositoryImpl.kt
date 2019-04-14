@@ -11,8 +11,8 @@ class SortByRepositoryImpl(
         rxPreferences: RxSharedPreferences
 ) : SortByRepository {
     private val sortDateDirection: Observable<Boolean> = rxPreferences.getBoolean(SORT_DATE_DIRECTION_KEY, true).asObservable()
-    private val sortWordDirection: Observable<Boolean> = rxPreferences.getBoolean(SORT_WORD_DIRECTION_KEY, false).asObservable()
-    private val sortTranslationDirection: Observable<Boolean> = rxPreferences.getBoolean(SORT_TRANSLATION_DIRECTION_KEY, false).asObservable()
+    private val sortWordDirection: Observable<Boolean> = rxPreferences.getBoolean(SORT_WORD_DIRECTION_KEY, true).asObservable()
+    private val sortTranslationDirection: Observable<Boolean> = rxPreferences.getBoolean(SORT_TRANSLATION_DIRECTION_KEY, true).asObservable()
     private val sortBy: Observable<Int> = rxPreferences.getInteger(SORT_KEY, 2).asObservable()
 
     override fun setSortBy(sortByData: SortByData) {
