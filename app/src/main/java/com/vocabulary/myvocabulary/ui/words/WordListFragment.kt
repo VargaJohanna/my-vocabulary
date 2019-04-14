@@ -69,30 +69,20 @@ class WordListFragment : Fragment(), WordAdapter.WordItemClickListener {
             setOnMenuItemClickListener { item: MenuItem? ->
                 when (item?.itemId) {
                     R.id.start_quiz_from_word_list -> showStartQuizDialog(wordViewModel.dictionaryId)
-
                     R.id.sort_by_translation -> {
-                        // Display the correct icon
                         navigationIconsSet(wordViewModel.isTranslationDescending(), menu.getItem(0).subMenu, item)
-                        // Set sort by type
                         wordViewModel.setSortBy(SortByOptions.SortByTranslation, wordViewModel.isTranslationDescending())
-                        // Flip the direction so when it's clicked next time it will be reversed
                         wordViewModel.setTranslationDescending(!wordViewModel.isTranslationDescending())
                     }
                     R.id.sort_by_word -> {
-                        // Display the correct icon
                         navigationIconsSet(wordViewModel.isWordDescending(), menu.getItem(0).subMenu, item)
-                        // Set sort by type
                         wordViewModel.setSortBy(SortByOptions.SortByWord, wordViewModel.isWordDescending())
-                        // Flip the direction so when it's clicked next time it will be reversed
                         wordViewModel.setWordDescending(!wordViewModel.isWordDescending())
 
                     }
                     R.id.sort_by_date -> {
-                        // Display the correct icon
                         navigationIconsSet(wordViewModel.isDateDescending(), menu.getItem(0).subMenu, item)
-                        // Set sort by type
                         wordViewModel.setSortBy(SortByOptions.SortByDate, wordViewModel.isDateDescending())
-                        // Flip the direction so when it's clicked next time it will be reversed
                         wordViewModel.setDateDescending(!wordViewModel.isDateDescending())
                     }
                 }
