@@ -5,13 +5,13 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.vocabulary.myvocabulary.ext.plusAssign
-import com.vocabulary.myvocabulary.room.wordData.SortByRepository
-import com.vocabulary.myvocabulary.room.wordData.SortedListRepository
-import com.vocabulary.myvocabulary.room.wordData.WordRepository
+import com.vocabulary.myvocabulary.repositories.sortBy.SortByRepository
+import com.vocabulary.myvocabulary.repositories.sortedList.SortedListRepository
+import com.vocabulary.myvocabulary.repositories.word.WordRepository
 import com.vocabulary.myvocabulary.rx.RxSchedulers
 import com.vocabulary.myvocabulary.ui.quizzes.QuizRepository
 import com.vocabulary.myvocabulary.ui.quizzes.QuizTypes
-import com.vocabulary.myvocabulary.utils.SortByOptions
+import com.vocabulary.myvocabulary.repositories.sortBy.SortByOptions
 import io.reactivex.Completable
 import io.reactivex.disposables.CompositeDisposable
 import org.koin.core.KoinComponent

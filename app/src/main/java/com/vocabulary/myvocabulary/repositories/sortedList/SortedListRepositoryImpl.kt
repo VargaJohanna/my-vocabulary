@@ -1,8 +1,10 @@
-package com.vocabulary.myvocabulary.room.wordData
+package com.vocabulary.myvocabulary.repositories.sortedList
 
+import com.vocabulary.myvocabulary.repositories.sortBy.SortByRepository
+import com.vocabulary.myvocabulary.repositories.word.WordRepository
 import com.vocabulary.myvocabulary.ui.words.Word
-import com.vocabulary.myvocabulary.utils.SortByOptions
-import com.vocabulary.myvocabulary.utils.toSortByOption
+import com.vocabulary.myvocabulary.repositories.sortBy.SortByOptions
+import com.vocabulary.myvocabulary.repositories.sortBy.toSortByOption
 import io.reactivex.Observable
 import io.reactivex.functions.Function3
 

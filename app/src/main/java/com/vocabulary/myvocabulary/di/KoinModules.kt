@@ -1,9 +1,13 @@
 package com.vocabulary.myvocabulary.di
 
-import com.vocabulary.myvocabulary.room.AppDatabase
-import com.vocabulary.myvocabulary.room.dictionaryData.DictionaryRepository
-import com.vocabulary.myvocabulary.room.dictionaryData.DictionaryRepositoryImpl
-import com.vocabulary.myvocabulary.room.wordData.*
+import com.vocabulary.myvocabulary.repositories.AppDatabase
+import com.vocabulary.myvocabulary.repositories.dictionary.DictionaryRepository
+import com.vocabulary.myvocabulary.repositories.dictionary.DictionaryRepositoryImpl
+import com.vocabulary.myvocabulary.repositories.sortBy.SortByRepository
+import com.vocabulary.myvocabulary.repositories.sortBy.SortByRepositoryImpl
+import com.vocabulary.myvocabulary.repositories.sortedList.SortedListRepository
+import com.vocabulary.myvocabulary.repositories.sortedList.SortedListRepositoryImpl
+import com.vocabulary.myvocabulary.repositories.word.*
 import com.vocabulary.myvocabulary.rx.RxSchedulers
 import com.vocabulary.myvocabulary.rx.SchedulersImpl
 import com.vocabulary.myvocabulary.ui.dictionaries.DictionaryListViewModel

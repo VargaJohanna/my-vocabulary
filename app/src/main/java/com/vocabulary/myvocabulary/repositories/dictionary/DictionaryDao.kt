@@ -1,8 +1,7 @@
-package com.vocabulary.myvocabulary.room.dictionaryData
+package com.vocabulary.myvocabulary.repositories.dictionary
 
 import androidx.room.*
 import io.reactivex.Observable
-import io.reactivex.Single
 
 @Dao
 interface DictionaryDao {
