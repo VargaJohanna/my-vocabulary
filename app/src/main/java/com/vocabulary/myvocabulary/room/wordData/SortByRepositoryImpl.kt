@@ -18,9 +18,11 @@ class SortByRepositoryImpl(
     private val preferences: SharedPreferences = PreferenceManager.getDefaultSharedPreferences(context)
     private val rxPreferences = RxSharedPreferences.create(preferences)
     override var sortDirection: Observable<Boolean> = rxPreferences.getBoolean(SORT_DIRECTION_KEY, false).asObservable()
-    override val sortBy: Observable<Int> = rxPreferences.getInteger(SORT_KEY, 2).asObservable()
+    override var defaultSortBy: Int = 2
+    override val sortBy: Observable<Int> = rxPreferences.getInteger(SORT_KEY, defaultSortBy).asObservable()
 
     override fun setSortBy(option: SortByOptions, descending: Boolean) {
+        defaultSortBy = option.toInt()
         preferences.edit().apply {
             putInt(SORT_KEY, option.toInt())
             putBoolean(SORT_DIRECTION_KEY, descending)
