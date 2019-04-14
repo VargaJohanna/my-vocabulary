@@ -2,6 +2,7 @@ package com.vocabulary.myvocabulary.ui.words
 
 import android.app.AlertDialog
 import android.os.Bundle
+import android.util.Log
 import android.view.*
 import android.widget.PopupMenu
 import android.widget.ProgressBar
@@ -17,11 +18,11 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.vocabulary.myvocabulary.R
 import com.vocabulary.myvocabulary.ext.plusAssign
 import com.vocabulary.myvocabulary.ext.show
+import com.vocabulary.myvocabulary.repositories.sortBy.SortByOptions
+import com.vocabulary.myvocabulary.repositories.sortBy.toSortByOption
 import com.vocabulary.myvocabulary.rx.RxSchedulers
 import com.vocabulary.myvocabulary.ui.quizzes.toQuizType
 import com.vocabulary.myvocabulary.utils.DialogFactory
-import com.vocabulary.myvocabulary.repositories.sortBy.SortByOptions
-import com.vocabulary.myvocabulary.repositories.sortBy.toSortByOption
 import io.reactivex.disposables.CompositeDisposable
 import kotlinx.android.synthetic.main.fragment_word_list.view.*
 import org.koin.android.ext.android.inject
@@ -31,7 +32,7 @@ import org.koin.core.parameter.parametersOf
 class WordListFragment : Fragment(), WordAdapter.WordItemClickListener {
     private val args by navArgs<WordListFragmentArgs>()
     private val wordViewModel: WordListViewModel by viewModel {
-        parametersOf(args.dictionaryId, requireActivity())
+        parametersOf(args.dictionaryId)
     }
     private val dialogFactory: DialogFactory by inject()
     private val rxSchedulers: RxSchedulers by inject()
@@ -107,7 +108,7 @@ class WordListFragment : Fragment(), WordAdapter.WordItemClickListener {
 
     private fun navigationIconsSet(descending: Boolean, menu: Menu, item: MenuItem) {
         menu.forEach {
-            if(it == item) {
+            if (it == item) {
                 if (descending) it.setIcon(R.drawable.ic_arrow_downward)
                 else it.setIcon(R.drawable.ic_arrow_upward)
             } else {
