@@ -20,8 +20,8 @@ import com.vocabulary.myvocabulary.ext.show
 import com.vocabulary.myvocabulary.rx.RxSchedulers
 import com.vocabulary.myvocabulary.ui.quizzes.toQuizType
 import com.vocabulary.myvocabulary.utils.DialogFactory
-import com.vocabulary.myvocabulary.utils.SortByOptions
-import com.vocabulary.myvocabulary.utils.toSortByOption
+import com.vocabulary.myvocabulary.repositories.sortBy.SortByOptions
+import com.vocabulary.myvocabulary.repositories.sortBy.toSortByOption
 import io.reactivex.disposables.CompositeDisposable
 import kotlinx.android.synthetic.main.fragment_word_list.view.*
 import org.koin.android.ext.android.inject

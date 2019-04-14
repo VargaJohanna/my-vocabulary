@@ -1,6 +1,5 @@
-package com.vocabulary.myvocabulary.room.wordData
+package com.vocabulary.myvocabulary.repositories.sortBy
 
-import com.vocabulary.myvocabulary.utils.SortByOptions
 import io.reactivex.Observable
 
 interface SortByRepository {

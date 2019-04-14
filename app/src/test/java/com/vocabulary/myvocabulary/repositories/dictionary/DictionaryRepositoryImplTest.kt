@@ -1,4 +1,4 @@
-package com.vocabulary.myvocabulary.room.dictionaryData
+package com.vocabulary.myvocabulary.repositories.dictionary
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.nhaarman.mockitokotlin2.mock

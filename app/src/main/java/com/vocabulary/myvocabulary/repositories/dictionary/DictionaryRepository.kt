@@ -1,4 +1,4 @@
-package com.vocabulary.myvocabulary.room.dictionaryData
+package com.vocabulary.myvocabulary.repositories.dictionary
 
 import com.vocabulary.myvocabulary.ui.dictionaries.Dictionary
 import io.reactivex.Observable

@@ -1,11 +1,9 @@
-package com.vocabulary.myvocabulary.room.wordData
+package com.vocabulary.myvocabulary.repositories.sortBy
 
 import android.content.Context
 import android.content.SharedPreferences
 import android.preference.PreferenceManager
 import com.f2prateek.rx.preferences2.RxSharedPreferences
-import com.vocabulary.myvocabulary.utils.SortByOptions
-import com.vocabulary.myvocabulary.utils.toInt
 import io.reactivex.Observable
 
 
