@@ -21,6 +21,7 @@ import com.vocabulary.myvocabulary.rx.RxSchedulers
 import com.vocabulary.myvocabulary.ui.quizzes.toQuizType
 import com.vocabulary.myvocabulary.utils.DialogFactory
 import com.vocabulary.myvocabulary.utils.SortByOptions
+import com.vocabulary.myvocabulary.utils.toSortByOption
 import io.reactivex.disposables.CompositeDisposable
 import kotlinx.android.synthetic.main.fragment_word_list.view.*
 import org.koin.android.ext.android.inject
@@ -62,22 +63,23 @@ class WordListFragment : Fragment(), WordAdapter.WordItemClickListener {
     private fun setToolbarMenu(toolbar: Toolbar) {
         toolbar.apply {
             inflateMenu(R.menu.word_list_menu)
-            var itemList = mutableListOf<MenuItem>()
+            setDefaultIcons(menu.getItem(0).subMenu)
 
             setOnMenuItemClickListener { item: MenuItem? ->
-                menu.getItem(0).subMenu.forEach {
-                    it.setIcon(R.drawable.ic_empty_icon)
-                }
                 when (item?.itemId) {
                     R.id.start_quiz_from_word_list -> showStartQuizDialog(wordViewModel.dictionaryId)
 
                     R.id.sort_by_translation -> {
+                        // Display the correct icon
+                        navigationIconsSet(wordViewModel.isTranslationDescending(), menu.getItem(0).subMenu, item)
                         // Set sort by type
                         wordViewModel.setSortBy(SortByOptions.SortByTranslation, wordViewModel.isTranslationDescending())
                         // Flip the direction so when it's clicked next time it will be reversed
                         wordViewModel.setTranslationDescending(!wordViewModel.isTranslationDescending())
                     }
                     R.id.sort_by_word -> {
+                        // Display the correct icon
+                        navigationIconsSet(wordViewModel.isWordDescending(), menu.getItem(0).subMenu, item)
                         // Set sort by type
                         wordViewModel.setSortBy(SortByOptions.SortByWord, wordViewModel.isWordDescending())
                         // Flip the direction so when it's clicked next time it will be reversed
@@ -85,6 +87,8 @@ class WordListFragment : Fragment(), WordAdapter.WordItemClickListener {
 
                     }
                     R.id.sort_by_date -> {
+                        // Display the correct icon
+                        navigationIconsSet(wordViewModel.isDateDescending(), menu.getItem(0).subMenu, item)
                         // Set sort by type
                         wordViewModel.setSortBy(SortByOptions.SortByDate, wordViewModel.isDateDescending())
                         // Flip the direction so when it's clicked next time it will be reversed
@@ -98,6 +102,34 @@ class WordListFragment : Fragment(), WordAdapter.WordItemClickListener {
                 findNavController().popBackStack()
             }
 
+        }
+    }
+
+    private fun navigationIconsSet(descending: Boolean, menu: Menu, item: MenuItem) {
+        menu.forEach {
+            if(it == item) {
+                if (descending) it.setIcon(R.drawable.ic_arrow_downward)
+                else it.setIcon(R.drawable.ic_arrow_upward)
+            } else {
+                it.setIcon(R.drawable.ic_empty_icon)
+            }
+        }
+    }
+
+    private fun setDefaultIcons(menu: Menu) {
+        when (wordViewModel.defaultSortByOption().toSortByOption()) {
+            SortByOptions.SortByDate -> setIcons(menu, R.id.sort_by_date)
+            SortByOptions.SortByWord -> setIcons(menu, R.id.sort_by_word)
+            SortByOptions.SortByTranslation -> setIcons(menu, R.id.sort_by_translation)
+        }
+    }
+
+    private fun setIcons(menu: Menu, menuItemId: Int) {
+        menu.forEach {
+            if (it.itemId == menuItemId) it.setIcon(
+                    if (wordViewModel.isDateDescending()) R.drawable.ic_arrow_downward
+                    else R.drawable.ic_arrow_upward)
+            else it.setIcon(R.drawable.ic_empty_icon)
         }
     }
 

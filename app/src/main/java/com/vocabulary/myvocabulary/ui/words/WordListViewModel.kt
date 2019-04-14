@@ -102,4 +102,6 @@ class WordListViewModel(
         sortByRepository.dateDescending = descending
     }
 
+    fun defaultSortByOption() = sortByRepository.defaultSortBy
+
 }
