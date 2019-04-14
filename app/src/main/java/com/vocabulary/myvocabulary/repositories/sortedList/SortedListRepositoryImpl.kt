@@ -1,12 +1,11 @@
 package com.vocabulary.myvocabulary.repositories.sortedList
 
+import com.vocabulary.myvocabulary.repositories.sortBy.SortByOptions
 import com.vocabulary.myvocabulary.repositories.sortBy.SortByRepository
 import com.vocabulary.myvocabulary.repositories.word.WordRepository
 import com.vocabulary.myvocabulary.ui.words.Word
-import com.vocabulary.myvocabulary.repositories.sortBy.SortByOptions
-import com.vocabulary.myvocabulary.repositories.sortBy.toSortByOption
 import io.reactivex.Observable
-import io.reactivex.functions.Function3
+import io.reactivex.functions.BiFunction
 
 class SortedListRepositoryImpl(
         private val wordRepository: WordRepository,
@@ -16,20 +15,19 @@ class SortedListRepositoryImpl(
     override fun getSortedWordList(dictionaryId: Long): Observable<List<Word>> {
         return Observable.combineLatest(
                 wordRepository.getObservableWordList(dictionaryId),
-                sortByRepository.sortBy,
-                sortByRepository.sortDirection,
-                Function3 { list, sort, descending ->
-                    when (sort.toSortByOption()) {
+                sortByRepository.sortByData(),
+                BiFunction { list, sortData ->
+                    when (sortData.sortByOption) {
                         SortByOptions.SortByTranslation ->
-                            if (descending) list.sortedWith(compareByDescending { it.translation })
+                            if (sortData.translationDescending) list.sortedWith(compareByDescending { it.translation })
                             else list.sortedWith(compareBy { it.translation })
 
                         SortByOptions.SortByWord ->
-                            if (descending) list.sortedWith(compareByDescending { it.word })
+                            if (sortData.wordDescending) list.sortedWith(compareByDescending { it.word })
                             else list.sortedWith(compareBy { it.word })
 
                         SortByOptions.SortByDate ->
-                            if (descending) list.sortedWith(compareByDescending { it.created })
+                            if (sortData.dateDescending) list.sortedWith(compareByDescending { it.created })
                             else list.sortedWith(compareBy { it.created })
                     }
                 }
