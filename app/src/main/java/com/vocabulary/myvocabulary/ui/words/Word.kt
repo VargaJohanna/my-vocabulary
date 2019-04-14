@@ -1,6 +1,6 @@
 package com.vocabulary.myvocabulary.ui.words
 
-import com.vocabulary.myvocabulary.room.wordData.WordEntry
+import com.vocabulary.myvocabulary.repositories.word.WordEntry
 import java.util.*
 
 data class Word(

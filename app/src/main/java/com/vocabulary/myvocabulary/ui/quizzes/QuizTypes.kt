@@ -22,4 +22,3 @@ fun QuizTypes.toInt(): Int {
         QuizTypes.WeakestQuiz -> 2
     }
 }
-

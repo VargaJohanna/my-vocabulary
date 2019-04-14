@@ -1,4 +1,4 @@
-package com.vocabulary.myvocabulary.room
+package com.vocabulary.myvocabulary.repositories
 
 import java.util.concurrent.Executors
 

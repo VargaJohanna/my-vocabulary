@@ -1,4 +1,4 @@
-package com.vocabulary.myvocabulary.room
+package com.vocabulary.myvocabulary.repositories
 
 import android.content.Context
 import androidx.room.Database
@@ -7,10 +7,10 @@ import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 import androidx.sqlite.db.SupportSQLiteDatabase
 import com.vocabulary.myvocabulary.R
-import com.vocabulary.myvocabulary.room.dictionaryData.DictionaryDao
-import com.vocabulary.myvocabulary.room.dictionaryData.DictionaryEntry
-import com.vocabulary.myvocabulary.room.wordData.WordDao
-import com.vocabulary.myvocabulary.room.wordData.WordEntry
+import com.vocabulary.myvocabulary.repositories.dictionary.DictionaryDao
+import com.vocabulary.myvocabulary.repositories.dictionary.DictionaryEntry
+import com.vocabulary.myvocabulary.repositories.word.WordDao
+import com.vocabulary.myvocabulary.repositories.word.WordEntry
 import com.vocabulary.myvocabulary.ui.dictionaries.Dictionary
 import com.vocabulary.myvocabulary.ui.dictionaries.toDictionaryEntry
 import com.vocabulary.myvocabulary.ui.words.Word

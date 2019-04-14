@@ -1,10 +1,15 @@
 package com.vocabulary.myvocabulary.di
 
-import com.vocabulary.myvocabulary.room.AppDatabase
-import com.vocabulary.myvocabulary.room.dictionaryData.DictionaryRepository
-import com.vocabulary.myvocabulary.room.dictionaryData.DictionaryRepositoryImpl
-import com.vocabulary.myvocabulary.room.wordData.WordRepository
-import com.vocabulary.myvocabulary.room.wordData.WordRepositoryImpl
+import android.preference.PreferenceManager
+import com.f2prateek.rx.preferences2.RxSharedPreferences
+import com.vocabulary.myvocabulary.repositories.AppDatabase
+import com.vocabulary.myvocabulary.repositories.dictionary.DictionaryRepository
+import com.vocabulary.myvocabulary.repositories.dictionary.DictionaryRepositoryImpl
+import com.vocabulary.myvocabulary.repositories.sortBy.SortByRepository
+import com.vocabulary.myvocabulary.repositories.sortBy.SortByRepositoryImpl
+import com.vocabulary.myvocabulary.repositories.sortedList.SortedListRepository
+import com.vocabulary.myvocabulary.repositories.sortedList.SortedListRepositoryImpl
+import com.vocabulary.myvocabulary.repositories.word.*
 import com.vocabulary.myvocabulary.rx.RxSchedulers
 import com.vocabulary.myvocabulary.rx.SchedulersImpl
 import com.vocabulary.myvocabulary.ui.dictionaries.DictionaryListViewModel
@@ -25,11 +30,16 @@ val repositoryModule = module {
     single<DictionaryRepository> { DictionaryRepositoryImpl(get(), get()) }
     single<WordRepository> { WordRepositoryImpl(get()) }
     single<QuizRepository> { QuizRepositoryImpl(get()) }
+    single<SortByRepository> {
+        val preferences = PreferenceManager.getDefaultSharedPreferences(get())
+        SortByRepositoryImpl(preferences,
+        RxSharedPreferences.create(preferences))}
+    single<SortedListRepository> { SortedListRepositoryImpl(get(), get()) }
 }
 
 val viewModelModule = module {
     viewModel { DictionaryListViewModel(get(), get(), get()) }
-    viewModel { (dictionaryId: Long) -> WordListViewModel(dictionaryId, get(), get(), get()) }
+    viewModel { (dictionaryId: Long) -> WordListViewModel(dictionaryId, get(), get(), get(), get(), get()) }
     viewModel { (dictionaryId: Long, optionType: Int, failedOnly: Boolean) ->
         QuizViewModel(
                 dictionaryId,

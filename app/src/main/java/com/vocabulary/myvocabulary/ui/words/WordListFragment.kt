@@ -2,13 +2,11 @@ package com.vocabulary.myvocabulary.ui.words
 
 import android.app.AlertDialog
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.MenuItem
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import android.widget.PopupMenu
 import android.widget.ProgressBar
 import androidx.appcompat.widget.Toolbar
+import androidx.core.view.forEach
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
@@ -19,6 +17,7 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.vocabulary.myvocabulary.R
 import com.vocabulary.myvocabulary.ext.plusAssign
 import com.vocabulary.myvocabulary.ext.show
+import com.vocabulary.myvocabulary.repositories.sortBy.SortByOptions
 import com.vocabulary.myvocabulary.rx.RxSchedulers
 import com.vocabulary.myvocabulary.ui.quizzes.toQuizType
 import com.vocabulary.myvocabulary.utils.DialogFactory
@@ -41,7 +40,6 @@ class WordListFragment : Fragment(), WordAdapter.WordItemClickListener {
     private var popUp: PopupMenu? = null
     private val disposables = CompositeDisposable()
 
-
     override fun onItemClick(word: Word) {
         val action = WordListFragmentDirections.fromWordListToWordDetails(wordViewModel.dictionaryId, word.wordId)
         findNavController().navigate(action)
@@ -62,16 +60,59 @@ class WordListFragment : Fragment(), WordAdapter.WordItemClickListener {
     }
 
     private fun setToolbarMenu(toolbar: Toolbar) {
-        toolbar.inflateMenu(R.menu.word_list_menu)
-        toolbar.setOnMenuItemClickListener { item: MenuItem? ->
-            when (item?.itemId) {
-                R.id.start_quiz_from_word_list -> showStartQuizDialog(wordViewModel.dictionaryId)
+        toolbar.apply {
+            inflateMenu(R.menu.word_list_menu)
+            navigationIconsSet(menu.getItem(0).subMenu)
+            setOnMenuItemClickListener { item: MenuItem? ->
+                navigationIconsSet(menu.getItem(0).subMenu)
+                when (item?.itemId) {
+                    R.id.start_quiz_from_word_list -> showStartQuizDialog(wordViewModel.dictionaryId)
+                    R.id.sort_by_translation -> {
+                        wordViewModel.setSortBy(wordViewModel.currentSortByData.copy(
+                                sortByOption = SortByOptions.SortByTranslation,
+                                translationDescending = !wordViewModel.currentSortByData.translationDescending)
+                        )
+                    }
+                    R.id.sort_by_word -> {
+                        wordViewModel.setSortBy(wordViewModel.currentSortByData.copy(
+                                sortByOption = SortByOptions.SortByWord,
+                                wordDescending = !wordViewModel.currentSortByData.wordDescending)
+                        )
+
+                    }
+                    R.id.sort_by_date -> {
+                        wordViewModel.setSortBy(wordViewModel.currentSortByData.copy(
+                                sortByOption = SortByOptions.SortByDate,
+                                dateDescending = !wordViewModel.currentSortByData.dateDescending)
+                        )
+                    }
+                }
+                true
             }
-            true
+            title = args.dictionaryName
+            setNavigationOnClickListener {
+                findNavController().popBackStack()
+            }
+
         }
-        toolbar.title = args.dictionaryName
-        toolbar.setNavigationOnClickListener {
-            findNavController().popBackStack()
+    }
+
+    private fun navigationIconsSet(menu: Menu) {
+        wordViewModel.currentSortByData.let {
+            when (it.sortByOption) {
+                SortByOptions.SortByDate -> setIcons(menu, R.id.sort_by_date, it.dateDescending)
+                SortByOptions.SortByWord -> setIcons(menu, R.id.sort_by_word, it.wordDescending)
+                SortByOptions.SortByTranslation -> setIcons(menu, R.id.sort_by_translation, it.translationDescending)
+            }
+        }
+    }
+
+    private fun setIcons(menu: Menu, menuItemId: Int, descending: Boolean) {
+        menu.forEach {
+            if (it.itemId == menuItemId) it.setIcon(
+                    if (descending) R.drawable.ic_arrow_downward
+                    else R.drawable.ic_arrow_upward)
+            else it.setIcon(R.drawable.ic_empty_icon)
         }
     }
 
@@ -99,6 +140,7 @@ class WordListFragment : Fragment(), WordAdapter.WordItemClickListener {
     private fun createPopUpMenu(word: Word, view: View) {
         popUp = PopupMenu(requireActivity(), view).apply {
             inflate(R.menu.word_options_menu)
+
             setOnMenuItemClickListener {
                 when (it.itemId) {
                     R.id.menu_word_edit -> showEditDialog(word)
@@ -157,13 +199,13 @@ class WordListFragment : Fragment(), WordAdapter.WordItemClickListener {
                 .subscribeOn(rxSchedulers.io())
                 .observeOn(rxSchedulers.main())
                 .subscribe {
-            val action = WordListFragmentDirections.fromWordListToQuiz(
-                    dictionaryId,
-                    selectedOption,
-                    selectedQuiz
-            )
-            findNavController().navigate(action)
-        }
+                    val action = WordListFragmentDirections.fromWordListToQuiz(
+                            dictionaryId,
+                            selectedOption,
+                            selectedQuiz
+                    )
+                    findNavController().navigate(action)
+                }
     }
 
     override fun onStop() {

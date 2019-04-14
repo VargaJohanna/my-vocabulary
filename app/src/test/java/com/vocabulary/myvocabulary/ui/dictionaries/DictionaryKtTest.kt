@@ -1,6 +1,6 @@
 package com.vocabulary.myvocabulary.ui.dictionaries
 
-import com.vocabulary.myvocabulary.room.dictionaryData.DictionaryEntry
+import com.vocabulary.myvocabulary.repositories.dictionary.DictionaryEntry
 import org.junit.Assert
 import org.junit.Test
 import java.util.*

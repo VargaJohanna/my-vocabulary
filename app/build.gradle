@@ -88,4 +88,7 @@ dependencies {
 
     //About page
     implementation 'com.github.jrvansuita:MaterialAbout:0.2.3'
+
+    // Share preferences
+    implementation 'com.f2prateek.rx.preferences2:rx-preferences:2.0.0'
 }
