@@ -2,7 +2,6 @@ package com.vocabulary.myvocabulary.ui.words
 
 import android.app.AlertDialog
 import android.os.Bundle
-import android.util.Log
 import android.view.*
 import android.widget.PopupMenu
 import android.widget.ProgressBar
@@ -19,7 +18,6 @@ import com.vocabulary.myvocabulary.R
 import com.vocabulary.myvocabulary.ext.plusAssign
 import com.vocabulary.myvocabulary.ext.show
 import com.vocabulary.myvocabulary.repositories.sortBy.SortByOptions
-import com.vocabulary.myvocabulary.repositories.sortBy.toSortByOption
 import com.vocabulary.myvocabulary.rx.RxSchedulers
 import com.vocabulary.myvocabulary.ui.quizzes.toQuizType
 import com.vocabulary.myvocabulary.utils.DialogFactory
@@ -64,26 +62,29 @@ class WordListFragment : Fragment(), WordAdapter.WordItemClickListener {
     private fun setToolbarMenu(toolbar: Toolbar) {
         toolbar.apply {
             inflateMenu(R.menu.word_list_menu)
-            setDefaultIcons(menu.getItem(0).subMenu)
-
+            navigationIconsSet(menu.getItem(0).subMenu)
             setOnMenuItemClickListener { item: MenuItem? ->
+                navigationIconsSet(menu.getItem(0).subMenu)
                 when (item?.itemId) {
                     R.id.start_quiz_from_word_list -> showStartQuizDialog(wordViewModel.dictionaryId)
                     R.id.sort_by_translation -> {
-                        navigationIconsSet(wordViewModel.isTranslationDescending(), menu.getItem(0).subMenu, item)
-                        wordViewModel.setSortBy(SortByOptions.SortByTranslation, wordViewModel.isTranslationDescending())
-                        wordViewModel.setTranslationDescending(!wordViewModel.isTranslationDescending())
+                        wordViewModel.setSortBy(wordViewModel.currentSortByData.copy(
+                                sortByOption = SortByOptions.SortByTranslation,
+                                translationDescending = !wordViewModel.currentSortByData.translationDescending)
+                        )
                     }
                     R.id.sort_by_word -> {
-                        navigationIconsSet(wordViewModel.isWordDescending(), menu.getItem(0).subMenu, item)
-                        wordViewModel.setSortBy(SortByOptions.SortByWord, wordViewModel.isWordDescending())
-                        wordViewModel.setWordDescending(!wordViewModel.isWordDescending())
+                        wordViewModel.setSortBy(wordViewModel.currentSortByData.copy(
+                                sortByOption = SortByOptions.SortByWord,
+                                wordDescending = !wordViewModel.currentSortByData.wordDescending)
+                        )
 
                     }
                     R.id.sort_by_date -> {
-                        navigationIconsSet(wordViewModel.isDateDescending(), menu.getItem(0).subMenu, item)
-                        wordViewModel.setSortBy(SortByOptions.SortByDate, wordViewModel.isDateDescending())
-                        wordViewModel.setDateDescending(!wordViewModel.isDateDescending())
+                        wordViewModel.setSortBy(wordViewModel.currentSortByData.copy(
+                                sortByOption = SortByOptions.SortByDate,
+                                dateDescending = !wordViewModel.currentSortByData.dateDescending)
+                        )
                     }
                 }
                 true
@@ -96,29 +97,18 @@ class WordListFragment : Fragment(), WordAdapter.WordItemClickListener {
         }
     }
 
-    private fun navigationIconsSet(descending: Boolean, menu: Menu, item: MenuItem) {
-        menu.forEach {
-            if (it == item) {
-                if (descending) it.setIcon(R.drawable.ic_arrow_downward)
-                else it.setIcon(R.drawable.ic_arrow_upward)
-            } else {
-                it.setIcon(R.drawable.ic_empty_icon)
-            }
+    private fun navigationIconsSet(menu: Menu) {
+        when (wordViewModel.currentSortByData.sortByOption) {
+            SortByOptions.SortByDate -> setIcons(menu, R.id.sort_by_date, wordViewModel.currentSortByData.dateDescending)
+            SortByOptions.SortByWord -> setIcons(menu, R.id.sort_by_word, wordViewModel.currentSortByData.wordDescending)
+            SortByOptions.SortByTranslation -> setIcons(menu, R.id.sort_by_translation, wordViewModel.currentSortByData.translationDescending)
         }
     }
 
-    private fun setDefaultIcons(menu: Menu) {
-        when (wordViewModel.defaultSortByOption().toSortByOption()) {
-            SortByOptions.SortByDate -> setIcons(menu, R.id.sort_by_date)
-            SortByOptions.SortByWord -> setIcons(menu, R.id.sort_by_word)
-            SortByOptions.SortByTranslation -> setIcons(menu, R.id.sort_by_translation)
-        }
-    }
-
-    private fun setIcons(menu: Menu, menuItemId: Int) {
+    private fun setIcons(menu: Menu, menuItemId: Int, descending: Boolean) {
         menu.forEach {
             if (it.itemId == menuItemId) it.setIcon(
-                    if (wordViewModel.isDateDescending()) R.drawable.ic_arrow_downward
+                    if (descending) R.drawable.ic_arrow_downward
                     else R.drawable.ic_arrow_upward)
             else it.setIcon(R.drawable.ic_empty_icon)
         }

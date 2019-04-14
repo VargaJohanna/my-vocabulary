@@ -4,7 +4,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.vocabulary.myvocabulary.ext.plusAssign
-import com.vocabulary.myvocabulary.repositories.sortBy.SortByOptions
+import com.vocabulary.myvocabulary.repositories.sortBy.SortByData
 import com.vocabulary.myvocabulary.repositories.sortBy.SortByRepository
 import com.vocabulary.myvocabulary.repositories.sortedList.SortedListRepository
 import com.vocabulary.myvocabulary.repositories.word.WordRepository
@@ -26,9 +26,18 @@ class WordListViewModel(
 ) : ViewModel() {
     private val disposables = CompositeDisposable()
     private val liveWordList: MutableLiveData<List<Word>> = MutableLiveData()
+    var currentSortByData: SortByData = SortByData()
 
     init {
         observeList()
+        observeSortByData()
+    }
+
+    private fun observeSortByData() {
+        disposables += sortByRepository.sortByData()
+                .subscribeOn(rxSchedulers.io())
+                .observeOn(rxSchedulers.main())
+                .subscribe { t -> currentSortByData = t }
     }
 
     fun insertWord(word: Word) {
@@ -75,26 +84,7 @@ class WordListViewModel(
         return quizRepository.resetQuizList(dictionaryId, quizType)
     }
 
-    fun setSortBy(sort: SortByOptions, descending: Boolean) {
-        sortByRepository.setSortBy(sort, descending)
+    fun setSortBy(sortByData: SortByData) {
+        sortByRepository.setSortBy(sortByData)
     }
-
-    fun isWordDescending() = sortByRepository.wordDescending
-    fun isTranslationDescending() = sortByRepository.translationDescending
-    fun isDateDescending() = sortByRepository.dateDescending
-
-    fun setWordDescending(descending: Boolean) {
-        sortByRepository.wordDescending = descending
-    }
-
-    fun setTranslationDescending(descending: Boolean) {
-        sortByRepository.translationDescending = descending
-    }
-
-    fun setDateDescending(descending: Boolean) {
-        sortByRepository.dateDescending = descending
-    }
-
-    fun defaultSortByOption() = sortByRepository.defaultSortBy
-
 }
