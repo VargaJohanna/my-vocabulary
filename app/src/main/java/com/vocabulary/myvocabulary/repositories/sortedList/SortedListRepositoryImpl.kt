@@ -27,7 +27,7 @@ class SortedListRepositoryImpl(
                             else list.sortedWith(compareBy { it.word })
 
                         SortByOptions.SortByDate ->
-                            if (sortData.dateDescending) list.sortedWith(compareByDescending { it.created })
+                            if (sortData.dateDescending) list.sortedWith(compareBy { it.created }).reversed()
                             else list.sortedWith(compareBy { it.created })
                     }
                 }
