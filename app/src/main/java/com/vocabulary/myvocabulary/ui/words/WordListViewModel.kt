@@ -82,8 +82,24 @@ class WordListViewModel(
         return quizRepository.resetQuizList(dictionaryId, quizType)
     }
 
-    fun setSortBy(sort: SortByOptions) {
-        sortByRepository.reverseSortingDirection()
-        sortByRepository.setSortBy(sort)
+    fun setSortBy(sort: SortByOptions, descending: Boolean) {
+        sortByRepository.setSortBy(sort, descending)
     }
+
+    fun isWordDescending() = sortByRepository.wordDescending
+    fun isTranslationDescending() = sortByRepository.translationDescending
+    fun isDateDescending() = sortByRepository.dateDescending
+
+    fun setWordDescending(descending: Boolean) {
+        sortByRepository.wordDescending = descending
+    }
+
+    fun setTranslationDescending(descending: Boolean) {
+        sortByRepository.translationDescending = descending
+    }
+
+    fun setDateDescending(descending: Boolean) {
+        sortByRepository.dateDescending = descending
+    }
+
 }
