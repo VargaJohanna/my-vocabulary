@@ -1,39 +1,35 @@
 package com.vocabulary.myvocabulary.room.wordData
 
-import android.app.Application
 import android.content.Context
 import android.content.SharedPreferences
-import android.preference.Preference
-import com.vocabulary.myvocabulary.utils.SortByDirection
+import android.preference.PreferenceManager
+import com.f2prateek.rx.preferences2.RxSharedPreferences
 import com.vocabulary.myvocabulary.utils.SortByOptions
 import com.vocabulary.myvocabulary.utils.toInt
-import com.vocabulary.myvocabulary.utils.toSortByOption
 import io.reactivex.Observable
-import io.reactivex.subjects.BehaviorSubject
-import com.f2prateek.rx.preferences2.RxSharedPreferences
-import android.preference.PreferenceManager
-
 
 
 class SortByRepositoryImpl(
         context: Context
 ) : SortByRepository {
+    override var wordDescending: Boolean = false
+    override var translationDescending: Boolean = false
+    override var dateDescending: Boolean = true
     private val preferences: SharedPreferences = PreferenceManager.getDefaultSharedPreferences(context)
     private val rxPreferences = RxSharedPreferences.create(preferences)
-    override var sortDirection: SortByDirection = SortByDirection.SortDecrease
-    private var _sortBy: com.f2prateek.rx.preferences2.Preference<Int> =  rxPreferences.getInteger("SORT", 0)
-    override val sortBy: Observable<Int> = _sortBy.asObservable()
+    override var sortDirection: Observable<Boolean> = rxPreferences.getBoolean(SORT_DIRECTION_KEY, false).asObservable()
+    override val sortBy: Observable<Int> = rxPreferences.getInteger(SORT_KEY, 2).asObservable()
 
-
-    override fun setSortBy(option: SortByOptions) {
-        val editor: SharedPreferences.Editor = preferences.edit()
-        editor.putInt("SORT", option.toInt())
-        editor.apply()
+    override fun setSortBy(option: SortByOptions, descending: Boolean) {
+        preferences.edit().apply {
+            putInt(SORT_KEY, option.toInt())
+            putBoolean(SORT_DIRECTION_KEY, descending)
+            apply()
+        }
     }
 
-    override fun reverseSortingDirection() {
-        if (sortDirection == SortByDirection.SortDecrease) {
-            sortDirection = SortByDirection.SortIncrease
-        } else sortDirection = SortByDirection.SortDecrease
+    companion object {
+        const val SORT_KEY = "SORT"
+        const val SORT_DIRECTION_KEY = "SORT_DIRECTION"
     }
 }
