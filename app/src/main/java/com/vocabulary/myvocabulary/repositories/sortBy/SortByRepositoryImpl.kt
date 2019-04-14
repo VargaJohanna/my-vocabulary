@@ -31,7 +31,6 @@ class SortByRepositoryImpl(
             }
             apply()
         }
-        sortByData()
     }
 
     override fun sortByData(): Observable<SortByData> {
