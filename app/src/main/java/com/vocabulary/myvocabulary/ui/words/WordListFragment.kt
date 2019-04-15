@@ -22,6 +22,7 @@ import com.vocabulary.myvocabulary.rx.RxSchedulers
 import com.vocabulary.myvocabulary.ui.quizzes.toQuizType
 import com.vocabulary.myvocabulary.utils.DialogFactory
 import io.reactivex.disposables.CompositeDisposable
+import kotlinx.android.synthetic.main.fragment_word_list.*
 import kotlinx.android.synthetic.main.fragment_word_list.view.*
 import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.viewModel
@@ -54,6 +55,7 @@ class WordListFragment : Fragment(), WordAdapter.WordItemClickListener {
         return inflater.inflate(R.layout.fragment_word_list, container, false).apply {
             generateWordList(wordAdapter, word_recycler_view)
             observeWordList(wordAdapter, word_list_progress_bar)
+            observeEmptyState()
             setFabOnClickListener(word_fab)
             setToolbarMenu(word_list_toolbar)
         }
@@ -128,7 +130,24 @@ class WordListFragment : Fragment(), WordAdapter.WordItemClickListener {
         wordViewModel.getLiveWordList().observe(requireActivity(), Observer {
             wordAdapter.updateList(it)
             progressBar.show(false)
+            wordViewModel.isListEmpty.postValue(it.isEmpty())
         })
+    }
+
+    private fun observeEmptyState() {
+        wordViewModel.isListEmpty.observe(requireActivity(), Observer {
+            if(animation_book != null) {
+                showEmptyState(it)
+            }
+        })
+    }
+
+    private fun showEmptyState(show: Boolean) {
+        animation_book.show(show)
+        empty_state_message_title.show(show)
+        empty_state_message.show(show)
+        word_column_title.show(!show)
+        translation_column_title.show(!show)
     }
 
     private fun setFabOnClickListener(fab: FloatingActionButton) {
@@ -216,5 +235,4 @@ class WordListFragment : Fragment(), WordAdapter.WordItemClickListener {
         popUp?.dismiss()
         super.onStop()
     }
-
 }
