@@ -147,4 +147,19 @@
         app:lottie_fileName="star-success.json"
         app:lottie_loop="false" />
 
+    <com.airbnb.lottie.LottieAnimationView
+        android:id="@+id/failure_animation"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginStart="@dimen/margin_normal"
+        android:layout_marginTop="@dimen/margin_normal"
+        android:layout_marginEnd="@dimen/margin_normal"
+        android:visibility="invisible"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:lottie_autoPlay="true"
+        app:lottie_fileName="crying.json"
+        app:lottie_loop="false" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

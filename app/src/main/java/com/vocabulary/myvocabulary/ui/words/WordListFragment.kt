@@ -13,7 +13,6 @@ import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.airbnb.lottie.LottieAnimationView
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.vocabulary.myvocabulary.R
 import com.vocabulary.myvocabulary.ext.plusAssign
@@ -130,15 +129,14 @@ class WordListFragment : Fragment(), WordAdapter.WordItemClickListener {
         wordViewModel.getLiveWordList().observe(requireActivity(), Observer {
             wordAdapter.updateList(it)
             progressBar.show(false)
-            if(it.isEmpty()) {
-                showAnimation(true)
-            } else {
-                showAnimation(false)
+            if(animation_book != null) {
+                if(it.isEmpty()) showEmptyState(true)
+                else showEmptyState(false)
             }
         })
     }
 
-    private fun showAnimation(show: Boolean) {
+    private fun showEmptyState(show: Boolean) {
         animation_book.show(show)
         empty_state_message_title.show(show)
         empty_state_message.show(show)
