@@ -50,7 +50,7 @@ class ResultFragment : Fragment() {
         val resultAdapter = ResultAdapter(emptyList(), resultViewModel.directionResult)
         resultViewModel.getGuessResult()
         return inflater.inflate(R.layout.fragment_result, container, false).apply {
-            observeWordList(resultAdapter, result_progress_bar, success_animation, savedInstanceState)
+            observeWordList(resultAdapter, result_progress_bar, success_animation, failure_animation, savedInstanceState)
             generateWordList(resultAdapter, result_recycler_view)
             setExitFabOnClickListener(result_exit_fab)
             setRetryFabOnClickListener(result_restart_fab, failed_only_container, start_over_container)
@@ -67,13 +67,13 @@ class ResultFragment : Fragment() {
         }
     }
 
-    private fun observeWordList(resultAdapter: ResultAdapter, progressBar: ProgressBar, success_animation: LottieAnimationView, savedInstanceState: Bundle?) {
+    private fun observeWordList(resultAdapter: ResultAdapter, progressBar: ProgressBar, successAnimation: LottieAnimationView, failureAnimation: LottieAnimationView, savedInstanceState: Bundle?) {
         progressBar.show(true)
         resultViewModel.getLiveGuessedList().observe(requireActivity(), Observer {
             resultAdapter.updateList(it)
             progressBar.show(false)
             if (savedInstanceState == null && it.isNotEmpty()) {
-                showSuccessAnimation(success_animation)
+                showAnimation(successAnimation, failureAnimation)
             }
         })
     }
@@ -114,14 +114,14 @@ class ResultFragment : Fragment() {
                     .subscribeOn(rxSchedulers.io())
                     .observeOn(rxSchedulers.main())
                     .subscribe {
-                val action = ResultFragmentDirections.fromResultToQuiz(
-                        args.dictionaryId,
-                        resultViewModel.directionResult.toInt(),
-                        false,
-                        args.quizType
-                )
-                findNavController().navigate(action)
-            }
+                        val action = ResultFragmentDirections.fromResultToQuiz(
+                                args.dictionaryId,
+                                resultViewModel.directionResult.toInt(),
+                                false,
+                                args.quizType
+                        )
+                        findNavController().navigate(action)
+                    }
         }
     }
 
@@ -137,15 +137,15 @@ class ResultFragment : Fragment() {
         }
     }
 
-    private fun showSuccessAnimation(animationView: LottieAnimationView) {
+    private fun showAnimation(animationViewSuccess: LottieAnimationView, animationViewFailure: LottieAnimationView) {
         if (resultViewModel.isAllPassed) {
-            animationView.show(true)
-            animationView.addAnimatorListener(object : Animator.AnimatorListener {
+            animationViewSuccess.show(true)
+            animationViewSuccess.addAnimatorListener(object : Animator.AnimatorListener {
                 override fun onAnimationRepeat(p0: Animator?) {
                 }
 
                 override fun onAnimationEnd(p0: Animator?) {
-                    animationView.show(false)
+                    animationViewSuccess.show(false)
                 }
 
                 override fun onAnimationCancel(p0: Animator?) {
@@ -153,9 +153,26 @@ class ResultFragment : Fragment() {
 
                 override fun onAnimationStart(p0: Animator?) {
                 }
+            })
+        } else {
+            animationViewFailure.show(true)
+            animationViewFailure.addAnimatorListener(object : Animator.AnimatorListener {
+                override fun onAnimationRepeat(p0: Animator?) {
+                }
 
+                override fun onAnimationEnd(p0: Animator?) {
+                    animationViewFailure.show(false)
+                }
+
+                override fun onAnimationCancel(p0: Animator?) {
+                }
+
+                override fun onAnimationStart(p0: Animator?) {
+                }
             })
         }
+
+
     }
 
     private fun hideKeyboard() {
