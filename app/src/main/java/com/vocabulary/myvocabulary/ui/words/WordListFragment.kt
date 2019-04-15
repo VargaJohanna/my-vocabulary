@@ -130,12 +130,12 @@ class WordListFragment : Fragment(), WordAdapter.WordItemClickListener {
         wordViewModel.getLiveWordList().observe(requireActivity(), Observer {
             wordAdapter.updateList(it)
             progressBar.show(false)
-            wordViewModel.isListEmpty.postValue(it.isEmpty())
+            wordViewModel.setIsListEmpty(it.isEmpty())
         })
     }
 
     private fun observeEmptyState() {
-        wordViewModel.isListEmpty.observe(requireActivity(), Observer {
+        wordViewModel.isListEmpty().observe(requireActivity(), Observer {
             if(animation_book != null) {
                 showEmptyState(it)
             }
