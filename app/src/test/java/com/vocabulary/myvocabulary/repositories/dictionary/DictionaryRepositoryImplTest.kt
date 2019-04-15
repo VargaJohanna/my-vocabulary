@@ -5,7 +5,7 @@ import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.verify
 import com.nhaarman.mockitokotlin2.whenever
 import com.vocabulary.myvocabulary.ui.dictionaries.Dictionary
-import com.vocabulary.myvocabulary.ui.dictionaries.TestScheduler
+import com.vocabulary.myvocabulary.TestScheduler
 import com.vocabulary.myvocabulary.ui.dictionaries.toDictionaryEntry
 import io.reactivex.Observable
 import org.junit.Rule
