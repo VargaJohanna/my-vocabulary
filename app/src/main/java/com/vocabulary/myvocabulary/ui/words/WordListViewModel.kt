@@ -27,7 +27,7 @@ class WordListViewModel(
     private val disposables = CompositeDisposable()
     private val liveWordList: MutableLiveData<List<Word>> = MutableLiveData()
     var currentSortByData: SortByData = SortByData()
-    val isListEmpty: MutableLiveData<Boolean> = MutableLiveData()
+    private val isListEmpty: MutableLiveData<Boolean> = MutableLiveData()
 
     init {
         observeList()
@@ -87,5 +87,10 @@ class WordListViewModel(
 
     fun setSortBy(sortByData: SortByData) {
         sortByRepository.setSortBy(sortByData)
+    }
+
+    fun isListEmpty(): LiveData<Boolean> = isListEmpty
+    fun setIsListEmpty(isEmpty: Boolean) {
+        isListEmpty.postValue(isEmpty)
     }
 }
