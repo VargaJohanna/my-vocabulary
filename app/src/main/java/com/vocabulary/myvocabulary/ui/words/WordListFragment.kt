@@ -13,6 +13,7 @@ import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.airbnb.lottie.LottieAnimationView
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.vocabulary.myvocabulary.R
 import com.vocabulary.myvocabulary.ext.plusAssign
@@ -22,6 +23,7 @@ import com.vocabulary.myvocabulary.rx.RxSchedulers
 import com.vocabulary.myvocabulary.ui.quizzes.toQuizType
 import com.vocabulary.myvocabulary.utils.DialogFactory
 import io.reactivex.disposables.CompositeDisposable
+import kotlinx.android.synthetic.main.fragment_word_list.*
 import kotlinx.android.synthetic.main.fragment_word_list.view.*
 import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.viewModel
@@ -128,7 +130,20 @@ class WordListFragment : Fragment(), WordAdapter.WordItemClickListener {
         wordViewModel.getLiveWordList().observe(requireActivity(), Observer {
             wordAdapter.updateList(it)
             progressBar.show(false)
+            if(it.isEmpty()) {
+                showAnimation(true)
+            } else {
+                showAnimation(false)
+            }
         })
+    }
+
+    private fun showAnimation(show: Boolean) {
+        animation_book.show(show)
+        empty_state_message_title.show(show)
+        empty_state_message.show(show)
+        word_column_title.show(!show)
+        translation_column_title.show(!show)
     }
 
     private fun setFabOnClickListener(fab: FloatingActionButton) {

@@ -89,4 +89,5 @@
     <string name="example_translation_domo">domo</string>
     <string name="example_translation_mare">mare</string>
     <string name="sort_by_date">Date</string>
+    <string name="empty_dictionary_state_message">Add an expression and it will show up here.</string>
 </resources>
