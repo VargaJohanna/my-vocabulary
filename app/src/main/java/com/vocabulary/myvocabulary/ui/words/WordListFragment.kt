@@ -55,6 +55,7 @@ class WordListFragment : Fragment(), WordAdapter.WordItemClickListener {
         return inflater.inflate(R.layout.fragment_word_list, container, false).apply {
             generateWordList(wordAdapter, word_recycler_view)
             observeWordList(wordAdapter, word_list_progress_bar)
+            observeEmptyState()
             setFabOnClickListener(word_fab)
             setToolbarMenu(word_list_toolbar)
         }
@@ -129,9 +130,14 @@ class WordListFragment : Fragment(), WordAdapter.WordItemClickListener {
         wordViewModel.getLiveWordList().observe(requireActivity(), Observer {
             wordAdapter.updateList(it)
             progressBar.show(false)
+            wordViewModel.isListEmpty.postValue(it.isEmpty())
+        })
+    }
+
+    private fun observeEmptyState() {
+        wordViewModel.isListEmpty.observe(requireActivity(), Observer {
             if(animation_book != null) {
-                if(it.isEmpty()) showEmptyState(true)
-                else showEmptyState(false)
+                showEmptyState(it)
             }
         })
     }
@@ -229,5 +235,4 @@ class WordListFragment : Fragment(), WordAdapter.WordItemClickListener {
         popUp?.dismiss()
         super.onStop()
     }
-
 }
