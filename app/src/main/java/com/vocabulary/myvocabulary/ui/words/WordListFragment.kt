@@ -63,35 +63,40 @@ class WordListFragment : Fragment(), WordAdapter.WordItemClickListener {
 
     private fun setToolbarMenu(toolbar: Toolbar) {
         toolbar.apply {
-            inflateMenu(R.menu.word_list_menu)
-            navigationIconsSet(menu.getItem(0).subMenu)
-            setOnMenuItemClickListener { item: MenuItem? ->
-                navigationIconsSet(menu.getItem(0).subMenu)
-                when (item?.itemId) {
-                    R.id.start_quiz_from_word_list -> showStartQuizDialog(wordViewModel.dictionaryId)
-                    R.id.sort_by_translation -> {
-                        wordViewModel.setSortBy(wordViewModel.currentSortByData.copy(
-                                sortByOption = SortByOptions.SortByTranslation,
-                                translationDescending = !wordViewModel.currentSortByData.translationDescending)
-                        )
-                    }
-                    R.id.sort_by_word -> {
-                        wordViewModel.setSortBy(wordViewModel.currentSortByData.copy(
-                                sortByOption = SortByOptions.SortByWord,
-                                wordDescending = !wordViewModel.currentSortByData.wordDescending)
-                        )
+            wordViewModel.isListEmpty().observe(requireActivity(), Observer {
+                if(!it) {
+                    inflateMenu(R.menu.word_list_menu)
+                    navigationIconsSet(menu.getItem(0).subMenu)
+                    setOnMenuItemClickListener { item: MenuItem? ->
+                        navigationIconsSet(menu.getItem(0).subMenu)
+                        when (item?.itemId) {
+                            R.id.start_quiz_from_word_list -> showStartQuizDialog(wordViewModel.dictionaryId)
+                            R.id.sort_by_translation -> {
+                                wordViewModel.setSortBy(wordViewModel.currentSortByData.copy(
+                                        sortByOption = SortByOptions.SortByTranslation,
+                                        translationDescending = !wordViewModel.currentSortByData.translationDescending)
+                                )
+                            }
+                            R.id.sort_by_word -> {
+                                wordViewModel.setSortBy(wordViewModel.currentSortByData.copy(
+                                        sortByOption = SortByOptions.SortByWord,
+                                        wordDescending = !wordViewModel.currentSortByData.wordDescending)
+                                )
 
+                            }
+                            R.id.sort_by_date -> {
+                                wordViewModel.setSortBy(wordViewModel.currentSortByData.copy(
+                                        sortByOption = SortByOptions.SortByDate,
+                                        dateDescending = !wordViewModel.currentSortByData.dateDescending)
+                                )
+                            }
+                        }
+                        true
                     }
-                    R.id.sort_by_date -> {
-                        wordViewModel.setSortBy(wordViewModel.currentSortByData.copy(
-                                sortByOption = SortByOptions.SortByDate,
-                                dateDescending = !wordViewModel.currentSortByData.dateDescending)
-                        )
-                    }
+                    title = args.dictionaryName
                 }
-                true
-            }
-            title = args.dictionaryName
+            })
+
             setNavigationOnClickListener {
                 findNavController().popBackStack()
             }
@@ -130,7 +135,9 @@ class WordListFragment : Fragment(), WordAdapter.WordItemClickListener {
         wordViewModel.getLiveWordList().observe(requireActivity(), Observer {
             wordAdapter.updateList(it)
             progressBar.show(false)
-            wordViewModel.setIsListEmpty(it.isEmpty())
+            if(animation_book != null) {
+                showEmptyState(it.isEmpty())
+            }
         })
     }
 
@@ -148,6 +155,7 @@ class WordListFragment : Fragment(), WordAdapter.WordItemClickListener {
         empty_state_message.show(show)
         word_column_title.show(!show)
         translation_column_title.show(!show)
+
     }
 
     private fun setFabOnClickListener(fab: FloatingActionButton) {
