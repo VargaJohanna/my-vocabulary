@@ -63,44 +63,52 @@ class WordListFragment : Fragment(), WordAdapter.WordItemClickListener {
 
     private fun setToolbarMenu(toolbar: Toolbar) {
         toolbar.apply {
-            wordViewModel.isListEmpty().observe(requireActivity(), Observer {
-                if(!it) {
-                    inflateMenu(R.menu.word_list_menu)
-                    navigationIconsSet(menu.getItem(0).subMenu)
-                    setOnMenuItemClickListener { item: MenuItem? ->
-                        navigationIconsSet(menu.getItem(0).subMenu)
-                        when (item?.itemId) {
-                            R.id.start_quiz_from_word_list -> showStartQuizDialog(wordViewModel.dictionaryId)
-                            R.id.sort_by_translation -> {
-                                wordViewModel.setSortBy(wordViewModel.currentSortByData.copy(
-                                        sortByOption = SortByOptions.SortByTranslation,
-                                        translationDescending = !wordViewModel.currentSortByData.translationDescending)
-                                )
-                            }
-                            R.id.sort_by_word -> {
-                                wordViewModel.setSortBy(wordViewModel.currentSortByData.copy(
-                                        sortByOption = SortByOptions.SortByWord,
-                                        wordDescending = !wordViewModel.currentSortByData.wordDescending)
-                                )
-
-                            }
-                            R.id.sort_by_date -> {
-                                wordViewModel.setSortBy(wordViewModel.currentSortByData.copy(
-                                        sortByOption = SortByOptions.SortByDate,
-                                        dateDescending = !wordViewModel.currentSortByData.dateDescending)
-                                )
-                            }
-                        }
-                        true
-                    }
-                    title = args.dictionaryName
-                }
-            })
-
+            title = args.dictionaryName
             setNavigationOnClickListener {
                 findNavController().popBackStack()
             }
+            wordViewModel.isListEmpty().observe(requireActivity(), Observer { isListEmpty ->
+                inflateToolbarMenu(isListEmpty, toolbar)
+            })
 
+
+        }
+    }
+
+    private fun inflateToolbarMenu(isListEmpty: Boolean, toolbar: Toolbar) {
+        toolbar.apply {
+            if (!isListEmpty && toolbar.menu.size() == 0) {
+                inflateMenu(R.menu.word_list_menu)
+                navigationIconsSet(menu.getItem(0).subMenu)
+                setOnMenuItemClickListener { item: MenuItem? ->
+                    navigationIconsSet(menu.getItem(0).subMenu)
+                    when (item?.itemId) {
+                        R.id.start_quiz_from_word_list -> showStartQuizDialog(wordViewModel.dictionaryId)
+                        R.id.sort_by_translation -> {
+                            wordViewModel.setSortBy(wordViewModel.currentSortByData.copy(
+                                    sortByOption = SortByOptions.SortByTranslation,
+                                    translationDescending = !wordViewModel.currentSortByData.translationDescending)
+                            )
+                        }
+                        R.id.sort_by_word -> {
+                            wordViewModel.setSortBy(wordViewModel.currentSortByData.copy(
+                                    sortByOption = SortByOptions.SortByWord,
+                                    wordDescending = !wordViewModel.currentSortByData.wordDescending)
+                            )
+
+                        }
+                        R.id.sort_by_date -> {
+                            wordViewModel.setSortBy(wordViewModel.currentSortByData.copy(
+                                    sortByOption = SortByOptions.SortByDate,
+                                    dateDescending = !wordViewModel.currentSortByData.dateDescending)
+                            )
+                        }
+                    }
+                    true
+                }
+            } else if (isListEmpty) {
+                toolbar.menu.clear()
+            }
         }
     }
 
@@ -135,15 +143,16 @@ class WordListFragment : Fragment(), WordAdapter.WordItemClickListener {
         wordViewModel.getLiveWordList().observe(requireActivity(), Observer {
             wordAdapter.updateList(it)
             progressBar.show(false)
-            if(animation_book != null) {
+            if (animation_book != null) {
                 showEmptyState(it.isEmpty())
+                inflateToolbarMenu(it.isEmpty(), word_list_toolbar)
             }
         })
     }
 
     private fun observeEmptyState() {
         wordViewModel.isListEmpty().observe(requireActivity(), Observer {
-            if(animation_book != null) {
+            if (animation_book != null) {
                 showEmptyState(it)
             }
         })
