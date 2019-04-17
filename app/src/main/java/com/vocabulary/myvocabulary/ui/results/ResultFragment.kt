@@ -140,13 +140,13 @@ class ResultFragment : Fragment() {
 
     private fun showAnimation(animationViewSuccess: LottieAnimationView, animationViewFailure: LottieAnimationView) {
         if (resultViewModel.isAllPassed) {
-            success_animation.show(true)
-            success_animation.addAnimatorListener(object : Animator.AnimatorListener {
+            animationViewSuccess.show(true)
+            animationViewSuccess.addAnimatorListener(object : Animator.AnimatorListener {
                 override fun onAnimationRepeat(p0: Animator?) {
                 }
 
                 override fun onAnimationEnd(p0: Animator?) {
-                    success_animation.show(false)
+                    animationViewSuccess.show(false)
                 }
 
                 override fun onAnimationCancel(p0: Animator?) {
@@ -156,13 +156,13 @@ class ResultFragment : Fragment() {
                 }
             })
         } else {
-            failure_animation.show(true)
-            failure_animation.addAnimatorListener(object : Animator.AnimatorListener {
+            animationViewFailure.show(true)
+            animationViewFailure.addAnimatorListener(object : Animator.AnimatorListener {
                 override fun onAnimationRepeat(p0: Animator?) {
                 }
 
                 override fun onAnimationEnd(p0: Animator?) {
-                    failure_animation.show(false)
+                    animationViewFailure.show(false)
                 }
 
                 override fun onAnimationCancel(p0: Animator?) {
