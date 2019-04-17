@@ -27,6 +27,7 @@ import com.vocabulary.myvocabulary.ui.quizzes.toDirectionType
 import com.vocabulary.myvocabulary.ui.quizzes.toInt
 import com.vocabulary.myvocabulary.ui.quizzes.toQuizType
 import io.reactivex.disposables.CompositeDisposable
+import kotlinx.android.synthetic.main.fragment_result.*
 import kotlinx.android.synthetic.main.fragment_result.view.*
 import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.sharedViewModel
@@ -139,13 +140,13 @@ class ResultFragment : Fragment() {
 
     private fun showAnimation(animationViewSuccess: LottieAnimationView, animationViewFailure: LottieAnimationView) {
         if (resultViewModel.isAllPassed) {
-            animationViewSuccess.show(true)
-            animationViewSuccess.addAnimatorListener(object : Animator.AnimatorListener {
+            success_animation.show(true)
+            success_animation.addAnimatorListener(object : Animator.AnimatorListener {
                 override fun onAnimationRepeat(p0: Animator?) {
                 }
 
                 override fun onAnimationEnd(p0: Animator?) {
-                    animationViewSuccess.show(false)
+                    success_animation.show(false)
                 }
 
                 override fun onAnimationCancel(p0: Animator?) {
@@ -155,13 +156,13 @@ class ResultFragment : Fragment() {
                 }
             })
         } else {
-            animationViewFailure.show(true)
-            animationViewFailure.addAnimatorListener(object : Animator.AnimatorListener {
+            failure_animation.show(true)
+            failure_animation.addAnimatorListener(object : Animator.AnimatorListener {
                 override fun onAnimationRepeat(p0: Animator?) {
                 }
 
                 override fun onAnimationEnd(p0: Animator?) {
-                    animationViewFailure.show(false)
+                    failure_animation.show(false)
                 }
 
                 override fun onAnimationCancel(p0: Animator?) {

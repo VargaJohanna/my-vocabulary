@@ -52,7 +52,10 @@ class WordListViewModel(
         disposables += sortedListRepository.getSortedWordList(dictionaryId)
                 .subscribeOn(rxSchedulers.io())
                 .observeOn(rxSchedulers.main())
-                .subscribe { t -> liveWordList.postValue(t) }
+                .subscribe {
+                    t -> liveWordList.postValue(t)
+                    isListEmpty.postValue(t.isEmpty())
+                }
     }
 
     fun getLiveWordList(): LiveData<List<Word>> = liveWordList
@@ -90,7 +93,4 @@ class WordListViewModel(
     }
 
     fun isListEmpty(): LiveData<Boolean> = isListEmpty
-    fun setIsListEmpty(isEmpty: Boolean) {
-        isListEmpty.postValue(isEmpty)
-    }
 }
