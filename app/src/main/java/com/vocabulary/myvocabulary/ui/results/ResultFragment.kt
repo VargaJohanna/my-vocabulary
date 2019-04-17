@@ -27,6 +27,7 @@ import com.vocabulary.myvocabulary.ui.quizzes.toDirectionType
 import com.vocabulary.myvocabulary.ui.quizzes.toInt
 import com.vocabulary.myvocabulary.ui.quizzes.toQuizType
 import io.reactivex.disposables.CompositeDisposable
+import kotlinx.android.synthetic.main.fragment_result.*
 import kotlinx.android.synthetic.main.fragment_result.view.*
 import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.sharedViewModel
