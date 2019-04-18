@@ -13,7 +13,7 @@ import com.vocabulary.myvocabulary.repositories.word.WordRepository
 import com.vocabulary.myvocabulary.ui.quizzes.QuizRepository
 import com.vocabulary.myvocabulary.ui.quizzes.QuizTypes
 import io.reactivex.Observable
-import org.junit.Assert
+import org.junit.Assert.assertEquals
 import org.junit.Rule
 import org.junit.Test
 import org.mockito.Mockito.verify
@@ -26,11 +26,16 @@ class WordListViewModelTest {
     var mockito = InstantTaskExecutorRule()
     private val dictionaryId = 2L
     private val date = Date(2010, 10, 10, 10, 10)
-
     private val sortByRepository = mock<SortByRepository>()
     private val wordRepository = mock<WordRepository>()
     private val sortedListRepository = mock<SortedListRepository>()
     private val quizRepository = mock<QuizRepository>()
+    private val wordListToTest = asList(
+            Word(containerDictionaryId = dictionaryId, word = "a", translation = "translation", created = date),
+            Word(containerDictionaryId = dictionaryId, word = "b", translation = "translation2", created = date),
+            Word(containerDictionaryId = dictionaryId, word = "c", translation = "translation3", created = date)
+    )
+    private val sortByDataToTest = SortByData(sortByOption = SortByOptions.SortByTranslation, dateDescending = true, wordDescending = true, translationDescending = false)
 
     @Test
     fun `should create word when insertWord() is called`() {
@@ -50,8 +55,8 @@ class WordListViewModelTest {
 
         val createdObject = wordListViewModel.createWordObject(wordString, translationString)
 
-        Assert.assertEquals(wordString, createdObject.word)
-        Assert.assertEquals(translationString, createdObject.translation)
+        assertEquals(wordString, createdObject.word)
+        assertEquals(translationString, createdObject.translation)
     }
 
     @Test
@@ -81,13 +86,13 @@ class WordListViewModelTest {
 
         val resetQuiz = wordListViewModel.startNew(dictionaryId, quizType)
 
-        Assert.assertEquals(resetQuiz, quizRepository.resetQuizList(dictionaryId, quizType))
+        assertEquals(resetQuiz, quizRepository.resetQuizList(dictionaryId, quizType))
     }
 
     @Test
     fun `should delegate setSortBy in repository when setSortBy() is called`() {
         val wordListViewModel = givenWordListViewModel()
-        val sortByData = SortByData(sortByOption = SortByOptions.SortByTranslation, dateDescending = true, wordDescending = true, translationDescending = false)
+        val sortByData = sortByDataToTest
 
         wordListViewModel.setSortBy(sortByData)
 
@@ -97,47 +102,38 @@ class WordListViewModelTest {
     @Test
     fun `should return a liveData with a list of words`() {
         val wordListViewModel = givenWordListViewModelWithData()
-        val observer: androidx.lifecycle.Observer<List<Word>> = mock()
 
-        wordListViewModel.getLiveWordList().observeForever(observer)
+        wordListViewModel.getLiveWordList().observeForever(mock())
 
-        Assert.assertEquals(asList(
-                Word(containerDictionaryId = dictionaryId, word = "a", translation = "translation", created = date),
-                Word(containerDictionaryId = dictionaryId, word = "b", translation = "translation2", created = date),
-                Word(containerDictionaryId = dictionaryId, word = "c", translation = "translation3", created = date)
-        ), wordListViewModel.getLiveWordList().value)
+        assertEquals(wordListToTest, wordListViewModel.getLiveWordList().value)
     }
 
     @Test
     fun `should return sortByData when currentSortByData is called`() {
         val wordListViewModel = givenWordListViewModelWithData()
 
-        val sortByDataToTest = wordListViewModel.currentSortByData
+        val currentSortByData = wordListViewModel.currentSortByData
 
-        Assert.assertEquals(SortByData(sortByOption = SortByOptions.SortByDate, dateDescending = true, translationDescending = true, wordDescending = false),
-                sortByDataToTest)
+        assertEquals(sortByDataToTest,
+                currentSortByData)
     }
 
     @Test
     fun `should return true when word list is empty`() {
         val wordListViewModel = givenWordListViewModelWithEmptyList()
-        val observer: androidx.lifecycle.Observer<Boolean> = mock()
 
-        wordListViewModel.isListEmpty().observeForever(observer)
+        wordListViewModel.isListEmpty().observeForever(mock())
 
-        Assert.assertEquals(true, wordListViewModel.isListEmpty().value)
-
-
+        assertEquals(true, wordListViewModel.isListEmpty().value)
     }
 
     @Test
     fun `should return false when word list is not empty`() {
         val wordListViewModel = givenWordListViewModelWithData()
-        val observer: androidx.lifecycle.Observer<Boolean> = mock()
 
-        wordListViewModel.isListEmpty().observeForever(observer)
+        wordListViewModel.isListEmpty().observeForever(mock())
 
-        Assert.assertEquals(false, wordListViewModel.isListEmpty().value)
+        assertEquals(false, wordListViewModel.isListEmpty().value)
     }
 
     private fun givenWordListViewModel(): WordListViewModel {
@@ -148,15 +144,9 @@ class WordListViewModelTest {
 
     private fun givenWordListViewModelWithData(): WordListViewModel {
         whenever(sortedListRepository.getSortedWordList(dictionaryId)).thenReturn(Observable.just(
-                asList(
-                     Word(containerDictionaryId = dictionaryId, word = "a", translation = "translation", created = date),
-                     Word(containerDictionaryId = dictionaryId, word = "b", translation = "translation2", created = date),
-                     Word(containerDictionaryId = dictionaryId, word = "c", translation = "translation3", created = date)
-                )
+                wordListToTest
         ))
-        whenever(sortByRepository.sortByData()).thenReturn(Observable.just(
-                SortByData(sortByOption = SortByOptions.SortByDate, dateDescending = true, translationDescending = true, wordDescending = false)
-        ))
+        whenever(sortByRepository.sortByData()).thenReturn(Observable.just(sortByDataToTest))
         return WordListViewModel(dictionaryId, sortByRepository, wordRepository, sortedListRepository, TestScheduler(), quizRepository)
     }
 
