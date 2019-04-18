@@ -9,7 +9,6 @@ import com.vocabulary.myvocabulary.repositories.sortBy.SortByData
 import com.vocabulary.myvocabulary.repositories.sortBy.SortByOptions
 import com.vocabulary.myvocabulary.repositories.sortBy.SortByRepository
 import com.vocabulary.myvocabulary.repositories.sortedList.SortedListRepository
-import com.vocabulary.myvocabulary.repositories.word.WordDao
 import com.vocabulary.myvocabulary.repositories.word.WordRepository
 import com.vocabulary.myvocabulary.ui.quizzes.QuizRepository
 import com.vocabulary.myvocabulary.ui.quizzes.QuizTypes
@@ -19,6 +18,7 @@ import org.junit.Rule
 import org.junit.Test
 import org.mockito.Mockito.verify
 import java.util.*
+import java.util.Arrays.asList
 
 class WordListViewModelTest {
     @Rule
@@ -33,7 +33,7 @@ class WordListViewModelTest {
     private val quizRepository = mock<QuizRepository>()
 
     @Test
-    fun`should create word when insertWord() is called`() {
+    fun `should create word when insertWord() is called`() {
         val wordListViewModel = givenWordListViewModel()
         val wordToTest = Word(containerDictionaryId = dictionaryId, word = "word", translation = "translation", created = date)
 
@@ -85,17 +85,37 @@ class WordListViewModelTest {
     }
 
     @Test
-    fun `should call setSortBy in repository when setSortBy() is called`() {
+    fun `should delegate setSortBy in repository when setSortBy() is called`() {
         val wordListViewModel = givenWordListViewModel()
         val sortByData = SortByData(sortByOption = SortByOptions.SortByTranslation, dateDescending = true, wordDescending = true, translationDescending = false)
 
         wordListViewModel.setSortBy(sortByData)
 
-        Assert.assertTrue(wordListViewModel.setSortBy(sortByData) == sortByRepository.setSortBy(sortByData))
+        verify(sortByRepository).setSortBy(sortByData)
+    }
+
+    @Test
+    fun `should return a list of words`() {
+        val wordListViewModel = givenWordListViewModelWithWordList()
+
+
+        wordListViewModel.getLiveWordList().value
     }
 
     private fun givenWordListViewModel(): WordListViewModel {
         whenever(sortedListRepository.getSortedWordList(any())).thenReturn(Observable.never())
+        whenever(sortByRepository.sortByData()).thenReturn(Observable.never())
+        return WordListViewModel(dictionaryId, sortByRepository, wordRepository, sortedListRepository, TestScheduler(), quizRepository)
+    }
+
+    private fun givenWordListViewModelWithWordList(): WordListViewModel {
+        whenever(sortedListRepository.getSortedWordList(dictionaryId)).thenReturn(Observable.just(
+                asList(
+                     Word(containerDictionaryId = dictionaryId, word = "a", translation = "translation", created = date),
+                     Word(containerDictionaryId = dictionaryId, word = "b", translation = "translation2", created = date),
+                     Word(containerDictionaryId = dictionaryId, word = "c", translation = "translation3", created = date)
+                )
+        ))
         whenever(sortByRepository.sortByData()).thenReturn(Observable.never())
         return WordListViewModel(dictionaryId, sortByRepository, wordRepository, sortedListRepository, TestScheduler(), quizRepository)
     }
