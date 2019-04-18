@@ -1,4 +1,4 @@
-package com.vocabulary.myvocabulary.ui.dictionaries
+package com.vocabulary.myvocabulary
 
 import com.vocabulary.myvocabulary.rx.RxSchedulers
 import io.reactivex.Scheduler
