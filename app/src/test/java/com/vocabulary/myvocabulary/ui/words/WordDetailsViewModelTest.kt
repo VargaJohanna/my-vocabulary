@@ -17,12 +17,13 @@ class WordDetailsViewModelTest {
     @JvmField
     var mockito = InstantTaskExecutorRule()
     private val wordRepository = mock<WordRepository>()
-    private val singleWord = Word(wordId = 1L, containerDictionaryId = 2L, word = "a", translation = "a", created = Date(2019, 4, 4, 4, 4))
+    private val requestedId = 1L
+    private val singleWord = Word(wordId = requestedId, containerDictionaryId = 2L, word = "a", translation = "a", created = Date(2019, 4, 4, 4, 4))
 
     @Test
     fun `should delegate to repository when getWordById() is called`() {
         val wordDetailsViewModel = givenWordDetailsViewModel()
-        val requestedId = 1L
+        val requestedId = requestedId
 
         wordDetailsViewModel.getWordById(requestedId)
 
@@ -32,7 +33,7 @@ class WordDetailsViewModelTest {
     @Test
     fun `should update currentWordLive when getWordById() is called`() {
         val wordDetailsViewModel = givenWordDetailsViewModel()
-        wordDetailsViewModel.getWordById(1L)
+        wordDetailsViewModel.getWordById(requestedId)
 
         wordDetailsViewModel.getCurrentWord().observeForever(mock())
 
@@ -40,7 +41,7 @@ class WordDetailsViewModelTest {
     }
 
     private fun givenWordDetailsViewModel(): WordDetailsViewModel {
-        whenever(wordRepository.getWordById(1L)).thenReturn(Single.just(singleWord))
+        whenever(wordRepository.getWordById(requestedId)).thenReturn(Single.just(singleWord))
         return WordDetailsViewModel(wordRepository, TestScheduler())
     }
 }
