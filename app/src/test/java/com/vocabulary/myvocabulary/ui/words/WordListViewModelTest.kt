@@ -95,11 +95,49 @@ class WordListViewModelTest {
     }
 
     @Test
-    fun `should return a list of words`() {
-        val wordListViewModel = givenWordListViewModelWithWordList()
+    fun `should return a liveData with a list of words`() {
+        val wordListViewModel = givenWordListViewModelWithData()
+        val observer: androidx.lifecycle.Observer<List<Word>> = mock()
+
+        wordListViewModel.getLiveWordList().observeForever(observer)
+
+        Assert.assertEquals(asList(
+                Word(containerDictionaryId = dictionaryId, word = "a", translation = "translation", created = date),
+                Word(containerDictionaryId = dictionaryId, word = "b", translation = "translation2", created = date),
+                Word(containerDictionaryId = dictionaryId, word = "c", translation = "translation3", created = date)
+        ), wordListViewModel.getLiveWordList().value)
+    }
+
+    @Test
+    fun `should return sortByData when currentSortByData is called`() {
+        val wordListViewModel = givenWordListViewModelWithData()
+
+        val sortByDataToTest = wordListViewModel.currentSortByData
+
+        Assert.assertEquals(SortByData(sortByOption = SortByOptions.SortByDate, dateDescending = true, translationDescending = true, wordDescending = false),
+                sortByDataToTest)
+    }
+
+    @Test
+    fun `should return true when word list is empty`() {
+        val wordListViewModel = givenWordListViewModelWithEmptyList()
+        val observer: androidx.lifecycle.Observer<Boolean> = mock()
+
+        wordListViewModel.isListEmpty().observeForever(observer)
+
+        Assert.assertEquals(true, wordListViewModel.isListEmpty().value)
 
 
-        wordListViewModel.getLiveWordList().value
+    }
+
+    @Test
+    fun `should return false when word list is not empty`() {
+        val wordListViewModel = givenWordListViewModelWithData()
+        val observer: androidx.lifecycle.Observer<Boolean> = mock()
+
+        wordListViewModel.isListEmpty().observeForever(observer)
+
+        Assert.assertEquals(false, wordListViewModel.isListEmpty().value)
     }
 
     private fun givenWordListViewModel(): WordListViewModel {
@@ -108,7 +146,7 @@ class WordListViewModelTest {
         return WordListViewModel(dictionaryId, sortByRepository, wordRepository, sortedListRepository, TestScheduler(), quizRepository)
     }
 
-    private fun givenWordListViewModelWithWordList(): WordListViewModel {
+    private fun givenWordListViewModelWithData(): WordListViewModel {
         whenever(sortedListRepository.getSortedWordList(dictionaryId)).thenReturn(Observable.just(
                 asList(
                      Word(containerDictionaryId = dictionaryId, word = "a", translation = "translation", created = date),
@@ -116,6 +154,14 @@ class WordListViewModelTest {
                      Word(containerDictionaryId = dictionaryId, word = "c", translation = "translation3", created = date)
                 )
         ))
+        whenever(sortByRepository.sortByData()).thenReturn(Observable.just(
+                SortByData(sortByOption = SortByOptions.SortByDate, dateDescending = true, translationDescending = true, wordDescending = false)
+        ))
+        return WordListViewModel(dictionaryId, sortByRepository, wordRepository, sortedListRepository, TestScheduler(), quizRepository)
+    }
+
+    private fun givenWordListViewModelWithEmptyList(): WordListViewModel {
+        whenever(sortedListRepository.getSortedWordList(dictionaryId)).thenReturn(Observable.just(emptyList()))
         whenever(sortByRepository.sortByData()).thenReturn(Observable.never())
         return WordListViewModel(dictionaryId, sortByRepository, wordRepository, sortedListRepository, TestScheduler(), quizRepository)
     }
