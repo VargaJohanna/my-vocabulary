@@ -143,9 +143,7 @@ class WordListViewModelTest {
     }
 
     private fun givenWordListViewModelWithData(): WordListViewModel {
-        whenever(sortedListRepository.getSortedWordList(dictionaryId)).thenReturn(Observable.just(
-                wordListToTest
-        ))
+        whenever(sortedListRepository.getSortedWordList(dictionaryId)).thenReturn(Observable.just(wordListToTest))
         whenever(sortByRepository.sortByData()).thenReturn(Observable.just(sortByDataToTest))
         return WordListViewModel(dictionaryId, sortByRepository, wordRepository, sortedListRepository, TestScheduler(), quizRepository)
     }
