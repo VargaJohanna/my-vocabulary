@@ -7,7 +7,7 @@ import com.nhaarman.mockitokotlin2.verify
 import com.nhaarman.mockitokotlin2.whenever
 import com.vocabulary.myvocabulary.TestScheduler
 import com.vocabulary.myvocabulary.repositories.dictionary.DictionaryRepository
-import com.vocabulary.myvocabulary.ui.quizzes.QuizRepository
+import com.vocabulary.myvocabulary.repositories.quiz.QuizRepository
 import io.reactivex.Observable
 import org.junit.Assert
 import org.junit.Rule
