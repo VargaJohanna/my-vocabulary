@@ -9,7 +9,7 @@ import com.vocabulary.myvocabulary.repositories.sortBy.SortByRepository
 import com.vocabulary.myvocabulary.repositories.sortedList.SortedListRepository
 import com.vocabulary.myvocabulary.repositories.word.WordRepository
 import com.vocabulary.myvocabulary.rx.RxSchedulers
-import com.vocabulary.myvocabulary.ui.quizzes.QuizRepository
+import com.vocabulary.myvocabulary.repositories.quiz.QuizRepository
 import com.vocabulary.myvocabulary.ui.quizzes.QuizTypes
 import io.reactivex.Completable
 import io.reactivex.disposables.CompositeDisposable

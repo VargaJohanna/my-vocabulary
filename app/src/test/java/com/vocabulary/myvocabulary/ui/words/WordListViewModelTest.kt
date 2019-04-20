@@ -10,7 +10,7 @@ import com.vocabulary.myvocabulary.repositories.sortBy.SortByOptions
 import com.vocabulary.myvocabulary.repositories.sortBy.SortByRepository
 import com.vocabulary.myvocabulary.repositories.sortedList.SortedListRepository
 import com.vocabulary.myvocabulary.repositories.word.WordRepository
-import com.vocabulary.myvocabulary.ui.quizzes.QuizRepository
+import com.vocabulary.myvocabulary.repositories.quiz.QuizRepository
 import com.vocabulary.myvocabulary.ui.quizzes.QuizTypes
 import io.reactivex.Observable
 import org.junit.Assert.assertEquals
