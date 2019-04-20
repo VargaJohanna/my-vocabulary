@@ -1,5 +1,6 @@
 package com.vocabulary.myvocabulary.ui.results
 
+import androidx.annotation.VisibleForTesting
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.vocabulary.myvocabulary.ext.plusAssign
@@ -84,5 +85,15 @@ class ResultViewModel(
 
     fun latestGuess(lastGuess: GuessedWord) {
         guessedWordMap[lastGuess.wordId] = lastGuess.guess.trim()
+    }
+
+    @VisibleForTesting
+    fun getGuessedWordMap() = guessedWordMap
+
+    @VisibleForTesting
+    fun setGuessedWordMap(list: List<GuessedWord>) {
+        list.forEach {
+            guessedWordMap[it.wordId] = it.guess
+        }
     }
 }
