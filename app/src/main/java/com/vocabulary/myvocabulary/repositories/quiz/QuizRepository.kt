@@ -1,5 +1,6 @@
-package com.vocabulary.myvocabulary.ui.quizzes
+package com.vocabulary.myvocabulary.repositories.quiz
 
+import com.vocabulary.myvocabulary.ui.quizzes.QuizTypes
 import com.vocabulary.myvocabulary.ui.words.Word
 import io.reactivex.Completable
 import io.reactivex.Observable

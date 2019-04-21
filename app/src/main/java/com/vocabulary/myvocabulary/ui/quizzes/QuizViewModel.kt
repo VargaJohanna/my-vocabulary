@@ -1,9 +1,11 @@
 package com.vocabulary.myvocabulary.ui.quizzes
 
+import androidx.annotation.VisibleForTesting
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.vocabulary.myvocabulary.ext.plusAssign
+import com.vocabulary.myvocabulary.repositories.quiz.QuizRepository
 import com.vocabulary.myvocabulary.rx.RxSchedulers
 import com.vocabulary.myvocabulary.ui.words.Word
 import io.reactivex.disposables.CompositeDisposable
@@ -38,15 +40,15 @@ class QuizViewModel(
                     focusableWordList.clear()
                     it.forEachIndexed { index: Int, word: Word ->
                         val newFocusableWord = QuizViewModel.FocusableWord(word, index == 0)
-                        if (!focusableWordList.contains(newFocusableWord) && word.containerDictionaryId == dictionaryId) {
-                            if (!failedOnly || !word.lastResult) focusableWordList.add(newFocusableWord)
+                        if (!getFocusableWordList().contains(newFocusableWord) && word.containerDictionaryId == dictionaryId) {
+                            if (!failedOnly || !word.lastResult) getFocusableWordList().add(newFocusableWord)
                         }
                     }
-                    if (focusableWordList.isNotEmpty()) {
+                    if (getFocusableWordList().isNotEmpty()) {
                         focusableWordList.shuffle()
-                        liveSubWordList.postValue(focusableWordList.subList(0, 1))
-                        updateIcon.postValue(focusableWordList.size == 1)
-                        listIsFinished = focusableWordList.size == 1
+                        liveSubWordList.postValue(getFocusableWordList().subList(0, 1))
+                        updateIcon.postValue(getFocusableWordList().size == 1)
+                        listIsFinished = getFocusableWordList().size == 1
                     } else {
                         liveSubWordList.postValue(emptyList())
                     }
@@ -61,13 +63,13 @@ class QuizViewModel(
     }
 
     fun nextClicked() {
-        if (lastIndexOfSubList < focusableWordList.size) {
+        if (lastIndexOfSubList < getFocusableWordList().size) {
             lastIndexOfSubList += 1
             setFocusableValue(lastIndexOfSubList)
-            listIsFinished = lastIndexOfSubList == focusableWordList.size
+            listIsFinished = lastIndexOfSubList == getFocusableWordList().size
 
-            liveSubWordList.postValue(focusableWordList.subList(0, lastIndexOfSubList))
-            updateIcon.postValue(lastIndexOfSubList == focusableWordList.size)
+            liveSubWordList.postValue(getFocusableWordList().subList(0, lastIndexOfSubList))
+            updateIcon.postValue(lastIndexOfSubList == getFocusableWordList().size)
         }
     }
 
@@ -76,11 +78,22 @@ class QuizViewModel(
     fun getUpdateIcon(): LiveData<Boolean> = updateIcon
 
     private fun setFocusableValue(position: Int) {
-        focusableWordList.subList(0, lastIndexOfSubList).forEachIndexed { index, focusableWord ->
+        getFocusableWordList().subList(0, lastIndexOfSubList).forEachIndexed { index, focusableWord ->
             val focused = index == position - 1 || index == position - 2
-            focusableWordList.subList(0, lastIndexOfSubList)[index] = focusableWord.copy(isFocused = focused)
+            getFocusableWordList().subList(0, lastIndexOfSubList)[index] = focusableWord.copy(isFocused = focused)
         }
     }
+
+    @VisibleForTesting
+    fun getFocusableWordList() = focusableWordList
+
+    @VisibleForTesting
+    fun setFocusableWordList(list: MutableList<FocusableWord>) {
+        focusableWordList = list
+    }
+
+    @VisibleForTesting
+    fun getListIsFinished() = listIsFinished
 
     data class FocusableWord(
             val word: Word,

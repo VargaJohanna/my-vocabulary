@@ -13,8 +13,8 @@ import com.vocabulary.myvocabulary.repositories.word.*
 import com.vocabulary.myvocabulary.rx.RxSchedulers
 import com.vocabulary.myvocabulary.rx.SchedulersImpl
 import com.vocabulary.myvocabulary.ui.dictionaries.DictionaryListViewModel
-import com.vocabulary.myvocabulary.ui.quizzes.QuizRepository
-import com.vocabulary.myvocabulary.ui.quizzes.QuizRepositoryImpl
+import com.vocabulary.myvocabulary.repositories.quiz.QuizRepository
+import com.vocabulary.myvocabulary.repositories.quiz.QuizRepositoryImpl
 import com.vocabulary.myvocabulary.ui.quizzes.QuizViewModel
 import com.vocabulary.myvocabulary.ui.results.ResultViewModel
 import com.vocabulary.myvocabulary.ui.words.WordDetailsViewModel
