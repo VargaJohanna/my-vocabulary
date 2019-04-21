@@ -20,11 +20,11 @@ class WordRepositoryImplTest {
     private val wordDao = mock<WordDao>()
     private val requestedDictionary = 1L
     private val wordIdToTest = 1L
-    private val wordToTest = Word(wordId = 1L, containerDictionaryId = requestedDictionary, word = "a", translation = "b", created = Date(2019, 4, 4, 4, 4))
+    private val wordToTest = Word(wordId = 1L, containerDictionaryId = requestedDictionary, word = "a", translation = "b", created = Date(5))
     private val wordList: List<Word> = asList(
-            Word(wordId = 1L, containerDictionaryId = requestedDictionary, word = "a", translation = "b", created = Date(2019, 4, 4, 4, 4)),
-            Word(wordId = 2L, containerDictionaryId = requestedDictionary, word = "b", translation = "c", created = Date(2019, 4, 4, 4, 4)),
-            Word(wordId = 3L, containerDictionaryId = requestedDictionary, word = "c", translation = "d", created = Date(2019, 4, 4, 4, 4))
+            Word(wordId = 1L, containerDictionaryId = requestedDictionary, word = "a", translation = "b", created = Date(5)),
+            Word(wordId = 2L, containerDictionaryId = requestedDictionary, word = "b", translation = "c", created = Date(5)),
+            Word(wordId = 3L, containerDictionaryId = requestedDictionary, word = "c", translation = "d", created = Date(5))
     )
 
     @Test

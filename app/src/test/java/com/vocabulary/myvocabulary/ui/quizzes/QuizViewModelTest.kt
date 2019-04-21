@@ -21,7 +21,7 @@ class QuizViewModelTest {
     private val quizRepository = mock<QuizRepository>()
     private val dictionaryId = 1L
     private val optionType = 1
-    private val date = Date(2010, 10, 10, 10, 10)
+    private val date = Date(5)
     private val quizList = asList(
             Word(containerDictionaryId = dictionaryId, word = "a", translation = "translation", created = date, lastResult = true),
             Word(containerDictionaryId = dictionaryId, word = "b", translation = "translation2", created = date, lastResult = true),
