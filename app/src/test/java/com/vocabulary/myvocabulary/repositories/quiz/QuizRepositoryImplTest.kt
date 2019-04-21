@@ -19,7 +19,7 @@ class QuizRepositoryImplTest {
 
     private val wordRepository = mock<WordRepository>()
     private val dictionaryId = 1L
-    private val date = Date(2019, 4, 20, 20, 20, 20)
+    private val date = Date(5)
     private val wordListToTest = asList(
             Word(containerDictionaryId = dictionaryId, word = "a", translation = "translation1", created = date),
             Word(containerDictionaryId = dictionaryId, word = "b", translation = "translation2", created = date),
