@@ -43,14 +43,7 @@ class QuizRepositoryImpl(
     private fun resetWeakestFive(dictionaryId: Long): Single<List<Word>> {
         return wordRepository.getObservableWordList(dictionaryId)
                 .firstOrError()
-                .map { list ->
-                    list.map {
-                        when {
-                            it.beenAsked != 0 -> it to (it.failed.toFloat() / it.beenAsked.toFloat())
-                            else -> it to 0f
-                        }
-                    }.sortedWith(compareBy({ (_, value) -> value }, { (key, _) -> key.beenAsked })).toMap().keys.reversed()
-                }
+                .map { sortWeaknessesList(it)}
                 .map { it.take(5) }
                 .doOnSuccess {
                     _quizList.onNext(it)
@@ -59,5 +52,15 @@ class QuizRepositoryImpl(
 
     override fun updateQuizList(list: List<Word>) {
         _quizList.onNext(list)
+    }
+
+    private fun sortWeaknessesList(list: List<Word>) :List<Word> {
+        // Sort by failed / beenAsked ratio. If it's the same then take the one where beenAsked is more
+        return list.map {
+            when {
+                it.beenAsked != 0 -> it to (it.failed.toFloat() / it.beenAsked.toFloat())
+                else -> it to 0f
+            }
+        }.sortedWith(compareBy({ (_, value) -> value }, { (key, _) -> key.beenAsked })).toMap().keys.reversed()
     }
 }
