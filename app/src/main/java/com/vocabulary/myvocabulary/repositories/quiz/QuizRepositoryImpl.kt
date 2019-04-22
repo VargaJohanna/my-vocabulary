@@ -46,7 +46,7 @@ class QuizRepositoryImpl(
                 .map { list ->
                     list.map {
                         when {
-                            it.beenAsked != 0 -> it to ((it.failed.toFloat() + 1) / (it.beenAsked.toFloat() + 1))
+                            it.beenAsked != 0 -> it to (it.failed.toFloat() / it.beenAsked.toFloat())
                             else -> it to 0f
                         }
                     }.sortedWith(compareBy({ (_, value) -> value }, { (key, _) -> key.beenAsked })).toMap().keys.reversed()
