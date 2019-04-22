@@ -54,8 +54,10 @@ class QuizRepositoryImpl(
         _quizList.onNext(list)
     }
 
-    private fun sortWeaknessesList(list: List<Word>) :List<Word> {
-        // Sort by failed / beenAsked ratio. If it's the same then take the one where beenAsked is more
+    /*
+    Sort by failed / beenAsked ratio. If it's the same then take the one where beenAsked is more
+     */
+    private fun sortWeaknessesList(list: List<Word>): List<Word> {
         return list.map {
             when {
                 it.beenAsked != 0 -> it to (it.failed.toFloat() / it.beenAsked.toFloat())
