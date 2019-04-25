@@ -38,7 +38,7 @@
     <string name="dialog_lets_do_it">"Kezdjük!"</string>
     <string name="dialog_option_picker_error">"Válassz egy opciót!"</string>
     <string name="dialog_quiz_type_error">"Válassz egy kvíz típust!"</string>
-    <string name="quiz_hint_enter_solution">Írd be a megoldást</string>
+    <string name="quiz_hint_enter_solution">Válasz</string>
     <string name="result_fragment_title">Eredmények</string>
     <string name="tick_description">Helyes megoldás ikon</string>
     <string name="wrong_answer_icon_description">Rossz megoldás ikon</string>
