@@ -26,6 +26,7 @@ class ResultViewModel(
 ) : ViewModel() {
     private val disposables = CompositeDisposable()
     private val liveGuessedWordList: MutableLiveData<List<Word>> = MutableLiveData()
+    private val liveNumberOfPasses: MutableLiveData<Int> = MutableLiveData()
     var directionResult: QuizDirectionType = QuizDirectionType.AskWord
     var isAllPassed = true
 
@@ -54,6 +55,7 @@ class ResultViewModel(
                 .subscribe { guessList ->
                     liveGuessedWordList.postValue(guessList)
                     quizRepository.updateQuizList(guessList)
+                    liveNumberOfPasses.postValue(guessList.filter { it.lastResult }.size)
                 }
     }
 
@@ -71,16 +73,14 @@ class ResultViewModel(
         return if (directionResult == QuizDirectionType.AskWord) {
             if (it.translation == entry.value) {
                 it.copy(lastResult = true, lastGuess = entry.value, beenAsked = it.beenAsked + 1, passed = it.passed + 1)
-            }
-            else {
+            } else {
                 setAllPassedValue(false)
                 it.copy(lastResult = false, lastGuess = entry.value, beenAsked = it.beenAsked + 1, failed = it.failed + 1)
             }
         } else {
             if (it.word == entry.value) {
                 it.copy(lastResult = true, lastGuess = entry.value, beenAsked = it.beenAsked + 1, passed = it.passed + 1)
-            }
-            else {
+            } else {
                 setAllPassedValue(false)
                 it.copy(lastResult = false, lastGuess = entry.value, beenAsked = it.beenAsked + 1, failed = it.failed + 1)
             }
