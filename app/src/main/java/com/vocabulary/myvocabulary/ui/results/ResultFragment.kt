@@ -83,8 +83,8 @@ class ResultFragment : Fragment() {
 
     private fun setExitFabOnClickListener(fab: FloatingActionButton) {
         fab.setOnClickListener {
-            findNavController().navigate(R.id.from_result_to_home)
             resultViewModel.dispose()
+            findNavController().navigate(R.id.from_result_to_home)
         }
     }
 
@@ -126,7 +126,7 @@ class ResultFragment : Fragment() {
                         )
                         findNavController().navigate(action)
                     }
-        resultViewModel.dispose()
+            resultViewModel.dispose()
         }
     }
 
@@ -138,8 +138,8 @@ class ResultFragment : Fragment() {
                     true,
                     args.quizType
             )
+            resultViewModel.dispose()
             findNavController().navigate(action)
-        resultViewModel.dispose()
         }
     }
 
