@@ -111,8 +111,8 @@ class DialogFactory {
             dictionaryName: String,
             doItClick: (selectedDirection: Int, dictionaryId: Long, selectedQuizType: Int) -> Unit
     ): AlertDialog {
-        var selectedDirection = -1
-        var selectedQuizType = -1
+        var selectedDirection = 0
+        var selectedQuizType = 0
         val inflater = activity.layoutInflater
         val dialogView: View = inflater.inflate(R.layout.dialog_start_quiz, null)
         val directionRadioGroup: RadioGroup = dialogView.direction_radioGroup
@@ -317,7 +317,7 @@ class DialogFactory {
             activity: Activity,
             doItClick: (selectedOption: Int) -> Unit
     ): AlertDialog {
-        var selectedOption = -1
+        var selectedOption = 0
         val inflater = activity.layoutInflater
         val dialogView: View = inflater.inflate(R.layout.dialog_direction_option_picker, null)
         val radioGroup: RadioGroup = dialogView.radioGroup

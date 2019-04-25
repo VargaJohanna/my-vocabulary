@@ -34,6 +34,7 @@
             android:layout_marginStart="@dimen/margin_medium"
             android:padding="@dimen/padding_normal"
             android:text="@string/quiz_list_quick_one"
+            android:checked="true"
             android:textSize="@dimen/text_size_normal" />
 
         <RadioButton
@@ -103,6 +104,7 @@
             android:layout_marginStart="@dimen/margin_medium"
             android:padding="@dimen/padding_normal"
             android:text="@string/word_list_meaning"
+            android:checked="true"
             android:textSize="@dimen/text_size_normal" />
 
         <RadioButton
