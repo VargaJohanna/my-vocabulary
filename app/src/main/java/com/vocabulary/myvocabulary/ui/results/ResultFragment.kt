@@ -113,7 +113,6 @@ class ResultFragment : Fragment() {
 
     private fun setStartOverOnClickListener(startOverFab: FloatingActionButton) {
         startOverFab.setOnClickListener {
-            resultViewModel.updateQuizList()
             resultViewModel.resetGuessedWordCollections()
             disposables += resultViewModel.startNew(args.dictionaryId, args.quizType.toQuizType())
                     .subscribeOn(rxSchedulers.io())
@@ -133,7 +132,6 @@ class ResultFragment : Fragment() {
 
     private fun setFailedOnlyOnClickListener(startOverFab: FloatingActionButton) {
         startOverFab.setOnClickListener {
-            resultViewModel.updateQuizList()
             val action = ResultFragmentDirections.fromResultToQuiz(
                     args.dictionaryId,
                     resultViewModel.directionResult.toInt(),
