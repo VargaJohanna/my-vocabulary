@@ -44,6 +44,7 @@
             android:layout_height="wrap_content"
             android:textSize="@dimen/text_size_normal"
             android:padding="@dimen/padding_normal"
+            android:checked="true"
             android:layout_marginStart="@dimen/margin_medium"
             android:text="@string/word_list_meaning" />
 
