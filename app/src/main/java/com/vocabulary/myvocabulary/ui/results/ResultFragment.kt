@@ -27,7 +27,6 @@ import com.vocabulary.myvocabulary.ui.quizzes.toDirectionType
 import com.vocabulary.myvocabulary.ui.quizzes.toInt
 import com.vocabulary.myvocabulary.ui.quizzes.toQuizType
 import io.reactivex.disposables.CompositeDisposable
-import kotlinx.android.synthetic.main.fragment_result.*
 import kotlinx.android.synthetic.main.fragment_result.view.*
 import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.sharedViewModel
@@ -47,9 +46,9 @@ class ResultFragment : Fragment() {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         hideKeyboard()
+        resultViewModel.observeGuessedWordMap()
         resultViewModel.setDirection(args.directionType.toDirectionType())
         val resultAdapter = ResultAdapter(emptyList(), resultViewModel.directionResult)
-        resultViewModel.getGuessResult()
         return inflater.inflate(R.layout.fragment_result, container, false).apply {
             observeWordList(resultAdapter, result_progress_bar, success_animation, failure_animation, savedInstanceState)
             generateWordList(resultAdapter, result_recycler_view)
@@ -57,7 +56,10 @@ class ResultFragment : Fragment() {
             setRetryFabOnClickListener(result_restart_fab, failed_only_container, start_over_container)
             setStartOverOnClickListener(start_over_fab)
             setFailedOnlyOnClickListener(failed_only_fab)
-            result_toolbar.setNavigationOnClickListener { findNavController().popBackStack() }
+            result_toolbar.setNavigationOnClickListener {
+                findNavController().popBackStack()
+                resultViewModel.dispose()
+            }
         }
     }
 
@@ -81,6 +83,7 @@ class ResultFragment : Fragment() {
 
     private fun setExitFabOnClickListener(fab: FloatingActionButton) {
         fab.setOnClickListener {
+            resultViewModel.dispose()
             findNavController().navigate(R.id.from_result_to_home)
         }
     }
@@ -123,6 +126,7 @@ class ResultFragment : Fragment() {
                         )
                         findNavController().navigate(action)
                     }
+            resultViewModel.dispose()
         }
     }
 
@@ -134,6 +138,7 @@ class ResultFragment : Fragment() {
                     true,
                     args.quizType
             )
+            resultViewModel.dispose()
             findNavController().navigate(action)
         }
     }
