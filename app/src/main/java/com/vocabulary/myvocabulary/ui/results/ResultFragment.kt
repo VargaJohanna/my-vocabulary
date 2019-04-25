@@ -26,11 +26,14 @@ import com.vocabulary.myvocabulary.rx.RxSchedulers
 import com.vocabulary.myvocabulary.ui.quizzes.toDirectionType
 import com.vocabulary.myvocabulary.ui.quizzes.toInt
 import com.vocabulary.myvocabulary.ui.quizzes.toQuizType
+import com.vocabulary.myvocabulary.ui.words.Word
 import io.reactivex.disposables.CompositeDisposable
+import kotlinx.android.synthetic.main.fragment_result.*
 import kotlinx.android.synthetic.main.fragment_result.view.*
 import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.sharedViewModel
 import org.koin.core.parameter.parametersOf
+import kotlin.math.round
 
 class ResultFragment : Fragment() {
     private val args by navArgs<ResultFragmentArgs>()
@@ -75,10 +78,16 @@ class ResultFragment : Fragment() {
         resultViewModel.getLiveGuessedList().observe(requireActivity(), Observer {
             resultAdapter.updateList(it)
             progressBar.show(false)
+            if(it.isNotEmpty()) setResultStatistics(it)
             if (savedInstanceState == null && it.isNotEmpty()) {
                 showAnimation(successAnimation, failureAnimation)
             }
         })
+    }
+    private fun setResultStatistics(list: List<Word>) {
+        val passes = list.filter { it.lastResult }.size
+        val all = list.size
+        if(result_stats != null) result_stats.text = String.format(getString(R.string.result_stats), passes, all, round(((passes.toFloat() / all.toFloat()) * 100)).toInt())
     }
 
     private fun setExitFabOnClickListener(fab: FloatingActionButton) {

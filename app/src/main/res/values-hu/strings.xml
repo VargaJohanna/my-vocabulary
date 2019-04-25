@@ -90,5 +90,6 @@
     <string name="example_translation_mare">mare</string>
     <string name="sort_by_date">Létrehozás</string>
     <string name="empty_dictionary_state_message">Adj hozzá kifejezéseket, és itt fognak megjelenni.</string>
+    <string name="result_stats">%1$d / %2$d - %3$d%</string>
 
 </resources>
