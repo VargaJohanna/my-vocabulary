@@ -5,6 +5,8 @@ import com.f2prateek.rx.preferences2.RxSharedPreferences
 import com.vocabulary.myvocabulary.repositories.AppDatabase
 import com.vocabulary.myvocabulary.repositories.dictionary.DictionaryRepository
 import com.vocabulary.myvocabulary.repositories.dictionary.DictionaryRepositoryImpl
+import com.vocabulary.myvocabulary.repositories.guessedWord.GuessedWordRepository
+import com.vocabulary.myvocabulary.repositories.guessedWord.GuessedWordRepositoryImpl
 import com.vocabulary.myvocabulary.repositories.sortBy.SortByRepository
 import com.vocabulary.myvocabulary.repositories.sortBy.SortByRepositoryImpl
 import com.vocabulary.myvocabulary.repositories.sortedList.SortedListRepository
@@ -35,6 +37,7 @@ val repositoryModule = module {
         SortByRepositoryImpl(preferences,
         RxSharedPreferences.create(preferences))}
     single<SortedListRepository> { SortedListRepositoryImpl(get(), get()) }
+    single<GuessedWordRepository> { GuessedWordRepositoryImpl() }
 }
 
 val viewModelModule = module {
@@ -48,7 +51,7 @@ val viewModelModule = module {
                 get(),
                 get())
     }
-    viewModel { (dictionaryId: Long) -> ResultViewModel(dictionaryId, get(), get(), get()) }
+    viewModel { (dictionaryId: Long) -> ResultViewModel(dictionaryId, get(), get(), get(), get()) }
     viewModel { WordDetailsViewModel(get(), get()) }
 }
 
