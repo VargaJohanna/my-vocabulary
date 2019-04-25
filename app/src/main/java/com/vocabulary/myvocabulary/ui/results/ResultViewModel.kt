@@ -26,7 +26,6 @@ class ResultViewModel(
 ) : ViewModel() {
     private val disposables = CompositeDisposable()
     private val liveGuessedWordList: MutableLiveData<List<Word>> = MutableLiveData()
-    private val liveNumberOfPasses: MutableLiveData<Int> = MutableLiveData()
     var directionResult: QuizDirectionType = QuizDirectionType.AskWord
     var isAllPassed = true
 
@@ -55,7 +54,6 @@ class ResultViewModel(
                 .subscribe { guessList ->
                     liveGuessedWordList.postValue(guessList)
                     quizRepository.updateQuizList(guessList)
-                    liveNumberOfPasses.postValue(guessList.filter { it.lastResult }.size)
                 }
     }
 
