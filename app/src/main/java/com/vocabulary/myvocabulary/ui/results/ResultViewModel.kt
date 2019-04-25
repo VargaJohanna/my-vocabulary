@@ -55,7 +55,7 @@ class ResultViewModel(
                 .observeOn(rxSchedulers.main())
                 .subscribe { guessList ->
                     liveGuessedWordList.postValue(guessList)
-                    wordsWithLatestGuess = guessList
+                    quizRepository.updateQuizList(guessList)
                 }
     }
 
@@ -89,10 +89,6 @@ class ResultViewModel(
         }
     }
 
-    fun updateQuizList() {
-        quizRepository.updateQuizList(wordsWithLatestGuess)
-    }
-
     fun dispose() {
         disposables.clear()
     }
@@ -122,14 +118,4 @@ class ResultViewModel(
     fun latestGuess(lastGuess: GuessedWord) {
         guessedWordRepository.addToGuessedWordMap(lastGuess)
     }
-
-//    @VisibleForTesting
-//    fun getGuessedWordMap() = guessesMap
-//
-//    @VisibleForTesting
-//    fun setGuessedWordMap(list: List<GuessedWord>) {
-//        list.forEach {
-//            guessesMap[it.wordId] = it.guess
-//        }
-//    }
 }
