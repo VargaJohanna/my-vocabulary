@@ -25,11 +25,9 @@ class ResultViewModel(
         private val guessedWordRepository: GuessedWordRepository
 ) : ViewModel() {
     private val disposables = CompositeDisposable()
-    private var _liveGuessedWordList: MutableList<Word> = mutableListOf()
     private val liveGuessedWordList: MutableLiveData<List<Word>> = MutableLiveData()
     var directionResult: QuizDirectionType = QuizDirectionType.AskWord
     var isAllPassed = true
-    private var wordsWithLatestGuess: MutableList<Word> = mutableListOf()
 
     override fun onCleared() {
         disposables.clear()
@@ -98,8 +96,7 @@ class ResultViewModel(
 
     fun resetGuessedWordCollections() {
         guessedWordRepository.resetGuessedWordMap()
-        _liveGuessedWordList = mutableListOf()
-        liveGuessedWordList.postValue(_liveGuessedWordList)
+        liveGuessedWordList.postValue(mutableListOf())
         setAllPassedValue(true)
     }
 

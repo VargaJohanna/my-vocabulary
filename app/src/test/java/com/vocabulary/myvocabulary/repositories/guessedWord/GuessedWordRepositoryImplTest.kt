@@ -35,16 +35,6 @@ class GuessedWordRepositoryImplTest {
                 .dispose()
     }
 
-    @Test
-    fun `should return observable when guessedWordMap`() {
-        val guessedWordRepository = givenGuessedWordRepository()
-
-        val testObserver = guessedWordRepository.guessedWordMap.test()
-
-        testObserver.assertNoErrors()
-                .dispose()
-    }
-
     private fun givenGuessedWordRepository(): GuessedWordRepository {
         return GuessedWordRepositoryImpl()
     }
