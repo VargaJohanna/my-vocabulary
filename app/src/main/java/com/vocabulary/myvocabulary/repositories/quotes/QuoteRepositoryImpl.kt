@@ -1,6 +1,6 @@
 package com.vocabulary.myvocabulary.repositories.quotes
 
-import com.vocabulary.myvocabulary.quotes.Quote
+import com.vocabulary.myvocabulary.quotes.QuoteData
 import io.reactivex.Observable
 
 class QuoteRepositoryImpl(
@@ -8,14 +8,13 @@ class QuoteRepositoryImpl(
         private val localQuoteRepository: LocalQuoteRepository
 ) : QuoteRepository {
 
-    override fun getQuote(): Observable<Quote> {
-        val localQuote: Observable<Quote> = localQuoteRepository.getLocalQuote().toObservable()
-        val networkQuote: Observable<Quote> = networkQuoteRepository.fetchQuote().toObservable()
+    override fun getQuote(): Observable<QuoteData.Quote> {
+        val localQuote: Observable<QuoteData.Quote> = localQuoteRepository.getLocalQuote().toObservable()
+        val networkQuote: Observable<QuoteData.Quote> = networkQuoteRepository.fetchQuote().toObservable()
 
         return Observable.concat(localQuote, networkQuote
                 .doOnNext {
                     localQuoteRepository.saveLocalQuote(it)
                 })
-
     }
 }

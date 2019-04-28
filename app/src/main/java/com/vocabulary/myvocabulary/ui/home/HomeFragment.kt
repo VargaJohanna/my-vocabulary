@@ -11,6 +11,7 @@ import androidx.lifecycle.Observer
 import androidx.navigation.findNavController
 import com.vocabulary.myvocabulary.R
 import com.vocabulary.myvocabulary.ext.show
+import com.vocabulary.myvocabulary.quotes.QuoteData
 import com.vocabulary.myvocabulary.utils.DialogFactory
 import kotlinx.android.synthetic.main.fragment_home.*
 import kotlinx.android.synthetic.main.fragment_home.view.*
@@ -29,19 +30,20 @@ class HomeFragment : Fragment() {
             quote_button.setOnClickListener {
                 showQuote(home_progress_bar)
             }
-
         }
     }
 
     private fun showQuote(progressbar: ProgressBar) {
         progressbar.show(true)
         homeViewModel.liveQuote.observe(requireActivity(), Observer {
-            progressbar.show(false)
-            dialogFactory.buildInfoDialog(
-                    requireActivity(),
-                    it.title,
-                    it.quote
-            ).show()
+            if(it != QuoteData.EMPTY) {
+                progressbar.show(false)
+                dialogFactory.buildInfoDialog(
+                        requireActivity(),
+                        it.title,
+                        it.quote
+                ).show()
+            }
         })
     }
 }

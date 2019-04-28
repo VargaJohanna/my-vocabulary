@@ -1,8 +1,8 @@
 package com.vocabulary.myvocabulary.repositories.quotes
 
-import com.vocabulary.myvocabulary.quotes.Quote
+import com.vocabulary.myvocabulary.quotes.QuoteData
 import io.reactivex.Single
 
 interface NetworkQuoteRepository {
-    fun fetchQuote(): Single<Quote>
+    fun fetchQuote(): Single<QuoteData.Quote>
 }
