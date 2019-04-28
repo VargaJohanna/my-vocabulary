@@ -4,6 +4,8 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
+import android.widget.ImageButton
 import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.fragment.app.Fragment
@@ -27,22 +29,28 @@ class HomeFragment : Fragment() {
             dictionary_button.setOnClickListener { it.findNavController().navigate(R.id.action_homeFragment_to_dictionaryListFragment) }
             quiz_button.setOnClickListener { it.findNavController().navigate(R.id.action_homeFragment_to_quizListFragment) }
             about_button.setOnClickListener { it.findNavController().navigate(R.id.to_aboutFragment) }
-            quote_button.setOnClickListener {
-                showQuote(home_progress_bar)
-            }
+            showQuote(quiz_button, home_progress_bar)
         }
     }
 
-    private fun showQuote(progressbar: ProgressBar) {
+    private fun showQuote(quoteButton: Button, progressbar: ProgressBar) {
         progressbar.show(true)
-        homeViewModel.liveQuote.observe(requireActivity(), Observer {
+        homeViewModel.liveQuote.observe(requireActivity(), Observer { quoteData ->
             progressbar.show(false)
-            dialogFactory.buildQuotesDialog(
-                    requireActivity(),
-                    it.title,
-                    it.quote,
-                    it.author
-            ).show()
+            if(quoteData != QuoteData.EMPTY) {
+                quoteButton.show(true)
+                quoteButton.setOnClickListener {
+                    quoteData as QuoteData.Quote
+                    dialogFactory.buildQuotesDialog(
+                            requireActivity(),
+                            quoteData.title,
+                            quoteData.quote,
+                            quoteData.author
+                    ).show()
+                }
+            } else {
+                quoteButton.show(false)
+            }
         })
     }
 }
