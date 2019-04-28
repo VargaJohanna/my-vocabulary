@@ -1,10 +1,7 @@
 package com.vocabulary.myvocabulary
 
 import android.app.Application
-import com.vocabulary.myvocabulary.di.factoryModule
-import com.vocabulary.myvocabulary.di.repositoryModule
-import com.vocabulary.myvocabulary.di.schedulerModule
-import com.vocabulary.myvocabulary.di.viewModelModule
+import com.vocabulary.myvocabulary.di.*
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.context.startKoin
 
@@ -13,7 +10,7 @@ class MyApplication : Application() {
         super.onCreate()
         startKoin {
             androidContext(this@MyApplication)
-            modules(repositoryModule, viewModelModule, schedulerModule, factoryModule)
+            modules(networkModule, repositoryModule, viewModelModule, schedulerModule, factoryModule)
         }
     }
 }
