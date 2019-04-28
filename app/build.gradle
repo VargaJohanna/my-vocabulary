@@ -54,6 +54,7 @@ dependencies {
     def koin_core_version = "2.0.0-beta-1"
     def material_about_version = "0.2.3"
     def rx_preferences_version = "2.0.0"
+    def retrofit_version = "2.5.0"
 
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
     implementation "androidx.constraintlayout:constraintlayout:$constraint_layout_version"
@@ -68,6 +69,12 @@ dependencies {
     //RxJava
     implementation "io.reactivex.rxjava2:rxandroid:$rx_android_version"
     implementation "io.reactivex.rxjava2:rxjava:$rx_java_version"
+
+    //Retrofit
+    implementation "com.squareup.retrofit2:retrofit:$retrofit_version"
+    implementation "com.squareup.retrofit2:converter-gson:$retrofit_version"
+    implementation "com.squareup.retrofit2:adapter-rxjava2:$retrofit_version"
+    implementation "com.squareup.retrofit2:converter-gson:$retrofit_version"
 
     //Espresso
     testImplementation "junit:junit:$junit_version"
@@ -87,12 +94,12 @@ dependencies {
     implementation "androidx.lifecycle:lifecycle-extensions:$lifecycle_version"
     annotationProcessor "androidx.lifecycle:lifecycle-compiler:$lifecycle_version"
 
-    // Navigation
+    //Navigation
     implementation "androidx.core:core-ktx:$core_ktx_version"
     implementation "android.arch.navigation:navigation-fragment-ktx:$nav_version"
     implementation "android.arch.navigation:navigation-ui-ktx:$nav_version"
 
-    // Koin
+    //Koin
     implementation "org.koin:koin-core:$koin_core_version"
     implementation "org.koin:koin-core-ext:$koin_core_version"
     implementation "org.koin:koin-androidx-scope:$koin_core_version"
@@ -104,6 +111,6 @@ dependencies {
     //About page
     implementation "com.github.jrvansuita:MaterialAbout:$material_about_version"
 
-    // Share preferences
+    //Share preferences
     implementation "com.f2prateek.rx.preferences2:rx-preferences:$rx_preferences_version"
 }
