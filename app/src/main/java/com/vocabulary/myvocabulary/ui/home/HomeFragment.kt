@@ -36,14 +36,13 @@ class HomeFragment : Fragment() {
     private fun showQuote(progressbar: ProgressBar) {
         progressbar.show(true)
         homeViewModel.liveQuote.observe(requireActivity(), Observer {
-            if(it != QuoteData.EMPTY) {
-                progressbar.show(false)
-                dialogFactory.buildInfoDialog(
-                        requireActivity(),
-                        it.title,
-                        it.quote
-                ).show()
-            }
+            progressbar.show(false)
+            dialogFactory.buildQuotesDialog(
+                    requireActivity(),
+                    it.title,
+                    it.quote,
+                    it.author
+            ).show()
         })
     }
 }

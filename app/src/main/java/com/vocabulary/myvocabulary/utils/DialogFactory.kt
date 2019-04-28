@@ -5,10 +5,7 @@ import android.app.AlertDialog
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.View
-import android.widget.Button
-import android.widget.EditText
-import android.widget.RadioGroup
-import android.widget.TextView
+import android.widget.*
 import com.vocabulary.myvocabulary.R
 import com.vocabulary.myvocabulary.ext.show
 import com.vocabulary.myvocabulary.ui.dictionaries.Dictionary
@@ -16,9 +13,12 @@ import com.vocabulary.myvocabulary.ui.words.Word
 import kotlinx.android.synthetic.main.dialog_create_dictionary.view.*
 import kotlinx.android.synthetic.main.dialog_create_word.view.*
 import kotlinx.android.synthetic.main.dialog_direction_option_picker.view.*
+import kotlinx.android.synthetic.main.dialog_quote.view.*
 import kotlinx.android.synthetic.main.dialog_rename_dictionary.view.*
+import kotlinx.android.synthetic.main.dialog_rename_dictionary.view.rename_dictionary_button
 import kotlinx.android.synthetic.main.dialog_rename_word.view.*
 import kotlinx.android.synthetic.main.dialog_start_quiz.view.*
+import kotlinx.android.synthetic.main.fragment_home.view.*
 
 class DialogFactory {
 
@@ -347,33 +347,24 @@ class DialogFactory {
 
     fun buildQuotesDialog(
             activity: Activity,
-            doItClick: (selectedOption: Int) -> Unit
+            titleText: String,
+            quoteText: String,
+            authorText: String
     ): AlertDialog {
-        var selectedOption = 0
         val inflater = activity.layoutInflater
-        val dialogView: View = inflater.inflate(R.layout.dialog_direction_option_picker, null)
-        val radioGroup: RadioGroup = dialogView.radioGroup
-        val doItButton: Button = dialogView.lets_do_it_button
-        val cancelButton: Button = dialogView.cancel_direction_picker_dialog
-        val errorMessage: TextView = dialogView.option_picker_error
+        val dialogView: View = inflater.inflate(R.layout.dialog_quote, null)
+        val thanksButton: ImageButton = dialogView.quote_button
+        val quote: TextView = dialogView.quote_text
+        val author: TextView = dialogView.quote_author
         val dialogBuilder = AlertDialog.Builder(activity)
         return dialogBuilder.create().apply {
             setView(dialogView)
-            radioGroup.setOnCheckedChangeListener { _, checkedId ->
-                errorMessage.show(false)
-                selectedOption = if (checkedId == R.id.word_radio) 0 else 1
-            }
-            doItButton.setOnClickListener {
-                if (selectedOption == -1) {
-                    errorMessage.show(true)
-                } else {
-                    doItClick(selectedOption)
-                }
-            }
-            cancelButton.setOnClickListener {
+            quote.text = quoteText
+            author.text = authorText
+            thanksButton.setOnClickListener {
                 dismiss()
             }
-            setTitle(R.string.dialog_pick_direction)
+            setTitle(titleText)
         }
     }
 }
