@@ -57,7 +57,7 @@ val networkModule = module {
     single{RxJava2CallAdapterFactory.create()}
     single{GsonConverterFactory.create()}
     single { Retrofit.Builder()
-            .baseUrl(Constants.BASE_URL)
+            .baseUrl(Constants.QOD_BASE_URL)
             .addCallAdapterFactory(get<RxJava2CallAdapterFactory>())
             .addConverterFactory(get<GsonConverterFactory>())
             .build() }
