@@ -16,6 +16,7 @@ import com.vocabulary.myvocabulary.ui.words.Word
 import kotlinx.android.synthetic.main.dialog_create_dictionary.view.*
 import kotlinx.android.synthetic.main.dialog_create_word.view.*
 import kotlinx.android.synthetic.main.dialog_direction_option_picker.view.*
+import kotlinx.android.synthetic.main.dialog_quote.view.*
 import kotlinx.android.synthetic.main.dialog_rename_dictionary.view.*
 import kotlinx.android.synthetic.main.dialog_rename_word.view.*
 import kotlinx.android.synthetic.main.dialog_start_quiz.view.*
@@ -342,6 +343,29 @@ class DialogFactory {
                 dismiss()
             }
             setTitle(R.string.dialog_pick_direction)
+        }
+    }
+
+    fun buildQuotesDialog(
+            activity: Activity,
+            titleText: String,
+            quoteText: String,
+            authorText: String
+    ): AlertDialog {
+        val inflater = activity.layoutInflater
+        val dialogView: View = inflater.inflate(R.layout.dialog_quote, null)
+        val thanksButton: Button = dialogView.quote_thanks_button
+        val quote: TextView = dialogView.quote_text
+        val author: TextView = dialogView.quote_author
+        val dialogBuilder = AlertDialog.Builder(activity)
+        return dialogBuilder.create().apply {
+            setView(dialogView)
+            quote.text = activity.getString(R.string.quote_text, quoteText)
+            author.text = authorText
+            thanksButton.setOnClickListener {
+                dismiss()
+            }
+            setTitle(titleText)
         }
     }
 }

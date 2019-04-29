@@ -38,6 +38,19 @@
                 android:src="@drawable/ic_info_outline"
                 android:tint="@color/icons"
                 android:elevation="2dp"/>
+
+            <ImageButton
+                android:id="@+id/quote_button"
+                android:layout_width="@dimen/information_icon_size"
+                android:layout_height="@dimen/information_icon_size"
+                android:padding="@dimen/padding_normal"
+                android:background="@null"
+                android:scaleType="fitCenter"
+                android:layout_gravity="end"
+                android:src="@drawable/ic_format_quote"
+                android:tint="@color/icons"
+                android:visibility="invisible"
+                android:elevation="2dp"/>
         </androidx.appcompat.widget.Toolbar>
     </com.google.android.material.appbar.AppBarLayout>
 
