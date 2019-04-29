@@ -9,12 +9,13 @@ class QuoteRepositoryImpl(
 ) : QuoteRepository {
 
     override fun getQuote(): Observable<QuoteData.Quote> {
-        val localQuote: Observable<QuoteData.Quote> = localQuoteRepository.getLocalQuote().toObservable()
+        val localQuote: Observable<QuoteData.Quote> = localQuoteRepository.getQuote().toObservable()
         val networkQuote: Observable<QuoteData.Quote> = networkQuoteRepository.fetchQuote().toObservable()
 
-        return Observable.concat(localQuote, networkQuote
-                .doOnNext {
-                    localQuoteRepository.saveLocalQuote(it)
+        return Observable.concat(
+                localQuote,
+                networkQuote.doOnNext {
+                    localQuoteRepository.saveQuote(it)
                 })
     }
 }

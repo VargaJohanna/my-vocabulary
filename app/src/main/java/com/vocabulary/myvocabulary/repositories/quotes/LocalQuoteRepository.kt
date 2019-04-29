@@ -4,6 +4,6 @@ import com.vocabulary.myvocabulary.quotes.QuoteData
 import io.reactivex.Maybe
 
 interface LocalQuoteRepository {
-    fun getLocalQuote(): Maybe<QuoteData.Quote>
-    fun saveLocalQuote(quote: QuoteData.Quote)
+    fun getQuote(): Maybe<QuoteData.Quote>
+    fun saveQuote(quote: QuoteData.Quote)
 }
