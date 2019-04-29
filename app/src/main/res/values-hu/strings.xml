@@ -92,7 +92,6 @@
     <string name="empty_dictionary_state_message">Adj hozzá kifejezéseket, és itt fognak megjelenni.</string>
     <string name="result_stats">%1$d / %2$d - %3$d%</string>
     <string name="thanks">" Köszönöm"</string>
-    <string name="quote_menu">Napi idézet</string>
-    <string name="about_menu">Rólunk</string>
+    <string name="quote_text">\"%1$s\"</string>
 
 </resources>

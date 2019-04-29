@@ -1,5 +1,6 @@
 package com.vocabulary.myvocabulary.ui.home
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -21,12 +22,16 @@ class HomeViewModel(
         observeQuote()
     }
 
-    // how to handle error?
     private fun observeQuote() {
         disposables += quoteRepository.getQuote()
                 .subscribeOn(rxSchedulers.io())
                 .observeOn(rxSchedulers.main())
-                .doOnError { _liveQuote.postValue(QuoteData.EMPTY) }
-                .subscribe { t -> _liveQuote.postValue(t) }
+                .subscribe(
+                        { _liveQuote.postValue(it) },
+                        {
+                            Log.d("QUOTE_ERROR", it.message)
+                            _liveQuote.postValue(QuoteData.EMPTY)
+                        }
+                )
     }
 }

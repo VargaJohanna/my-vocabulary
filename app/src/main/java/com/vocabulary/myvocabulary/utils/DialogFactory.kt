@@ -5,7 +5,10 @@ import android.app.AlertDialog
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.View
-import android.widget.*
+import android.widget.Button
+import android.widget.EditText
+import android.widget.RadioGroup
+import android.widget.TextView
 import com.vocabulary.myvocabulary.R
 import com.vocabulary.myvocabulary.ext.show
 import com.vocabulary.myvocabulary.ui.dictionaries.Dictionary
@@ -15,10 +18,8 @@ import kotlinx.android.synthetic.main.dialog_create_word.view.*
 import kotlinx.android.synthetic.main.dialog_direction_option_picker.view.*
 import kotlinx.android.synthetic.main.dialog_quote.view.*
 import kotlinx.android.synthetic.main.dialog_rename_dictionary.view.*
-import kotlinx.android.synthetic.main.dialog_rename_dictionary.view.rename_dictionary_button
 import kotlinx.android.synthetic.main.dialog_rename_word.view.*
 import kotlinx.android.synthetic.main.dialog_start_quiz.view.*
-import kotlinx.android.synthetic.main.fragment_home.view.*
 
 class DialogFactory {
 
@@ -353,13 +354,13 @@ class DialogFactory {
     ): AlertDialog {
         val inflater = activity.layoutInflater
         val dialogView: View = inflater.inflate(R.layout.dialog_quote, null)
-        val thanksButton: ImageButton = dialogView.quote_button
+        val thanksButton: Button = dialogView.quote_thanks_button
         val quote: TextView = dialogView.quote_text
         val author: TextView = dialogView.quote_author
         val dialogBuilder = AlertDialog.Builder(activity)
         return dialogBuilder.create().apply {
             setView(dialogView)
-            quote.text = quoteText
+            quote.text = activity.getString(R.string.quote_text, quoteText)
             author.text = authorText
             thanksButton.setOnClickListener {
                 dismiss()
