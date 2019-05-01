@@ -186,8 +186,6 @@ class ResultFragment : Fragment() {
                 }
             })
         }
-
-
     }
 
     private fun hideKeyboard() {
