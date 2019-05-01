@@ -50,23 +50,13 @@ class DialogFactory {
                 val inputWord = editTextWord.text.toString().trim()
                 val inputTranslation = editTextTranslation.text.toString().trim()
 
-                if (inputWord.isNotEmpty() && inputTranslation.isNotEmpty()) {
-                    errorMessageWord.show(false)
+                if (inputTranslation.isNotEmpty()) {
                     errorMessageTranslation.show(false)
                     saveClick(
-                            editTextWord.text.toString().trim(),
-                            editTextTranslation.text.toString().trim()
+                            inputWord,
+                            inputTranslation
                     )
-                } else if (inputWord.isEmpty() && inputTranslation.isEmpty()) {
-                    errorMessageWord.show(true)
-                    errorMessageTranslation.show(true)
-                } else if (inputWord.isEmpty()) {
-                    errorMessageWord.show(true)
-                    errorMessageTranslation.show(false)
-                } else if (inputTranslation.isEmpty()) {
-                    errorMessageWord.show(false)
-                    errorMessageTranslation.show(true)
-                }
+                } else errorMessageTranslation.show(true)
             }
             cancelButton.setOnClickListener {
                 dismiss()
@@ -181,23 +171,16 @@ class DialogFactory {
             saveButton.setOnClickListener {
                 val inputWord = editTextWord.text.toString().trim()
                 val inputTranslation = editTextTranslation.text.toString().trim()
-                if (inputWord.isNotEmpty() && inputTranslation.isNotEmpty()) {
-                    errorMessageWord.show(false)
+                if (inputTranslation.isNotEmpty()) {
                     errorMessageTranslation.show(false)
                     createClick(
-                            editTextWord.text.toString().trim(),
-                            editTextTranslation.text.toString().trim())
+                            inputWord,
+                            inputTranslation)
                     editTextWord.setText("")
                     editTextTranslation.setText("")
                     editTextTranslation.requestFocus()
 
-                } else if (inputWord.isEmpty() && inputTranslation.isEmpty()) {
-                    errorMessageWord.show(true)
-                    errorMessageTranslation.show(true)
-                } else if (inputWord.isEmpty()) {
-                    errorMessageWord.show(true)
-                    errorMessageTranslation.show(false)
-                } else if (inputTranslation.isEmpty()) {
+                } else {
                     errorMessageWord.show(false)
                     errorMessageTranslation.show(true)
                 }
@@ -205,24 +188,17 @@ class DialogFactory {
             addMoreButton.setOnClickListener {
                 val inputWord = editTextWord.text.toString().trim()
                 val inputTranslation = editTextTranslation.text.toString().trim()
-                if (inputWord.isNotEmpty() && inputTranslation.isNotEmpty()) {
-                    errorMessageWord.show(false)
+                if (inputTranslation.isNotEmpty()) {
                     errorMessageTranslation.show(false)
                     addMoreClick(
-                            editTextWord.text.toString().trim(),
-                            editTextTranslation.text.toString().trim()
+                            inputWord,
+                            inputTranslation
                     )
                     editTextWord.setText("")
                     editTextTranslation.setText("")
                     editTextTranslation.requestFocus()
 
-                } else if (inputWord.isEmpty() && inputTranslation.isEmpty()) {
-                    errorMessageWord.show(true)
-                    errorMessageTranslation.show(true)
-                } else if (inputWord.isEmpty()) {
-                    errorMessageWord.show(true)
-                    errorMessageTranslation.show(false)
-                } else if (inputTranslation.isEmpty()) {
+                } else {
                     errorMessageWord.show(false)
                     errorMessageTranslation.show(true)
                 }

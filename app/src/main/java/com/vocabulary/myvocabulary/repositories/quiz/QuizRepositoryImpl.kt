@@ -25,6 +25,7 @@ class QuizRepositoryImpl(
     private fun resetFullQuizList(dictionaryId: Long): Single<List<Word>> {
         return wordRepository.getObservableWordList(dictionaryId)
                 .firstOrError()
+                .map { list -> list.filter { it.word.isNotEmpty() } }
                 .doOnSuccess {
                     _quizList.onNext(it)
                 }
@@ -33,6 +34,7 @@ class QuizRepositoryImpl(
     private fun resetQuickQuizList(dictionaryId: Long): Single<List<Word>> {
         return wordRepository.getObservableWordList(dictionaryId)
                 .firstOrError()
+                .map { list -> list.filter { it.word.isNotEmpty() } }
                 .map { it.shuffled() }
                 .map { it.take(5) }
                 .doOnSuccess {
@@ -43,6 +45,7 @@ class QuizRepositoryImpl(
     private fun resetWeakestFive(dictionaryId: Long): Single<List<Word>> {
         return wordRepository.getObservableWordList(dictionaryId)
                 .firstOrError()
+                .map { list -> list.filter { it.word.isNotEmpty() } }
                 .map { sortWeaknessesList(it)}
                 .map { it.take(5) }
                 .doOnSuccess {

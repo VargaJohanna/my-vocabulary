@@ -23,11 +23,11 @@
             android:padding="@dimen/padding_normal"
             android:textSize="@dimen/text_size_medium"
             android:background="?selectableItemBackground"
+            android:hint="@string/word_hint"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@+id/word_options"
             app:layout_constraintStart_toEndOf="@id/guideline"
             app:layout_constraintTop_toTopOf="parent"
-            tools:text="polip"
              />
 
         <androidx.constraintlayout.widget.Guideline
