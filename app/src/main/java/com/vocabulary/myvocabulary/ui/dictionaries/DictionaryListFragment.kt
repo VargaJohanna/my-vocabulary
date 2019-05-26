@@ -1,12 +1,16 @@
 package com.vocabulary.myvocabulary.ui.dictionaries
 
+import android.app.Activity.RESULT_OK
 import android.app.AlertDialog
+import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.LinearLayout
 import android.widget.PopupMenu
 import android.widget.ProgressBar
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.navigation.findNavController
@@ -15,12 +19,14 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.vocabulary.myvocabulary.R
+import com.vocabulary.myvocabulary.ext.display
 import com.vocabulary.myvocabulary.ext.plusAssign
 import com.vocabulary.myvocabulary.ext.show
 import com.vocabulary.myvocabulary.rx.RxSchedulers
 import com.vocabulary.myvocabulary.ui.quizzes.toQuizType
 import com.vocabulary.myvocabulary.utils.DialogFactory
 import io.reactivex.disposables.CompositeDisposable
+import kotlinx.android.synthetic.main.fragment_dictionary_list.*
 import kotlinx.android.synthetic.main.fragment_dictionary_list.view.*
 import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.viewModel
@@ -38,6 +44,7 @@ class DictionaryListFragment : Fragment(), DictionaryAdapter.ItemClickListener {
     private var popUp: PopupMenu? = null
     private var importDialog: AlertDialog? = null
     private val disposables = CompositeDisposable()
+    private var isFabOpen = false
 
     override fun onItemClick(dictionary: Dictionary) {
         val action = DictionaryListFragmentDirections.actionDictionaryToWordList(dictionary.dictionaryId, dictionary.dictionaryName)
@@ -56,31 +63,35 @@ class DictionaryListFragment : Fragment(), DictionaryAdapter.ItemClickListener {
         return inflater.inflate(R.layout.fragment_dictionary_list, container, false).apply {
             generateDictionaryList(dictionaryAdapter, dictionary_recycler_view)
             observeList(dictionaryAdapter, progress_bar)
-            setFabOnClickListener(dictionary_fab)
+            setFabOnClickListener(dictionary_fab, import_container, create_new_container)
+            setCreateNewFabOnClickListener(create_new_fab)
+            setImportFabOnClickListener(import_fab)
             dictionary_list_toolbar.setNavigationOnClickListener { findNavController().popBackStack() }
         }
     }
 
     private fun importDictionary() {
-        shareViewModel.getLiveIsImport().observe(requireActivity(), Observer {isImport ->
-            if(isImport && importDialog == null) {
-                importDialog = dialogFactory.buildDictionaryCreateDialog(
-                        requireActivity(),
-                        getString(R.string.import_dictionary_dialog_title)
-                ) { nameToCreate ->
-                    shareViewModel.createDictionary(Dictionary(
-                            dictionaryName = nameToCreate,
-                            dictionaryCreated = Calendar.getInstance().time))
+        shareViewModel.getLiveIsImport().observe(requireActivity(), Observer { isImport ->
+            if (isImport) {
+                if (importDialog == null || !importDialog!!.isShowing) {
+                    importDialog = dialogFactory.buildDictionaryCreateDialog(
+                            requireActivity(),
+                            getString(R.string.import_dictionary_dialog_title)
+                    ) { nameToCreate ->
+                        shareViewModel.createDictionary(Dictionary(
+                                dictionaryName = nameToCreate,
+                                dictionaryCreated = Calendar.getInstance().time))
 
-                    shareViewModel.getImportedDictionaryDetails().observe(this, Observer { event ->
-                        event.getContentIfNotHandled()?.let {
-                            shareViewModel.parseDataAndCreateWords(it.dictionaryId, requireActivity())
-                            shareViewModel.setIsImport(false)
-                        }
-                        importDialog?.dismiss()
-                    })
+                        shareViewModel.getImportedDictionaryDetails().observe(this, Observer { event ->
+                            event.getContentIfNotHandled()?.let {
+                                shareViewModel.parseDataAndCreateWords(it.dictionaryId, requireActivity())
+                                shareViewModel.setIsImport(false)
+                            }
+                            importDialog?.dismiss()
+                        })
+                    }
+                    importDialog?.show()
                 }
-                importDialog?.show()
             }
         })
     }
@@ -101,8 +112,15 @@ class DictionaryListFragment : Fragment(), DictionaryAdapter.ItemClickListener {
         })
     }
 
-    private fun setFabOnClickListener(fab: FloatingActionButton) {
+    private fun setFabOnClickListener(fab: FloatingActionButton, importContainer: LinearLayout, createNewContainer: LinearLayout) {
         fab.setOnClickListener {
+            if (isFabOpen) closeFabMenu(importContainer, createNewContainer)
+            else showFabMenu(importContainer, createNewContainer)
+        }
+    }
+
+    private fun setCreateNewFabOnClickListener(createFab: FloatingActionButton) {
+        createFab.setOnClickListener {
             createDialog = dialogFactory.buildDictionaryCreateDialog(
                     requireActivity(),
                     getString(R.string.create_new_dictionary_dialog_title)
@@ -116,10 +134,17 @@ class DictionaryListFragment : Fragment(), DictionaryAdapter.ItemClickListener {
                     }
                 })
             }
+            closeFabMenu(import_container, create_new_container)
             createDialog?.show()
         }
     }
 
+    private fun setImportFabOnClickListener(importFab: FloatingActionButton) {
+        importFab.setOnClickListener {
+            requestFile()
+            closeFabMenu(import_container, create_new_container)
+        }
+    }
 
     private fun createPopUpMenu(dictionary: Dictionary, view: View) {
         popUp = PopupMenu(requireActivity(), view).apply {
@@ -171,14 +196,52 @@ class DictionaryListFragment : Fragment(), DictionaryAdapter.ItemClickListener {
         disposables += viewModel.startNew(dictionaryId, selectedQuiz.toQuizType())
                 .subscribeOn(rxSchedulers.io())
                 .observeOn(rxSchedulers.main())
-                .subscribe{
-            val action = DictionaryListFragmentDirections.fromDictionaryToQuiz(
-                    dictionaryId,
-                    selectedOption,
-                    selectedQuiz
-            )
-            findNavController().navigate(action)
+                .subscribe {
+                    val action = DictionaryListFragmentDirections.fromDictionaryToQuiz(
+                            dictionaryId,
+                            selectedOption,
+                            selectedQuiz
+                    )
+                    findNavController().navigate(action)
+                }
+    }
+
+    private fun requestFile() {
+        val intent = Intent(Intent.ACTION_PICK)
+        if (intent.resolveActivity(requireActivity().packageManager) != null) {
+            intent.addCategory(Intent.CATEGORY_DEFAULT)
+            startActivityForResult(intent, 0)
         }
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, intent: Intent?) {
+        if (resultCode == RESULT_OK && intent != null) {
+            if (intent.data != null) {
+                if (requireActivity().contentResolver.getType(intent.data!!) == "text/csv") {
+                    shareViewModel.saveCsvData(intent.data!!)
+                    shareViewModel.setIsImport(true)
+                } else {
+                    shareViewModel.setIsImport(false)
+                    Toast.makeText(requireActivity(), getString(R.string.only_csv_import), Toast.LENGTH_LONG).show()
+                }
+            }
+        }
+    }
+
+    private fun closeFabMenu(importContainer: LinearLayout, createNewContainer: LinearLayout) {
+        isFabOpen = false
+        importContainer.display(false)
+        createNewContainer.display(false)
+        importContainer.animate().translationY(0f)
+        createNewContainer.animate().translationY(0f)
+    }
+
+    private fun showFabMenu(importContainer: LinearLayout, createNewContainer: LinearLayout) {
+        isFabOpen = true
+        importContainer.display(true)
+        createNewContainer.display(true)
+        importContainer.animate().translationY(-resources.getDimension(R.dimen.standard_150))
+        createNewContainer.animate().translationY(-resources.getDimension(R.dimen.standard_75))
     }
 
     override fun onStop() {
