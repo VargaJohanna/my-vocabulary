@@ -29,7 +29,7 @@ class HomeActivity : AppCompatActivity() {
 
     private fun manageIntent(data: Uri?) {
         if (data != null) {
-            homeViewModel.saveCsvData(intent.data!!)
+            homeViewModel.saveCsvData(data)
             homeViewModel.setIsImport(true)
             findNavController(R.id.home_nav_host_fragment).navigate(R.id.dictionaryListFragment)
         } else {
