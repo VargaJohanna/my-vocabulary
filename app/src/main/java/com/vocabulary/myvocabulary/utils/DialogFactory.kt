@@ -245,6 +245,7 @@ class DialogFactory {
 
     fun buildDictionaryCreateDialog(
             activity: Activity,
+            title: String,
             createClick: (nameToCreate: String) -> Unit
     ): AlertDialog {
         val inflater = activity.layoutInflater
@@ -272,7 +273,7 @@ class DialogFactory {
                 errorMessage.show(false)
                 dismiss()
             }
-            setTitle(activity.getString(R.string.create_new_dictionary_dialog_title))
+            setTitle(title)
         }
     }
 

@@ -1,5 +1,6 @@
 package com.vocabulary.myvocabulary.ui.home
 
+import android.net.Uri
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -8,11 +9,13 @@ import com.vocabulary.myvocabulary.ext.plusAssign
 import com.vocabulary.myvocabulary.quotes.QuoteData
 import com.vocabulary.myvocabulary.repositories.quotes.QuoteRepository
 import com.vocabulary.myvocabulary.rx.RxSchedulers
+import com.vocabulary.myvocabulary.repositories.share.ShareDictionaryRepository
 import io.reactivex.disposables.CompositeDisposable
 
 class HomeViewModel(
         private val rxSchedulers: RxSchedulers,
-        private val quoteRepository: QuoteRepository
+        private val quoteRepository: QuoteRepository,
+        private val shareDictionaryRepository: ShareDictionaryRepository
 ) : ViewModel() {
     private val _liveQuote: MutableLiveData<QuoteData> = MutableLiveData()
     val liveQuote: LiveData<QuoteData> = _liveQuote
@@ -34,4 +37,13 @@ class HomeViewModel(
                         }
                 )
     }
+
+    fun saveCsvData(csv: Uri) {
+        shareDictionaryRepository.storeCsvData(csv)
+    }
+
+    fun setIsImport(isImport: Boolean) {
+        shareDictionaryRepository.setIsImport(isImport)
+    }
+
 }

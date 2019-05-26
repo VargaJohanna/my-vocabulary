@@ -18,7 +18,7 @@ import com.vocabulary.myvocabulary.ui.words.toWordEntry
 import com.vocabulary.myvocabulary.utils.DateTypeConverter
 import java.util.*
 
-@Database(entities = [DictionaryEntry::class, WordEntry::class], version = 4, exportSchema = false)
+@Database(entities = [DictionaryEntry::class, WordEntry::class], version = 4, exportSchema = true)
 @TypeConverters(DateTypeConverter::class)
 abstract class AppDatabase : RoomDatabase() {
     abstract fun dictionaryDao(): DictionaryDao

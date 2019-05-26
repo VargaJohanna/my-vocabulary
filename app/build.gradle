@@ -32,6 +32,12 @@ android {
     androidExtensions {
         experimental = true
     }
+
+    kapt {
+        arguments {
+            arg("room.schemaLocation", "$projectDir/schemas".toString())
+        }
+    }
 }
 
 dependencies {
@@ -55,6 +61,7 @@ dependencies {
     def material_about_version = "0.2.3"
     def rx_preferences_version = "2.0.0"
     def retrofit_version = "2.5.0"
+    def apache_csv_version = "1.6"
 
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
     implementation "androidx.constraintlayout:constraintlayout:$constraint_layout_version"
@@ -113,4 +120,7 @@ dependencies {
 
     //Share preferences
     implementation "com.f2prateek.rx.preferences2:rx-preferences:$rx_preferences_version"
+
+    //Apache CSV
+    implementation "org.apache.commons:commons-csv:$apache_csv_version"
 }

@@ -22,8 +22,11 @@ import com.vocabulary.myvocabulary.rx.RxSchedulers
 import com.vocabulary.myvocabulary.rx.SchedulersImpl
 import com.vocabulary.myvocabulary.ui.dictionaries.DictionaryListViewModel
 import com.vocabulary.myvocabulary.ui.home.HomeViewModel
+import com.vocabulary.myvocabulary.ui.dictionaries.ShareDictionaryViewModel
 import com.vocabulary.myvocabulary.ui.quizzes.QuizViewModel
 import com.vocabulary.myvocabulary.ui.results.ResultViewModel
+import com.vocabulary.myvocabulary.repositories.share.ShareDictionaryRepository
+import com.vocabulary.myvocabulary.repositories.share.ShareDictionaryRepositoryImpl
 import com.vocabulary.myvocabulary.ui.words.WordDetailsViewModel
 import com.vocabulary.myvocabulary.ui.words.WordListViewModel
 import com.vocabulary.myvocabulary.utils.DialogFactory
@@ -50,6 +53,7 @@ val repositoryModule = module {
     single<QuoteRepository> { QuoteRepositoryImpl(get(), get()) }
     single { PreferenceManager.getDefaultSharedPreferences(get()) }
     single { RxSharedPreferences.create(get()) }
+    single<ShareDictionaryRepository> { ShareDictionaryRepositoryImpl() }
 }
 
 val networkModule = module {
@@ -76,7 +80,8 @@ val viewModelModule = module {
     }
     viewModel { (dictionaryId: Long) -> ResultViewModel(dictionaryId, get(), get(), get(), get()) }
     viewModel { WordDetailsViewModel(get(), get()) }
-    viewModel { HomeViewModel(get(), get()) }
+    viewModel { HomeViewModel(get(), get(), get()) }
+    viewModel { ShareDictionaryViewModel(get(), get(), get(), get()) }
 }
 
 val schedulerModule = module {
