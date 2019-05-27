@@ -97,7 +97,8 @@
     <string name="import_dictionary_dialog_title">Import dictionary</string>
     <string name="import_dictionary_menu">Import Dictionary</string>
     <string name="only_csv_import">Only CSV files can be imported.</string>
-    <string name="import_fab_label">Import</string>
+    <string name="import_fab_label">Import from CSV file</string>
     <string name="create_fab_label">New</string>
+    <string name="export_menu_label">Share</string>
 
 </resources>

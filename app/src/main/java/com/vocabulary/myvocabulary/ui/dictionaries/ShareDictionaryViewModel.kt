@@ -2,8 +2,11 @@ package com.vocabulary.myvocabulary.ui.dictionaries
 
 import android.content.ContentResolver
 import android.content.Context
+import android.content.Intent
 import android.net.Uri
 import android.util.Log
+import androidx.core.content.ContextCompat.startActivity
+import androidx.core.content.FileProvider
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -19,8 +22,8 @@ import io.reactivex.Single
 import io.reactivex.disposables.CompositeDisposable
 import org.apache.commons.csv.CSVFormat
 import org.apache.commons.csv.CSVParser
-import java.io.BufferedReader
-import java.io.InputStreamReader
+import org.apache.commons.csv.CSVPrinter
+import java.io.*
 import java.util.*
 
 class ShareDictionaryViewModel(
@@ -67,13 +70,13 @@ class ShareDictionaryViewModel(
                     for (csvRecord in csvParser) {
                         insertWordToDatabase(Word(
                                 containerDictionaryId = dictionaryId,
-                                word = csvRecord.get(0),
-                                translation = csvRecord.get(1),
+                                translation = csvRecord.get(0),
+                                word = csvRecord.get(1),
                                 created = Calendar.getInstance().time
                         ))
                     }
                 } catch (ex: Exception) {
-                    Log.d("DEBUG", ex.message)
+                    ex.printStackTrace()
                 }
             }
 
@@ -103,6 +106,54 @@ class ShareDictionaryViewModel(
         shareDictionaryRepository.storeCsvData(csv)
     }
 
+    private fun writeCsvFile(words: List<Word>, context: Context): File {
+        var fileWriter: FileWriter? = null
+        var csvPrinter: CSVPrinter? = null
+        val file = File("${context.filesDir.path}/exported.csv")
+        try {
+            file.createNewFile()
+            fileWriter = FileWriter(file)
+            csvPrinter = CSVPrinter(fileWriter, CSVFormat.DEFAULT)
+
+            for (word in words) {
+                val data = Arrays.asList(
+                        word.translation,
+                        word.word
+                )
+                csvPrinter.printRecord(data)
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+            Log.e("ERROR", e.message)
+        } finally {
+            try {
+                fileWriter!!.flush()
+                fileWriter.close()
+                csvPrinter!!.close()
+            } catch (e: IOException) {
+                e.printStackTrace()
+                Log.e("ERROR", e.message)
+            }
+        }
+        return file
+    }
+
+    fun shareDictionary(words: List<Word>, context: Context) {
+        val file = writeCsvFile(words, context)
+        val intent = Intent(Intent.ACTION_SEND)
+        intent.type = "text/csv"
+        intent.putExtra(
+                Intent.EXTRA_STREAM,
+                FileProvider.getUriForFile(
+                        context,
+                        context.applicationContext.packageName + ".fileprovider",
+                        file)
+        )
+        intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+        startActivity(context, Intent.createChooser(intent, "Share file"), null)
+    }
+
     fun getImportedDictionaryDetails(): LiveData<Event<DictionaryDetails>> = importedDictionaryDetails
     fun getLiveIsImport(): LiveData<Boolean> = isImport
+
 }

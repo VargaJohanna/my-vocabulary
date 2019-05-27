@@ -1,11 +1,13 @@
 package com.vocabulary.myvocabulary.ui.words
 
 import android.app.AlertDialog
+import android.content.Intent
 import android.os.Bundle
 import android.view.*
 import android.widget.PopupMenu
 import android.widget.ProgressBar
 import androidx.appcompat.widget.Toolbar
+import androidx.core.content.FileProvider
 import androidx.core.view.forEach
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
@@ -19,6 +21,7 @@ import com.vocabulary.myvocabulary.ext.plusAssign
 import com.vocabulary.myvocabulary.ext.show
 import com.vocabulary.myvocabulary.repositories.sortBy.SortByOptions
 import com.vocabulary.myvocabulary.rx.RxSchedulers
+import com.vocabulary.myvocabulary.ui.dictionaries.ShareDictionaryViewModel
 import com.vocabulary.myvocabulary.ui.quizzes.toQuizType
 import com.vocabulary.myvocabulary.utils.DialogFactory
 import io.reactivex.disposables.CompositeDisposable
@@ -33,6 +36,7 @@ class WordListFragment : Fragment(), WordAdapter.WordItemClickListener {
     private val wordViewModel: WordListViewModel by viewModel {
         parametersOf(args.dictionaryId)
     }
+    private val shareViewModel: ShareDictionaryViewModel by viewModel()
     private val dialogFactory: DialogFactory by inject()
     private val rxSchedulers: RxSchedulers by inject()
     private var createDialog: AlertDialog? = null
@@ -84,6 +88,7 @@ class WordListFragment : Fragment(), WordAdapter.WordItemClickListener {
                     navigationIconsSet(menu.getItem(0).subMenu)
                     when (item?.itemId) {
                         R.id.start_quiz_from_word_list -> showStartQuizDialog(wordViewModel.dictionaryId)
+                        R.id.export_dictionary -> shareDictionary()
                         R.id.sort_by_translation -> {
                             wordViewModel.setSortBy(wordViewModel.currentSortByData.copy(
                                     sortByOption = SortByOptions.SortByTranslation,
@@ -241,6 +246,12 @@ class WordListFragment : Fragment(), WordAdapter.WordItemClickListener {
                     )
                     findNavController().navigate(action)
                 }
+    }
+
+    private fun shareDictionary() {
+        if(wordViewModel.getLiveWordList().value != null) {
+            shareViewModel.shareDictionary(wordViewModel.getLiveWordList().value!!, requireContext())
+        }
     }
 
     override fun onStop() {
