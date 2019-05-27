@@ -10,6 +10,7 @@ import androidx.core.content.FileProvider
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import com.vocabulary.myvocabulary.R
 import com.vocabulary.myvocabulary.ext.plusAssign
 import com.vocabulary.myvocabulary.repositories.dictionary.DictionaryRepository
 import com.vocabulary.myvocabulary.repositories.share.ShareDictionaryRepository
@@ -23,7 +24,10 @@ import io.reactivex.disposables.CompositeDisposable
 import org.apache.commons.csv.CSVFormat
 import org.apache.commons.csv.CSVParser
 import org.apache.commons.csv.CSVPrinter
-import java.io.*
+import java.io.BufferedReader
+import java.io.File
+import java.io.FileWriter
+import java.io.InputStreamReader
 import java.util.*
 
 class ShareDictionaryViewModel(
@@ -49,20 +53,20 @@ class ShareDictionaryViewModel(
         disposables += Single.fromCallable { dictionaryRepository.createDictionary(dictionary) }
                 .subscribeOn(rxSchedulers.io())
                 .observeOn(rxSchedulers.main())
-                .subscribe { t: Long ->
-                    importedDictionaryDetails.postValue(Event(DictionaryDetails(t, dictionary.dictionaryName)))
+                .subscribe { dictionaryId: Long ->
+                    importedDictionaryDetails.postValue(Event(DictionaryDetails(dictionaryId, dictionary.dictionaryName)))
                 }
     }
 
-    fun fetchCsvUri(): Uri? = shareDictionaryRepository.getCsvData()
+    fun fetchCsvUri(): Uri? = shareDictionaryRepository.getCsvUri()
 
     fun parseDataAndCreateWords(dictionaryId: Long, context: Context) {
-        if(shareDictionaryRepository.getCsvData() != null) {
-            val scheme = shareDictionaryRepository.getCsvData()!!.scheme
+        shareDictionaryRepository.getCsvUri()?.let {
+            val scheme = it.scheme
             if (ContentResolver.SCHEME_CONTENT == scheme) {
                 try {
                     val contentResolver = context.contentResolver
-                    val inputStream = contentResolver.openInputStream(shareDictionaryRepository.getCsvData()!!)
+                    val inputStream = contentResolver.openInputStream(it)
 
                     val reader = BufferedReader(InputStreamReader(inputStream))
                     val csvParser = CSVParser(reader, CSVFormat.DEFAULT)
@@ -79,9 +83,7 @@ class ShareDictionaryViewModel(
                     ex.printStackTrace()
                 }
             }
-
         }
-
     }
 
     private fun insertWordToDatabase(word: Word) {
@@ -95,7 +97,7 @@ class ShareDictionaryViewModel(
         disposables += shareDictionaryRepository.getImport()
                 .subscribeOn(rxSchedulers.io())
                 .observeOn(rxSchedulers.main())
-                .subscribe{ isImport.postValue(it) }
+                .subscribe { isImport.postValue(it) }
     }
 
     fun setIsImport(isImport: Boolean) {
@@ -107,13 +109,11 @@ class ShareDictionaryViewModel(
     }
 
     private fun writeCsvFile(words: List<Word>, context: Context): File {
-        var fileWriter: FileWriter? = null
-        var csvPrinter: CSVPrinter? = null
         val file = File("${context.filesDir.path}/export_dictionary.csv")
         try {
             file.createNewFile()
-            fileWriter = FileWriter(file)
-            csvPrinter = CSVPrinter(fileWriter, CSVFormat.DEFAULT)
+            val fileWriter = FileWriter(file)
+            val csvPrinter = CSVPrinter(fileWriter, CSVFormat.DEFAULT)
 
             for (word in words) {
                 val data = Arrays.asList(
@@ -122,18 +122,13 @@ class ShareDictionaryViewModel(
                 )
                 csvPrinter.printRecord(data)
             }
+
+            fileWriter.flush()
+            fileWriter.close()
+            csvPrinter.close()
         } catch (e: Exception) {
             e.printStackTrace()
             Log.e("ERROR", e.message)
-        } finally {
-            try {
-                fileWriter!!.flush()
-                fileWriter.close()
-                csvPrinter!!.close()
-            } catch (e: IOException) {
-                e.printStackTrace()
-                Log.e("ERROR", e.message)
-            }
         }
         return file
     }
@@ -150,7 +145,7 @@ class ShareDictionaryViewModel(
                         file)
         )
         intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-        startActivity(context, Intent.createChooser(intent, "Share file"), null)
+        startActivity(context, Intent.createChooser(intent, context.getString(R.string.share_file_title)), null)
     }
 
     fun getImportedDictionaryDetails(): LiveData<Event<DictionaryDetails>> = importedDictionaryDetails

@@ -12,15 +12,11 @@ class ShareDictionaryRepositoryImpl : ShareDictionaryRepository {
         _import.onNext(import)
     }
 
-    override fun getImport(): Observable<Boolean> {
-        return import
-    }
+    override fun getImport() = import
 
     private var csvData: Uri? = null
 
-    override fun getCsvData(): Uri? {
-        return csvData
-    }
+    override fun getCsvUri() = csvData
 
     override fun storeCsvData(data: Uri) {
         csvData = data

@@ -100,5 +100,6 @@
     <string name="import_fab_label">Import from CSV file</string>
     <string name="create_fab_label">Create new</string>
     <string name="export_menu_label">Share</string>
+    <string name="share_file_title">Share file</string>
 
 </resources>
