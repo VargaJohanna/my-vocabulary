@@ -4,6 +4,7 @@ import android.app.Activity.RESULT_OK
 import android.app.AlertDialog
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -73,7 +74,8 @@ class DictionaryListFragment : Fragment(), DictionaryAdapter.ItemClickListener {
     private fun importDictionary() {
         shareViewModel.getLiveIsImport().observe(requireActivity(), Observer { isImport ->
             if (isImport) {
-                if (importDialog == null || !importDialog!!.isShowing) {
+                shareViewModel.setIsImport(false)
+                if (importDialog == null) {
                     importDialog = dialogFactory.buildDictionaryCreateDialog(
                             requireActivity(),
                             getString(R.string.import_dictionary_dialog_title)
@@ -85,7 +87,6 @@ class DictionaryListFragment : Fragment(), DictionaryAdapter.ItemClickListener {
                         shareViewModel.getImportedDictionaryDetails().observe(this, Observer { event ->
                             event.getContentIfNotHandled()?.let {
                                 shareViewModel.parseDataAndCreateWords(it.dictionaryId, requireActivity())
-                                shareViewModel.setIsImport(false)
                             }
                             importDialog?.dismiss()
                         })

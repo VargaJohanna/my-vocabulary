@@ -5,7 +5,7 @@ import io.reactivex.Observable
 import io.reactivex.subjects.BehaviorSubject
 
 class ShareDictionaryRepositoryImpl : ShareDictionaryRepository {
-    private val _import = BehaviorSubject.create<Boolean>()
+    private val _import = BehaviorSubject.createDefault(false)
     private val import: Observable<Boolean> = _import
 
     override fun setIsImport(import: Boolean) {
