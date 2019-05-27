@@ -95,7 +95,7 @@
     <string name="quote_text">\"%1$s\"</string>
     <string name="word_hint">Töltsd ki</string>
     <string name="import_dictionary_dialog_title">Szótár importálása</string>
-    <string name="create_fab_label">Új</string>
+    <string name="create_fab_label">Létrehozás</string>
     <string name="import_dictionary_menu">Szótár importálása</string>
     <string name="only_csv_import">Kizárólag CSV fájlok importálhatóak.</string>
     <string name="import_fab_label">Importálás CSV fájlból</string>
