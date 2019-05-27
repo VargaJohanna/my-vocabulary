@@ -7,7 +7,8 @@ import java.util.*
 
 @Entity(tableName = "dictionaries")
 data class DictionaryEntry(
-        @PrimaryKey(autoGenerate = true) @ColumnInfo(name = "dictionary_id") var dictionaryId: Long,
+        @PrimaryKey(autoGenerate = true)
+        @ColumnInfo(name = "dictionary_id") var dictionaryId: Long,
         @ColumnInfo(name = "dictionary_name") var dictionaryName: String,
         @ColumnInfo(name = "dictionary_created") @TypeConverters(DateTypeConverter::class) var dictionaryCreated: Date)
 {
