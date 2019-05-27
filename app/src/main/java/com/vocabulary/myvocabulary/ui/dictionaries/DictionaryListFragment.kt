@@ -75,7 +75,7 @@ class DictionaryListFragment : Fragment(), DictionaryAdapter.ItemClickListener {
         shareViewModel.getLiveIsImport().observe(requireActivity(), Observer { isImport ->
             if (isImport) {
                 shareViewModel.setIsImport(false)
-                if (importDialog == null) {
+                if (importDialog == null || importDialog!!.isShowing.not()) {
                     importDialog = dialogFactory.buildDictionaryCreateDialog(
                             requireActivity(),
                             getString(R.string.import_dictionary_dialog_title)
