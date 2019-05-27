@@ -1,0 +1,140 @@
+{
+  "formatVersion": 1,
+  "database": {
+    "version": 4,
+    "identityHash": "667ecddc79f1f1ecbf2ac1b6ecb78985",
+    "entities": [
+      {
+        "tableName": "dictionaries",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`dictionary_id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `dictionary_name` TEXT NOT NULL, `dictionary_created` INTEGER NOT NULL)",
+        "fields": [
+          {
+            "fieldPath": "dictionaryId",
+            "columnName": "dictionary_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "dictionaryName",
+            "columnName": "dictionary_name",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "dictionaryCreated",
+            "columnName": "dictionary_created",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "dictionary_id"
+          ],
+          "autoGenerate": true
+        },
+        "indices": [],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "words",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`word_id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `container_dictionary_id` INTEGER NOT NULL, `word` TEXT NOT NULL, `translation` TEXT NOT NULL, `been_asked` INTEGER NOT NULL, `failed` INTEGER NOT NULL, `passed` INTEGER NOT NULL, `created` INTEGER NOT NULL, `last_result` INTEGER NOT NULL, `last_guess` TEXT NOT NULL, FOREIGN KEY(`container_dictionary_id`) REFERENCES `dictionaries`(`dictionary_id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "fields": [
+          {
+            "fieldPath": "wordId",
+            "columnName": "word_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "containerDictionaryId",
+            "columnName": "container_dictionary_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "word",
+            "columnName": "word",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "translation",
+            "columnName": "translation",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "beenAsked",
+            "columnName": "been_asked",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "failed",
+            "columnName": "failed",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "passed",
+            "columnName": "passed",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "created",
+            "columnName": "created",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "lastResult",
+            "columnName": "last_result",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "lastGuess",
+            "columnName": "last_guess",
+            "affinity": "TEXT",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "word_id"
+          ],
+          "autoGenerate": true
+        },
+        "indices": [
+          {
+            "name": "index_words_container_dictionary_id",
+            "unique": false,
+            "columnNames": [
+              "container_dictionary_id"
+            ],
+            "createSql": "CREATE  INDEX `index_words_container_dictionary_id` ON `${TABLE_NAME}` (`container_dictionary_id`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "dictionaries",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "container_dictionary_id"
+            ],
+            "referencedColumns": [
+              "dictionary_id"
+            ]
+          }
+        ]
+      }
+    ],
+    "setupQueries": [
+      "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, \"667ecddc79f1f1ecbf2ac1b6ecb78985\")"
+    ]
+  }
+}
