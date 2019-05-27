@@ -109,7 +109,7 @@ class ShareDictionaryViewModel(
     private fun writeCsvFile(words: List<Word>, context: Context): File {
         var fileWriter: FileWriter? = null
         var csvPrinter: CSVPrinter? = null
-        val file = File("${context.filesDir.path}/exported.csv")
+        val file = File("${context.filesDir.path}/export_dictionary.csv")
         try {
             file.createNewFile()
             fileWriter = FileWriter(file)
