@@ -4,7 +4,6 @@ import android.app.Activity.RESULT_OK
 import android.app.AlertDialog
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -31,20 +30,18 @@ import kotlinx.android.synthetic.main.fragment_dictionary_list.*
 import kotlinx.android.synthetic.main.fragment_dictionary_list.view.*
 import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.viewModel
-import java.util.*
-import kotlin.collections.ArrayList
 
 class DictionaryListFragment : Fragment(), DictionaryAdapter.ItemClickListener {
     private val viewModel: DictionaryListViewModel by viewModel()
     private val shareViewModel: ShareDictionaryViewModel by viewModel()
     private val dialogFactory: DialogFactory by inject()
     private val rxSchedulers: RxSchedulers by inject()
+    private val disposables = CompositeDisposable()
     private var createDialog: AlertDialog? = null
     private var renameDialog: AlertDialog? = null
     private var startQuizDialog: AlertDialog? = null
     private var popUp: PopupMenu? = null
     private var importDialog: AlertDialog? = null
-    private val disposables = CompositeDisposable()
     private var isFabOpen = false
 
     override fun onItemClick(dictionary: Dictionary) {
@@ -59,7 +56,6 @@ class DictionaryListFragment : Fragment(), DictionaryAdapter.ItemClickListener {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val dictionaryAdapter = DictionaryAdapter(ArrayList(), this, true)
         shareViewModel.fetchCsvUri()
-        importDictionary()
 
         return inflater.inflate(R.layout.fragment_dictionary_list, container, false).apply {
             generateDictionaryList(dictionaryAdapter, dictionary_recycler_view)
@@ -69,32 +65,6 @@ class DictionaryListFragment : Fragment(), DictionaryAdapter.ItemClickListener {
             setImportFabOnClickListener(import_fab)
             dictionary_list_toolbar.setNavigationOnClickListener { findNavController().popBackStack() }
         }
-    }
-
-    private fun importDictionary() {
-        shareViewModel.getLiveIsImport().observe(requireActivity(), Observer { isImport ->
-            if (isImport) {
-                shareViewModel.setIsImport(false)
-                if (importDialog == null || importDialog!!.isShowing.not()) {
-                    importDialog = dialogFactory.buildDictionaryCreateDialog(
-                            requireActivity(),
-                            getString(R.string.import_dictionary_dialog_title)
-                    ) { nameToCreate ->
-                        shareViewModel.createDictionary(Dictionary(
-                                dictionaryName = nameToCreate,
-                                dictionaryCreated = Calendar.getInstance().time))
-
-                        shareViewModel.getImportedDictionaryDetails().observe(this, Observer { event ->
-                            event.getContentIfNotHandled()?.let {
-                                shareViewModel.parseDataAndCreateWords(it.dictionaryId, requireActivity())
-                            }
-                            importDialog?.dismiss()
-                        })
-                    }
-                    importDialog?.show()
-                }
-            }
-        })
     }
 
     private fun generateDictionaryList(dictionaryAdapter: DictionaryAdapter, recyclerView: RecyclerView) {
