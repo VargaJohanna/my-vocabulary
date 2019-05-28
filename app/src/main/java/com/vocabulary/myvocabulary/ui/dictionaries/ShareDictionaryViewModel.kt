@@ -97,7 +97,9 @@ class ShareDictionaryViewModel(
         disposables += shareDictionaryRepository.getImport()
                 .subscribeOn(rxSchedulers.io())
                 .observeOn(rxSchedulers.main())
-                .subscribe { isImport.postValue(it) }
+                .subscribe {
+                    isImport.postValue(it)
+                }
     }
 
     fun setIsImport(isImport: Boolean) {
