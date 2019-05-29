@@ -27,6 +27,8 @@ class HomeActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_home)
         manageIntent(intent?.data)
+
+        importDictionary()
     }
 
     override fun onNewIntent(intent: Intent?) {
@@ -38,7 +40,6 @@ class HomeActivity : AppCompatActivity() {
         if (data != null) {
             homeViewModel.saveCsvData(data)
             homeViewModel.setIsImport(true)
-            importDictionary()
         } else {
             homeViewModel.setIsImport(false)
         }
