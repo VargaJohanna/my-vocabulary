@@ -68,7 +68,7 @@ class ShareDictionaryViewModel(
                     val contentResolver = context.contentResolver
                     val inputStream = contentResolver.openInputStream(it)
 
-                    val reader = BufferedReader(InputStreamReader(inputStream))
+                    val reader = BufferedReader(InputStreamReader(inputStream, "UTF-8"))
                     val csvParser = CSVParser(reader, CSVFormat.DEFAULT)
 
                     for (csvRecord in csvParser) {
