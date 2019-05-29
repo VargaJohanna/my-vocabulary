@@ -30,6 +30,8 @@ import kotlinx.android.synthetic.main.fragment_dictionary_list.*
 import kotlinx.android.synthetic.main.fragment_dictionary_list.view.*
 import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.viewModel
+import java.util.*
+import kotlin.collections.ArrayList
 
 class DictionaryListFragment : Fragment(), DictionaryAdapter.ItemClickListener {
     private val viewModel: DictionaryListViewModel by viewModel()
@@ -64,6 +66,7 @@ class DictionaryListFragment : Fragment(), DictionaryAdapter.ItemClickListener {
             setCreateNewFabOnClickListener(create_new_fab)
             setImportFabOnClickListener(import_fab)
             dictionary_list_toolbar.setNavigationOnClickListener { findNavController().popBackStack() }
+            importDictionary()
         }
     }
 
@@ -213,6 +216,34 @@ class DictionaryListFragment : Fragment(), DictionaryAdapter.ItemClickListener {
         createNewContainer.display(true)
         importContainer.animate().translationY(-resources.getDimension(R.dimen.standard_150))
         createNewContainer.animate().translationY(-resources.getDimension(R.dimen.standard_75))
+    }
+
+    private fun importDictionary() {
+        shareViewModel.getLiveIsImport().observe(requireActivity(), Observer { isImport ->
+            if (isImport) {
+                shareViewModel.setIsImport(false)
+                if (importDialog == null || importDialog!!.isShowing.not()) {
+                    importDialog = dialogFactory.buildDictionaryCreateDialog(
+                            requireActivity(),
+                            getString(R.string.import_dictionary_dialog_title)
+                    ) { nameToCreate ->
+                        shareViewModel.createDictionary(Dictionary(
+                                dictionaryName = nameToCreate,
+                                dictionaryCreated = Calendar.getInstance().time))
+
+                        // TODO: Fix me
+                        shareViewModel.getImportedDictionaryDetails().observe(this, Observer { event ->
+                            event.getContentIfNotHandled()?.let {
+                                shareViewModel.parseDataAndCreateWords(it.dictionaryId, requireActivity())
+
+                                importDialog?.dismiss()
+                            }
+                        })
+                    }
+                    importDialog?.show()
+                }
+            }
+        })
     }
 
     override fun onStop() {
