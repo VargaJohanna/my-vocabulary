@@ -6,6 +6,9 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.animation.AccelerateInterpolator
+import android.view.animation.AlphaAnimation
+import android.view.animation.AnimationSet
 import android.view.inputmethod.InputMethodManager
 import android.widget.LinearLayout
 import android.widget.ProgressBar
@@ -171,11 +174,21 @@ class ResultFragment : Fragment() {
             })
         } else {
             animationViewFailure.show(true)
+            animationViewFailure.setMinAndMaxFrame(150, 260)
+            animationViewFailure.speed = 1.3f
             animationViewFailure.addAnimatorListener(object : Animator.AnimatorListener {
                 override fun onAnimationRepeat(p0: Animator?) {
                 }
 
                 override fun onAnimationEnd(p0: Animator?) {
+                    val fadeOut = AlphaAnimation(1f, 0f)
+                    fadeOut.interpolator = AccelerateInterpolator()
+                    fadeOut.startOffset = 1000
+                    fadeOut.duration = 500
+
+                    val fadeAnimation = AnimationSet(false)
+                    fadeAnimation.addAnimation(fadeOut)
+                    animationViewFailure.animation = fadeAnimation
                     animationViewFailure.show(false)
                 }
 
@@ -196,6 +209,7 @@ class ResultFragment : Fragment() {
     }
 
     override fun onStop() {
+        resultViewModel.dispose()
         disposables.clear()
         super.onStop()
     }
