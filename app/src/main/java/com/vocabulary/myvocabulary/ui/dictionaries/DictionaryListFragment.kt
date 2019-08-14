@@ -217,13 +217,13 @@ class DictionaryListFragment : Fragment(), DictionaryAdapter.ItemClickListener {
         createNewContainer.animate().translationY(-resources.getDimension(R.dimen.standard_75))
     }
 
-    override fun onStop() {
+    override fun onDestroy() {
         disposables.clear()
         createDialog?.dismiss()
         renameDialog?.dismiss()
         startQuizDialog?.dismiss()
         popUp?.dismiss()
         importDialog?.dismiss()
-        super.onStop()
+        super.onDestroy()
     }
 }

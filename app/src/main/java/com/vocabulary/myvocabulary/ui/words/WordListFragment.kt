@@ -254,12 +254,12 @@ class WordListFragment : Fragment(), WordAdapter.WordItemClickListener {
         }
     }
 
-    override fun onStop() {
+    override fun onDestroy() {
         disposables.clear()
         createDialog?.dismiss()
         renameDialog?.dismiss()
         startQuizDialog?.dismiss()
         popUp?.dismiss()
-        super.onStop()
+        super.onDestroy()
     }
 }
