@@ -9,14 +9,14 @@ import com.vocabulary.myvocabulary.R
 import kotlinx.android.synthetic.main.row_word.view.*
 
 class WordAdapter(private var wordList: List<Word>, private val itemClickListener: WordItemClickListener) : RecyclerView.Adapter<WordAdapter.WordViewHolder>() {
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): WordAdapter.WordViewHolder {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): WordViewHolder {
         val inflater = LayoutInflater.from(parent.context)
         return WordViewHolder(inflater.inflate(R.layout.row_word, parent, false))
     }
 
     override fun getItemCount() = wordList.size
 
-    override fun onBindViewHolder(holder: WordAdapter.WordViewHolder, position: Int) {
+    override fun onBindViewHolder(holder: WordViewHolder, position: Int) {
         holder.bind(wordList[position])
     }
 
@@ -43,6 +43,14 @@ class WordAdapter(private var wordList: List<Word>, private val itemClickListene
     fun updateList(newList: List<Word>) {
         val diffResult = DiffUtil.calculateDiff(WordDiffUtilCallBack(wordList, newList))
         this.wordList = newList
+        diffResult.dispatchUpdatesTo(this)
+    }
+
+    fun filterList(searched: String) {
+       val diffResult = DiffUtil.calculateDiff(WordDiffUtilCallBack(
+                wordList,
+                this.wordList.filter { it.translation.startsWith(searched, true) }))
+        this.wordList = this.wordList.filter { it.translation.startsWith(searched, true) }
         diffResult.dispatchUpdatesTo(this)
     }
 

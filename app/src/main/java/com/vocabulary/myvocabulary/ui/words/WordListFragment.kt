@@ -1,13 +1,14 @@
 package com.vocabulary.myvocabulary.ui.words
 
 import android.app.AlertDialog
-import android.content.Intent
 import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
 import android.view.*
+import android.widget.EditText
 import android.widget.PopupMenu
 import android.widget.ProgressBar
 import androidx.appcompat.widget.Toolbar
-import androidx.core.content.FileProvider
 import androidx.core.view.forEach
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
@@ -62,6 +63,7 @@ class WordListFragment : Fragment(), WordAdapter.WordItemClickListener {
             observeEmptyState()
             setFabOnClickListener(word_fab)
             setToolbarMenu(word_list_toolbar)
+            searchTranslation(search_bar_expression, wordAdapter)
         }
     }
 
@@ -74,8 +76,6 @@ class WordListFragment : Fragment(), WordAdapter.WordItemClickListener {
             wordViewModel.isListEmpty().observe(requireActivity(), Observer { isListEmpty ->
                 inflateToolbarMenu(isListEmpty, toolbar)
             })
-
-
         }
     }
 
@@ -254,6 +254,10 @@ class WordListFragment : Fragment(), WordAdapter.WordItemClickListener {
         }
     }
 
+    private fun searchTranslation(searchField: EditText, wordAdapter: WordAdapter) {
+        searchField.addTextChangedListener(SearchTextWatcher(wordAdapter))
+    }
+
     override fun onDestroy() {
         disposables.clear()
         createDialog?.dismiss()
@@ -261,5 +265,17 @@ class WordListFragment : Fragment(), WordAdapter.WordItemClickListener {
         startQuizDialog?.dismiss()
         popUp?.dismiss()
         super.onDestroy()
+    }
+
+    private inner class SearchTextWatcher(val wordAdapter: WordAdapter): TextWatcher {
+        override fun afterTextChanged(p0: Editable?) {
+            wordAdapter.filterList(p0.toString())
+        }
+
+        override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
+        }
+
+        override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
+        }
     }
 }
