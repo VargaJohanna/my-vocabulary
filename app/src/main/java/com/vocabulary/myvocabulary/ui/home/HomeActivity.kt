@@ -45,9 +45,9 @@ class HomeActivity : AppCompatActivity() {
         }
     }
 
-    override fun onStop() {
+    override fun onDestroy() {
         importDialog?.dismiss()
-        super.onStop()
+        super.onDestroy()
     }
 
     private fun importDictionary() {

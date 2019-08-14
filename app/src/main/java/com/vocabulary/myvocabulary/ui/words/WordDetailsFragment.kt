@@ -98,8 +98,8 @@ class WordDetailsFragment : Fragment() {
         }
     }
 
-    override fun onStop() {
+    override fun onDestroy() {
         wordEditDialog?.dismiss()
-        super.onStop()
+        super.onDestroy()
     }
 }

@@ -91,9 +91,9 @@ class DictionaryPickerFragment : Fragment(), DictionaryAdapter.ItemClickListener
         }
     }
 
-    override fun onStop() {
+    override fun onDestroy() {
         optionsDialog?.dismiss()
         disposables.clear()
-        super.onStop()
+        super.onDestroy()
     }
 }
