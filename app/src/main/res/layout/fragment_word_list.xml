@@ -24,6 +24,30 @@
             app:titleTextColor="@color/icons" />
     </com.google.android.material.appbar.AppBarLayout>
 
+    <EditText
+        android:id="@+id/search_bar_expression"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/margin_medium"
+        android:layout_marginStart="@dimen/margin_normal"
+        android:layout_marginEnd="@dimen/margin_normal"
+        android:drawableStart="@drawable/ic_search"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/guideline"
+        app:layout_constraintTop_toBottomOf="@+id/app_bar"/>
+
+    <EditText
+        android:id="@+id/search_bar_meaning"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/margin_medium"
+        android:layout_marginStart="@dimen/margin_normal"
+        android:layout_marginEnd="@dimen/margin_normal"
+        android:drawableStart="@drawable/ic_search"
+        app:layout_constraintStart_toEndOf="@+id/guideline"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/app_bar"/>
+
     <TextView
         android:id="@+id/word_column_title"
         android:layout_width="0dp"
@@ -38,7 +62,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toStartOf="@+id/guideline"
-        app:layout_constraintTop_toBottomOf="@+id/app_bar" />
+        app:layout_constraintTop_toBottomOf="@+id/search_bar_expression" />
 
     <TextView
         android:id="@+id/translation_column_title"
@@ -52,7 +76,7 @@
         android:textSize="@dimen/text_size_bigger"
         app:layout_constraintEnd_toStartOf="@+id/guideline"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/app_bar" />
+        app:layout_constraintTop_toBottomOf="@+id/search_bar_expression" />
 
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/guideline"

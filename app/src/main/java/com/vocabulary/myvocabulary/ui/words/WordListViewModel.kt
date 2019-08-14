@@ -93,4 +93,5 @@ class WordListViewModel(
     }
 
     fun isListEmpty(): LiveData<Boolean> = isListEmpty
+
 }
