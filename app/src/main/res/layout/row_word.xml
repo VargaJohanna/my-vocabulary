@@ -12,6 +12,7 @@
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
+        android:background="?selectableItemBackground"
         android:layout_height="wrap_content">
 
         <TextView
@@ -22,7 +23,6 @@
             android:gravity="start"
             android:padding="@dimen/padding_normal"
             android:textSize="@dimen/text_size_medium"
-            android:background="?selectableItemBackground"
             android:hint="@string/word_hint"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@+id/word_options"
@@ -57,7 +57,6 @@
             android:gravity="start"
             android:padding="@dimen/padding_normal"
             android:textSize="@dimen/text_size_medium"
-            android:background="?selectableItemBackground"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@id/guideline"
             app:layout_constraintStart_toStartOf="parent"

@@ -17,3 +17,7 @@ fun View.display(displayed: Boolean) {
         View.GONE
     }
 }
+
+fun View.displayWithAnimation(displayed: Boolean) {
+    this.animate().translationY(this.height.toFloat())
+}
