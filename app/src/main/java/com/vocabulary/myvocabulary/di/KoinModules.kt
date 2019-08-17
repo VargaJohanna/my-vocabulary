@@ -12,6 +12,8 @@ import com.vocabulary.myvocabulary.repositories.guessedWord.GuessedWordRepositor
 import com.vocabulary.myvocabulary.repositories.quiz.QuizRepository
 import com.vocabulary.myvocabulary.repositories.quiz.QuizRepositoryImpl
 import com.vocabulary.myvocabulary.repositories.quotes.*
+import com.vocabulary.myvocabulary.repositories.search.SearchRepository
+import com.vocabulary.myvocabulary.repositories.search.SearchRepositoryImpl
 import com.vocabulary.myvocabulary.repositories.sortBy.SortByRepository
 import com.vocabulary.myvocabulary.repositories.sortBy.SortByRepositoryImpl
 import com.vocabulary.myvocabulary.repositories.sortedList.SortedListRepository
@@ -46,6 +48,9 @@ val repositoryModule = module {
     single<SortByRepository> {
         SortByRepositoryImpl(get(), get())
     }
+    single<SearchRepository> {
+        SearchRepositoryImpl(get(), get())
+    }
     single<SortedListRepository> { SortedListRepositoryImpl(get(), get()) }
     single<GuessedWordRepository> { GuessedWordRepositoryImpl() }
     single<LocalQuoteRepository> { LocalQuoteRepositoryImpl() }
@@ -69,7 +74,7 @@ val networkModule = module {
 
 val viewModelModule = module {
     viewModel { DictionaryListViewModel(get(), get(), get()) }
-    viewModel { (dictionaryId: Long) -> WordListViewModel(dictionaryId, get(), get(), get(), get(), get()) }
+    viewModel { (dictionaryId: Long) -> WordListViewModel(dictionaryId, get(), get(), get(), get(), get(), get()) }
     viewModel { (dictionaryId: Long, optionType: Int, failedOnly: Boolean) ->
         QuizViewModel(
                 dictionaryId,

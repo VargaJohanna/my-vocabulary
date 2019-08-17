@@ -22,10 +22,7 @@ class WordAdapter(private var wordList: List<Word>, private val itemClickListene
 
     inner class WordViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         init {
-            itemView.word.setOnClickListener {
-                itemClickListener.onItemClick(wordList[adapterPosition])
-            }
-            itemView.translation.setOnClickListener {
+            itemView.setOnClickListener {
                 itemClickListener.onItemClick(wordList[adapterPosition])
             }
 
@@ -43,14 +40,6 @@ class WordAdapter(private var wordList: List<Word>, private val itemClickListene
     fun updateList(newList: List<Word>) {
         val diffResult = DiffUtil.calculateDiff(WordDiffUtilCallBack(wordList, newList))
         this.wordList = newList
-        diffResult.dispatchUpdatesTo(this)
-    }
-
-    fun filterList(searched: String) {
-       val diffResult = DiffUtil.calculateDiff(WordDiffUtilCallBack(
-                wordList,
-                this.wordList.filter { it.translation.startsWith(searched, true) }))
-        this.wordList = this.wordList.filter { it.translation.startsWith(searched, true) }
         diffResult.dispatchUpdatesTo(this)
     }
 

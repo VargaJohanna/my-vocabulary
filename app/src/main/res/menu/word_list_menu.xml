@@ -41,6 +41,10 @@
                 android:id="@+id/export_dictionary"
                 android:title="@string/export_menu_label"
                 app:showAsAction="ifRoom|collapseActionView" />
+            <item
+                android:id="@+id/search"
+                android:title="@string/search"
+                app:showAsAction="ifRoom|collapseActionView"/>
         </menu>
     </item>
 
