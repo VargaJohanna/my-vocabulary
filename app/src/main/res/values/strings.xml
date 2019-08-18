@@ -101,5 +101,6 @@
     <string name="create_fab_label">Create new</string>
     <string name="export_menu_label">Share</string>
     <string name="share_file_title">Share file</string>
+    <string name="search">Search</string>
 
 </resources>

@@ -101,5 +101,6 @@
     <string name="import_fab_label">Importálás CSV fájlból</string>
     <string name="export_menu_label">Megosztás</string>
     <string name="share_file_title">Megosztás</string>
+    <string name="search">Keresés</string>
 
 </resources>

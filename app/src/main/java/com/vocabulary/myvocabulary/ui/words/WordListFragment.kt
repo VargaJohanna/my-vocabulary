@@ -1,14 +1,18 @@
 package com.vocabulary.myvocabulary.ui.words
 
 import android.app.AlertDialog
-import android.content.Intent
 import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
 import android.view.*
+import android.widget.EditText
+import android.widget.ImageView
 import android.widget.PopupMenu
 import android.widget.ProgressBar
 import androidx.appcompat.widget.Toolbar
-import androidx.core.content.FileProvider
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.forEach
+import androidx.core.view.isGone
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
@@ -17,6 +21,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.vocabulary.myvocabulary.R
+import com.vocabulary.myvocabulary.ext.display
 import com.vocabulary.myvocabulary.ext.plusAssign
 import com.vocabulary.myvocabulary.ext.show
 import com.vocabulary.myvocabulary.repositories.sortBy.SortByOptions
@@ -43,6 +48,8 @@ class WordListFragment : Fragment(), WordAdapter.WordItemClickListener {
     private var renameDialog: AlertDialog? = null
     private var startQuizDialog: AlertDialog? = null
     private var popUp: PopupMenu? = null
+    private var searchBar: ConstraintLayout? = null
+    private var searchField: EditText? = null
     private val disposables = CompositeDisposable()
 
     override fun onItemClick(word: Word) {
@@ -60,8 +67,13 @@ class WordListFragment : Fragment(), WordAdapter.WordItemClickListener {
             generateWordList(wordAdapter, word_recycler_view)
             observeWordList(wordAdapter, word_list_progress_bar)
             observeEmptyState()
+            observeSearchedList(wordAdapter)
+            observeSearchBarStatus(search_wrapper)
             setFabOnClickListener(word_fab)
             setToolbarMenu(word_list_toolbar)
+            searchWord(search_field, clear_search)
+            searchBar = search_wrapper
+            searchField = search_field
         }
     }
 
@@ -69,13 +81,15 @@ class WordListFragment : Fragment(), WordAdapter.WordItemClickListener {
         toolbar.apply {
             title = args.dictionaryName
             setNavigationOnClickListener {
-                findNavController().popBackStack()
+                if(searchBar?.isGone == true) {
+                    findNavController().popBackStack()
+                } else {
+                    wordViewModel.setSearchBarStatus(false)
+                }
             }
             wordViewModel.isListEmpty().observe(requireActivity(), Observer { isListEmpty ->
                 inflateToolbarMenu(isListEmpty, toolbar)
             })
-
-
         }
     }
 
@@ -108,6 +122,7 @@ class WordListFragment : Fragment(), WordAdapter.WordItemClickListener {
                                     dateDescending = !wordViewModel.currentSortByData.dateDescending)
                             )
                         }
+                        R.id.search -> showSearchBar()
                     }
                     true
                 }
@@ -249,9 +264,40 @@ class WordListFragment : Fragment(), WordAdapter.WordItemClickListener {
     }
 
     private fun shareDictionary() {
-        if(wordViewModel.getLiveWordList().value != null) {
+        if (wordViewModel.getLiveWordList().value != null) {
             shareViewModel.shareDictionary(wordViewModel.getLiveWordList().value!!, requireContext())
         }
+    }
+
+    private fun searchWord(searchField: EditText, clear: ImageView) {
+        searchField.addTextChangedListener(SearchTextWatcher())
+        searchField.setOnFocusChangeListener { v, hasFocus ->
+            if (hasFocus) searchField.setCompoundDrawablesWithIntrinsicBounds(0, 0, 0, 0)
+            else searchField.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_search, 0, 0, 0)
+        }
+
+        clear.setOnClickListener {
+            searchField.text.clear()
+        }
+    }
+
+    private fun observeSearchedList(wordAdapter: WordAdapter) {
+        wordViewModel.getSearchedList().observe(requireActivity(), Observer {
+            wordAdapter.updateList(it)
+        })
+    }
+
+    private fun showSearchBar() {
+        wordViewModel.isSearchBarOpen().value?.let {
+            wordViewModel.setSearchBarStatus(!it)
+        }
+    }
+
+    private fun observeSearchBarStatus(searchWrapper: ConstraintLayout) {
+        wordViewModel.isSearchBarOpen().observe(requireActivity(), Observer {
+            searchWrapper.display(it)
+            if(!it) search_field.text.clear()
+        })
     }
 
     override fun onDestroy() {
@@ -261,5 +307,17 @@ class WordListFragment : Fragment(), WordAdapter.WordItemClickListener {
         startQuizDialog?.dismiss()
         popUp?.dismiss()
         super.onDestroy()
+    }
+
+    private inner class SearchTextWatcher : TextWatcher {
+        override fun afterTextChanged(p0: Editable?) {
+            wordViewModel.searchList(p0.toString())
+        }
+
+        override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
+        }
+
+        override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
+        }
     }
 }

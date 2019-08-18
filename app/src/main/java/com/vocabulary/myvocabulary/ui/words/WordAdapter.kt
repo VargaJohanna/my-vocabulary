@@ -9,23 +9,20 @@ import com.vocabulary.myvocabulary.R
 import kotlinx.android.synthetic.main.row_word.view.*
 
 class WordAdapter(private var wordList: List<Word>, private val itemClickListener: WordItemClickListener) : RecyclerView.Adapter<WordAdapter.WordViewHolder>() {
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): WordAdapter.WordViewHolder {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): WordViewHolder {
         val inflater = LayoutInflater.from(parent.context)
         return WordViewHolder(inflater.inflate(R.layout.row_word, parent, false))
     }
 
     override fun getItemCount() = wordList.size
 
-    override fun onBindViewHolder(holder: WordAdapter.WordViewHolder, position: Int) {
+    override fun onBindViewHolder(holder: WordViewHolder, position: Int) {
         holder.bind(wordList[position])
     }
 
     inner class WordViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         init {
-            itemView.word.setOnClickListener {
-                itemClickListener.onItemClick(wordList[adapterPosition])
-            }
-            itemView.translation.setOnClickListener {
+            itemView.setOnClickListener {
                 itemClickListener.onItemClick(wordList[adapterPosition])
             }
 
