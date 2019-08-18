@@ -4,13 +4,13 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.vocabulary.myvocabulary.ext.plusAssign
+import com.vocabulary.myvocabulary.repositories.quiz.QuizRepository
+import com.vocabulary.myvocabulary.repositories.search.SearchRepository
 import com.vocabulary.myvocabulary.repositories.sortBy.SortByData
 import com.vocabulary.myvocabulary.repositories.sortBy.SortByRepository
 import com.vocabulary.myvocabulary.repositories.sortedList.SortedListRepository
 import com.vocabulary.myvocabulary.repositories.word.WordRepository
 import com.vocabulary.myvocabulary.rx.RxSchedulers
-import com.vocabulary.myvocabulary.repositories.quiz.QuizRepository
-import com.vocabulary.myvocabulary.repositories.search.SearchRepository
 import com.vocabulary.myvocabulary.ui.quizzes.QuizTypes
 import io.reactivex.Completable
 import io.reactivex.disposables.CompositeDisposable
@@ -43,7 +43,7 @@ class WordListViewModel(
         disposables += searchRepository.showSearchBar()
                 .subscribeOn(rxSchedulers.io())
                 .observeOn(rxSchedulers.main())
-                .subscribe{t -> isSearchBarOpenCurrent.postValue(t)}
+                .subscribe { t -> isSearchBarOpenCurrent.postValue(t) }
     }
 
     fun isSearchBarOpen(): LiveData<Boolean> = isSearchBarOpenCurrent
@@ -115,7 +115,8 @@ class WordListViewModel(
 
     fun searchList(find: String) {
         searchList.postValue(liveWordList.value?.filter {
-            it.translation.startsWith(find, true) || it.word.startsWith(find, true)})
+            it.translation.startsWith(find, true) || it.word.startsWith(find, true)
+        })
     }
 
     fun getSearchedList(): LiveData<List<Word>> = searchList
