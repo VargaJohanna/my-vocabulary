@@ -85,7 +85,7 @@ val viewModelModule = module {
     }
     viewModel { (dictionaryId: Long) -> ResultViewModel(dictionaryId, get(), get(), get(), get()) }
     viewModel { WordDetailsViewModel(get(), get()) }
-    viewModel { HomeViewModel(get(), get(), get()) }
+    viewModel { HomeViewModel(get(), get(), get(), get()) }
     viewModel { ShareDictionaryViewModel(get(), get(), get(), get()) }
 }
 

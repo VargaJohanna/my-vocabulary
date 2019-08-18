@@ -85,7 +85,6 @@ class WordListFragment : Fragment(), WordAdapter.WordItemClickListener {
                     findNavController().popBackStack()
                 } else {
                     wordViewModel.setSearchBarStatus(false)
-                    searchField?.text?.clear()
                 }
             }
             wordViewModel.isListEmpty().observe(requireActivity(), Observer { isListEmpty ->
@@ -290,13 +289,15 @@ class WordListFragment : Fragment(), WordAdapter.WordItemClickListener {
     }
 
     private fun showSearchBar() {
-        wordViewModel.setSearchBarStatus(search_wrapper.isGone)
-        if(search_wrapper.isGone) search_field.text.clear()
+        wordViewModel.isSearchBarOpen().value?.let {
+            wordViewModel.setSearchBarStatus(!it)
+        }
     }
 
     private fun observeSearchBarStatus(searchWrapper: ConstraintLayout) {
         wordViewModel.isSearchBarOpen().observe(requireActivity(), Observer {
             searchWrapper.display(it)
+            if(!it) search_field.text.clear()
         })
     }
 
