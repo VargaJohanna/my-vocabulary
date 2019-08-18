@@ -102,5 +102,6 @@
     <string name="export_menu_label">Megosztás</string>
     <string name="share_file_title">Megosztás</string>
     <string name="search">Keresés</string>
+    <string name="search_hint">Keresés...</string>
 
 </resources>

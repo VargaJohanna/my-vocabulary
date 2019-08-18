@@ -75,7 +75,7 @@ class WordListViewModel(
                     liveWordList.postValue(t)
                     isListEmpty.postValue(t.isEmpty())
                     searchList.postValue(t.filter {
-                        it.translation.startsWith(searchedTerm, true) || it.word.startsWith(searchedTerm, true)
+                        it.translation.contains(searchedTerm, true) || it.word.contains(searchedTerm, true)
                     })
                 }
     }
@@ -118,7 +118,7 @@ class WordListViewModel(
 
     fun searchList(find: String) {
         searchList.postValue(liveWordList.value?.filter {
-            it.translation.startsWith(find, true) || it.word.startsWith(find, true)
+            it.translation.contains(find, true) || it.word.contains(find, true)
         })
     }
 
