@@ -1,27 +1,17 @@
 package com.vocabulary.myvocabulary.repositories.search
 
-import android.content.SharedPreferences
-import com.f2prateek.rx.preferences2.RxSharedPreferences
 import io.reactivex.Observable
+import io.reactivex.subjects.BehaviorSubject
 
-class SearchRepositoryImpl(
-        private val preferences: SharedPreferences,
-        rxPreferences: RxSharedPreferences
-) : SearchRepository {
-    private val searchBarStatus: Observable<Boolean> = rxPreferences.getBoolean(SEARCH_BAR_KEY, false).asObservable()
+class SearchRepositoryImpl : SearchRepository {
+    private val _searchBarState: BehaviorSubject<Boolean> = BehaviorSubject.createDefault(false)
+    private val searchBarState: Observable<Boolean> = _searchBarState
 
     override fun saveSearchBarStatus(isSearchOpen: Boolean) {
-        preferences.edit().apply{
-            putBoolean(SEARCH_BAR_KEY, isSearchOpen)
-            apply()
-        }
+        _searchBarState.onNext(isSearchOpen)
     }
 
     override fun showSearchBar(): Observable<Boolean> {
-        return searchBarStatus
-    }
-
-    companion object {
-        const val SEARCH_BAR_KEY = "SEARCH"
+        return searchBarState
     }
 }

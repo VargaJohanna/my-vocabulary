@@ -7,7 +7,6 @@ import android.text.TextWatcher
 import android.view.*
 import android.widget.EditText
 import android.widget.ImageView
-import android.widget.PopupMenu
 import android.widget.ProgressBar
 import androidx.appcompat.widget.Toolbar
 import androidx.constraintlayout.widget.ConstraintLayout
@@ -45,9 +44,7 @@ class WordListFragment : Fragment(), WordAdapter.WordItemClickListener {
     private val dialogFactory: DialogFactory by inject()
     private val rxSchedulers: RxSchedulers by inject()
     private var createDialog: AlertDialog? = null
-    private var renameDialog: AlertDialog? = null
     private var startQuizDialog: AlertDialog? = null
-    private var popUp: PopupMenu? = null
     private var searchBar: ConstraintLayout? = null
     private var searchField: EditText? = null
     private val disposables = CompositeDisposable()
@@ -55,10 +52,6 @@ class WordListFragment : Fragment(), WordAdapter.WordItemClickListener {
     override fun onItemClick(word: Word) {
         val action = WordListFragmentDirections.fromWordListToWordDetails(wordViewModel.dictionaryId, word.wordId)
         findNavController().navigate(action)
-    }
-
-    override fun onOptionsClick(word: Word, view: View) {
-        createPopUpMenu(word, view)
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -81,7 +74,7 @@ class WordListFragment : Fragment(), WordAdapter.WordItemClickListener {
         toolbar.apply {
             title = args.dictionaryName
             setNavigationOnClickListener {
-                if(searchBar?.isGone == true) {
+                if (searchBar?.isGone == true) {
                     findNavController().popBackStack()
                 } else {
                     wordViewModel.setSearchBarStatus(false)
@@ -114,7 +107,6 @@ class WordListFragment : Fragment(), WordAdapter.WordItemClickListener {
                                     sortByOption = SortByOptions.SortByWord,
                                     wordDescending = !wordViewModel.currentSortByData.wordDescending)
                             )
-
                         }
                         R.id.sort_by_date -> {
                             wordViewModel.setSortBy(wordViewModel.currentSortByData.copy(
@@ -189,21 +181,7 @@ class WordListFragment : Fragment(), WordAdapter.WordItemClickListener {
     private fun setFabOnClickListener(fab: FloatingActionButton) {
         fab.setOnClickListener {
             openCreateDialog()
-        }
-    }
-
-    private fun createPopUpMenu(word: Word, view: View) {
-        popUp = PopupMenu(requireActivity(), view).apply {
-            inflate(R.menu.word_options_menu)
-
-            setOnMenuItemClickListener {
-                when (it.itemId) {
-                    R.id.menu_word_edit -> showEditDialog(word)
-                    R.id.menu_word_delete -> showDeleteWordDialog(word)
-                }
-                true
-            }
-            show()
+            wordViewModel.setSearchBarStatus(false)
         }
     }
 
@@ -219,25 +197,6 @@ class WordListFragment : Fragment(), WordAdapter.WordItemClickListener {
         createDialog?.show()
     }
 
-    private fun showDeleteWordDialog(word: Word) {
-        dialogFactory.buildDeleteWordDialog(
-                requireActivity(),
-                getString(R.string.dialog_delete_word_title),
-                "${getString(R.string.verify_deletion)}\n\"${word.translation} - ${word.word}\" ?") {
-            wordViewModel.deleteWord(word)
-        }.show()
-    }
-
-    private fun showEditDialog(word: Word) {
-        renameDialog = dialogFactory.buildWordEditDialog(
-                requireActivity(),
-                word) { wordInput, translationInput ->
-            wordViewModel.updateWord(word.copy(word = wordInput, translation = translationInput))
-            renameDialog?.dismiss()
-        }
-        renameDialog?.show()
-    }
-
     private fun showStartQuizDialog(dictionaryId: Long) {
         startQuizDialog = dialogFactory.buildStartQuizDialog(
                 dictionaryId,
@@ -247,6 +206,7 @@ class WordListFragment : Fragment(), WordAdapter.WordItemClickListener {
             startQuizDialog?.dismiss()
         }
         startQuizDialog?.show()
+        wordViewModel.setSearchBarStatus(false)
     }
 
     private fun startQuiz(selectedOption: Int, dictionaryId: Long, selectedQuiz: Int) {
@@ -296,22 +256,21 @@ class WordListFragment : Fragment(), WordAdapter.WordItemClickListener {
     private fun observeSearchBarStatus(searchWrapper: ConstraintLayout) {
         wordViewModel.isSearchBarOpen().observe(requireActivity(), Observer {
             searchWrapper.display(it)
-            if(!it) search_field.text.clear()
+            if (!it) search_field?.text?.clear()
         })
     }
 
     override fun onDestroy() {
         disposables.clear()
         createDialog?.dismiss()
-        renameDialog?.dismiss()
         startQuizDialog?.dismiss()
-        popUp?.dismiss()
         super.onDestroy()
     }
 
     private inner class SearchTextWatcher : TextWatcher {
         override fun afterTextChanged(p0: Editable?) {
             wordViewModel.searchList(p0.toString())
+            wordViewModel.searchedTerm = p0.toString()
         }
 
         override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {

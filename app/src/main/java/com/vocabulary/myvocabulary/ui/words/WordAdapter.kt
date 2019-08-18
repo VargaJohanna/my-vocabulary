@@ -25,10 +25,6 @@ class WordAdapter(private var wordList: List<Word>, private val itemClickListene
             itemView.setOnClickListener {
                 itemClickListener.onItemClick(wordList[adapterPosition])
             }
-
-            itemView.word_options.setOnClickListener {
-                itemClickListener.onOptionsClick(wordList[adapterPosition], it)
-            }
         }
 
         fun bind(word: Word) {
@@ -45,6 +41,5 @@ class WordAdapter(private var wordList: List<Word>, private val itemClickListene
 
     interface WordItemClickListener {
         fun onItemClick(word: Word)
-        fun onOptionsClick(word: Word, view: View)
     }
 }

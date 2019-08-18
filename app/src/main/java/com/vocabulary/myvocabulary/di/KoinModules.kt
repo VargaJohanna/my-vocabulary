@@ -49,7 +49,7 @@ val repositoryModule = module {
         SortByRepositoryImpl(get(), get())
     }
     single<SearchRepository> {
-        SearchRepositoryImpl(get(), get())
+        SearchRepositoryImpl()
     }
     single<SortedListRepository> { SortedListRepositoryImpl(get(), get()) }
     single<GuessedWordRepository> { GuessedWordRepositoryImpl() }
