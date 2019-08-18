@@ -8,14 +8,16 @@ import androidx.lifecycle.ViewModel
 import com.vocabulary.myvocabulary.ext.plusAssign
 import com.vocabulary.myvocabulary.quotes.QuoteData
 import com.vocabulary.myvocabulary.repositories.quotes.QuoteRepository
-import com.vocabulary.myvocabulary.rx.RxSchedulers
+import com.vocabulary.myvocabulary.repositories.search.SearchRepository
 import com.vocabulary.myvocabulary.repositories.share.ShareDictionaryRepository
+import com.vocabulary.myvocabulary.rx.RxSchedulers
 import io.reactivex.disposables.CompositeDisposable
 
 class HomeViewModel(
         private val rxSchedulers: RxSchedulers,
         private val quoteRepository: QuoteRepository,
-        private val shareDictionaryRepository: ShareDictionaryRepository
+        private val shareDictionaryRepository: ShareDictionaryRepository,
+        private val searchRepository: SearchRepository
 ) : ViewModel() {
     private val _liveQuote: MutableLiveData<QuoteData> = MutableLiveData()
     val liveQuote: LiveData<QuoteData> = _liveQuote
@@ -46,4 +48,11 @@ class HomeViewModel(
         shareDictionaryRepository.setIsImport(isImport)
     }
 
+    fun searchBarState(): Boolean {
+        return searchRepository.showSearchBar().subscribeOn(rxSchedulers.io()).blockingFirst(false)
+    }
+
+    fun setSearchBarState(isOpen: Boolean) {
+        searchRepository.saveSearchBarStatus(isOpen)
+    }
 }
