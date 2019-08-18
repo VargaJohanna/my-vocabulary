@@ -32,6 +32,7 @@ class WordListViewModel(
     var currentSortByData: SortByData = SortByData()
     private val isListEmpty: MutableLiveData<Boolean> = MutableLiveData()
     private val isSearchBarOpenCurrent: MutableLiveData<Boolean> = MutableLiveData()
+    var searchedTerm = ""
 
     init {
         observeList()
@@ -73,6 +74,9 @@ class WordListViewModel(
                 .subscribe { t ->
                     liveWordList.postValue(t)
                     isListEmpty.postValue(t.isEmpty())
+                    searchList.postValue(t.filter {
+                        it.translation.startsWith(searchedTerm, true) || it.word.startsWith(searchedTerm, true)
+                    })
                 }
     }
 
