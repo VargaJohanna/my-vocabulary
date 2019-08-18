@@ -93,7 +93,6 @@ class WordListFragment : Fragment(), WordAdapter.WordItemClickListener {
         }
     }
 
-
     private fun inflateToolbarMenu(isListEmpty: Boolean, toolbar: Toolbar) {
         toolbar.apply {
             if (!isListEmpty && toolbar.menu.size() == 0) {

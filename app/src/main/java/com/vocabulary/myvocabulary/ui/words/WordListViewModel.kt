@@ -48,7 +48,6 @@ class WordListViewModel(
 
     fun isSearchBarOpen(): LiveData<Boolean> = isSearchBarOpenCurrent
 
-
     fun setSearchBarStatus(isOpen: Boolean) {
         searchRepository.saveSearchBarStatus(isOpen)
     }
