@@ -50,6 +50,17 @@ class HomeActivity : AppCompatActivity() {
         super.onDestroy()
     }
 
+    override fun onBackPressed() {
+        val onWordListScreen =
+                findNavController(R.id.home_nav_host_fragment).currentDestination?.id == R.id.wordListFragment
+
+        if (onWordListScreen && homeViewModel.searchBarState()) {
+            homeViewModel.setSearchBarState(false)
+        } else {
+            super.onBackPressed()
+        }
+    }
+
     private fun importDictionary() {
         shareViewModel.getLiveIsImport().observe(this, Observer { isImport ->
             if (isImport) {

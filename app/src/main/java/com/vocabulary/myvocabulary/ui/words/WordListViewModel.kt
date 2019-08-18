@@ -4,12 +4,13 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.vocabulary.myvocabulary.ext.plusAssign
+import com.vocabulary.myvocabulary.repositories.quiz.QuizRepository
+import com.vocabulary.myvocabulary.repositories.search.SearchRepository
 import com.vocabulary.myvocabulary.repositories.sortBy.SortByData
 import com.vocabulary.myvocabulary.repositories.sortBy.SortByRepository
 import com.vocabulary.myvocabulary.repositories.sortedList.SortedListRepository
 import com.vocabulary.myvocabulary.repositories.word.WordRepository
 import com.vocabulary.myvocabulary.rx.RxSchedulers
-import com.vocabulary.myvocabulary.repositories.quiz.QuizRepository
 import com.vocabulary.myvocabulary.ui.quizzes.QuizTypes
 import io.reactivex.Completable
 import io.reactivex.disposables.CompositeDisposable
@@ -21,17 +22,34 @@ class WordListViewModel(
         private val wordRepository: WordRepository,
         private val sortedListRepository: SortedListRepository,
         private val rxSchedulers: RxSchedulers,
-        private val quizRepository: QuizRepository
+        private val quizRepository: QuizRepository,
+        private val searchRepository: SearchRepository
 
 ) : ViewModel() {
     private val disposables = CompositeDisposable()
     private val liveWordList: MutableLiveData<List<Word>> = MutableLiveData()
+    private val searchList: MutableLiveData<List<Word>> = MutableLiveData()
     var currentSortByData: SortByData = SortByData()
     private val isListEmpty: MutableLiveData<Boolean> = MutableLiveData()
+    private val isSearchBarOpenCurrent: MutableLiveData<Boolean> = MutableLiveData()
 
     init {
         observeList()
         observeSortByData()
+        observeSearchBarStatus()
+    }
+
+    private fun observeSearchBarStatus() {
+        disposables += searchRepository.showSearchBar()
+                .subscribeOn(rxSchedulers.io())
+                .observeOn(rxSchedulers.main())
+                .subscribe { t -> isSearchBarOpenCurrent.postValue(t) }
+    }
+
+    fun isSearchBarOpen(): LiveData<Boolean> = isSearchBarOpenCurrent
+
+    fun setSearchBarStatus(isOpen: Boolean) {
+        searchRepository.saveSearchBarStatus(isOpen)
     }
 
     private fun observeSortByData() {
@@ -52,8 +70,8 @@ class WordListViewModel(
         disposables += sortedListRepository.getSortedWordList(dictionaryId)
                 .subscribeOn(rxSchedulers.io())
                 .observeOn(rxSchedulers.main())
-                .subscribe {
-                    t -> liveWordList.postValue(t)
+                .subscribe { t ->
+                    liveWordList.postValue(t)
                     isListEmpty.postValue(t.isEmpty())
                 }
     }
@@ -93,4 +111,13 @@ class WordListViewModel(
     }
 
     fun isListEmpty(): LiveData<Boolean> = isListEmpty
+
+    fun searchList(find: String) {
+        searchList.postValue(liveWordList.value?.filter {
+            it.translation.startsWith(find, true) || it.word.startsWith(find, true)
+        })
+    }
+
+    fun getSearchedList(): LiveData<List<Word>> = searchList
+
 }
