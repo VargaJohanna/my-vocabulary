@@ -6,9 +6,6 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.view.animation.AccelerateInterpolator
-import android.view.animation.AlphaAnimation
-import android.view.animation.AnimationSet
 import android.view.inputmethod.InputMethodManager
 import android.widget.LinearLayout
 import android.widget.ProgressBar
@@ -23,6 +20,7 @@ import com.airbnb.lottie.LottieAnimationView
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.vocabulary.myvocabulary.R
 import com.vocabulary.myvocabulary.ext.display
+import com.vocabulary.myvocabulary.ext.fadeoutAnimation
 import com.vocabulary.myvocabulary.ext.plusAssign
 import com.vocabulary.myvocabulary.ext.show
 import com.vocabulary.myvocabulary.rx.RxSchedulers
@@ -66,6 +64,8 @@ class ResultFragment : Fragment() {
                 findNavController().popBackStack()
                 resultViewModel.dispose()
             }
+            closeAnimationOnClick(success_animation)
+            closeAnimationOnClick(failure_animation)
         }
     }
 
@@ -81,16 +81,17 @@ class ResultFragment : Fragment() {
         resultViewModel.getLiveGuessedList().observe(requireActivity(), Observer {
             resultAdapter.updateList(it)
             progressBar.show(false)
-            if(it.isNotEmpty()) setResultStatistics(it)
+            if (it.isNotEmpty()) setResultStatistics(it)
             if (savedInstanceState == null && it.isNotEmpty()) {
                 showAnimation(successAnimation, failureAnimation)
             }
         })
     }
+
     private fun setResultStatistics(list: List<Word>) {
         val passes = list.filter { it.lastResult }.size
         val all = list.size
-        if(result_stats != null) result_stats.text = String.format(getString(R.string.result_stats), passes, all, round(((passes.toFloat() / all.toFloat()) * 100)).toInt())
+        if (result_stats != null) result_stats.text = String.format(getString(R.string.result_stats), passes, all, round(((passes.toFloat() / all.toFloat()) * 100)).toInt())
     }
 
     private fun setExitFabOnClickListener(fab: FloatingActionButton) {
@@ -159,45 +160,46 @@ class ResultFragment : Fragment() {
         if (resultViewModel.isAllPassed) {
             animationViewSuccess.show(true)
             animationViewSuccess.addAnimatorListener(object : Animator.AnimatorListener {
-                override fun onAnimationRepeat(p0: Animator?) {
-                }
-
                 override fun onAnimationEnd(p0: Animator?) {
                     animationViewSuccess.show(false)
                 }
 
+                override fun onAnimationRepeat(p0: Animator?) {}
+
                 override fun onAnimationCancel(p0: Animator?) {
+                    animationViewSuccess.fadeoutAnimation(150)
+                    animationViewSuccess.show(false)
                 }
 
-                override fun onAnimationStart(p0: Animator?) {
-                }
+                override fun onAnimationStart(p0: Animator?) {}
             })
         } else {
             animationViewFailure.show(true)
-            animationViewFailure.setMinAndMaxFrame(150, 260)
-            animationViewFailure.speed = 1.3f
+            animationViewFailure.setMinAndMaxFrame(200, 260)
+            animationViewFailure.speed = 1.5f
             animationViewFailure.addAnimatorListener(object : Animator.AnimatorListener {
-                override fun onAnimationRepeat(p0: Animator?) {
-                }
-
                 override fun onAnimationEnd(p0: Animator?) {
-                    val fadeOut = AlphaAnimation(1f, 0f)
-                    fadeOut.interpolator = AccelerateInterpolator()
-                    fadeOut.startOffset = 1000
-                    fadeOut.duration = 500
-
-                    val fadeAnimation = AnimationSet(false)
-                    fadeAnimation.addAnimation(fadeOut)
-                    animationViewFailure.animation = fadeAnimation
+                    animationViewFailure.fadeoutAnimation()
                     animationViewFailure.show(false)
                 }
 
+                override fun onAnimationRepeat(p0: Animator?) {}
+
                 override fun onAnimationCancel(p0: Animator?) {
+                    animationViewFailure.fadeoutAnimation(150)
+                    animationViewFailure.show(false)
                 }
 
-                override fun onAnimationStart(p0: Animator?) {
-                }
+                override fun onAnimationStart(p0: Animator?) {}
             })
+        }
+    }
+
+    private fun closeAnimationOnClick(animation: LottieAnimationView?) {
+        animation?.let { animationView ->
+            animationView.setOnClickListener {
+                animationView.cancelAnimation()
+            }
         }
     }
 
