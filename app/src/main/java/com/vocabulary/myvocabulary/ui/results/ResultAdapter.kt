@@ -53,7 +53,7 @@ class ResultAdapter(
         }
 
         private fun setGuessText(word: Word, guess: TextView) {
-            guess.text = if (word.lastGuess.isEmpty()) "--" else word.lastGuess
+            guess.text = if (word.lastGuess.isEmpty()) "-" else word.lastGuess
         }
 
         private fun setQuestionText(word: Word, resultQuestion: TextView) {
