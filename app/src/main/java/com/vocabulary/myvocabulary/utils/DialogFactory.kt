@@ -314,6 +314,7 @@ class DialogFactory {
                     errorMessage.show(true)
                 } else {
                     doItClick(selectedOption)
+                    dismiss()
                 }
             }
             cancelButton.setOnClickListener {
