@@ -28,6 +28,8 @@ import com.vocabulary.myvocabulary.rx.RxSchedulers
 import com.vocabulary.myvocabulary.ui.dictionaries.ShareDictionaryViewModel
 import com.vocabulary.myvocabulary.ui.quizzes.toQuizType
 import com.vocabulary.myvocabulary.utils.DialogFactory
+import com.xwray.groupie.GroupAdapter
+import com.xwray.groupie.ViewHolder
 import io.reactivex.disposables.CompositeDisposable
 import kotlinx.android.synthetic.main.fragment_word_list.*
 import kotlinx.android.synthetic.main.fragment_word_list.view.*
@@ -48,6 +50,7 @@ class WordListFragment : Fragment(), WordAdapter.WordItemClickListener {
     private var searchBar: ConstraintLayout? = null
     private var searchField: EditText? = null
     private val disposables = CompositeDisposable()
+    private val wordAdapter = GroupAdapter<ViewHolder>()
 
     override fun onItemClick(word: Word) {
         val action = WordListFragmentDirections.fromWordListToWordDetails(wordViewModel.dictionaryId, word.wordId)
@@ -55,12 +58,11 @@ class WordListFragment : Fragment(), WordAdapter.WordItemClickListener {
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        val wordAdapter = WordAdapter(emptyList(), this)
         return inflater.inflate(R.layout.fragment_word_list, container, false).apply {
-            generateWordList(wordAdapter, word_recycler_view)
-            observeWordList(wordAdapter, word_list_progress_bar)
+            generateWordList(word_recycler_view)
+            observeWordList(word_list_progress_bar)
             observeEmptyState()
-            observeSearchedList(wordAdapter)
+            observeSearchedList()
             observeSearchBarStatus(search_wrapper)
             setFabOnClickListener(word_fab)
             setToolbarMenu(word_list_toolbar)
@@ -143,21 +145,22 @@ class WordListFragment : Fragment(), WordAdapter.WordItemClickListener {
         }
     }
 
-    private fun generateWordList(wordAdapter: WordAdapter, recyclerView: RecyclerView) {
+    private fun generateWordList(recyclerView: RecyclerView) {
         recyclerView.apply {
             layoutManager = LinearLayoutManager(requireContext(), RecyclerView.VERTICAL, false)
             adapter = wordAdapter
         }
     }
 
-    private fun observeWordList(wordAdapter: WordAdapter, progressBar: ProgressBar) {
+    private fun observeWordList(progressBar: ProgressBar) {
         progressBar.show(true)
-        wordViewModel.getLiveWordList().observe(requireActivity(), Observer {
-            wordAdapter.updateList(it)
+        wordViewModel.getLiveWordList().observe(requireActivity(), Observer { list ->
+            wordAdapter.update(list.map { WordItem(it) })
+
             progressBar.show(false)
             if (animation_book != null) {
-                showEmptyState(it.isEmpty())
-                inflateToolbarMenu(it.isEmpty(), word_list_toolbar)
+                showEmptyState(list.isEmpty())
+                inflateToolbarMenu(list.isEmpty(), word_list_toolbar)
             }
         })
     }
@@ -241,9 +244,9 @@ class WordListFragment : Fragment(), WordAdapter.WordItemClickListener {
         }
     }
 
-    private fun observeSearchedList(wordAdapter: WordAdapter) {
-        wordViewModel.getSearchedList().observe(requireActivity(), Observer {
-            wordAdapter.updateList(it)
+    private fun observeSearchedList() {
+        wordViewModel.getSearchedList().observe(requireActivity(), Observer { list ->
+            wordAdapter.update(list.map { WordItem(it) })
         })
     }
 
