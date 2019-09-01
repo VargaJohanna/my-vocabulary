@@ -103,5 +103,6 @@
     <string name="share_file_title">Megosztás</string>
     <string name="search">Keresés</string>
     <string name="search_hint">Keresés...</string>
+    <string name="number_of_words">Szavak száma: %d</string>
 
 </resources>
