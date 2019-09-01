@@ -166,10 +166,7 @@ class ResultFragment : Fragment() {
 
                 override fun onAnimationRepeat(p0: Animator?) {}
 
-                override fun onAnimationCancel(p0: Animator?) {
-                    animationViewSuccess.fadeoutAnimation(150)
-                    animationViewSuccess.show(false)
-                }
+                override fun onAnimationCancel(p0: Animator?) {}
 
                 override fun onAnimationStart(p0: Animator?) {}
             })
@@ -185,10 +182,7 @@ class ResultFragment : Fragment() {
 
                 override fun onAnimationRepeat(p0: Animator?) {}
 
-                override fun onAnimationCancel(p0: Animator?) {
-                    animationViewFailure.fadeoutAnimation(150)
-                    animationViewFailure.show(false)
-                }
+                override fun onAnimationCancel(p0: Animator?) {}
 
                 override fun onAnimationStart(p0: Animator?) {}
             })
@@ -198,6 +192,7 @@ class ResultFragment : Fragment() {
     private fun closeAnimationOnClick(animation: LottieAnimationView?) {
         animation?.let { animationView ->
             animationView.setOnClickListener {
+                animation.display(false)
                 animationView.cancelAnimation()
             }
         }
