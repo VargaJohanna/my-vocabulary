@@ -58,11 +58,10 @@ class WordListFragment : Fragment() {
             generateWordList(word_recycler_view)
             observeWordList(word_list_progress_bar)
             observeEmptyState()
-            observeSearchedList()
             observeSearchBarStatus(search_wrapper)
             setFabOnClickListener(word_fab)
             setToolbarMenu(word_list_toolbar)
-            searchWord(search_field, clear_search)
+            searchWordViewSetup(search_field, clear_search)
             searchBar = search_wrapper
             searchField = search_field
         }
@@ -155,7 +154,9 @@ class WordListFragment : Fragment() {
 
     private fun observeWordList(progressBar: ProgressBar) {
         progressBar.show(true)
-        wordViewModel.getLiveWordList().observe(requireActivity(), Observer { wordList ->
+        wordViewModel.getLiveWordList().observe(requireActivity(), Observer { data ->
+            val wordList = data.first
+            val isSearchOpen = data.second
             val items = ArrayList<Item>()
             items += wordList.map { WordItem(it) { selectedItem: WordItem -> onItemClick(selectedItem) } }
             items += NumberOfWordsItem(String.format(getString(R.string.number_of_words), wordList.size))
@@ -163,8 +164,8 @@ class WordListFragment : Fragment() {
 
             progressBar.show(false)
             if (animation_book != null) {
-                showEmptyState(wordList.isEmpty())
-                inflateToolbarMenu(wordList.isEmpty(), word_list_toolbar)
+                showEmptyState(wordList.isEmpty() && !isSearchOpen)
+                inflateToolbarMenu(wordList.isEmpty() && !isSearchOpen, word_list_toolbar)
             }
         })
     }
@@ -184,6 +185,7 @@ class WordListFragment : Fragment() {
         word_column_title.show(!show)
         translation_column_title.show(!show)
         word_recycler_view.show(!show)
+        if (show) wordViewModel.setSearchBarStatus(false)
     }
 
     private fun setFabOnClickListener(fab: FloatingActionButton) {
@@ -233,11 +235,11 @@ class WordListFragment : Fragment() {
 
     private fun shareDictionary() {
         if (wordViewModel.getLiveWordList().value != null) {
-            shareViewModel.shareDictionary(wordViewModel.getLiveWordList().value!!, requireContext())
+            shareViewModel.shareDictionary(wordViewModel.getLiveWordList().value!!.first, requireContext())
         }
     }
 
-    private fun searchWord(searchField: EditText, clear: ImageView) {
+    private fun searchWordViewSetup(searchField: EditText, clear: ImageView) {
         searchField.addTextChangedListener(SearchTextWatcher())
         searchField.setOnFocusChangeListener { v, hasFocus ->
             if (hasFocus) searchField.setCompoundDrawablesWithIntrinsicBounds(0, 0, 0, 0)
@@ -247,15 +249,6 @@ class WordListFragment : Fragment() {
         clear.setOnClickListener {
             searchField.text.clear()
         }
-    }
-
-    private fun observeSearchedList() {
-        wordViewModel.getSearchedList().observe(requireActivity(), Observer { list ->
-            val items = ArrayList<Item>()
-            items += list.map { WordItem(it) { selectedItem: WordItem -> onItemClick(selectedItem) } }
-            items += NumberOfWordsItem(String.format(getString(R.string.number_of_words), list.size))
-            wordAdapter.update(items)
-        })
     }
 
     private fun showSearchBar() {
@@ -280,14 +273,14 @@ class WordListFragment : Fragment() {
 
     private inner class SearchTextWatcher : TextWatcher {
         override fun afterTextChanged(p0: Editable?) {
-            wordViewModel.searchList(p0.toString())
-            wordViewModel.searchedTerm = p0.toString()
         }
 
         override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
         }
 
         override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
+            wordViewModel.searchedTerm = p0.toString()
+            wordViewModel.searchList(p0.toString())
         }
     }
 }
