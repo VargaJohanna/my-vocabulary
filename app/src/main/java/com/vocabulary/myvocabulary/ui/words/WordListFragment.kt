@@ -4,7 +4,6 @@ import android.app.AlertDialog
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
-import android.util.Log
 import android.view.*
 import android.widget.EditText
 import android.widget.ImageView
@@ -158,7 +157,7 @@ class WordListFragment : Fragment() {
         progressBar.show(true)
         wordViewModel.getLiveWordList().observe(requireActivity(), Observer { wordList ->
             val items = ArrayList<Item>()
-            items += wordList.map { WordItem(it) { selectedItem: WordItem -> onItemClick(selectedItem)} }
+            items += wordList.map { WordItem(it) { selectedItem: WordItem -> onItemClick(selectedItem) } }
             items += NumberOfWordsItem(String.format(getString(R.string.number_of_words), wordList.size))
             wordAdapter.update(items)
 
@@ -252,7 +251,7 @@ class WordListFragment : Fragment() {
     private fun observeSearchedList() {
         wordViewModel.getSearchedList().observe(requireActivity(), Observer { list ->
             val items = ArrayList<Item>()
-            items += list.map { WordItem(it) { selectedItem: WordItem -> onItemClick(selectedItem)} }
+            items += list.map { WordItem(it) { selectedItem: WordItem -> onItemClick(selectedItem) } }
             items += NumberOfWordsItem(String.format(getString(R.string.number_of_words), list.size))
             wordAdapter.update(items)
         })

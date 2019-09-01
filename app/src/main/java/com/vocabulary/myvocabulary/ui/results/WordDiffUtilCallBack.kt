@@ -1,4 +1,4 @@
-package com.vocabulary.myvocabulary.ui.words
+package com.vocabulary.myvocabulary.ui.results
 
 import androidx.recyclerview.widget.DiffUtil
 import com.vocabulary.myvocabulary.ui.words.Word
