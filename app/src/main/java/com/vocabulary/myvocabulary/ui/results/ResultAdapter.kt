@@ -12,7 +12,6 @@ import com.vocabulary.myvocabulary.ext.display
 import com.vocabulary.myvocabulary.ext.show
 import com.vocabulary.myvocabulary.ui.quizzes.QuizDirectionType
 import com.vocabulary.myvocabulary.ui.words.Word
-import com.vocabulary.myvocabulary.ui.words.WordDiffUtilCallBack
 import kotlinx.android.synthetic.main.row_result.view.*
 
 class ResultAdapter(
