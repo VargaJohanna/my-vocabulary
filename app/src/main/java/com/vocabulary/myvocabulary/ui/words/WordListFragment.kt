@@ -183,6 +183,7 @@ class WordListFragment : Fragment() {
         empty_state_message.show(show)
         word_column_title.show(!show)
         translation_column_title.show(!show)
+        word_recycler_view.show(!show)
     }
 
     private fun setFabOnClickListener(fab: FloatingActionButton) {
