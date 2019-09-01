@@ -4,6 +4,7 @@ import android.app.AlertDialog
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
+import android.util.Log
 import android.view.*
 import android.widget.EditText
 import android.widget.ImageView
@@ -30,6 +31,7 @@ import com.vocabulary.myvocabulary.ui.quizzes.toQuizType
 import com.vocabulary.myvocabulary.utils.DialogFactory
 import com.xwray.groupie.GroupAdapter
 import com.xwray.groupie.ViewHolder
+import com.xwray.groupie.kotlinandroidextensions.Item
 import io.reactivex.disposables.CompositeDisposable
 import kotlinx.android.synthetic.main.fragment_word_list.*
 import kotlinx.android.synthetic.main.fragment_word_list.view.*
@@ -37,7 +39,7 @@ import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.viewModel
 import org.koin.core.parameter.parametersOf
 
-class WordListFragment : Fragment(), WordAdapter.WordItemClickListener {
+class WordListFragment : Fragment() {
     private val args by navArgs<WordListFragmentArgs>()
     private val wordViewModel: WordListViewModel by viewModel {
         parametersOf(args.dictionaryId)
@@ -52,11 +54,6 @@ class WordListFragment : Fragment(), WordAdapter.WordItemClickListener {
     private val disposables = CompositeDisposable()
     private val wordAdapter = GroupAdapter<ViewHolder>()
 
-    override fun onItemClick(word: Word) {
-        val action = WordListFragmentDirections.fromWordListToWordDetails(wordViewModel.dictionaryId, word.wordId)
-        findNavController().navigate(action)
-    }
-
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return inflater.inflate(R.layout.fragment_word_list, container, false).apply {
             generateWordList(word_recycler_view)
@@ -70,6 +67,11 @@ class WordListFragment : Fragment(), WordAdapter.WordItemClickListener {
             searchBar = search_wrapper
             searchField = search_field
         }
+    }
+
+    private fun onItemClick(word: WordItem) {
+        val action = WordListFragmentDirections.fromWordListToWordDetails(wordViewModel.dictionaryId, word.wordData.wordId)
+        findNavController().navigate(action)
     }
 
     private fun setToolbarMenu(toolbar: Toolbar) {
@@ -154,13 +156,16 @@ class WordListFragment : Fragment(), WordAdapter.WordItemClickListener {
 
     private fun observeWordList(progressBar: ProgressBar) {
         progressBar.show(true)
-        wordViewModel.getLiveWordList().observe(requireActivity(), Observer { list ->
-            wordAdapter.update(list.map { WordItem(it) })
+        wordViewModel.getLiveWordList().observe(requireActivity(), Observer { wordList ->
+            val items = ArrayList<Item>()
+            items += wordList.map { WordItem(it) { selectedItem: WordItem -> onItemClick(selectedItem)} }
+            items += NumberOfWordsItem(String.format(getString(R.string.number_of_words), wordList.size))
+            wordAdapter.update(items)
 
             progressBar.show(false)
             if (animation_book != null) {
-                showEmptyState(list.isEmpty())
-                inflateToolbarMenu(list.isEmpty(), word_list_toolbar)
+                showEmptyState(wordList.isEmpty())
+                inflateToolbarMenu(wordList.isEmpty(), word_list_toolbar)
             }
         })
     }
@@ -246,7 +251,10 @@ class WordListFragment : Fragment(), WordAdapter.WordItemClickListener {
 
     private fun observeSearchedList() {
         wordViewModel.getSearchedList().observe(requireActivity(), Observer { list ->
-            wordAdapter.update(list.map { WordItem(it) })
+            val items = ArrayList<Item>()
+            items += list.map { WordItem(it) { selectedItem: WordItem -> onItemClick(selectedItem)} }
+            items += NumberOfWordsItem(String.format(getString(R.string.number_of_words), list.size))
+            wordAdapter.update(items)
         })
     }
 
