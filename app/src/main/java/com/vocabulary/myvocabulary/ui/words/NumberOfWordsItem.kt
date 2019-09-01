@@ -17,8 +17,8 @@ class NumberOfWordsItem(
 
     override fun getLayout() = R.layout.row_number_of_words
 
-//    override fun isSameAs(other: com.xwray.groupie.Item<*>?) =  numberOfWords == (other as? NumberOfWordsItem)?.numberOfWords
-//
-//    override fun equals(other: Any?) = numberOfWords == (other as? NumberOfWordsItem)?.numberOfWords
+    override fun isSameAs(other: com.xwray.groupie.Item<*>?) = numberOfWords == (other as? NumberOfWordsItem)?.numberOfWords
+
+    override fun equals(other: Any?) = numberOfWords == (other as? NumberOfWordsItem)?.numberOfWords
 
 }
