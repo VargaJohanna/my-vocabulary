@@ -27,8 +27,8 @@ class WordListViewModel(
 
 ) : ViewModel() {
     private val disposables = CompositeDisposable()
-    private val liveWordList: MutableLiveData<List<Word>> = MutableLiveData()
-    private val searchList: MutableLiveData<List<Word>> = MutableLiveData()
+    private var listFromData: List<Word> = emptyList()
+    private val liveWordList: MutableLiveData<Pair<List<Word>, Boolean>> = MutableLiveData()
     var currentSortByData: SortByData = SortByData()
     private val isListEmpty: MutableLiveData<Boolean> = MutableLiveData()
     private val isSearchBarOpenCurrent: MutableLiveData<Boolean> = MutableLiveData()
@@ -72,15 +72,15 @@ class WordListViewModel(
                 .subscribeOn(rxSchedulers.io())
                 .observeOn(rxSchedulers.main())
                 .subscribe { t ->
-                    liveWordList.postValue(t)
-                    isListEmpty.postValue(t.isEmpty())
-                    searchList.postValue(t.filter {
-                        it.translation.contains(searchedTerm, true) || it.word.contains(searchedTerm, true)
-                    })
+                    isListEmpty.postValue(t.isEmpty() && !(isSearchBarOpenCurrent.value ?: false))
+                    listFromData = t
+                    liveWordList.postValue(Pair(
+                            first = t.filter { it.translation.contains(searchedTerm, true) || it.word.contains(searchedTerm, true) },
+                            second = isSearchBarOpenCurrent.value ?: false))
                 }
     }
 
-    fun getLiveWordList(): LiveData<List<Word>> = liveWordList
+    fun getLiveWordList(): LiveData<Pair<List<Word>, Boolean>> = liveWordList
 
     override fun onCleared() {
         disposables.clear()
@@ -117,11 +117,8 @@ class WordListViewModel(
     fun isListEmpty(): LiveData<Boolean> = isListEmpty
 
     fun searchList(find: String) {
-        searchList.postValue(liveWordList.value?.filter {
-            it.translation.contains(find, true) || it.word.contains(find, true)
-        })
+        liveWordList.postValue(Pair(
+                first = listFromData.filter { it.translation.contains(find, true) || it.word.contains(find, true) },
+                second = isSearchBarOpenCurrent.value ?: false))
     }
-
-    fun getSearchedList(): LiveData<List<Word>> = searchList
-
 }
