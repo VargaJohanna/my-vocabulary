@@ -13,7 +13,9 @@ import com.vocabulary.myvocabulary.repositories.word.WordRepository
 import com.vocabulary.myvocabulary.rx.RxSchedulers
 import com.vocabulary.myvocabulary.ui.quizzes.QuizTypes
 import io.reactivex.Completable
+import io.reactivex.Observable
 import io.reactivex.disposables.CompositeDisposable
+import io.reactivex.functions.BiFunction
 import java.util.*
 
 class WordListViewModel(
@@ -27,17 +29,15 @@ class WordListViewModel(
 
 ) : ViewModel() {
     private val disposables = CompositeDisposable()
-    private var listFromData: List<Word> = emptyList()
     private val liveWordList: MutableLiveData<Pair<List<Word>, Boolean>> = MutableLiveData()
     var currentSortByData: SortByData = SortByData()
     private val isListEmpty: MutableLiveData<Boolean> = MutableLiveData()
     private val isSearchBarOpenCurrent: MutableLiveData<Boolean> = MutableLiveData()
-    var searchedTerm = ""
 
     init {
-        observeList()
-        observeSortByData()
         observeSearchBarStatus()
+        observeSortByData()
+        observeList()
     }
 
     private fun observeSearchBarStatus() {
@@ -68,14 +68,16 @@ class WordListViewModel(
     }
 
     private fun observeList() {
-        disposables += sortedListRepository.getSortedWordList(dictionaryId)
+        disposables += Observable.combineLatest(
+                sortedListRepository.getSortedWordList(dictionaryId),
+                searchRepository.searchedTerm,
+                BiFunction<List<Word>, String, List<Word>> { wordList, searchTerm -> searchList(wordList, searchTerm) })
                 .subscribeOn(rxSchedulers.io())
                 .observeOn(rxSchedulers.main())
                 .subscribe { t ->
                     isListEmpty.postValue(t.isEmpty() && !(isSearchBarOpenCurrent.value ?: false))
-                    listFromData = t
                     liveWordList.postValue(Pair(
-                            first = t.filter { it.translation.contains(searchedTerm, true) || it.word.contains(searchedTerm, true) },
+                            first = t,
                             second = isSearchBarOpenCurrent.value ?: false))
                 }
     }
@@ -116,9 +118,11 @@ class WordListViewModel(
 
     fun isListEmpty(): LiveData<Boolean> = isListEmpty
 
-    fun searchList(find: String) {
-        liveWordList.postValue(Pair(
-                first = listFromData.filter { it.translation.contains(find, true) || it.word.contains(find, true) },
-                second = isSearchBarOpenCurrent.value ?: false))
+    private fun searchList(wordList: List<Word>, find: String): List<Word> {
+        return wordList.filter { it.translation.contains(find, true) || it.word.contains(find, true) }
+    }
+
+    fun setSearchedTerm(searchTerm: String) {
+        searchRepository.setSearchedTerm(searchTerm)
     }
 }

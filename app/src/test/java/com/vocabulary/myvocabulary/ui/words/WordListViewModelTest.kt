@@ -11,6 +11,7 @@ import com.vocabulary.myvocabulary.repositories.sortBy.SortByRepository
 import com.vocabulary.myvocabulary.repositories.sortedList.SortedListRepository
 import com.vocabulary.myvocabulary.repositories.word.WordRepository
 import com.vocabulary.myvocabulary.repositories.quiz.QuizRepository
+import com.vocabulary.myvocabulary.repositories.search.SearchRepository
 import com.vocabulary.myvocabulary.ui.quizzes.QuizTypes
 import io.reactivex.Observable
 import org.junit.Assert.assertEquals
@@ -30,9 +31,13 @@ class WordListViewModelTest {
     private val wordRepository = mock<WordRepository>()
     private val sortedListRepository = mock<SortedListRepository>()
     private val quizRepository = mock<QuizRepository>()
+    private val searchRepository = mock<SearchRepository>()
     private val wordListToTest = asList(
             Word(containerDictionaryId = dictionaryId, word = "a", translation = "translation", created = date),
             Word(containerDictionaryId = dictionaryId, word = "b", translation = "translation2", created = date),
+            Word(containerDictionaryId = dictionaryId, word = "c", translation = "translation3", created = date)
+    )
+    private val searchResultWordListToTest = asList(
             Word(containerDictionaryId = dictionaryId, word = "c", translation = "translation3", created = date)
     )
     private val sortByDataToTest = SortByData(sortByOption = SortByOptions.SortByTranslation, dateDescending = true, wordDescending = true, translationDescending = false)
@@ -101,16 +106,17 @@ class WordListViewModelTest {
 
     @Test
     fun `should return a liveData with a list of words`() {
-        val wordListViewModel = givenWordListViewModelWithData()
+        val wordListViewModel = givenWordListViewModelWithDataOpenSearch()
 
         wordListViewModel.getLiveWordList().observeForever(mock())
 
-        assertEquals(wordListToTest, wordListViewModel.getLiveWordList().value)
+        assertEquals(wordListToTest, wordListViewModel.getLiveWordList().value?.first)
+        assertEquals(true, wordListViewModel.getLiveWordList().value?.second)
     }
 
     @Test
     fun `should return sortByData when currentSortByData is called`() {
-        val wordListViewModel = givenWordListViewModelWithData()
+        val wordListViewModel = givenWordListViewModelWithDataOpenSearch()
 
         val currentSortByData = wordListViewModel.currentSortByData
 
@@ -119,8 +125,8 @@ class WordListViewModelTest {
     }
 
     @Test
-    fun `should return true when word list is empty`() {
-        val wordListViewModel = givenWordListViewModelWithEmptyList()
+    fun `isListEmpty() should return true when word list is empty and search bar is closed`() {
+        val wordListViewModel = givenWordListViewModelWithEmptyListClosedSearch()
 
         wordListViewModel.isListEmpty().observeForever(mock())
 
@@ -128,29 +134,103 @@ class WordListViewModelTest {
     }
 
     @Test
-    fun `should return false when word list is not empty`() {
-        val wordListViewModel = givenWordListViewModelWithData()
+    fun `isListEmpty() should return false when word list is not empty and search bar is open`() {
+        val wordListViewModel = givenWordListViewModelWithDataOpenSearch()
 
         wordListViewModel.isListEmpty().observeForever(mock())
 
         assertEquals(false, wordListViewModel.isListEmpty().value)
     }
 
+    @Test
+    fun `isListEmpty() should return false when word list is empty and search bar is open`() {
+        val wordListViewModel = givenWordListViewModelWithEmptyListOpenSearch()
+
+        wordListViewModel.isListEmpty().observeForever(mock())
+
+        assertEquals(false, wordListViewModel.isListEmpty().value)
+    }
+
+    @Test
+    fun `isListEmpty() should return false when word list is not empty and search bar is closed`() {
+        val wordListViewModel = givenWordListViewModelWithDataClosedSearch()
+
+        wordListViewModel.isListEmpty().observeForever(mock())
+
+        assertEquals(false, wordListViewModel.isListEmpty().value)
+    }
+
+    @Test
+    fun `should update searched term when setSearchedTerm() is called`() {
+        val wordListViewModel = givenWordListViewModel()
+
+        wordListViewModel.setSearchedTerm("test")
+
+        verify(searchRepository).setSearchedTerm("test")
+    }
+
+    @Test
+    fun `should update search bar status when setSearchBarStatus() is called`() {
+        val wordListViewModel = givenWordListViewModel()
+
+        wordListViewModel.setSearchBarStatus(true)
+
+        verify(searchRepository).saveSearchBarStatus(true)
+    }
+
+    @Test
+    fun `should return results of a search`() {
+        val wordListViewModel = givenWordListViewModelWithDataSearchResult()
+
+        wordListViewModel.getLiveWordList().observeForever(mock())
+        assertEquals(searchResultWordListToTest, wordListViewModel.getLiveWordList().value?.first)
+        assertEquals(true, wordListViewModel.getLiveWordList().value?.second)
+    }
+
     private fun givenWordListViewModel(): WordListViewModel {
         whenever(sortedListRepository.getSortedWordList(any())).thenReturn(Observable.never())
         whenever(sortByRepository.sortByData()).thenReturn(Observable.never())
-        return WordListViewModel(dictionaryId, sortByRepository, wordRepository, sortedListRepository, TestScheduler(), quizRepository)
+        whenever(searchRepository.searchedTerm).thenReturn(Observable.just(""))
+        whenever(searchRepository.showSearchBar()).thenReturn(Observable.just(true))
+        return WordListViewModel(dictionaryId, sortByRepository, wordRepository, sortedListRepository, TestScheduler(), quizRepository, searchRepository)
     }
 
-    private fun givenWordListViewModelWithData(): WordListViewModel {
+    private fun givenWordListViewModelWithDataOpenSearch(): WordListViewModel {
         whenever(sortedListRepository.getSortedWordList(dictionaryId)).thenReturn(Observable.just(wordListToTest))
         whenever(sortByRepository.sortByData()).thenReturn(Observable.just(sortByDataToTest))
-        return WordListViewModel(dictionaryId, sortByRepository, wordRepository, sortedListRepository, TestScheduler(), quizRepository)
+        whenever(searchRepository.searchedTerm).thenReturn(Observable.just(""))
+        whenever(searchRepository.showSearchBar()).thenReturn(Observable.just(true))
+        return WordListViewModel(dictionaryId, sortByRepository, wordRepository, sortedListRepository, TestScheduler(), quizRepository, searchRepository)
+    }
+    private fun givenWordListViewModelWithDataSearchResult(): WordListViewModel {
+        whenever(sortedListRepository.getSortedWordList(dictionaryId)).thenReturn(Observable.just(wordListToTest))
+        whenever(sortByRepository.sortByData()).thenReturn(Observable.just(sortByDataToTest))
+        whenever(searchRepository.searchedTerm).thenReturn(Observable.just("translation3"))
+        whenever(searchRepository.showSearchBar()).thenReturn(Observable.just(true))
+        return WordListViewModel(dictionaryId, sortByRepository, wordRepository, sortedListRepository, TestScheduler(), quizRepository, searchRepository)
     }
 
-    private fun givenWordListViewModelWithEmptyList(): WordListViewModel {
+    private fun givenWordListViewModelWithDataClosedSearch(): WordListViewModel {
+        whenever(sortedListRepository.getSortedWordList(dictionaryId)).thenReturn(Observable.just(wordListToTest))
+        whenever(sortByRepository.sortByData()).thenReturn(Observable.just(sortByDataToTest))
+        whenever(searchRepository.searchedTerm).thenReturn(Observable.just(""))
+        whenever(searchRepository.showSearchBar()).thenReturn(Observable.just(false))
+        return WordListViewModel(dictionaryId, sortByRepository, wordRepository, sortedListRepository, TestScheduler(), quizRepository, searchRepository)
+    }
+
+    private fun givenWordListViewModelWithEmptyListOpenSearch(): WordListViewModel {
         whenever(sortedListRepository.getSortedWordList(dictionaryId)).thenReturn(Observable.just(emptyList()))
         whenever(sortByRepository.sortByData()).thenReturn(Observable.never())
-        return WordListViewModel(dictionaryId, sortByRepository, wordRepository, sortedListRepository, TestScheduler(), quizRepository)
+        whenever(searchRepository.searchedTerm).thenReturn(Observable.just("a"))
+        whenever(searchRepository.showSearchBar()).thenReturn(Observable.just(true))
+        return WordListViewModel(dictionaryId, sortByRepository, wordRepository, sortedListRepository, TestScheduler(), quizRepository, searchRepository)
+    }
+
+    private fun givenWordListViewModelWithEmptyListClosedSearch(): WordListViewModel {
+        whenever(sortedListRepository.getSortedWordList(dictionaryId)).thenReturn(Observable.just(emptyList()))
+        whenever(sortByRepository.sortByData()).thenReturn(Observable.never())
+        whenever(searchRepository.searchedTerm).thenReturn(Observable.just(""))
+        whenever(searchRepository.showSearchBar()).thenReturn(Observable.just(false))
+        return WordListViewModel(dictionaryId, sortByRepository, wordRepository, sortedListRepository, TestScheduler(), quizRepository, searchRepository)
     }
 }

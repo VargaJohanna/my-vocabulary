@@ -241,7 +241,7 @@ class WordListFragment : Fragment() {
 
     private fun searchWordViewSetup(searchField: EditText, clear: ImageView) {
         searchField.addTextChangedListener(SearchTextWatcher())
-        searchField.setOnFocusChangeListener { v, hasFocus ->
+        searchField.setOnFocusChangeListener { _, hasFocus ->
             if (hasFocus) searchField.setCompoundDrawablesWithIntrinsicBounds(0, 0, 0, 0)
             else searchField.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_search, 0, 0, 0)
         }
@@ -279,8 +279,7 @@ class WordListFragment : Fragment() {
         }
 
         override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
-            wordViewModel.searchedTerm = p0.toString()
-            wordViewModel.searchList(p0.toString())
+            wordViewModel.setSearchedTerm(p0.toString())
         }
     }
 }
