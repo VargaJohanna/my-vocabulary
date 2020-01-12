@@ -17,6 +17,7 @@
             android:id="@+id/quiz_toolbar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            app:titleTextColor="@color/white"
             android:layout_margin="0dp"
             android:elevation="3dp"
             android:fitsSystemWindows="true"
@@ -48,7 +49,7 @@
         android:layout_gravity="end|bottom"
         android:layout_margin="@dimen/margin_medium"
         android:src="@drawable/ic_arrow_right"
-        android:tint="@color/icons"
+        android:tintMode="@color/icons"
         app:fabSize="normal"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
