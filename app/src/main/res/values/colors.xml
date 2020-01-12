@@ -16,4 +16,7 @@
   <color name="light_grey">#eeeeee</color>
   <color name="transparent">#00ffffff</color>
 
+  <!-- Dark colours -->
+  <color name="dialogBackground">#ffffff</color>
+
 </resources>
