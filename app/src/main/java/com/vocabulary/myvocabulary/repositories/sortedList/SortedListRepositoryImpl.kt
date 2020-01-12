@@ -19,11 +19,11 @@ class SortedListRepositoryImpl(
                 BiFunction { list, sortData ->
                     when (sortData.sortByOption) {
                         SortByOptions.SortByTranslation ->
-                            if (sortData.translationDescending) list.sortedWith(compareByDescending { it.translation })
+                            if (sortData.translationDescending) list.sortedWith(compareByDescending(String.CASE_INSENSITIVE_ORDER) { it.translation })
                             else list.sortedWith(compareBy { it.translation })
 
                         SortByOptions.SortByWord ->
-                            if (sortData.wordDescending) list.sortedWith(compareByDescending { it.word })
+                            if (sortData.wordDescending) list.sortedWith(compareByDescending(String.CASE_INSENSITIVE_ORDER) { it.word })
                             else list.sortedWith(compareBy { it.word })
 
                         SortByOptions.SortByDate ->
