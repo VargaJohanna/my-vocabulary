@@ -22,8 +22,7 @@
             android:layout_height="wrap_content"
             android:layout_margin="0dp"
             android:fitsSystemWindows="true"
-            app:navigationIcon="@drawable/ic_arrow_back"
-            app:titleTextColor="@color/icons" />
+            app:navigationIcon="@drawable/ic_arrow_back"/>
     </com.google.android.material.appbar.AppBarLayout>
 
     <androidx.constraintlayout.widget.ConstraintLayout

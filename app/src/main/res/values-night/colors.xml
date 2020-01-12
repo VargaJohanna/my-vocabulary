@@ -4,5 +4,11 @@
     <color name="colorPrimaryDark">#00252c</color>
     <color name="colorAccent">#07ffc1</color>
     <color name="dialogBackground">#33333D</color>
+    <color name="divider">#000000</color>
+    <color name="light_grey">#33333D</color>
+    <color name="light_error">#33ffae85</color>
+    <color name="light_green">#3307ffc1</color>
+    <color name="green">#07ffc1</color>
+    <color name="icons">#000000</color>
 
 </resources>
