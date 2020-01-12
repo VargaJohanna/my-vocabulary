@@ -34,11 +34,11 @@
                         <option name="values">
                           <map>
                             <entry key="assetSourceType" value="FILE" />
-                            <entry key="height" value="749" />
-                            <entry key="outputName" value="ic_clean_question_button_dark" />
+                            <entry key="height" value="198" />
+                            <entry key="outputName" value="ic_dictionaries_background_dark_transparent" />
                             <entry key="overrideSize" value="true" />
-                            <entry key="sourceFile" value="C:\Users\varga\Pictures\My Vocabulary\Dictionary Logo\clean_question_button_dark.svg" />
-                            <entry key="width" value="1000" />
+                            <entry key="sourceFile" value="C:\Users\varga\Pictures\My Vocabulary\Dictionary Logo\dictionaries_background_dark_transparent.svg" />
+                            <entry key="width" value="264" />
                           </map>
                         </option>
                       </PersistentState>
