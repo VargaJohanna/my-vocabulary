@@ -19,6 +19,7 @@
             android:id="@+id/main_toolbar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            app:titleTextColor="@color/white"
             android:fitsSystemWindows="true"
             android:textAlignment="center"
             app:layout_constraintEnd_toEndOf="parent"

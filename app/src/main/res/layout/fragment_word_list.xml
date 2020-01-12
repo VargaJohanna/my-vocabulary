@@ -20,6 +20,7 @@
             android:id="@+id/word_list_toolbar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            app:titleTextColor="@color/white"
             android:layout_margin="0dp"
             android:fitsSystemWindows="true"
             app:navigationIcon="@drawable/ic_arrow_back"/>
@@ -120,7 +121,7 @@
         android:layout_marginEnd="@dimen/margin_medium"
         android:layout_marginBottom="@dimen/margin_medium"
         android:src="@drawable/ic_plus_symbol"
-        android:tint="@color/icons"
+        android:tintMode="@color/icons"
         app:fabSize="normal"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />

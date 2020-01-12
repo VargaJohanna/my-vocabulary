@@ -19,6 +19,7 @@
             android:id="@+id/result_toolbar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            app:titleTextColor="@color/white"
             android:layout_margin="0dp"
             android:fitsSystemWindows="true"
             app:layout_constraintEnd_toEndOf="parent"
@@ -62,7 +63,7 @@
         android:layout_gravity="end|bottom"
         android:layout_margin="@dimen/margin_medium"
         android:src="@drawable/ic_retry"
-        android:tint="@color/icons"
+        android:tintMode="@color/icons"
         app:fabSize="normal"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
@@ -90,7 +91,7 @@
             android:layout_gravity="end|bottom"
             android:layout_margin="@dimen/margin_medium"
             android:src="@drawable/ic_failed_only"
-            android:tint="@color/icons"
+            android:tintMode="@color/icons"
             app:fabSize="normal" />
     </LinearLayout>
 
@@ -117,7 +118,7 @@
             android:layout_gravity="end|bottom"
             android:layout_margin="@dimen/margin_medium"
             android:src="@drawable/ic_refresh_icon"
-            android:tint="@color/icons"
+            android:tintMode="@color/icons"
             app:fabSize="normal" />
     </LinearLayout>
 
@@ -128,7 +129,7 @@
         android:layout_gravity="start|bottom"
         android:layout_margin="@dimen/margin_medium"
         android:src="@drawable/ic_remove_icon"
-        android:tint="@color/icons"
+        android:tintMode="@color/icons"
         app:fabSize="normal"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
