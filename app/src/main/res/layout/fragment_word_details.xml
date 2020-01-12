@@ -21,8 +21,7 @@
             android:layout_margin="0dp"
             android:fitsSystemWindows="true"
             app:navigationIcon="@drawable/ic_arrow_back"
-            app:title="@string/word_details_toolbar"
-            app:titleTextColor="@color/icons" />
+            app:title="@string/word_details_toolbar"/>
     </com.google.android.material.appbar.AppBarLayout>
 
 
@@ -35,7 +34,7 @@
         android:background="@null"
         android:padding="@dimen/padding_normal"
         android:src="@drawable/ic_edit"
-        android:tint="@color/primary_text"
+        android:tint="?attr/colorControlNormal"
         app:layout_constraintBottom_toTopOf="@+id/translation_card_view"
         app:layout_constraintEnd_toStartOf="@id/word_delete_button"
         app:layout_constraintTop_toBottomOf="@+id/app_bar" />
@@ -49,7 +48,7 @@
         android:background="@null"
         android:padding="@dimen/padding_normal"
         android:src="@drawable/ic_delete"
-        android:tint="@color/primary_text"
+        android:tint="?attr/colorControlNormal"
         app:layout_constraintBottom_toTopOf="@+id/translation_card_view"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/app_bar" />
