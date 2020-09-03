@@ -3,6 +3,8 @@ package com.vocabulary.myvocabulary.repositories.sortedList
 import com.vocabulary.myvocabulary.repositories.dictionary.DictionaryRepository
 import com.vocabulary.myvocabulary.repositories.sortBy.SortByOptions
 import com.vocabulary.myvocabulary.repositories.sortBy.SortByRepository
+import com.vocabulary.myvocabulary.repositories.sortBy.dictionary.SortByDictionaryOptions
+import com.vocabulary.myvocabulary.repositories.sortBy.dictionary.SortDictionaryRepository
 import com.vocabulary.myvocabulary.repositories.word.WordRepository
 import com.vocabulary.myvocabulary.ui.dictionaries.Dictionary
 import com.vocabulary.myvocabulary.ui.words.Word
@@ -12,6 +14,7 @@ import io.reactivex.functions.BiFunction
 class SortedListRepositoryImpl(
         private val wordRepository: WordRepository,
         private val sortByRepository: SortByRepository,
+        private val sortByDictRepository: SortDictionaryRepository,
         private val dictionaryRepository: DictionaryRepository
 ) : SortedListRepository {
 
@@ -42,7 +45,6 @@ class SortedListRepositoryImpl(
                                 list.sortedWith(compareBy { it.created })
                             }
 
-                        else -> list
                     }
                 }
         )
@@ -51,16 +53,21 @@ class SortedListRepositoryImpl(
     override fun getSortedDictionaryList(): Observable<List<Dictionary>> {
         return Observable.combineLatest(
                 dictionaryRepository.allDictionaries,
-                sortByRepository.sortByData(),
+                sortByDictRepository.sortByData(),
                 BiFunction { list, sortData ->
                     when (sortData.sortByOption) {
-                        SortByOptions.SortByDate ->
+                        SortByDictionaryOptions.SortByDate ->
                             if (sortData.dateDescending) {
                                 list.sortedWith(compareBy { it.dictionaryCreated }).reversed()
                             } else {
                                 list.sortedWith(compareBy { it.dictionaryCreated })
                             }
-                        else -> list
+                        SortByDictionaryOptions.SortByTitle ->
+                            if (sortData.titleDescending) {
+                                list.sortedWith(compareByDescending(String.CASE_INSENSITIVE_ORDER) { it.dictionaryName })
+                            } else {
+                                list.sortedWith(compareBy(String.CASE_INSENSITIVE_ORDER) { it.dictionaryName })
+                            }
                     }
                 }
         )

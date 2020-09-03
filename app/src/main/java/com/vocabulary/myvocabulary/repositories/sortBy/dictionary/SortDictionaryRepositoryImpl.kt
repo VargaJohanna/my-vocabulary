@@ -11,7 +11,7 @@ class SortDictionaryRepositoryImpl(
 ) : SortDictionaryRepository {
     private val sortDateDirection: Observable<Boolean> = rxPreferences.getBoolean(SORT_DICT_DATE_DIRECTION_KEY, true).asObservable()
     private val sortTitleDirection: Observable<Boolean> = rxPreferences.getBoolean(SORT_DICT_TITLE_DIRECTION_KEY, true).asObservable()
-    private val sortBy: Observable<Int> = rxPreferences.getInteger(SORT_DICT_KEY, 1).asObservable()
+    private val sortBy: Observable<Int> = rxPreferences.getInteger(SORT_DICT_KEY, 0).asObservable()
 
     override fun setSortBy(sortByData: SortDictionaryData) {
         preferences.edit().apply {
