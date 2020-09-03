@@ -9,7 +9,7 @@ sealed class SortByOptions(
 }
 
 fun Int.toSortByOption(): SortByOptions {
-    return when(this) {
+    return when (this) {
         SortByOptions.SortByTranslation.id -> SortByOptions.SortByTranslation
         SortByOptions.SortByWord.id -> SortByOptions.SortByWord
         SortByOptions.SortByDate.id -> SortByOptions.SortByDate

@@ -104,4 +104,5 @@
     <string name="search">Search</string>
     <string name="search_hint">Search...</string>
     <string name="number_of_words">Number of words: %1$d</string>
+    <string name="dictionary_title">Title</string>
 </resources>

@@ -29,6 +29,8 @@ import com.vocabulary.myvocabulary.ui.quizzes.QuizViewModel
 import com.vocabulary.myvocabulary.ui.results.ResultViewModel
 import com.vocabulary.myvocabulary.repositories.share.ShareDictionaryRepository
 import com.vocabulary.myvocabulary.repositories.share.ShareDictionaryRepositoryImpl
+import com.vocabulary.myvocabulary.repositories.sortBy.dictionary.SortDictionaryRepository
+import com.vocabulary.myvocabulary.repositories.sortBy.dictionary.SortDictionaryRepositoryImpl
 import com.vocabulary.myvocabulary.ui.words.WordDetailsViewModel
 import com.vocabulary.myvocabulary.ui.words.WordListViewModel
 import com.vocabulary.myvocabulary.utils.DialogFactory
@@ -48,10 +50,13 @@ val repositoryModule = module {
     single<SortByRepository> {
         SortByRepositoryImpl(get(), get())
     }
+    single<SortDictionaryRepository> {
+        SortDictionaryRepositoryImpl(get(), get())
+    }
     single<SearchRepository> {
         SearchRepositoryImpl()
     }
-    single<SortedListRepository> { SortedListRepositoryImpl(get(), get()) }
+    single<SortedListRepository> { SortedListRepositoryImpl(get(), get(), get()) }
     single<GuessedWordRepository> { GuessedWordRepositoryImpl() }
     single<LocalQuoteRepository> { LocalQuoteRepositoryImpl() }
     single<NetworkQuoteRepository> { NetworkQuoteRepositoryImpl(get()) }
@@ -73,7 +78,7 @@ val networkModule = module {
 }
 
 val viewModelModule = module {
-    viewModel { DictionaryListViewModel(get(), get(), get()) }
+    viewModel { DictionaryListViewModel(get(), get(), get(), get(), get()) }
     viewModel { (dictionaryId: Long) -> WordListViewModel(dictionaryId, get(), get(), get(), get(), get(), get()) }
     viewModel { (dictionaryId: Long, optionType: Int, failedOnly: Boolean) ->
         QuizViewModel(

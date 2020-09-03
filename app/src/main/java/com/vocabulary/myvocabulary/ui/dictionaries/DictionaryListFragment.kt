@@ -4,13 +4,13 @@ import android.app.Activity.RESULT_OK
 import android.app.AlertDialog
 import android.content.Intent
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import android.widget.LinearLayout
 import android.widget.PopupMenu
 import android.widget.ProgressBar
 import android.widget.Toast
+import androidx.appcompat.widget.Toolbar
+import androidx.core.view.forEach
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.navigation.findNavController
@@ -22,6 +22,7 @@ import com.vocabulary.myvocabulary.R
 import com.vocabulary.myvocabulary.ext.display
 import com.vocabulary.myvocabulary.ext.plusAssign
 import com.vocabulary.myvocabulary.ext.show
+import com.vocabulary.myvocabulary.repositories.sortBy.dictionary.SortByDictionaryOptions
 import com.vocabulary.myvocabulary.rx.RxSchedulers
 import com.vocabulary.myvocabulary.ui.quizzes.toQuizType
 import com.vocabulary.myvocabulary.utils.DialogFactory
@@ -30,8 +31,6 @@ import kotlinx.android.synthetic.main.fragment_dictionary_list.*
 import kotlinx.android.synthetic.main.fragment_dictionary_list.view.*
 import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.viewModel
-import java.util.*
-import kotlin.collections.ArrayList
 
 class DictionaryListFragment : Fragment(), DictionaryAdapter.ItemClickListener {
     private val viewModel: DictionaryListViewModel by viewModel()
@@ -66,6 +65,9 @@ class DictionaryListFragment : Fragment(), DictionaryAdapter.ItemClickListener {
             setCreateNewFabOnClickListener(create_new_fab)
             setImportFabOnClickListener(import_fab)
             dictionary_list_toolbar.setNavigationOnClickListener { findNavController().popBackStack() }
+            viewModel.isListEmpty().observe(this@DictionaryListFragment, Observer {
+                inflateToolbarMenu(it, dictionary_list_toolbar)
+            })
         }
     }
 
@@ -215,6 +217,53 @@ class DictionaryListFragment : Fragment(), DictionaryAdapter.ItemClickListener {
         createNewContainer.display(true)
         importContainer.animate().translationY(-resources.getDimension(R.dimen.standard_150))
         createNewContainer.animate().translationY(-resources.getDimension(R.dimen.standard_75))
+    }
+
+    private fun inflateToolbarMenu(isListEmpty: Boolean, toolbar: Toolbar) {
+        toolbar.apply {
+            if (!isListEmpty && toolbar.menu.size() == 0) {
+                inflateMenu(R.menu.dictionary_list_menu)
+                navigationIconsSet(menu.getItem(0).subMenu)
+                setOnMenuItemClickListener { item: MenuItem? ->
+                    navigationIconsSet(menu.getItem(0).subMenu)
+                    when (item?.itemId) {
+                        R.id.dictionary_sort_by_date -> {
+                            viewModel.setSortBy(viewModel.currentSortByData.copy(
+                                    sortByOption = SortByDictionaryOptions.SortByDate,
+                                    dateDescending = !viewModel.currentSortByData.dateDescending)
+                            )
+                        }
+                        R.id.dictionary_sort_by_title -> {
+                            viewModel.setSortBy(viewModel.currentSortByData.copy(
+                                    sortByOption = SortByDictionaryOptions.SortByTitle,
+                                    titleDescending = !viewModel.currentSortByData.dateDescending)
+                            )
+                        }
+                    }
+                    true
+                }
+            } else if (isListEmpty) {
+                toolbar.menu.clear()
+            }
+        }
+    }
+
+    private fun navigationIconsSet(menu: Menu) {
+        viewModel.currentSortByData.let {
+            when (it.sortByOption) {
+                SortByDictionaryOptions.SortByDate -> setIcons(menu, R.id.dictionary_sort_by_date, it.dateDescending)
+                SortByDictionaryOptions.SortByTitle -> setIcons(menu, R.id.dictionary_sort_by_title, it.titleDescending)
+            }
+        }
+    }
+
+    private fun setIcons(menu: Menu, menuItemId: Int, descending: Boolean) {
+        menu.forEach {
+            if (it.itemId == menuItemId) it.setIcon(
+                    if (descending) R.drawable.ic_arrow_downward
+                    else R.drawable.ic_arrow_upward)
+            else it.setIcon(R.drawable.ic_empty_icon)
+        }
     }
 
     override fun onDestroy() {
