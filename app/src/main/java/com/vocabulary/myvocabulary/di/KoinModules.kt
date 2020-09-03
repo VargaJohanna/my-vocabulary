@@ -56,7 +56,7 @@ val repositoryModule = module {
     single<SearchRepository> {
         SearchRepositoryImpl()
     }
-    single<SortedListRepository> { SortedListRepositoryImpl(get(), get(), get()) }
+    single<SortedListRepository> { SortedListRepositoryImpl(get(), get(), get(), get()) }
     single<GuessedWordRepository> { GuessedWordRepositoryImpl() }
     single<LocalQuoteRepository> { LocalQuoteRepositoryImpl() }
     single<NetworkQuoteRepository> { NetworkQuoteRepositoryImpl(get()) }
