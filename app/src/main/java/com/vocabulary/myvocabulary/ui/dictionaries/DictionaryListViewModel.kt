@@ -5,8 +5,11 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.vocabulary.myvocabulary.ext.plusAssign
 import com.vocabulary.myvocabulary.repositories.dictionary.DictionaryRepository
-import com.vocabulary.myvocabulary.rx.RxSchedulers
 import com.vocabulary.myvocabulary.repositories.quiz.QuizRepository
+import com.vocabulary.myvocabulary.repositories.sortBy.dictionary.SortDictionaryData
+import com.vocabulary.myvocabulary.repositories.sortBy.dictionary.SortDictionaryRepository
+import com.vocabulary.myvocabulary.repositories.sortedList.SortedListRepository
+import com.vocabulary.myvocabulary.rx.RxSchedulers
 import com.vocabulary.myvocabulary.ui.quizzes.QuizTypes
 import com.vocabulary.myvocabulary.utils.Event
 import io.reactivex.Completable
@@ -17,7 +20,10 @@ import java.util.*
 class DictionaryListViewModel(
         private val dictionaryRepository: DictionaryRepository,
         private val rxSchedulers: RxSchedulers,
-        private val quizRepository: QuizRepository
+        private val quizRepository: QuizRepository,
+        private val sortByRepository: SortDictionaryRepository,
+        private val sortedListRepository: SortedListRepository
+
 ) : ViewModel() {
 
     private val disposables = CompositeDisposable()
@@ -26,9 +32,12 @@ class DictionaryListViewModel(
     private val _newlyCreatedItemDetails = MutableLiveData<Event<DictionaryDetails>>()
     val newlyCreatedItemDetails: LiveData<Event<DictionaryDetails>> = _newlyCreatedItemDetails
     private lateinit var dictionaryName: String
+    var currentSortByData: SortDictionaryData = SortDictionaryData()
+    private val isListEmpty = MutableLiveData<Boolean>()
 
     init {
         observeList()
+        observeSortByData()
     }
 
     fun insertDictionary(dictionary: Dictionary) {
@@ -41,10 +50,13 @@ class DictionaryListViewModel(
     }
 
     private fun observeList() {
-        disposables += dictionaryRepository.allDictionaries
+        disposables += sortedListRepository.getSortedDictionaryList()
                 .subscribeOn(rxSchedulers.io())
                 .observeOn(rxSchedulers.main())
-                .subscribe { _liveDictionaryList.postValue(it) }
+                .subscribe {
+                    _liveDictionaryList.postValue(it)
+                    isListEmpty.value = it.isEmpty()
+                }
     }
 
     override fun onCleared() {
@@ -76,4 +88,18 @@ class DictionaryListViewModel(
     fun setDictionaryTitle(title: String) {
         dictionaryName = title
     }
+
+    private fun observeSortByData() {
+        disposables += sortByRepository.sortByData()
+                .subscribeOn(rxSchedulers.io())
+                .observeOn(rxSchedulers.main())
+                .subscribe { t -> currentSortByData = t }
+    }
+
+    fun setSortBy(sortByData: SortDictionaryData) {
+        sortByRepository.setSortBy(sortByData)
+    }
+
+    fun isListEmpty(): LiveData<Boolean> = isListEmpty
+
 }
