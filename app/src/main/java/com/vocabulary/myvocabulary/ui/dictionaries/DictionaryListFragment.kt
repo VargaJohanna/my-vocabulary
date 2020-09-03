@@ -236,7 +236,7 @@ class DictionaryListFragment : Fragment(), DictionaryAdapter.ItemClickListener {
                         R.id.dictionary_sort_by_title -> {
                             viewModel.setSortBy(viewModel.currentSortByData.copy(
                                     sortByOption = SortByDictionaryOptions.SortByTitle,
-                                    titleDescending = !viewModel.currentSortByData.dateDescending)
+                                    titleDescending = !viewModel.currentSortByData.titleDescending)
                             )
                         }
                     }
