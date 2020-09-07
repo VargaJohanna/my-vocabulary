@@ -12,13 +12,14 @@ class QuizRepositoryImpl(
         private val wordRepository: WordRepository
 ) : QuizRepository {
     private val _quizList: BehaviorSubject<List<Word>> = BehaviorSubject.create<List<Word>>()
-    override val quizList: Observable<List<Word>> = _quizList
+    override val  quizList: Observable<List<Word>> = _quizList
 
-    override fun resetQuizList(dictionaryId: Long, quizType: QuizTypes): Completable {
+    override fun resetQuizList(dictionaryId: Long, quizType: QuizTypes, quizSize: Int?): Completable {
         return when (quizType) {
             QuizTypes.FullQuiz -> resetFullQuizList(dictionaryId)
             QuizTypes.QuickQuiz -> resetQuickQuizList(dictionaryId)
             QuizTypes.WeakestQuiz -> resetWeakestFive(dictionaryId)
+            QuizTypes.CustomQuiz -> resetCustomQuizList(dictionaryId, quizSize)
         }.toCompletable()
     }
 
@@ -48,6 +49,27 @@ class QuizRepositoryImpl(
                 .map { list -> list.filter { it.word.isNotEmpty() } }
                 .map { sortWeaknessesList(it)}
                 .map { it.take(5) }
+                .doOnSuccess {
+                    _quizList.onNext(it)
+                }
+    }
+
+    private fun resetCustomQuizList(dictionaryId: Long, quizSize: Int?): Single<List<Word>> {
+        return wordRepository.getObservableWordList(dictionaryId)
+                .firstOrError()
+                .map { list -> list.filter { it.word.isNotEmpty() } }
+                .map { it.shuffled() }
+                .map {
+                    quizSize?.let { size ->
+                        if(size > it.size) {
+                            it
+                        } else {
+                            it.take(size)
+                        }
+                    }?: run {
+                        it.take(5)
+                    }
+                }
                 .doOnSuccess {
                     _quizList.onNext(it)
                 }

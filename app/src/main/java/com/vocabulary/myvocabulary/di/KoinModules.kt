@@ -9,6 +9,8 @@ import com.vocabulary.myvocabulary.repositories.dictionary.DictionaryRepository
 import com.vocabulary.myvocabulary.repositories.dictionary.DictionaryRepositoryImpl
 import com.vocabulary.myvocabulary.repositories.guessedWord.GuessedWordRepository
 import com.vocabulary.myvocabulary.repositories.guessedWord.GuessedWordRepositoryImpl
+import com.vocabulary.myvocabulary.repositories.quiz.CustomQuizRepository
+import com.vocabulary.myvocabulary.repositories.quiz.CustomQuizRepositoryImpl
 import com.vocabulary.myvocabulary.repositories.quiz.QuizRepository
 import com.vocabulary.myvocabulary.repositories.quiz.QuizRepositoryImpl
 import com.vocabulary.myvocabulary.repositories.quotes.*
@@ -64,6 +66,7 @@ val repositoryModule = module {
     single { PreferenceManager.getDefaultSharedPreferences(get()) }
     single { RxSharedPreferences.create(get()) }
     single<ShareDictionaryRepository> { ShareDictionaryRepositoryImpl() }
+    single<CustomQuizRepository> { CustomQuizRepositoryImpl() }
 }
 
 val networkModule = module {

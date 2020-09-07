@@ -8,6 +8,7 @@
     <string name="rename_dictionary_hint">Írj be egy új címet</string>
     <string name="create_word_hint">új jelentés</string>
     <string name="create_translation_hint">új szó</string>
+    <string name="quiz_size_hint">szavak száma</string>
     <string name="create_new_dictionary_dialog_title">Új szótár létrehozása</string>
     <string name="create_button_label">Mentés</string>
     <string name="dialog_rename_button_label">Átnevezés</string>
@@ -28,6 +29,7 @@
     <string name="create_new_word_dialog_title">Létrehozás</string>
     <string name="edit_word_dialog_title">Módosítás</string>
     <string name="save_button_label">Mentés</string>
+    <string name="start_button_label">Start</string>
     <string name="add_more_button_label">Folytatás</string>
     <string name="quiz_list_choose_a_quiz_type">Válassz egy kvízt</string>
     <string name="quiz_list_quick_one">Gyors kvíz</string>

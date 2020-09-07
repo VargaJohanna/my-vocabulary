@@ -4,6 +4,7 @@ sealed class QuizTypes {
     object QuickQuiz : QuizTypes()
     object FullQuiz : QuizTypes()
     object WeakestQuiz : QuizTypes()
+    object CustomQuiz : QuizTypes()
 }
 
 fun Int.toQuizType(): QuizTypes {
@@ -11,6 +12,7 @@ fun Int.toQuizType(): QuizTypes {
         0 -> QuizTypes.QuickQuiz
         1 -> QuizTypes.FullQuiz
         2 -> QuizTypes.WeakestQuiz
+        3 -> QuizTypes.CustomQuiz
         else -> throw IllegalStateException("Unknown quiz type: $this")
     }
 }
@@ -20,5 +22,6 @@ fun QuizTypes.toInt(): Int {
         QuizTypes.QuickQuiz -> 0
         QuizTypes.FullQuiz -> 1
         QuizTypes.WeakestQuiz -> 2
+        QuizTypes.CustomQuiz -> 3
     }
 }
