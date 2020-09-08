@@ -8,7 +8,7 @@
     <string name="rename_dictionary_hint">Enter a new title</string>
     <string name="create_word_hint">new meaning</string>
     <string name="create_translation_hint">new expression</string>
-    <string name="quiz_size_hint">number of words</string>
+    <string name="quiz_size_hint">Enter number of words</string>
     <string name="create_new_dictionary_dialog_title">Create New Dictionary</string>
     <string name="create_button_label">Create</string>
     <string name="dialog_rename_button_label">Rename</string>
@@ -35,6 +35,7 @@
     <string name="quiz_list_quick_one">Quick One</string>
     <string name="quiz_list_ask_me_everything">Ask Me Everything</string>
     <string name="quiz_list_weaknesses">Weaknesses</string>
+    <string name="quiz_list_custom">Custom</string>
     <string name="quiz_dictionary_picker_title">Pick a dictionary</string>
     <string name="dialog_pick_direction">"Choose what should be the question"</string>
     <string name="dialog_lets_do_it">"Let's do it"</string>
@@ -107,4 +108,5 @@
     <string name="search_hint">Search...</string>
     <string name="number_of_words">Number of words: %1$d</string>
     <string name="dictionary_title">Title</string>
+    <string name="custom_dialog_title">Enter number of words to be asked</string>
 </resources>

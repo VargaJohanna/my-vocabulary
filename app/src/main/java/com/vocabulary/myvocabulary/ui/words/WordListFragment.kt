@@ -211,7 +211,8 @@ class WordListFragment : Fragment() {
         startQuizDialog = dialogFactory.buildStartQuizDialog(
                 dictionaryId,
                 requireActivity(),
-                args.dictionaryName) { selectedDirection: Int, id: Long, selectedQuizType: Int ->
+                args.dictionaryName) { selectedDirection: Int, id: Long, selectedQuizType: Int, customSize: Int? ->
+            wordViewModel.addCustomQuizSize(customSize)
             startQuiz(selectedDirection, id, selectedQuizType)
             startQuizDialog?.dismiss()
         }
