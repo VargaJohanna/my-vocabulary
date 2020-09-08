@@ -4,6 +4,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.vocabulary.myvocabulary.ext.plusAssign
+import com.vocabulary.myvocabulary.repositories.quiz.CustomQuizRepository
 import com.vocabulary.myvocabulary.repositories.quiz.QuizRepository
 import com.vocabulary.myvocabulary.repositories.search.SearchRepository
 import com.vocabulary.myvocabulary.repositories.sortBy.SortByData
@@ -25,7 +26,8 @@ class WordListViewModel(
         private val sortedListRepository: SortedListRepository,
         private val rxSchedulers: RxSchedulers,
         private val quizRepository: QuizRepository,
-        private val searchRepository: SearchRepository
+        private val searchRepository: SearchRepository,
+        private val customQuizRepository: CustomQuizRepository
 
 ) : ViewModel() {
     private val disposables = CompositeDisposable()
@@ -33,11 +35,13 @@ class WordListViewModel(
     var currentSortByData: SortByData = SortByData()
     private val isListEmpty: MutableLiveData<Boolean> = MutableLiveData()
     private val isSearchBarOpenCurrent: MutableLiveData<Boolean> = MutableLiveData()
+    private var customQuizSize: Int = 10
 
     init {
         observeSearchBarStatus()
         observeSortByData()
         observeList()
+        observeCustomQuizSize()
     }
 
     private fun observeSearchBarStatus() {
@@ -109,7 +113,7 @@ class WordListViewModel(
     }
 
     fun startNew(dictionaryId: Long, quizType: QuizTypes): Completable {
-        return quizRepository.resetQuizList(dictionaryId, quizType)
+        return quizRepository.resetQuizList(dictionaryId, quizType, customQuizSize)
     }
 
     fun setSortBy(sortByData: SortByData) {
@@ -124,5 +128,18 @@ class WordListViewModel(
 
     fun setSearchedTerm(searchTerm: String) {
         searchRepository.setSearchedTerm(searchTerm)
+    }
+
+    private fun observeCustomQuizSize() {
+        disposables += customQuizRepository.quizSize
+                .subscribeOn(rxSchedulers.io())
+                .observeOn(rxSchedulers.main())
+                .subscribe { t -> customQuizSize = t }
+    }
+
+    fun addCustomQuizSize(size: Int?) {
+        size?.let {
+            customQuizRepository.setQuizSize(size)
+        }
     }
 }
