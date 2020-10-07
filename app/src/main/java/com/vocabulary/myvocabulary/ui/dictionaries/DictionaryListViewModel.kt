@@ -84,7 +84,7 @@ class DictionaryListViewModel(
     }
 
     fun startNew(dictionaryId: Long, quizType: QuizTypes): Completable {
-        return quizRepository.resetQuizList(dictionaryId, quizType, customQuizRepository.quizSize)
+        return quizRepository.resetQuizList(dictionaryId, quizType)
     }
 
     fun setDictionaryTitle(title: String) {

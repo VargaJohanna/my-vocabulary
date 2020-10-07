@@ -111,7 +111,7 @@ class WordListViewModel(
     }
 
     fun startNew(dictionaryId: Long, quizType: QuizTypes): Completable {
-        return quizRepository.resetQuizList(dictionaryId, quizType, customQuizRepository.quizSize)
+        return quizRepository.resetQuizList(dictionaryId, quizType)
     }
 
     fun setSortBy(sortByData: SortByData) {

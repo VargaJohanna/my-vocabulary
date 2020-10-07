@@ -23,8 +23,7 @@ class ResultViewModel(
         private val wordRepository: WordRepository,
         private val rxSchedulers: RxSchedulers,
         private val quizRepository: QuizRepository,
-        private val guessedWordRepository: GuessedWordRepository,
-        private val customQuizRepository: CustomQuizRepository
+        private val guessedWordRepository: GuessedWordRepository
 ) : ViewModel() {
     private val disposables = CompositeDisposable()
     private val liveGuessedWordList: MutableLiveData<List<Word>> = MutableLiveData()
@@ -109,7 +108,7 @@ class ResultViewModel(
     }
 
     fun startNew(dictionaryId: Long, quizType: QuizTypes): Completable {
-        return quizRepository.resetQuizList(dictionaryId, quizType, customQuizRepository.quizSize)
+        return quizRepository.resetQuizList(dictionaryId, quizType)
     }
 
     fun latestGuess(lastGuess: GuessedWord) {
