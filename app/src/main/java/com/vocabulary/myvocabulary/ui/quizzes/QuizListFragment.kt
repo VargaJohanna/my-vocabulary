@@ -60,8 +60,6 @@ class QuizListFragment : Fragment() {
             }
 
             custom_quiz_card.setOnClickListener {
-//                val action = QuizListFragmentDirections.toDictionaryPickerFragment(QuizTypes.WeakestQuiz.toInt())
-//                findNavController().navigate(action)
                 showCustomQuizDialog()
             }
 
@@ -69,7 +67,7 @@ class QuizListFragment : Fragment() {
                 dialogFactory.buildInfoDialog(
                         requireActivity(),
                         getString(R.string.quiz_list_custom),
-                        getString(R.string.weaknesses_info)
+                        getString(R.string.custom_info)
                 ).show()
             }
 
@@ -84,7 +82,7 @@ class QuizListFragment : Fragment() {
         ) { size ->
             customQuizRepository.quizSize = size
 
-            val action = QuizListFragmentDirections.toDictionaryPickerFragment(QuizTypes.WeakestQuiz.toInt())
+            val action = QuizListFragmentDirections.toDictionaryPickerFragment(QuizTypes.CustomQuiz.toInt())
             findNavController().navigate(action)
         }
         customQuizDialog?.show()
