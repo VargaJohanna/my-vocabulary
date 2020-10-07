@@ -11,6 +11,7 @@ import android.widget.RadioGroup
 import android.widget.TextView
 import com.vocabulary.myvocabulary.R
 import com.vocabulary.myvocabulary.ext.show
+import com.vocabulary.myvocabulary.ext.stringToInt
 import com.vocabulary.myvocabulary.ui.dictionaries.Dictionary
 import com.vocabulary.myvocabulary.ui.words.Word
 import kotlinx.android.synthetic.main.dialog_add_quiz_size.view.*
@@ -148,7 +149,7 @@ class DialogFactory {
             }
 
             doItButton.setOnClickListener {
-                doItClick(selectedDirection, dictionaryId, selectedQuizType, customEditText.text.toString().toInt())
+                doItClick(selectedDirection, dictionaryId, selectedQuizType, customEditText.text.toString().stringToInt())
             }
             cancelButton.setOnClickListener {
                 dismiss()
