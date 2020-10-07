@@ -69,6 +69,7 @@
     <string name="quick_list_info">Kikérdezi a szótárban található összes szót</string>
     <string name="ask_everything_info">5 véletlenszerűen kiválasztott szó lesz a kvízben</string>
     <string name="weaknesses_info">Az 5 legtöbbet elrontott szó lesz a kvízben</string>
+    <string name="custom_info">Megadhatod hány szó legyen a kvízben</string>
     <string name="renaming_dictionary_title">Szótár átnevezése</string>
     <string name="example_dictionary_title">Példa Szótár (Latin)</string>
     <string name="example_word_new">új</string>

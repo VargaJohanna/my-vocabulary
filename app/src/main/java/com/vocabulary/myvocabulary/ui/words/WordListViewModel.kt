@@ -35,13 +35,11 @@ class WordListViewModel(
     var currentSortByData: SortByData = SortByData()
     private val isListEmpty: MutableLiveData<Boolean> = MutableLiveData()
     private val isSearchBarOpenCurrent: MutableLiveData<Boolean> = MutableLiveData()
-    private var customQuizSize: Int = 10
 
     init {
         observeSearchBarStatus()
         observeSortByData()
         observeList()
-        observeCustomQuizSize()
     }
 
     private fun observeSearchBarStatus() {
@@ -113,7 +111,7 @@ class WordListViewModel(
     }
 
     fun startNew(dictionaryId: Long, quizType: QuizTypes): Completable {
-        return quizRepository.resetQuizList(dictionaryId, quizType, customQuizSize)
+        return quizRepository.resetQuizList(dictionaryId, quizType, customQuizRepository.quizSize)
     }
 
     fun setSortBy(sortByData: SortByData) {
@@ -130,16 +128,9 @@ class WordListViewModel(
         searchRepository.setSearchedTerm(searchTerm)
     }
 
-    private fun observeCustomQuizSize() {
-        disposables += customQuizRepository.quizSize
-                .subscribeOn(rxSchedulers.io())
-                .observeOn(rxSchedulers.main())
-                .subscribe { t -> customQuizSize = t }
-    }
-
     fun addCustomQuizSize(size: Int?) {
         size?.let {
-            customQuizRepository.setQuizSize(size)
+            customQuizRepository.quizSize = size
         }
     }
 }

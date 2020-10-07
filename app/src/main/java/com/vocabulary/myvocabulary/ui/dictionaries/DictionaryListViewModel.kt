@@ -35,13 +35,11 @@ class DictionaryListViewModel(
     val newlyCreatedItemDetails: LiveData<Event<DictionaryDetails>> = _newlyCreatedItemDetails
     private lateinit var dictionaryName: String
     var currentSortByData: SortDictionaryData = SortDictionaryData()
-    private var customQuizSize: Int = 10
     private val isListEmpty = MutableLiveData<Boolean>()
 
     init {
         observeList()
         observeSortByData()
-        observeCustomQuizSize()
     }
 
     fun insertDictionary(dictionary: Dictionary) {
@@ -86,7 +84,7 @@ class DictionaryListViewModel(
     }
 
     fun startNew(dictionaryId: Long, quizType: QuizTypes): Completable {
-        return quizRepository.resetQuizList(dictionaryId, quizType, customQuizSize)
+        return quizRepository.resetQuizList(dictionaryId, quizType, customQuizRepository.quizSize)
     }
 
     fun setDictionaryTitle(title: String) {
@@ -106,16 +104,9 @@ class DictionaryListViewModel(
 
     fun isListEmpty(): LiveData<Boolean> = isListEmpty
 
-    private fun observeCustomQuizSize() {
-        disposables += customQuizRepository.quizSize
-                .subscribeOn(rxSchedulers.io())
-                .observeOn(rxSchedulers.main())
-                .subscribe { t -> customQuizSize = t }
-    }
-
     fun addCustomQuizSize(size: Int?) {
         size?.let {
-            customQuizRepository.setQuizSize(size)
+            customQuizRepository.quizSize = size
         }
     }
 }

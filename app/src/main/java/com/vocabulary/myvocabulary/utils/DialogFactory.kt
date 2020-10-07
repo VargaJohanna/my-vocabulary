@@ -362,15 +362,18 @@ class DialogFactory {
 
     fun buildCustomQuizSizeDialog(
             activity: Activity,
-            titleText: String
+            titleText: String,
+            doItClick: (size: Int) -> Unit
     ): AlertDialog {
         val inflater = activity.layoutInflater
         val dialogView: View = inflater.inflate(R.layout.dialog_add_quiz_size, null)
         val startButton: Button = dialogView.start_button
+        val customSize: EditText = dialogView.quiz_size
         val dialogBuilder = AlertDialog.Builder(activity)
         return dialogBuilder.create().apply {
             setView(dialogView)
             startButton.setOnClickListener {
+                doItClick(customSize.text.toString().toInt())
                 dismiss()
             }
             setTitle(titleText)

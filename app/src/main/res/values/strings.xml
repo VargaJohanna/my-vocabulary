@@ -69,6 +69,7 @@
     <string name="quick_list_info">Asks all the expressions from the selected dictionary</string>
     <string name="ask_everything_info">Asks 5 random expressions from the selected dictionary</string>
     <string name="weaknesses_info">Asks the 5 most failed expressions from the selected dictionary</string>
+    <string name="custom_info">You can enter how many words you want to be picked from the selected dictionary</string>
     <string name="renaming_dictionary_title">Renaming</string>
     <string name="example_dictionary_title">Example Dictionary (Latin)</string>
     <string name="example_word_new">new</string>
