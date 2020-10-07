@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import com.vocabulary.myvocabulary.ext.plusAssign
 import com.vocabulary.myvocabulary.repositories.guessedWord.GuessedMapData
 import com.vocabulary.myvocabulary.repositories.guessedWord.GuessedWordRepository
+import com.vocabulary.myvocabulary.repositories.quiz.CustomQuizRepository
 import com.vocabulary.myvocabulary.repositories.quiz.QuizRepository
 import com.vocabulary.myvocabulary.repositories.word.WordRepository
 import com.vocabulary.myvocabulary.rx.RxSchedulers
@@ -22,7 +23,8 @@ class ResultViewModel(
         private val wordRepository: WordRepository,
         private val rxSchedulers: RxSchedulers,
         private val quizRepository: QuizRepository,
-        private val guessedWordRepository: GuessedWordRepository
+        private val guessedWordRepository: GuessedWordRepository,
+        private val customQuizRepository: CustomQuizRepository
 ) : ViewModel() {
     private val disposables = CompositeDisposable()
     private val liveGuessedWordList: MutableLiveData<List<Word>> = MutableLiveData()
@@ -107,7 +109,7 @@ class ResultViewModel(
     }
 
     fun startNew(dictionaryId: Long, quizType: QuizTypes): Completable {
-        return quizRepository.resetQuizList(dictionaryId, quizType)
+        return quizRepository.resetQuizList(dictionaryId, quizType, customQuizRepository.quizSize)
     }
 
     fun latestGuess(lastGuess: GuessedWord) {

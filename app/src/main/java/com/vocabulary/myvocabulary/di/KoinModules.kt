@@ -48,7 +48,7 @@ val repositoryModule = module {
     single { get<AppDatabase>().wordDao() }
     single<DictionaryRepository> { DictionaryRepositoryImpl(get(), get()) }
     single<WordRepository> { WordRepositoryImpl(get()) }
-    single<QuizRepository> { QuizRepositoryImpl(get()) }
+    single<QuizRepository> { QuizRepositoryImpl(get(), get()) }
     single<SortByRepository> {
         SortByRepositoryImpl(get(), get())
     }
@@ -91,7 +91,7 @@ val viewModelModule = module {
                 get(),
                 get())
     }
-    viewModel { (dictionaryId: Long) -> ResultViewModel(dictionaryId, get(), get(), get(), get()) }
+    viewModel { (dictionaryId: Long) -> ResultViewModel(dictionaryId, get(), get(), get(), get(), get()) }
     viewModel { WordDetailsViewModel(get(), get()) }
     viewModel { HomeViewModel(get(), get(), get(), get()) }
     viewModel { ShareDictionaryViewModel(get(), get(), get(), get()) }

@@ -9,12 +9,13 @@ import io.reactivex.Single
 import io.reactivex.subjects.BehaviorSubject
 
 class QuizRepositoryImpl(
-        private val wordRepository: WordRepository
+        private val wordRepository: WordRepository,
+        private val customQuizRepository: CustomQuizRepository
 ) : QuizRepository {
     private val _quizList: BehaviorSubject<List<Word>> = BehaviorSubject.create<List<Word>>()
     override val  quizList: Observable<List<Word>> = _quizList
 
-    override fun resetQuizList(dictionaryId: Long, quizType: QuizTypes, quizSize: Int?): Completable {
+    override fun resetQuizList(dictionaryId: Long, quizType: QuizTypes, quizSize: Int): Completable {
         return when (quizType) {
             QuizTypes.FullQuiz -> resetFullQuizList(dictionaryId)
             QuizTypes.QuickQuiz -> resetQuickQuizList(dictionaryId)
@@ -67,7 +68,7 @@ class QuizRepositoryImpl(
                             it.take(size)
                         }
                     }?: run {
-                        it.take(5)
+                        it
                     }
                 }
                 .doOnSuccess {

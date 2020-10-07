@@ -41,7 +41,6 @@ class DictionaryListFragment : Fragment(), DictionaryAdapter.ItemClickListener {
     private var createDialog: AlertDialog? = null
     private var renameDialog: AlertDialog? = null
     private var startQuizDialog: AlertDialog? = null
-    private var customQuizDialog: AlertDialog? = null
     private var popUp: PopupMenu? = null
     private var importDialog: AlertDialog? = null
     private var isFabOpen = false
@@ -275,7 +274,6 @@ class DictionaryListFragment : Fragment(), DictionaryAdapter.ItemClickListener {
         startQuizDialog?.dismiss()
         popUp?.dismiss()
         importDialog?.dismiss()
-        customQuizDialog?.dismiss()
         super.onDestroy()
     }
 }
