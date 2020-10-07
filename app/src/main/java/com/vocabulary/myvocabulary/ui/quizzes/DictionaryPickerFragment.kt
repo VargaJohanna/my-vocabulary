@@ -88,6 +88,7 @@ class DictionaryPickerFragment : Fragment(), DictionaryAdapter.ItemClickListener
             QuizTypes.QuickQuiz -> toolbar.title = getString(R.string.quiz_list_quick_one)
             QuizTypes.FullQuiz -> toolbar.title = getString(R.string.quiz_list_ask_me_everything)
             QuizTypes.WeakestQuiz -> toolbar.title = getString(R.string.quiz_list_weaknesses)
+            QuizTypes.CustomQuiz -> toolbar.title = getString(R.string.quiz_list_custom)
         }
     }
 
