@@ -8,7 +8,7 @@
     <string name="rename_dictionary_hint">Írj be egy új címet</string>
     <string name="create_word_hint">új jelentés</string>
     <string name="create_translation_hint">új szó</string>
-    <string name="quiz_size_hint">Add meg a szavak számát</string>
+    <string name="quiz_size_hint">Szavak száma</string>
     <string name="create_new_dictionary_dialog_title">Új szótár létrehozása</string>
     <string name="create_button_label">Mentés</string>
     <string name="dialog_rename_button_label">Átnevezés</string>
@@ -110,5 +110,6 @@
     <string name="number_of_words">Szavak száma: %d</string>
     <string name="dictionary_title">Cím</string>
     <string name="custom_dialog_title">Hány szó legyen?</string>
+    <string name="custom_dialog_error">Ennél kicsit  többet</string>
 
 </resources>

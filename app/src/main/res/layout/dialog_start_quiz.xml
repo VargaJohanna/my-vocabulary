@@ -64,22 +64,42 @@
             android:text="@string/quiz_list_custom"
             android:textSize="@dimen/text_size_normal" />
 
-        <EditText
-            android:id="@+id/custom_quiz_size"
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/custom_quiz_layout"
+            app:errorEnabled="true"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:visibility="gone"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
             android:layout_marginStart="@dimen/margin_medium"
-            android:layout_marginTop="@dimen/margin_medium"
+            android:layout_marginTop="@dimen/margin_large"
             android:layout_marginEnd="@dimen/margin_medium"
             android:layout_marginBottom="@dimen/margin_medium"
-            android:hint="@string/quiz_size_hint"
-            android:inputType="number"
-            android:paddingTop="@dimen/padding_normal"
-            android:visibility="gone"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            tools:visibility="visible" />
+            tools:visibility="visible">
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/custom_quiz_size"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/quiz_size_hint"
+                android:inputType="number"
+                app:errorEnabled="true"/>
+        </com.google.android.material.textfield.TextInputLayout>
+<!--        <EditText-->
+<!--            android:id="@+id/custom_quiz_size"-->
+<!--            android:layout_width="match_parent"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:layout_marginStart="@dimen/margin_medium"-->
+<!--            android:layout_marginTop="@dimen/margin_medium"-->
+<!--            android:layout_marginEnd="@dimen/margin_medium"-->
+<!--            android:layout_marginBottom="@dimen/margin_medium"-->
+<!--            android:hint="@string/quiz_size_hint"-->
+<!--            android:inputType="number"-->
+<!--            android:paddingTop="@dimen/padding_normal"-->
+<!--            android:visibility="gone"-->
+<!--            app:layout_constraintEnd_toEndOf="parent"-->
+<!--            app:layout_constraintStart_toStartOf="parent"-->
+<!--            app:layout_constraintTop_toTopOf="parent"-->
+<!--            tools:visibility="visible" />-->
     </RadioGroup>
 
     <TextView

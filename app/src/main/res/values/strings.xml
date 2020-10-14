@@ -8,7 +8,7 @@
     <string name="rename_dictionary_hint">Enter a new title</string>
     <string name="create_word_hint">new meaning</string>
     <string name="create_translation_hint">new expression</string>
-    <string name="quiz_size_hint">Enter number of words</string>
+    <string name="quiz_size_hint">Number of words</string>
     <string name="create_new_dictionary_dialog_title">Create New Dictionary</string>
     <string name="create_button_label">Create</string>
     <string name="dialog_rename_button_label">Rename</string>
@@ -110,4 +110,5 @@
     <string name="number_of_words">Number of words: %1$d</string>
     <string name="dictionary_title">Title</string>
     <string name="custom_dialog_title">Enter number of words to be asked</string>
+    <string name="custom_dialog_error">It should be more than that</string>
 </resources>

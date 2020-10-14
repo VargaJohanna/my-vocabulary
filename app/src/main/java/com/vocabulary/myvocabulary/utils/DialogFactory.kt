@@ -1,7 +1,6 @@
 package com.vocabulary.myvocabulary.utils
 
 import android.app.Activity
-import android.app.AlertDialog
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.View
@@ -9,6 +8,10 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.RadioGroup
 import android.widget.TextView
+import androidx.appcompat.app.AlertDialog
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.google.android.material.textfield.TextInputEditText
+import com.google.android.material.textfield.TextInputLayout
 import com.vocabulary.myvocabulary.R
 import com.vocabulary.myvocabulary.ext.show
 import com.vocabulary.myvocabulary.ext.stringToInt
@@ -112,7 +115,8 @@ class DialogFactory {
         val quizTypeRadioGroup: RadioGroup = dialogView.quiz_type_radioGroup
         val doItButton: Button = dialogView.from_dictionary_lets_do_it
         val cancelButton: Button = dialogView.from_dictionary_cancel
-        val customEditText: EditText = dialogView.custom_quiz_size
+        val customEditText: TextInputEditText = dialogView.custom_quiz_size
+        val textLayout: TextInputLayout = dialogView.custom_quiz_layout
         val dialogBuilder = AlertDialog.Builder(activity)
         return dialogBuilder.create().apply {
             setView(dialogView)
@@ -123,19 +127,19 @@ class DialogFactory {
                 when (checkedTypeId) {
                     R.id.quick_quiz_radio -> {
                         selectedQuizType = 0
-                        customEditText.visibility = View.GONE
+                        textLayout.visibility = View.GONE
                     }
                     R.id.full_quiz_radio -> {
                         selectedQuizType = 1
-                        customEditText.visibility = View.GONE
+                        textLayout.visibility = View.GONE
                     }
                     R.id.weakness_quiz_radio -> {
                         selectedQuizType = 2
-                        customEditText.visibility = View.GONE
+                        textLayout.visibility = View.GONE
                     }
                     R.id.custom_quiz_radio -> {
                         selectedQuizType = 3
-                        customEditText.visibility = View.VISIBLE
+                        textLayout.visibility = View.VISIBLE
                     }
                     else -> throw IllegalStateException("Unknown quiz type: $this")
                 }
@@ -149,12 +153,34 @@ class DialogFactory {
             }
 
             doItButton.setOnClickListener {
-                doItClick(selectedDirection, dictionaryId, selectedQuizType, customEditText.text.toString().stringToInt())
+                if(selectedQuizType == 3) {
+                    customEditText.text?.let{
+                        if(it.isEmpty() || it.toString() == "0"){
+                            textLayout.error = activity.getString(R.string.custom_dialog_error)
+                        } else {
+                            doItClick(selectedDirection, dictionaryId, selectedQuizType, it.toString().stringToInt())
+                            dismiss()
+                        }
+                    }
+                } else {
+                    doItClick(selectedDirection, dictionaryId, selectedQuizType, customEditText.text.toString().stringToInt())
+                    dismiss()
+                }
+
             }
             cancelButton.setOnClickListener {
                 dismiss()
             }
             setTitle("${activity.getString(R.string.dictionary_menu_start_quiz)} \"$dictionaryName\"")
+            customEditText.addTextChangedListener(object : TextWatcher {
+                override fun afterTextChanged(p0: Editable?) {}
+
+                override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {}
+
+                override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
+                    textLayout.error = null
+                }
+            })
         }
     }
 
@@ -369,14 +395,31 @@ class DialogFactory {
         val inflater = activity.layoutInflater
         val dialogView: View = inflater.inflate(R.layout.dialog_add_quiz_size, null)
         val startButton: Button = dialogView.start_button
-        val customSize: EditText = dialogView.quiz_size
-        val dialogBuilder = AlertDialog.Builder(activity)
+        val customSize: TextInputEditText = dialogView.quiz_size
+        val textLayout = dialogView.quiz_size_layout
+        val dialogBuilder = MaterialAlertDialogBuilder(activity)
         return dialogBuilder.create().apply {
             setView(dialogView)
             startButton.setOnClickListener {
-                doItClick(customSize.text.toString().toInt())
-                dismiss()
+                customSize.text?.let{
+                    if(it.isEmpty() || it.toString() == "0"){
+                        textLayout.error = activity.getString(R.string.custom_dialog_error)
+                    } else {
+                        doItClick(it.toString().toInt())
+                        dismiss()
+                    }
+                }
             }
+
+            customSize.addTextChangedListener(object : TextWatcher {
+                override fun afterTextChanged(p0: Editable?) {}
+
+                override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {}
+
+                override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
+                    textLayout.error = null
+                }
+            })
             setTitle(titleText)
         }
     }
