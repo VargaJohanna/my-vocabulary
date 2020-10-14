@@ -1,7 +1,6 @@
 package com.vocabulary.myvocabulary.ui.dictionaries
 
 import android.app.Activity.RESULT_OK
-import android.app.AlertDialog
 import android.content.Intent
 import android.os.Bundle
 import android.view.*
@@ -9,6 +8,7 @@ import android.widget.LinearLayout
 import android.widget.PopupMenu
 import android.widget.ProgressBar
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.Toolbar
 import androidx.core.view.forEach
 import androidx.fragment.app.Fragment
@@ -160,7 +160,8 @@ class DictionaryListFragment : Fragment(), DictionaryAdapter.ItemClickListener {
         startQuizDialog = dialogFactory.buildStartQuizDialog(
                 dictionary.dictionaryId,
                 requireActivity(),
-                dictionary.dictionaryName) { selectedDirection: Int, id: Long, selectedQuizType: Int ->
+                dictionary.dictionaryName) { selectedDirection: Int, id: Long, selectedQuizType: Int, customSize: Int? ->
+            viewModel.addCustomQuizSize(customSize)
             startQuiz(selectedDirection, id, selectedQuizType)
             startQuizDialog?.dismiss()
         }

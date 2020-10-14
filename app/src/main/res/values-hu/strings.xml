@@ -8,6 +8,7 @@
     <string name="rename_dictionary_hint">Írj be egy új címet</string>
     <string name="create_word_hint">új jelentés</string>
     <string name="create_translation_hint">új szó</string>
+    <string name="quiz_size_hint">Szavak száma</string>
     <string name="create_new_dictionary_dialog_title">Új szótár létrehozása</string>
     <string name="create_button_label">Mentés</string>
     <string name="dialog_rename_button_label">Átnevezés</string>
@@ -28,11 +29,13 @@
     <string name="create_new_word_dialog_title">Létrehozás</string>
     <string name="edit_word_dialog_title">Módosítás</string>
     <string name="save_button_label">Mentés</string>
+    <string name="start_button_label">Start</string>
     <string name="add_more_button_label">Folytatás</string>
     <string name="quiz_list_choose_a_quiz_type">Válassz egy kvízt</string>
     <string name="quiz_list_quick_one">Gyors kvíz</string>
     <string name="quiz_list_ask_me_everything">Teljes kvíz</string>
     <string name="quiz_list_weaknesses">Nehézségek</string>
+    <string name="quiz_list_custom">Testreszabott</string>
     <string name="quiz_dictionary_picker_title">Válassz egy szótárat</string>
     <string name="dialog_pick_direction">"Válaszd ki mi legyen a kérdés"</string>
     <string name="dialog_lets_do_it">"Kezdjük!"</string>
@@ -66,6 +69,7 @@
     <string name="quick_list_info">Kikérdezi a szótárban található összes szót</string>
     <string name="ask_everything_info">5 véletlenszerűen kiválasztott szó lesz a kvízben</string>
     <string name="weaknesses_info">Az 5 legtöbbet elrontott szó lesz a kvízben</string>
+    <string name="custom_info">Megadhatod hány szó legyen a kvízben</string>
     <string name="renaming_dictionary_title">Szótár átnevezése</string>
     <string name="example_dictionary_title">Példa Szótár (Latin)</string>
     <string name="example_word_new">új</string>
@@ -105,5 +109,7 @@
     <string name="search_hint">Keresés...</string>
     <string name="number_of_words">Szavak száma: %d</string>
     <string name="dictionary_title">Cím</string>
+    <string name="custom_dialog_title">Hány szó legyen?</string>
+    <string name="custom_dialog_error">Ennél kicsit  többet</string>
 
 </resources>

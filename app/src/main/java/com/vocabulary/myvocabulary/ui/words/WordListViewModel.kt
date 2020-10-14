@@ -4,6 +4,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.vocabulary.myvocabulary.ext.plusAssign
+import com.vocabulary.myvocabulary.repositories.quiz.CustomQuizRepository
 import com.vocabulary.myvocabulary.repositories.quiz.QuizRepository
 import com.vocabulary.myvocabulary.repositories.search.SearchRepository
 import com.vocabulary.myvocabulary.repositories.sortBy.SortByData
@@ -25,7 +26,8 @@ class WordListViewModel(
         private val sortedListRepository: SortedListRepository,
         private val rxSchedulers: RxSchedulers,
         private val quizRepository: QuizRepository,
-        private val searchRepository: SearchRepository
+        private val searchRepository: SearchRepository,
+        private val customQuizRepository: CustomQuizRepository
 
 ) : ViewModel() {
     private val disposables = CompositeDisposable()
@@ -124,5 +126,11 @@ class WordListViewModel(
 
     fun setSearchedTerm(searchTerm: String) {
         searchRepository.setSearchedTerm(searchTerm)
+    }
+
+    fun addCustomQuizSize(size: Int?) {
+        size?.let {
+            customQuizRepository.quizSize = size
+        }
     }
 }

@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import com.vocabulary.myvocabulary.ext.plusAssign
 import com.vocabulary.myvocabulary.repositories.guessedWord.GuessedMapData
 import com.vocabulary.myvocabulary.repositories.guessedWord.GuessedWordRepository
+import com.vocabulary.myvocabulary.repositories.quiz.CustomQuizRepository
 import com.vocabulary.myvocabulary.repositories.quiz.QuizRepository
 import com.vocabulary.myvocabulary.repositories.word.WordRepository
 import com.vocabulary.myvocabulary.rx.RxSchedulers

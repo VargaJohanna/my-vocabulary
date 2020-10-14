@@ -5,6 +5,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.vocabulary.myvocabulary.ext.plusAssign
 import com.vocabulary.myvocabulary.repositories.dictionary.DictionaryRepository
+import com.vocabulary.myvocabulary.repositories.quiz.CustomQuizRepository
 import com.vocabulary.myvocabulary.repositories.quiz.QuizRepository
 import com.vocabulary.myvocabulary.repositories.sortBy.dictionary.SortDictionaryData
 import com.vocabulary.myvocabulary.repositories.sortBy.dictionary.SortDictionaryRepository
@@ -22,7 +23,8 @@ class DictionaryListViewModel(
         private val rxSchedulers: RxSchedulers,
         private val quizRepository: QuizRepository,
         private val sortByRepository: SortDictionaryRepository,
-        private val sortedListRepository: SortedListRepository
+        private val sortedListRepository: SortedListRepository,
+        private val customQuizRepository: CustomQuizRepository
 
 ) : ViewModel() {
 
@@ -102,4 +104,9 @@ class DictionaryListViewModel(
 
     fun isListEmpty(): LiveData<Boolean> = isListEmpty
 
+    fun addCustomQuizSize(size: Int?) {
+        size?.let {
+            customQuizRepository.quizSize = size
+        }
+    }
 }

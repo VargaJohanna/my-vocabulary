@@ -9,6 +9,8 @@ import com.vocabulary.myvocabulary.repositories.dictionary.DictionaryRepository
 import com.vocabulary.myvocabulary.repositories.dictionary.DictionaryRepositoryImpl
 import com.vocabulary.myvocabulary.repositories.guessedWord.GuessedWordRepository
 import com.vocabulary.myvocabulary.repositories.guessedWord.GuessedWordRepositoryImpl
+import com.vocabulary.myvocabulary.repositories.quiz.CustomQuizRepository
+import com.vocabulary.myvocabulary.repositories.quiz.CustomQuizRepositoryImpl
 import com.vocabulary.myvocabulary.repositories.quiz.QuizRepository
 import com.vocabulary.myvocabulary.repositories.quiz.QuizRepositoryImpl
 import com.vocabulary.myvocabulary.repositories.quotes.*
@@ -46,7 +48,7 @@ val repositoryModule = module {
     single { get<AppDatabase>().wordDao() }
     single<DictionaryRepository> { DictionaryRepositoryImpl(get(), get()) }
     single<WordRepository> { WordRepositoryImpl(get()) }
-    single<QuizRepository> { QuizRepositoryImpl(get()) }
+    single<QuizRepository> { QuizRepositoryImpl(get(), get()) }
     single<SortByRepository> {
         SortByRepositoryImpl(get(), get())
     }
@@ -64,6 +66,7 @@ val repositoryModule = module {
     single { PreferenceManager.getDefaultSharedPreferences(get()) }
     single { RxSharedPreferences.create(get()) }
     single<ShareDictionaryRepository> { ShareDictionaryRepositoryImpl() }
+    single<CustomQuizRepository> { CustomQuizRepositoryImpl() }
 }
 
 val networkModule = module {
@@ -78,8 +81,8 @@ val networkModule = module {
 }
 
 val viewModelModule = module {
-    viewModel { DictionaryListViewModel(get(), get(), get(), get(), get()) }
-    viewModel { (dictionaryId: Long) -> WordListViewModel(dictionaryId, get(), get(), get(), get(), get(), get()) }
+    viewModel { DictionaryListViewModel(get(), get(), get(), get(), get(), get()) }
+    viewModel { (dictionaryId: Long) -> WordListViewModel(dictionaryId, get(), get(), get(), get(), get(), get(), get()) }
     viewModel { (dictionaryId: Long, optionType: Int, failedOnly: Boolean) ->
         QuizViewModel(
                 dictionaryId,

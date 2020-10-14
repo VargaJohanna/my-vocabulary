@@ -1,11 +1,11 @@
 package com.vocabulary.myvocabulary.ui.quizzes
 
-import android.app.AlertDialog
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ProgressBar
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.Toolbar
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
@@ -88,6 +88,7 @@ class DictionaryPickerFragment : Fragment(), DictionaryAdapter.ItemClickListener
             QuizTypes.QuickQuiz -> toolbar.title = getString(R.string.quiz_list_quick_one)
             QuizTypes.FullQuiz -> toolbar.title = getString(R.string.quiz_list_ask_me_everything)
             QuizTypes.WeakestQuiz -> toolbar.title = getString(R.string.quiz_list_weaknesses)
+            QuizTypes.CustomQuiz -> toolbar.title = getString(R.string.quiz_list_custom)
         }
     }
 
