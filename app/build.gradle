@@ -63,6 +63,8 @@ dependencies {
     def retrofit_version = "2.5.0"
     def apache_csv_version = "1.6"
     def groupie_version = "2.5.1"
+    def play_core_version = "1.8.2"
+    def play_core_kotlin_version = "1.8.1"
 
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
     implementation "androidx.constraintlayout:constraintlayout:$constraint_layout_version"
@@ -128,4 +130,8 @@ dependencies {
     //Groupie
     implementation "com.xwray:groupie:$groupie_version"
     implementation "com.xwray:groupie-kotlin-android-extensions:$groupie_version"
+
+    //Google Play Core Library
+    implementation "com.google.android.play:core:$play_core_version"
+    implementation "com.google.android.play:core-ktx:$play_core_kotlin_version"
 }

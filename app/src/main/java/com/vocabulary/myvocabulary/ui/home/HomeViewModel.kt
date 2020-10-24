@@ -1,5 +1,6 @@
 package com.vocabulary.myvocabulary.ui.home
 
+import android.content.SharedPreferences
 import android.net.Uri
 import android.util.Log
 import androidx.lifecycle.LiveData
@@ -17,14 +18,17 @@ class HomeViewModel(
         private val rxSchedulers: RxSchedulers,
         private val quoteRepository: QuoteRepository,
         private val shareDictionaryRepository: ShareDictionaryRepository,
-        private val searchRepository: SearchRepository
+        private val searchRepository: SearchRepository,
+        private val preferences: SharedPreferences
 ) : ViewModel() {
     private val _liveQuote: MutableLiveData<QuoteData> = MutableLiveData()
     val liveQuote: LiveData<QuoteData> = _liveQuote
     private val disposables = CompositeDisposable()
+    private val openedAppCounter: Int = preferences.getInt(COUNTER_KEY, 0)
 
     init {
         observeQuote()
+        openedAppCount()
     }
 
     private fun observeQuote() {
@@ -54,5 +58,16 @@ class HomeViewModel(
 
     fun setSearchBarState(isOpen: Boolean) {
         searchRepository.saveSearchBarStatus(isOpen)
+    }
+
+    private fun openedAppCount() {
+        preferences.edit().apply {
+            putInt(COUNTER_KEY, openedAppCounter + 1)
+            apply()
+        }
+    }
+
+    companion object {
+        const val COUNTER_KEY = "COUNTER"
     }
 }
