@@ -27,7 +27,7 @@ class HomeActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_home)
         manageIntent(intent?.data)
-
+        homeViewModel.openedAppCount()
         importDictionary()
     }
 

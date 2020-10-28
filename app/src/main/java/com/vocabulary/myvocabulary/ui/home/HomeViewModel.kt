@@ -28,7 +28,6 @@ class HomeViewModel(
 
     init {
         observeQuote()
-        openedAppCount()
     }
 
     private fun observeQuote() {
@@ -60,7 +59,7 @@ class HomeViewModel(
         searchRepository.saveSearchBarStatus(isOpen)
     }
 
-    private fun openedAppCount() {
+    fun openedAppCount() {
         preferences.edit().apply {
             putInt(COUNTER_KEY, openedAppCounter + 1)
             apply()
