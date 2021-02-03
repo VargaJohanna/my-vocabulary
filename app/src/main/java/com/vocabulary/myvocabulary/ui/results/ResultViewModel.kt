@@ -1,7 +1,9 @@
 package com.vocabulary.myvocabulary.ui.results
 
+import android.content.SharedPreferences
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import com.f2prateek.rx.preferences2.RxSharedPreferences
 import com.vocabulary.myvocabulary.ext.plusAssign
 import com.vocabulary.myvocabulary.repositories.guessedWord.GuessedMapData
 import com.vocabulary.myvocabulary.repositories.guessedWord.GuessedWordRepository
@@ -9,6 +11,7 @@ import com.vocabulary.myvocabulary.repositories.quiz.CustomQuizRepository
 import com.vocabulary.myvocabulary.repositories.quiz.QuizRepository
 import com.vocabulary.myvocabulary.repositories.word.WordRepository
 import com.vocabulary.myvocabulary.rx.RxSchedulers
+import com.vocabulary.myvocabulary.ui.home.HomeViewModel.Companion.COUNTER_KEY
 import com.vocabulary.myvocabulary.ui.quizzes.GuessedWord
 import com.vocabulary.myvocabulary.ui.quizzes.QuizDirectionType
 import com.vocabulary.myvocabulary.ui.quizzes.QuizTypes
@@ -23,12 +26,15 @@ class ResultViewModel(
         private val wordRepository: WordRepository,
         private val rxSchedulers: RxSchedulers,
         private val quizRepository: QuizRepository,
-        private val guessedWordRepository: GuessedWordRepository
+        private val guessedWordRepository: GuessedWordRepository,
+        preferences: SharedPreferences
+
 ) : ViewModel() {
     private val disposables = CompositeDisposable()
     private val liveGuessedWordList: MutableLiveData<List<Word>> = MutableLiveData()
     var directionResult: QuizDirectionType = QuizDirectionType.AskWord
     var isAllPassed = true
+    val openedAppCounter: Int = preferences.getInt(COUNTER_KEY, 0)
 
     override fun onCleared() {
         disposables.clear()

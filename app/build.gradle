@@ -63,7 +63,7 @@ dependencies {
     def retrofit_version = "2.5.0"
     def apache_csv_version = "1.6"
     def groupie_version = "2.5.1"
-    def play_core_version = "1.8.2"
+    def play_core_version = "1.9.1"
     def play_core_kotlin_version = "1.8.1"
 
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"

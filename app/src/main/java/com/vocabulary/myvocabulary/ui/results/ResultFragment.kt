@@ -18,6 +18,8 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.airbnb.lottie.LottieAnimationView
 import com.google.android.material.floatingactionbutton.FloatingActionButton
+import com.google.android.play.core.review.ReviewManager
+import com.google.android.play.core.review.ReviewManagerFactory
 import com.vocabulary.myvocabulary.R
 import com.vocabulary.myvocabulary.ext.display
 import com.vocabulary.myvocabulary.ext.fadeoutAnimation
@@ -46,9 +48,10 @@ class ResultFragment : Fragment() {
     private val rxSchedulers: RxSchedulers by inject()
     private var isFabOpen = false
     private val disposables = CompositeDisposable()
-
+    private lateinit var manager: ReviewManager
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+        manager = ReviewManagerFactory.create(requireContext())
         hideKeyboard()
         resultViewModel.observeGuessedWordMap()
         resultViewModel.setDirection(args.directionType.toDirectionType())
@@ -96,6 +99,7 @@ class ResultFragment : Fragment() {
 
     private fun setExitFabOnClickListener(fab: FloatingActionButton) {
         fab.setOnClickListener {
+            showInAppReview()
             resultViewModel.dispose()
             findNavController().navigate(R.id.from_result_to_home)
         }
@@ -103,6 +107,7 @@ class ResultFragment : Fragment() {
 
     private fun setRetryFabOnClickListener(restartFab: FloatingActionButton, failedOnlyContainer: LinearLayout, startOverFabContainer: LinearLayout) {
         restartFab.setOnClickListener {
+            showInAppReview()
             if (isFabOpen) closeFabMenu(failedOnlyContainer, startOverFabContainer)
             else showFabMenu(failedOnlyContainer, startOverFabContainer)
         }
@@ -205,8 +210,25 @@ class ResultFragment : Fragment() {
         imm.hideSoftInputFromWindow(view?.windowToken, 0)
     }
 
+    private fun showInAppReview(){
+        if(resultViewModel.openedAppCounter > 3) {
+            val request = manager.requestReviewFlow()
+            request.addOnCompleteListener { request ->
+                if (request.isSuccessful) {
+                    val reviewInfo = request.result
+                    val flow = manager.launchReviewFlow(requireActivity(), reviewInfo)
+                    flow.addOnCompleteListener { _ ->
+                        // The flow has finished. The API does not indicate whether the user
+                        // reviewed or not, or even whether the review dialog was shown. Thus, no
+                        // matter the result, we continue our app flow.
+                    }
+                }
+            }
+        }
+    }
+
     override fun onStop() {
-        resultViewModel.dispose()
+         resultViewModel.dispose()
         disposables.clear()
         super.onStop()
     }
