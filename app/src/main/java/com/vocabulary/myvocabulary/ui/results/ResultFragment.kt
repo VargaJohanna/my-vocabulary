@@ -60,7 +60,6 @@ class ResultFragment : Fragment() {
             observeWordList(resultAdapter, result_progress_bar, success_animation, failure_animation, savedInstanceState)
             generateWordList(resultAdapter, result_recycler_view)
             setExitFabOnClickListener(result_exit_fab)
-            setRetryFabOnClickListener(result_restart_fab, failed_only_container, start_over_container)
             setStartOverOnClickListener(start_over_fab)
             setFailedOnlyOnClickListener(failed_only_fab)
             result_toolbar.setNavigationOnClickListener {
@@ -70,6 +69,12 @@ class ResultFragment : Fragment() {
             closeAnimationOnClick(success_animation)
             closeAnimationOnClick(failure_animation)
         }
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        setRetryFabOnClickListener()
+
+        super.onViewCreated(view, savedInstanceState)
     }
 
     private fun generateWordList(resultAdapter: ResultAdapter, recyclerView: RecyclerView) {
@@ -105,11 +110,11 @@ class ResultFragment : Fragment() {
         }
     }
 
-    private fun setRetryFabOnClickListener(restartFab: FloatingActionButton, failedOnlyContainer: LinearLayout, startOverFabContainer: LinearLayout) {
-        restartFab.setOnClickListener {
+    private fun setRetryFabOnClickListener() {
+        result_restart_fab.setOnClickListener {
             showInAppReview()
-            if (isFabOpen) closeFabMenu(failedOnlyContainer, startOverFabContainer)
-            else showFabMenu(failedOnlyContainer, startOverFabContainer)
+            if (isFabOpen) closeFabMenu(failed_only_container, start_over_container)
+            else showFabMenu(failed_only_container, start_over_container)
         }
     }
 
