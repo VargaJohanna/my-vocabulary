@@ -5,19 +5,25 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import androidx.navigation.findNavController
+import androidx.navigation.fragment.findNavController
 import com.vansuita.materialabout.builder.AboutBuilder
 import com.vocabulary.myvocabulary.BuildConfig
 import com.vocabulary.myvocabulary.Constants
 import com.vocabulary.myvocabulary.R
-import kotlinx.android.synthetic.main.fragment_about.view.*
+import com.vocabulary.myvocabulary.databinding.FragmentAboutBinding
 
 class AboutFragment : Fragment() {
+    private var _binding: FragmentAboutBinding? = null
+    private val binding get() = _binding!!
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+        _binding = FragmentAboutBinding.inflate(inflater, container, false)
+        val view = binding.root
+
         val version = "${BuildConfig.VERSION_NAME} - ${BuildConfig.VERSION_CODE}"
         val builder = AboutBuilder.with(requireContext())
                 .setPhoto(R.drawable.profile)
-                .setCover(R.mipmap.profile_cover)
+                .setCover(com.vansuita.materialabout.R.mipmap.profile_cover)
                 .addEmailLink(Constants.EMAIL)
                 .addLinkedInLink(Constants.LINKEDIN_ID)
                 .setAppIcon(R.mipmap.ic_launcher)
@@ -29,9 +35,15 @@ class AboutFragment : Fragment() {
                 .setLinksColumnsCount(2)
                 .setWrapScrollView(true)
                 .setShowAsCard(true)
-        return inflater.inflate(R.layout.fragment_about, container, false).apply {
-            about_toolbar.setNavigationOnClickListener { findNavController().popBackStack() }
-            about_layout.addView(builder.build())
-        }
+
+        binding.aboutToolbar.setNavigationOnClickListener { findNavController().popBackStack() }
+        binding.aboutLayout.addView(builder.build())
+
+        return view
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 }

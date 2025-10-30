@@ -32,8 +32,6 @@ import com.xwray.groupie.GroupAdapter
 import com.xwray.groupie.ViewHolder
 import com.xwray.groupie.kotlinandroidextensions.Item
 import io.reactivex.disposables.CompositeDisposable
-import kotlinx.android.synthetic.main.fragment_word_list.*
-import kotlinx.android.synthetic.main.fragment_word_list.view.*
 import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.viewModel
 import org.koin.core.parameter.parametersOf
