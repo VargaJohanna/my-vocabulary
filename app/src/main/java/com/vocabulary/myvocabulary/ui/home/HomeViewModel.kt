@@ -37,7 +37,7 @@ class HomeViewModel(
                 .subscribe(
                         { _liveQuote.postValue(it) },
                         {
-                            Log.d("QUOTE_ERROR", it.message)
+                            Log.d("QUOTE_ERROR", it.message ?: "Unknown error")
                             _liveQuote.postValue(QuoteData.EMPTY)
                         }
                 )

@@ -118,9 +118,9 @@ class ShareDictionaryViewModel(
             val csvPrinter = CSVPrinter(fileWriter, CSVFormat.DEFAULT)
 
             for (word in words) {
-                val data = Arrays.asList(
-                        word.translation,
-                        word.word
+                val data = listOf(
+                    word.translation,
+                    word.word
                 )
                 csvPrinter.printRecord(data)
             }
@@ -130,7 +130,7 @@ class ShareDictionaryViewModel(
             csvPrinter.close()
         } catch (e: Exception) {
             e.printStackTrace()
-            Log.e("ERROR", e.message)
+            Log.e("ERROR", e.message ?: "Unknown error")
         }
         return file
     }

@@ -1,9 +1,9 @@
 package com.vocabulary.myvocabulary.ui.home
 
 import android.annotation.SuppressLint
-import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
+import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
@@ -13,13 +13,13 @@ import com.vocabulary.myvocabulary.ui.dictionaries.Dictionary
 import com.vocabulary.myvocabulary.ui.dictionaries.ShareDictionaryViewModel
 import com.vocabulary.myvocabulary.utils.DialogFactory
 import org.koin.android.ext.android.inject
-import org.koin.androidx.viewmodel.ext.viewModel
+import androidx.activity.viewModels
 import java.util.*
 
 class HomeActivity : AppCompatActivity() {
     private var importDialog: AlertDialog? = null
-    private val homeViewModel: HomeViewModel by viewModel()
-    private val shareViewModel: ShareDictionaryViewModel by viewModel()
+    private val homeViewModel: HomeViewModel by viewModels()
+    private val shareViewModel: ShareDictionaryViewModel by viewModels()
     private val dialogFactory: DialogFactory by inject()
 
     @SuppressLint("PrivateResource")
@@ -29,12 +29,28 @@ class HomeActivity : AppCompatActivity() {
         manageIntent(intent?.data)
         homeViewModel.openedAppCount()
         importDictionary()
+
+        val callback = object: OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                val navController = findNavController(R.id.home_nav_host_fragment)
+                val isOnWordListScreen = navController.currentDestination?.id == R.id.wordListFragment
+
+                if (isOnWordListScreen && homeViewModel.searchBarState()) {
+                    homeViewModel.setSearchBarState(false)
+                } else {
+                    isEnabled = false
+                    onBackPressedDispatcher.onBackPressed()
+                }
+            }
+        }
+        onBackPressedDispatcher.addCallback(this, callback)
     }
 
-    override fun onNewIntent(intent: Intent?) {
-        super.onNewIntent(intent)
-        manageIntent(intent?.data)
-    }
+//TODO: What is this for?
+//    override fun onNewIntent(intent: Intent?) {
+//        super.onNewIntent(intent)
+//        manageIntent(intent?.data)
+//    }
 
     private fun manageIntent(data: Uri?) {
         if (data != null) {
@@ -49,18 +65,6 @@ class HomeActivity : AppCompatActivity() {
         importDialog?.dismiss()
         super.onDestroy()
     }
-
-    override fun onBackPressed() {
-        val onWordListScreen =
-                findNavController(R.id.home_nav_host_fragment).currentDestination?.id == R.id.wordListFragment
-
-        if (onWordListScreen && homeViewModel.searchBarState()) {
-            homeViewModel.setSearchBarState(false)
-        } else {
-            super.onBackPressed()
-        }
-    }
-
     private fun importDictionary() {
         shareViewModel.getLiveIsImport().observe(this, Observer { isImport ->
             if (isImport) {

@@ -12,21 +12,36 @@ import com.vocabulary.myvocabulary.R
 import com.vocabulary.myvocabulary.ext.show
 import com.vocabulary.myvocabulary.quotes.QuoteData
 import com.vocabulary.myvocabulary.utils.DialogFactory
-import kotlinx.android.synthetic.main.fragment_home.view.*
 import org.koin.android.ext.android.inject
-import org.koin.androidx.viewmodel.ext.viewModel
+import org.koin.androidx.viewmodel.ext.android.viewModel
+import com.vocabulary.myvocabulary.databinding.FragmentHomeBinding
 
 class HomeFragment : Fragment() {
+    private var _binding: FragmentHomeBinding? = null
+    private val binding get() = _binding!!
     private val dialogFactory: DialogFactory by inject()
     private val homeViewModel: HomeViewModel by viewModel()
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        return inflater.inflate(R.layout.fragment_home, container, false).apply {
-            dictionary_button.setOnClickListener { it.findNavController().navigate(R.id.action_homeFragment_to_dictionaryListFragment) }
-            quiz_button.setOnClickListener { it.findNavController().navigate(R.id.action_homeFragment_to_quizListFragment) }
-            about_button.setOnClickListener { it.findNavController().navigate(R.id.to_aboutFragment) }
-            showQuote(quote_button)
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
+        _binding = FragmentHomeBinding.inflate(inflater, container, false)
+        val view = binding.root
+
+        binding.dictionaryButton.setOnClickListener {
+            it.findNavController().navigate(R.id.action_homeFragment_to_dictionaryListFragment)
         }
+        binding.quizButton.setOnClickListener {
+            it.findNavController().navigate(R.id.action_homeFragment_to_quizListFragment)
+        }
+        binding.aboutButton.setOnClickListener {
+            it.findNavController().navigate(R.id.to_aboutFragment)
+        }
+        showQuote(binding.quoteButton)
+
+        return view
     }
 
     private fun showQuote(quoteButton: ImageButton) {
@@ -36,15 +51,20 @@ class HomeFragment : Fragment() {
                 quoteButton.setOnClickListener {
                     quoteData as QuoteData.Quote
                     dialogFactory.buildQuotesDialog(
-                            requireActivity(),
-                            quoteData.title,
-                            quoteData.quote,
-                            quoteData.author
+                        requireActivity(),
+                        quoteData.title,
+                        quoteData.quote,
+                        quoteData.author
                     ).show()
                 }
             } else {
                 quoteButton.show(false)
             }
         })
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 }
