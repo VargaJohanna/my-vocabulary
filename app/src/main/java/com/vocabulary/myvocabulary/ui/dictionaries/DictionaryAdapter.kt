@@ -5,17 +5,18 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
-import com.vocabulary.myvocabulary.R
 import com.vocabulary.myvocabulary.ext.display
-import kotlinx.android.synthetic.main.row_dictionary.view.*
+import com.vocabulary.myvocabulary.databinding.RowDictionaryBinding
 
 class DictionaryAdapter(
-        private var dictionaryList: List<Dictionary>,
-        private val itemClickListener: ItemClickListener,
-        private val allowItemEditing: Boolean) : RecyclerView.Adapter<DictionaryAdapter.DictionaryViewHolder>()
-{ override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): DictionaryViewHolder {
-        val inflater = LayoutInflater.from(parent.context)
-        return DictionaryViewHolder(inflater.inflate(R.layout.row_dictionary, parent, false))
+    private var dictionaryList: List<Dictionary>,
+    private val itemClickListener: ItemClickListener,
+    private val allowItemEditing: Boolean
+) : RecyclerView.Adapter<DictionaryAdapter.DictionaryViewHolder>() {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): DictionaryViewHolder {
+        val binding =
+            RowDictionaryBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+        return DictionaryViewHolder(binding)
     }
 
     override fun getItemCount(): Int {
@@ -27,18 +28,19 @@ class DictionaryAdapter(
 
     }
 
-    inner class DictionaryViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+    inner class DictionaryViewHolder(private val binding: RowDictionaryBinding) :
+        RecyclerView.ViewHolder(binding.root) {
         fun bind(dictionary: Dictionary) {
-            itemView.dictionary_name.text = dictionary.dictionaryName
-            itemView.dictionary_options.display(allowItemEditing)
+            binding.dictionaryName.text = dictionary.dictionaryName
+            binding.dictionaryOptions.display(allowItemEditing)
         }
 
         init {
-            itemView.dictionary_name.setOnClickListener {
+            binding.dictionaryName.setOnClickListener {
                 itemClickListener.onItemClick(dictionaryList[adapterPosition])
             }
 
-            itemView.dictionary_options.setOnClickListener {
+            binding.dictionaryOptions.setOnClickListener {
                 itemClickListener.onOptionsClick(dictionaryList[adapterPosition], it)
             }
         }

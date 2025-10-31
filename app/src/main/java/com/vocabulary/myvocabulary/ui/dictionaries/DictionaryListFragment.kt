@@ -13,7 +13,6 @@ import androidx.appcompat.widget.Toolbar
 import androidx.core.view.forEach
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
-import androidx.navigation.findNavController
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -27,12 +26,13 @@ import com.vocabulary.myvocabulary.rx.RxSchedulers
 import com.vocabulary.myvocabulary.ui.quizzes.toQuizType
 import com.vocabulary.myvocabulary.utils.DialogFactory
 import io.reactivex.disposables.CompositeDisposable
-import kotlinx.android.synthetic.main.fragment_dictionary_list.*
-import kotlinx.android.synthetic.main.fragment_dictionary_list.view.*
 import org.koin.android.ext.android.inject
-import org.koin.androidx.viewmodel.ext.viewModel
+import org.koin.androidx.viewmodel.ext.android.viewModel
+import com.vocabulary.myvocabulary.databinding.FragmentDictionaryListBinding
 
 class DictionaryListFragment : Fragment(), DictionaryAdapter.ItemClickListener {
+    private var _binding: FragmentDictionaryListBinding? = null
+    private val binding get() = _binding!!
     private val viewModel: DictionaryListViewModel by viewModel()
     private val shareViewModel: ShareDictionaryViewModel by viewModel()
     private val dialogFactory: DialogFactory by inject()
@@ -55,20 +55,37 @@ class DictionaryListFragment : Fragment(), DictionaryAdapter.ItemClickListener {
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+        _binding = FragmentDictionaryListBinding.inflate(inflater, container, false)
+        val view = binding.root
+        return view
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
         val dictionaryAdapter = DictionaryAdapter(ArrayList(), this, true)
         shareViewModel.fetchCsvUri()
 
-        return inflater.inflate(R.layout.fragment_dictionary_list, container, false).apply {
-            generateDictionaryList(dictionaryAdapter, dictionary_recycler_view)
-            observeList(dictionaryAdapter, progress_bar)
-            setFabOnClickListener(dictionary_fab, import_container, create_new_container)
-            setCreateNewFabOnClickListener(create_new_fab)
-            setImportFabOnClickListener(import_fab)
-            dictionary_list_toolbar.setNavigationOnClickListener { findNavController().popBackStack() }
-            viewModel.isListEmpty().observe(this@DictionaryListFragment, Observer {
-                inflateToolbarMenu(it, dictionary_list_toolbar)
-            })
-        }
+        val dictionaryRecyclerView = view.findViewById<RecyclerView>(R.id.dictionary_recycler_view)
+        val progressBar = view.findViewById<ProgressBar>(R.id.progress_bar)
+        val dictionaryFab = view.findViewById<FloatingActionButton>(R.id.dictionary_fab)
+        val importContainer = view.findViewById<LinearLayout>(R.id.import_container)
+        val createNewContainer = view.findViewById<LinearLayout>(R.id.create_new_container)
+        val createNewFab = view.findViewById<FloatingActionButton>(R.id.create_new_fab)
+        val importFab = view.findViewById<FloatingActionButton>(R.id.import_fab)
+        val dictionaryListToolbar = view.findViewById<Toolbar>(R.id.dictionary_list_toolbar)
+
+        generateDictionaryList(dictionaryAdapter, dictionaryRecyclerView)
+        observeList(dictionaryAdapter, progressBar)
+        setFabOnClickListener(dictionaryFab, importContainer, createNewContainer)
+        setCreateNewFabOnClickListener(createNewFab)
+        setImportFabOnClickListener(importFab)
+
+        dictionaryListToolbar.setNavigationOnClickListener { findNavController().popBackStack() }
+
+        viewModel.isListEmpty().observe(viewLifecycleOwner, Observer { isListEmpty ->
+            inflateToolbarMenu(isListEmpty, dictionaryListToolbar)
+        })
     }
 
     private fun generateDictionaryList(dictionaryAdapter: DictionaryAdapter, recyclerView: RecyclerView) {
@@ -80,7 +97,7 @@ class DictionaryListFragment : Fragment(), DictionaryAdapter.ItemClickListener {
 
     private fun observeList(dictionaryAdapter: DictionaryAdapter, progressBar: ProgressBar) {
         progressBar.show(true)
-        viewModel.liveDictionaryList.observe(this, Observer {
+        viewModel.liveDictionaryList.observe(viewLifecycleOwner, Observer {
             dictionaryAdapter.updateList(it)
             progressBar.show(false)
 
@@ -109,7 +126,7 @@ class DictionaryListFragment : Fragment(), DictionaryAdapter.ItemClickListener {
                     }
                 })
             }
-            closeFabMenu(import_container, create_new_container)
+            closeFabMenu(binding.importContainer, binding.createNewContainer)
             createDialog?.show()
         }
     }
@@ -117,7 +134,7 @@ class DictionaryListFragment : Fragment(), DictionaryAdapter.ItemClickListener {
     private fun setImportFabOnClickListener(importFab: FloatingActionButton) {
         importFab.setOnClickListener {
             requestFile()
-            closeFabMenu(import_container, create_new_container)
+            closeFabMenu(binding.importContainer, binding.createNewContainer)
         }
     }
 
@@ -224,9 +241,9 @@ class DictionaryListFragment : Fragment(), DictionaryAdapter.ItemClickListener {
         toolbar.apply {
             if (!isListEmpty && toolbar.menu.size() == 0) {
                 inflateMenu(R.menu.dictionary_list_menu)
-                navigationIconsSet(menu.getItem(0).subMenu)
+//                navigationIconsSet(menu.getItem(0))
                 setOnMenuItemClickListener { item: MenuItem? ->
-                    navigationIconsSet(menu.getItem(0).subMenu)
+//                    navigationIconsSet(menu.getItem(0).subMenu)
                     when (item?.itemId) {
                         R.id.dictionary_sort_by_date -> {
                             viewModel.setSortBy(viewModel.currentSortByData.copy(
@@ -250,14 +267,15 @@ class DictionaryListFragment : Fragment(), DictionaryAdapter.ItemClickListener {
     }
 
     private fun navigationIconsSet(menu: Menu) {
-        viewModel.currentSortByData.let {
-            when (it.sortByOption) {
-                SortByDictionaryOptions.SortByDate -> setIcons(menu, R.id.dictionary_sort_by_date, it.dateDescending)
-                SortByDictionaryOptions.SortByTitle -> setIcons(menu, R.id.dictionary_sort_by_title, it.titleDescending)
-            }
-        }
+//        viewModel.currentSortByData.let {
+//            when (it.sortByOption) {
+//                SortByDictionaryOptions.SortByDate -> setIcons(menu, R.id.dictionary_sort_by_date, it.dateDescending)
+//                SortByDictionaryOptions.SortByTitle -> setIcons(menu, R.id.dictionary_sort_by_title, it.titleDescending)
+//            }
+//        }
     }
 
+    //TODO: Check why Menu needs to be added here. Why is it not enough to pass only the menuItem. Problem: menu.getItem[0].subMenu
     private fun setIcons(menu: Menu, menuItemId: Int, descending: Boolean) {
         menu.forEach {
             if (it.itemId == menuItemId) it.setIcon(
