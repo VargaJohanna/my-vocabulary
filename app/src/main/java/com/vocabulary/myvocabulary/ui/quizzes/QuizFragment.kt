@@ -6,6 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ProgressBar
 import android.widget.Toast
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
@@ -17,40 +18,49 @@ import com.vocabulary.myvocabulary.R
 import com.vocabulary.myvocabulary.ext.show
 import com.vocabulary.myvocabulary.ui.results.ResultViewModel
 import com.vocabulary.myvocabulary.utils.ItemDecorator
-import kotlinx.android.synthetic.main.fragment_quiz.view.*
-import org.koin.androidx.viewmodel.ext.sharedViewModel
-import org.koin.androidx.viewmodel.ext.viewModel
+import org.koin.androidx.viewmodel.ext.android.viewModel
 import org.koin.core.parameter.parametersOf
+import com.vocabulary.myvocabulary.databinding.FragmentQuizBinding
 
 class QuizFragment : Fragment() {
+    private var _binding: FragmentQuizBinding? = null
+    private val binding get() = _binding!!
     private val args by navArgs<QuizFragmentArgs>()
-    private val resultViewModel: ResultViewModel by sharedViewModel {
+
+    //TODO: Is it ok if it's "by viewModel" and not "by sharedViewModel"?
+    private val resultViewModel: ResultViewModel by viewModel {
         parametersOf(
-                args.dictionaryId,
-                args.quizOption
+            args.dictionaryId,
+            args.quizOption
         )
     }
     private val quizViewModel: QuizViewModel by viewModel {
         parametersOf(
-                args.dictionaryId,
-                args.quizOption,
-                args.failedOnly
+            args.dictionaryId,
+            args.quizOption,
+            args.failedOnly
         )
     }
     private lateinit var quizAdapter: QuizAdapter
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
+        _binding = FragmentQuizBinding.inflate(inflater, container, false)
+        val view = binding.root
+
         quizAdapter = QuizAdapter(mutableListOf(), quizViewModel.directionType)
         if (savedInstanceState == null) {
             resultViewModel.resetGuessedWordCollections()
         }
-        return inflater.inflate(R.layout.fragment_quiz, container, false).apply {
-            generateWordList(quizAdapter, quiz_recycler_view)
-            observeWordList(quizAdapter, quiz_progress_bar)
-            setNextButtonIconUpdateListener(quiz_next_fab)
-            setNextFabOnClickListener(quiz_next_fab)
-            quiz_toolbar.setNavigationOnClickListener { findNavController().popBackStack() }
-        }
+        generateWordList(quizAdapter, binding.quizRecyclerView)
+        observeWordList(quizAdapter, binding.quizProgressBar)
+        setNextButtonIconUpdateListener(binding.quizNextFab)
+        setNextFabOnClickListener(binding.quizNextFab)
+        binding.quizToolbar.setNavigationOnClickListener { findNavController().popBackStack() }
+        return view
     }
 
     private fun setNextFabOnClickListener(fab: FloatingActionButton) {
@@ -61,9 +71,9 @@ class QuizFragment : Fragment() {
                 quizViewModel.nextClicked()
             } else {
                 val action = QuizFragmentDirections.toResultFragment(
-                        quizViewModel.dictionaryId,
-                        quizViewModel.optionType,
-                        args.quizType
+                    quizViewModel.dictionaryId,
+                    quizViewModel.optionType,
+                    args.quizType
                 )
                 findNavController().navigate(action)
             }
@@ -72,8 +82,13 @@ class QuizFragment : Fragment() {
 
     private fun setNextButtonIconUpdateListener(fab: FloatingActionButton) {
         quizViewModel.getUpdateIcon().observe(requireActivity(), Observer {
-            fab.setImageDrawable(resources
-                    .getDrawable(if (it) R.drawable.ic_tick_icon else R.drawable.ic_arrow_right, requireActivity().theme))
+            fab.setImageDrawable(
+                ContextCompat
+                    .getDrawable(
+                        requireContext(),
+                        if (it) R.drawable.ic_tick_icon else R.drawable.ic_arrow_right
+                    )
+            )
         })
     }
 
@@ -84,7 +99,11 @@ class QuizFragment : Fragment() {
                 quizAdapter.updateList(it)
                 progressBar.show(false)
             } else {
-                Toast.makeText(requireActivity(), resources.getString(R.string.empty_dictionary_notification), Toast.LENGTH_SHORT).show()
+                Toast.makeText(
+                    requireActivity(),
+                    resources.getString(R.string.empty_dictionary_notification),
+                    Toast.LENGTH_SHORT
+                ).show()
                 findNavController().popBackStack()
             }
         })
@@ -99,5 +118,10 @@ class QuizFragment : Fragment() {
             addItemDecoration(ItemDecorator(65))
             adapter = quizAdapter
         }
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 }

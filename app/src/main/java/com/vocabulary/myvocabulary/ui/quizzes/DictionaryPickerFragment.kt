@@ -9,7 +9,6 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.Toolbar
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
-import androidx.navigation.findNavController
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -22,11 +21,13 @@ import com.vocabulary.myvocabulary.ui.dictionaries.DictionaryAdapter
 import com.vocabulary.myvocabulary.ui.dictionaries.DictionaryListViewModel
 import com.vocabulary.myvocabulary.utils.DialogFactory
 import io.reactivex.disposables.CompositeDisposable
-import kotlinx.android.synthetic.main.fragment_choose_dictionary.view.*
 import org.koin.android.ext.android.inject
-import org.koin.androidx.viewmodel.ext.viewModel
+import org.koin.androidx.viewmodel.ext.android.viewModel
+import com.vocabulary.myvocabulary.databinding.FragmentChooseDictionaryBinding
 
 class DictionaryPickerFragment : Fragment(), DictionaryAdapter.ItemClickListener {
+    private var _binding: FragmentChooseDictionaryBinding? = null
+    private val binding get() = _binding!!
     private val viewModel: DictionaryListViewModel by viewModel()
     private val dialogFactory: DialogFactory by inject()
     private var optionsDialog: AlertDialog? = null
@@ -47,19 +48,21 @@ class DictionaryPickerFragment : Fragment(), DictionaryAdapter.ItemClickListener
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+        _binding = FragmentChooseDictionaryBinding.inflate(inflater, container, false)
+        val view = binding.root
         val dictionaryAdapter = DictionaryAdapter(ArrayList(), this, false)
-
+        generateDictionaryList(dictionaryAdapter, binding.quizDictionaryPickerRecyclerView)
+        observeList(dictionaryAdapter, binding.progressBarDictionaryPicker)
+        setToolBarTitle(binding.dictionaryPickerToolbar)
+        binding.dictionaryPickerToolbar.setNavigationOnClickListener { findNavController().popBackStack() }
         return inflater.inflate(R.layout.fragment_choose_dictionary, container, false).apply {
-            generateDictionaryList(dictionaryAdapter, quiz_dictionary_picker_recycler_view)
-            observeList(dictionaryAdapter, progress_bar_dictionary_picker)
-            setToolBarTitle(dictionary_picker_toolbar)
-            dictionary_picker_toolbar.setNavigationOnClickListener { findNavController().popBackStack() }
+
         }
     }
 
     private fun observeList(dictionaryAdapter: DictionaryAdapter, progressBar: ProgressBar) {
         progressBar.show(true)
-        viewModel.liveDictionaryList.observe(this, Observer {
+        viewModel.liveDictionaryList.observe(viewLifecycleOwner, Observer {
             dictionaryAdapter.updateList(it)
             progressBar.show(false)
         })

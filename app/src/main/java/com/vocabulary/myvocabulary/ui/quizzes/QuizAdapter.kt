@@ -12,7 +12,7 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.vocabulary.myvocabulary.R
 import com.vocabulary.myvocabulary.ext.show
-import kotlinx.android.synthetic.main.row_quiz.view.*
+import com.vocabulary.myvocabulary.databinding.RowQuizBinding
 
 class QuizAdapter(
         private var wordList: MutableList<QuizViewModel.FocusableWord>,
@@ -21,8 +21,8 @@ class QuizAdapter(
     private var lastGuess: String? = null
     private var watcher = GuessTextWatcher()
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): QuizViewHolder {
-        val inflater = LayoutInflater.from(parent.context)
-        return QuizViewHolder(inflater.inflate(com.vocabulary.myvocabulary.R.layout.row_quiz, parent, false))
+        val binding = RowQuizBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+        return QuizViewHolder(binding)
     }
 
     override fun getItemCount(): Int = wordList.size
@@ -31,9 +31,9 @@ class QuizAdapter(
         holder.bind(wordList[position], position)
     }
 
-    inner class QuizViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+    inner class QuizViewHolder(private val binding: RowQuizBinding) : RecyclerView.ViewHolder(binding.root) {
         fun bind(wordObject: QuizViewModel.FocusableWord, position: Int) {
-            makeLastElementEditable(position, itemView.solution)
+            makeLastElementEditable(position, binding.solution)
             addElevationToEachItem(itemView, position)
 
             setTextWatcher(itemView, position)
@@ -44,35 +44,39 @@ class QuizAdapter(
 
         private fun setTextWatcher(itemView: View, position: Int) {
             if (position == wordList.size - 1) {
-                itemView.solution.addTextChangedListener(watcher)
+                binding.solution.addTextChangedListener(watcher)
             } else {
-                itemView.solution.removeTextChangedListener(watcher)
+                binding.solution.removeTextChangedListener(watcher)
             }
         }
 
         private fun setContent(wordObject: QuizViewModel.FocusableWord, itemView: View, position: Int) {
             itemView.apply {
                 if (position != wordList.size - 1) {
-                    question.setTextColor(ContextCompat.getColor(context, R.color.transparent))
-                    view.show(false)
+                    binding.question.setTextColor(ContextCompat.getColor(context, R.color.transparent))
+                    binding.view.show(false)
                     setBackgroundColor(ContextCompat.getColor(context, R.color.light_grey))
-                    solution.apply {
+                    binding.solution.apply {
                         setTextColor(ContextCompat.getColor(context, R.color.transparent))
                         setHintTextColor(ContextCompat.getColor(context, R.color.transparent))
                         background.setTint(ContextCompat.getColor(context, R.color.transparent))
                     }
+                    binding.solution.setTextColor(ContextCompat.getColor(context, R.color.transparent))
+                    binding.solution.setHintTextColor(ContextCompat.getColor(context, R.color.transparent))
+                    binding.solution.background.setTint(ContextCompat.getColor(context, R.color.transparent))
+
                 } else {
-                    question.setTextColor(ContextCompat.getColor(context, R.color.primary_text))
-                    view.show(true)
+                    binding.question.setTextColor(ContextCompat.getColor(context, R.color.primary_text))
+                    binding.view.show(true)
                     setBackgroundColor(ContextCompat.getColor(context, R.color.icons))
-                    solution.setText("")
-                    question.text = ""
+                    binding.solution.setText("")
+                    binding.question.text = ""
                     if (askDirection == QuizDirectionType.AskWord) {
-                        question.text = wordObject.word.word
+                        binding.question.text = wordObject.word.word
                     } else {
-                        question.text = wordObject.word.translation
+                        binding.question.text = wordObject.word.translation
                     }
-                    solution.apply {
+                    binding.solution.apply {
                         setTextColor(ContextCompat.getColor(context, R.color.primary_text))
                         setHintTextColor(ContextCompat.getColor(context, R.color.grey))
                         background.setTint(ContextCompat.getColor(context, R.color.divider))
