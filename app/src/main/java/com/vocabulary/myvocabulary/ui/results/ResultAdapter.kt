@@ -1,7 +1,6 @@
 package com.vocabulary.myvocabulary.ui.results
 
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.core.content.ContextCompat
@@ -12,15 +11,15 @@ import com.vocabulary.myvocabulary.ext.display
 import com.vocabulary.myvocabulary.ext.show
 import com.vocabulary.myvocabulary.ui.quizzes.QuizDirectionType
 import com.vocabulary.myvocabulary.ui.words.Word
-import kotlinx.android.synthetic.main.row_result.view.*
+import com.vocabulary.myvocabulary.databinding.RowResultBinding
 
 class ResultAdapter(
-        private var resultList: List<Word>,
-        private val directionType: QuizDirectionType
+    private var resultList: List<Word>,
+    private val directionType: QuizDirectionType
 ) : RecyclerView.Adapter<ResultAdapter.ResultViewHolder>() {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ResultViewHolder {
-        val inflater = LayoutInflater.from(parent.context)
-        return ResultViewHolder(inflater.inflate(R.layout.row_result, parent, false))
+        val binding = RowResultBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+        return ResultViewHolder(binding)
     }
 
     override fun getItemCount(): Int = resultList.size
@@ -29,25 +28,35 @@ class ResultAdapter(
         holder.bind(resultList[position])
     }
 
-    inner class ResultViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+    inner class ResultViewHolder(private val binding: RowResultBinding) :
+        RecyclerView.ViewHolder(binding.root) {
         fun bind(word: Word) {
-            setQuestionText(word, itemView.result_question)
-            setGuessText(word, itemView.guess)
-
-            setItemViewAppearance(itemView, word)
-
+            setQuestionText(word, binding.resultQuestion)
+            setGuessText(word, binding.guess)
+            setItemViewAppearance(binding, word)
         }
 
-        private fun setItemViewAppearance(itemView: View, word: Word) {
-            itemView.materialCardView.setBackgroundColor(ContextCompat.getColor(itemView.context,
-                    if (word.lastResult) R.color.light_green
-                    else R.color.light_error))
+        private fun setItemViewAppearance(binding: RowResultBinding, word: Word) {
 
-            itemView.passed_icon.show(word.lastResult)
-            itemView.failed_icon.show(!word.lastResult)
-            itemView.correct_solution.display(!word.lastResult)
-            itemView.guess.setTextColor(ContextCompat.getColor(itemView.context, if (!word.lastResult) R.color.error else R.color.secondary_text))
-            itemView.correct_solution.text = if (directionType == QuizDirectionType.AskWord) word.translation else word.word
+            binding.materialCardView.setBackgroundColor(
+                ContextCompat.getColor(
+                    itemView.context,
+                    if (word.lastResult) R.color.light_green
+                    else R.color.light_error
+                )
+            )
+
+            binding.passedIcon.show(word.lastResult)
+            binding.failedIcon.show(!word.lastResult)
+            binding.correctSolution.display(!word.lastResult)
+            binding.guess.setTextColor(
+                ContextCompat.getColor(
+                    itemView.context,
+                    if (!word.lastResult) R.color.error else R.color.secondary_text
+                )
+            )
+            binding.correctSolution.text =
+                if (directionType == QuizDirectionType.AskWord) word.translation else word.word
 
         }
 
@@ -56,7 +65,8 @@ class ResultAdapter(
         }
 
         private fun setQuestionText(word: Word, resultQuestion: TextView) {
-            resultQuestion.text = if (directionType == QuizDirectionType.AskWord) word.word else word.translation
+            resultQuestion.text =
+                if (directionType == QuizDirectionType.AskWord) word.word else word.translation
         }
     }
 
@@ -65,5 +75,4 @@ class ResultAdapter(
         this.resultList = newList
         diffResult.dispatchUpdatesTo(this)
     }
-
 }

@@ -11,7 +11,6 @@ import android.widget.LinearLayout
 import android.widget.ProgressBar
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
-import androidx.navigation.findNavController
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -31,18 +30,21 @@ import com.vocabulary.myvocabulary.ui.quizzes.toInt
 import com.vocabulary.myvocabulary.ui.quizzes.toQuizType
 import com.vocabulary.myvocabulary.ui.words.Word
 import io.reactivex.disposables.CompositeDisposable
-import kotlinx.android.synthetic.main.fragment_result.*
-import kotlinx.android.synthetic.main.fragment_result.view.*
 import org.koin.android.ext.android.inject
-import org.koin.androidx.viewmodel.ext.sharedViewModel
+import org.koin.androidx.viewmodel.ext.android.viewModel
 import org.koin.core.parameter.parametersOf
 import kotlin.math.round
+import com.vocabulary.myvocabulary.databinding.FragmentResultBinding
 
 class ResultFragment : Fragment() {
+    private var _binding: FragmentResultBinding? = null
+    private val binding get() = _binding!!
     private val args by navArgs<ResultFragmentArgs>()
-    private val resultViewModel: ResultViewModel by sharedViewModel {
+
+    //TODO: is it ok to use "by viewModel" instead of "by sharedViewModel"
+    private val resultViewModel: ResultViewModel by viewModel() {
         parametersOf(
-                args.dictionaryId
+            args.dictionaryId
         )
     }
     private val rxSchedulers: RxSchedulers by inject()
@@ -50,25 +52,36 @@ class ResultFragment : Fragment() {
     private val disposables = CompositeDisposable()
     private lateinit var manager: ReviewManager
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+    override fun onCreateView(
+        inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
+    ): View? {
+        _binding = FragmentResultBinding.inflate(inflater, container, false)
+        val view = binding.root
+
         manager = ReviewManagerFactory.create(requireContext())
         hideKeyboard()
         resultViewModel.observeGuessedWordMap()
         resultViewModel.setDirection(args.directionType.toDirectionType())
         val resultAdapter = ResultAdapter(emptyList(), resultViewModel.directionResult)
-        return inflater.inflate(R.layout.fragment_result, container, false).apply {
-            observeWordList(resultAdapter, result_progress_bar, success_animation, failure_animation, savedInstanceState)
-            generateWordList(resultAdapter, result_recycler_view)
-            setExitFabOnClickListener(result_exit_fab)
-            setStartOverOnClickListener(start_over_fab)
-            setFailedOnlyOnClickListener(failed_only_fab)
-            result_toolbar.setNavigationOnClickListener {
-                findNavController().popBackStack()
-                resultViewModel.dispose()
-            }
-            closeAnimationOnClick(success_animation)
-            closeAnimationOnClick(failure_animation)
+
+        observeWordList(
+            resultAdapter,
+            binding.resultProgressBar,
+            binding.successAnimation,
+            binding.failureAnimation,
+            savedInstanceState
+        )
+        generateWordList(resultAdapter, binding.resultRecyclerView)
+        setExitFabOnClickListener(binding.resultExitFab)
+        setStartOverOnClickListener(binding.startOverFab)
+        setFailedOnlyOnClickListener(binding.failedOnlyFab)
+        binding.resultToolbar.setNavigationOnClickListener {
+            findNavController().popBackStack()
+            resultViewModel.dispose()
         }
+        closeAnimationOnClick(binding.successAnimation)
+        closeAnimationOnClick(binding.failureAnimation)
+        return view
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -84,7 +97,13 @@ class ResultFragment : Fragment() {
         }
     }
 
-    private fun observeWordList(resultAdapter: ResultAdapter, progressBar: ProgressBar, successAnimation: LottieAnimationView, failureAnimation: LottieAnimationView, savedInstanceState: Bundle?) {
+    private fun observeWordList(
+        resultAdapter: ResultAdapter,
+        progressBar: ProgressBar,
+        successAnimation: LottieAnimationView,
+        failureAnimation: LottieAnimationView,
+        savedInstanceState: Bundle?
+    ) {
         progressBar.show(true)
         resultViewModel.getLiveGuessedList().observe(requireActivity(), Observer {
             resultAdapter.updateList(it)
@@ -99,7 +118,12 @@ class ResultFragment : Fragment() {
     private fun setResultStatistics(list: List<Word>) {
         val passes = list.filter { it.lastResult }.size
         val all = list.size
-        if (result_stats != null) result_stats.text = String.format(getString(R.string.result_stats), passes, all, round(((passes.toFloat() / all.toFloat()) * 100)).toInt())
+        binding.resultStats.text = String.format(
+            getString(R.string.result_stats),
+            passes,
+            all,
+            round(((passes.toFloat() / all.toFloat()) * 100)).toInt()
+        )
     }
 
     private fun setExitFabOnClickListener(fab: FloatingActionButton) {
@@ -111,14 +135,16 @@ class ResultFragment : Fragment() {
     }
 
     private fun setRetryFabOnClickListener() {
-        result_restart_fab.setOnClickListener {
+        binding.resultRestartFab.setOnClickListener {
             showInAppReview()
-            if (isFabOpen) closeFabMenu(failed_only_container, start_over_container)
-            else showFabMenu(failed_only_container, start_over_container)
+            if (isFabOpen) closeFabMenu(binding.failedOnlyContainer, binding.startOverContainer)
+            else showFabMenu(binding.failedOnlyContainer, binding.startOverContainer)
         }
     }
 
-    private fun closeFabMenu(failedOnlyContainer: LinearLayout, startOverFabContainer: LinearLayout) {
+    private fun closeFabMenu(
+        failedOnlyContainer: LinearLayout, startOverFabContainer: LinearLayout
+    ) {
         isFabOpen = false
         failedOnlyContainer.display(false)
         startOverFabContainer.display(false)
@@ -126,7 +152,9 @@ class ResultFragment : Fragment() {
         startOverFabContainer.animate().translationY(0f)
     }
 
-    private fun showFabMenu(failedOnlyFabContainer: LinearLayout, startOverFabContainer: LinearLayout) {
+    private fun showFabMenu(
+        failedOnlyFabContainer: LinearLayout, startOverFabContainer: LinearLayout
+    ) {
         isFabOpen = true
         failedOnlyFabContainer.display(!resultViewModel.isAllPassed)
         startOverFabContainer.display(true)
@@ -138,17 +166,15 @@ class ResultFragment : Fragment() {
         startOverFab.setOnClickListener {
             resultViewModel.resetGuessedWordCollections()
             disposables += resultViewModel.startNew(args.dictionaryId, args.quizType.toQuizType())
-                    .subscribeOn(rxSchedulers.io())
-                    .observeOn(rxSchedulers.main())
-                    .subscribe {
-                        val action = ResultFragmentDirections.fromResultToQuiz(
-                                args.dictionaryId,
-                                resultViewModel.directionResult.toInt(),
-                                false,
-                                args.quizType
-                        )
-                        findNavController().navigate(action)
-                    }
+                .subscribeOn(rxSchedulers.io()).observeOn(rxSchedulers.main()).subscribe {
+                    val action = ResultFragmentDirections.fromResultToQuiz(
+                        args.dictionaryId,
+                        resultViewModel.directionResult.toInt(),
+                        false,
+                        args.quizType
+                    )
+                    findNavController().navigate(action)
+                }
             resultViewModel.dispose()
         }
     }
@@ -156,45 +182,44 @@ class ResultFragment : Fragment() {
     private fun setFailedOnlyOnClickListener(startOverFab: FloatingActionButton) {
         startOverFab.setOnClickListener {
             val action = ResultFragmentDirections.fromResultToQuiz(
-                    args.dictionaryId,
-                    resultViewModel.directionResult.toInt(),
-                    true,
-                    args.quizType
+                args.dictionaryId, resultViewModel.directionResult.toInt(), true, args.quizType
             )
             resultViewModel.dispose()
             findNavController().navigate(action)
         }
     }
 
-    private fun showAnimation(animationViewSuccess: LottieAnimationView, animationViewFailure: LottieAnimationView) {
+    private fun showAnimation(
+        animationViewSuccess: LottieAnimationView, animationViewFailure: LottieAnimationView
+    ) {
         if (resultViewModel.isAllPassed) {
             animationViewSuccess.show(true)
             animationViewSuccess.addAnimatorListener(object : Animator.AnimatorListener {
-                override fun onAnimationEnd(p0: Animator?) {
+                override fun onAnimationEnd(p0: Animator) {
                     animationViewSuccess.show(false)
                 }
 
-                override fun onAnimationRepeat(p0: Animator?) {}
+                override fun onAnimationRepeat(p0: Animator) {}
 
-                override fun onAnimationCancel(p0: Animator?) {}
+                override fun onAnimationCancel(p0: Animator) {}
 
-                override fun onAnimationStart(p0: Animator?) {}
+                override fun onAnimationStart(p0: Animator) {}
             })
         } else {
             animationViewFailure.show(true)
             animationViewFailure.setMinAndMaxFrame(200, 260)
             animationViewFailure.speed = 1.5f
             animationViewFailure.addAnimatorListener(object : Animator.AnimatorListener {
-                override fun onAnimationEnd(p0: Animator?) {
+                override fun onAnimationEnd(p0: Animator) {
                     animationViewFailure.fadeoutAnimation()
                     animationViewFailure.show(false)
                 }
 
-                override fun onAnimationRepeat(p0: Animator?) {}
+                override fun onAnimationRepeat(p0: Animator) {}
 
-                override fun onAnimationCancel(p0: Animator?) {}
+                override fun onAnimationCancel(p0: Animator) {}
 
-                override fun onAnimationStart(p0: Animator?) {}
+                override fun onAnimationStart(p0: Animator) {}
             })
         }
     }
@@ -209,14 +234,15 @@ class ResultFragment : Fragment() {
     }
 
     private fun hideKeyboard() {
-        val imm: InputMethodManager = requireActivity().getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager
+        val imm: InputMethodManager =
+            requireActivity().getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager
         val view: View? = requireActivity().currentFocus
         if (view == null) View(requireActivity())
         imm.hideSoftInputFromWindow(view?.windowToken, 0)
     }
 
-    private fun showInAppReview(){
-        if(resultViewModel.openedAppCounter > 3) {
+    private fun showInAppReview() {
+        if (resultViewModel.openedAppCounter > 3) {
             val request = manager.requestReviewFlow()
             request.addOnCompleteListener { request ->
                 if (request.isSuccessful) {
@@ -233,8 +259,13 @@ class ResultFragment : Fragment() {
     }
 
     override fun onStop() {
-         resultViewModel.dispose()
+        resultViewModel.dispose()
         disposables.clear()
         super.onStop()
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 }

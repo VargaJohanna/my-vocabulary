@@ -20,6 +20,8 @@ import io.reactivex.Completable
 import io.reactivex.Observable
 import io.reactivex.Single
 import io.reactivex.disposables.CompositeDisposable
+import java.util.Locale
+import java.util.Locale.getDefault
 
 class ResultViewModel(
         val dictionaryId: Long,
@@ -76,14 +78,14 @@ class ResultViewModel(
 
     private fun evaluate(it: Word, entry: MutableMap.MutableEntry<Long, String>): Word {
         return if (directionResult == QuizDirectionType.AskWord) {
-            if (it.translation.toLowerCase() == entry.value.toLowerCase()) {
+            if (it.translation.lowercase(getDefault()) == entry.value.lowercase(getDefault())) {
                 it.copy(lastResult = true, lastGuess = entry.value, beenAsked = it.beenAsked + 1, passed = it.passed + 1)
             } else {
                 setAllPassedValue(false)
                 it.copy(lastResult = false, lastGuess = entry.value, beenAsked = it.beenAsked + 1, failed = it.failed + 1)
             }
         } else {
-            if (it.word.toLowerCase() == entry.value.toLowerCase()) {
+            if (it.word.lowercase(getDefault()) == entry.value.lowercase(getDefault())) {
                 it.copy(lastResult = true, lastGuess = entry.value, beenAsked = it.beenAsked + 1, passed = it.passed + 1)
             } else {
                 setAllPassedValue(false)
