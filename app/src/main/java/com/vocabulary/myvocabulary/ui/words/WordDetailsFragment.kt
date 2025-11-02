@@ -15,19 +15,21 @@ import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.vocabulary.myvocabulary.R
 import com.vocabulary.myvocabulary.utils.DialogFactory
-import kotlinx.android.synthetic.main.fragment_word_details.*
-import kotlinx.android.synthetic.main.fragment_word_details.view.*
 import org.koin.android.ext.android.inject
-import org.koin.androidx.viewmodel.ext.viewModel
 import org.koin.core.parameter.parametersOf
 import java.text.SimpleDateFormat
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import java.util.*
+import com.vocabulary.myvocabulary.databinding.FragmentWordDetailsBinding
+import org.koin.androidx.viewmodel.ext.android.viewModel
+
 
 class WordDetailsFragment : Fragment() {
+    private var _binding: FragmentWordDetailsBinding? = null
+    private val binding get() = _binding!!
     private val args by navArgs<WordDetailsFragmentArgs>()
-    private val wordViewModel: WordListViewModel by viewModel {
+    private val wordViewModel: WordListViewModel by viewModel() {
         parametersOf(args.dictionaryId)
     }
     private val wordDetailViewModel: WordDetailsViewModel by viewModel()
@@ -36,26 +38,27 @@ class WordDetailsFragment : Fragment() {
     private lateinit var wordCurrent: Word
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+        _binding = FragmentWordDetailsBinding.inflate(inflater, container, false)
+        val view = binding.root
         wordDetailViewModel.getWordById(args.wordId)
         wordDetailViewModel.getCurrentWord().observe(requireActivity(), androidx.lifecycle.Observer {
             wordCurrent = it
             setView(it)
         })
-        return inflater.inflate(R.layout.fragment_word_details, container, false).apply {
-            word_details_toolbar.setNavigationOnClickListener { findNavController().popBackStack() }
-            setWordEditButtonClickListener(details_word, details_translation, word_edit_button)
-            setWordDeleteButtonClickListener(word_delete_button)
-        }
+        binding.wordDetailsToolbar.setNavigationOnClickListener { findNavController().popBackStack() }
+        setWordEditButtonClickListener(binding.detailsWord, binding.detailsTranslation, binding.wordEditButton)
+        setWordDeleteButtonClickListener(binding.wordDeleteButton)
+        return view
     }
 
     private fun setView(word: Word) {
-        details_word.text = word.word
-        details_translation.text = word.translation
-        been_asked_value.text = word.beenAsked.toString()
-        passed_value.text = word.passed.toString()
-        failed_value.text = word.failed.toString()
-        last_result_value.text = if (word.lastResult) requireActivity().getString(R.string.passed) else requireActivity().getString(R.string.failed)
-        created_value.text = formatDate(word.created)
+        binding.detailsWord.text = word.word
+        binding.detailsTranslation.text = word.translation
+        binding.beenAskedValue.text = word.beenAsked.toString()
+        binding.passedValue.text = word.passed.toString()
+        binding.failedValue.text = word.failed.toString()
+        binding.lastResultValue.text = if (word.lastResult) requireActivity().getString(R.string.passed) else requireActivity().getString(R.string.failed)
+        binding.createdValue.text = formatDate(word.created)
     }
 
     private fun setWordDeleteButtonClickListener(delete: ImageButton) {

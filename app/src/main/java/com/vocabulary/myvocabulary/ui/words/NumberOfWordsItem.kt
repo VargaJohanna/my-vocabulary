@@ -1,23 +1,27 @@
 package com.vocabulary.myvocabulary.ui.words
 
+import android.view.View
 import com.vocabulary.myvocabulary.R
-import com.xwray.groupie.kotlinandroidextensions.Item
-import com.xwray.groupie.kotlinandroidextensions.ViewHolder
-import kotlinx.android.synthetic.main.row_number_of_words.view.*
-
+import com.vocabulary.myvocabulary.databinding.RowNumberOfWordsBinding
+import com.xwray.groupie.Item
+import com.xwray.groupie.viewbinding.BindableItem
 
 class NumberOfWordsItem(
-        private val numberOfWords: String
-) : Item() {
-    override fun bind(viewHolder: ViewHolder, position: Int) {
-        viewHolder.containerView.apply {
-            number_of_words.text = numberOfWords
-        }
+    private val numberOfWords: String
+) : BindableItem<RowNumberOfWordsBinding>() {
+    override fun initializeViewBinding(view: View): RowNumberOfWordsBinding {
+        return RowNumberOfWordsBinding.bind(view)
+    }
+
+    override fun bind(binding: RowNumberOfWordsBinding, position: Int) {
+        binding.numberOfWords.text = numberOfWords
     }
 
     override fun getLayout() = R.layout.row_number_of_words
 
-    override fun isSameAs(other: com.xwray.groupie.Item<*>?) = numberOfWords == (other as? NumberOfWordsItem)?.numberOfWords
+    override fun hasSameContentAs(other: Item<*>): Boolean {
+        return numberOfWords == (other as? NumberOfWordsItem)?.numberOfWords
+    }
 
     override fun equals(other: Any?) = numberOfWords == (other as? NumberOfWordsItem)?.numberOfWords
 

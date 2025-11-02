@@ -29,14 +29,17 @@ import com.vocabulary.myvocabulary.ui.dictionaries.ShareDictionaryViewModel
 import com.vocabulary.myvocabulary.ui.quizzes.toQuizType
 import com.vocabulary.myvocabulary.utils.DialogFactory
 import com.xwray.groupie.GroupAdapter
-import com.xwray.groupie.ViewHolder
-import com.xwray.groupie.kotlinandroidextensions.Item
 import io.reactivex.disposables.CompositeDisposable
 import org.koin.android.ext.android.inject
-import org.koin.androidx.viewmodel.ext.viewModel
+import org.koin.androidx.viewmodel.ext.android.viewModel
 import org.koin.core.parameter.parametersOf
+import com.xwray.groupie.Item
+import com.xwray.groupie.GroupieViewHolder
+import com.vocabulary.myvocabulary.databinding.FragmentWordListBinding
 
 class WordListFragment : Fragment() {
+    private var _binding: FragmentWordListBinding? = null
+    private val binding get() = _binding!!
     private val args by navArgs<WordListFragmentArgs>()
     private val wordViewModel: WordListViewModel by viewModel {
         parametersOf(args.dictionaryId)
@@ -49,20 +52,22 @@ class WordListFragment : Fragment() {
     private var searchBar: ConstraintLayout? = null
     private var searchField: EditText? = null
     private val disposables = CompositeDisposable()
-    private val wordAdapter = GroupAdapter<ViewHolder>()
+    private val wordAdapter = GroupAdapter<GroupieViewHolder>()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        return inflater.inflate(R.layout.fragment_word_list, container, false).apply {
-            generateWordList(word_recycler_view)
-            observeWordList(word_list_progress_bar)
-            observeEmptyState()
-            observeSearchBarStatus(search_wrapper)
-            setFabOnClickListener(word_fab)
-            setToolbarMenu(word_list_toolbar)
-            searchWordViewSetup(search_field, clear_search)
-            searchBar = search_wrapper
-            searchField = search_field
-        }
+        _binding = FragmentWordListBinding.inflate(inflater, container, false)
+        val view = binding.root
+        generateWordList(binding.wordRecyclerView)
+        observeWordList(binding.wordListProgressBar)
+        observeEmptyState()
+        observeSearchBarStatus(binding.searchWrapper)
+        setFabOnClickListener(binding.wordFab)
+        setToolbarMenu(binding.wordListToolbar)
+        searchWordViewSetup(binding.searchField, binding.clearSearch)
+        searchBar = binding.searchWrapper
+        searchField = binding.searchField
+
+        return view
     }
 
     private fun onItemClick(word: WordItem) {
@@ -90,9 +95,9 @@ class WordListFragment : Fragment() {
         toolbar.apply {
             if (!isListEmpty && toolbar.menu.size() == 0) {
                 inflateMenu(R.menu.word_list_menu)
-                navigationIconsSet(menu.getItem(0).subMenu)
+//                navigationIconsSet(menu.getItem(0).subMenu)
                 setOnMenuItemClickListener { item: MenuItem? ->
-                    navigationIconsSet(menu.getItem(0).subMenu)
+//                    navigationIconsSet(menu.getItem(0).subMenu)
                     when (item?.itemId) {
                         R.id.start_quiz_from_word_list -> showStartQuizDialog(wordViewModel.dictionaryId)
                         R.id.export_dictionary -> shareDictionary()
@@ -123,7 +128,7 @@ class WordListFragment : Fragment() {
             }
         }
     }
-
+    //TODO: Check why Menu needs to be added here. Why is it not enough to pass only the menuItem. Problem: menu.getItem[0].subMenu
     private fun navigationIconsSet(menu: Menu) {
         wordViewModel.currentSortByData.let {
             when (it.sortByOption) {
@@ -155,34 +160,30 @@ class WordListFragment : Fragment() {
         wordViewModel.getLiveWordList().observe(requireActivity(), Observer { data ->
             val wordList = data.first
             val isSearchOpen = data.second
-            val items = ArrayList<Item>()
+            val items = ArrayList<Item<out GroupieViewHolder>>()
             items += wordList.map { WordItem(it) { selectedItem: WordItem -> onItemClick(selectedItem) } }
             items += NumberOfWordsItem(String.format(getString(R.string.number_of_words), wordList.size))
             wordAdapter.update(items)
 
             progressBar.show(false)
-            if (animation_book != null) {
-                showEmptyState(wordList.isEmpty() && !isSearchOpen)
-                inflateToolbarMenu(wordList.isEmpty() && !isSearchOpen, word_list_toolbar)
-            }
+            showEmptyState(wordList.isEmpty() && !isSearchOpen)
+            inflateToolbarMenu(wordList.isEmpty() && !isSearchOpen, binding.wordListToolbar)
         })
     }
 
     private fun observeEmptyState() {
         wordViewModel.isListEmpty().observe(requireActivity(), Observer {
-            if (animation_book != null) {
-                showEmptyState(it)
-            }
+            showEmptyState(it)
         })
     }
 
     private fun showEmptyState(show: Boolean) {
-        animation_book.show(show)
-        empty_state_message_title.show(show)
-        empty_state_message.show(show)
-        word_column_title.show(!show)
-        translation_column_title.show(!show)
-        word_recycler_view.show(!show)
+        binding.animationBook.show(show)
+        binding.emptyStateMessageTitle.show(show)
+        binding.emptyStateMessage.show(show)
+        binding.wordColumnTitle.show(!show)
+        binding.translationColumnTitle.show(!show)
+        binding.wordRecyclerView.show(!show)
         if (show) wordViewModel.setSearchBarStatus(false)
     }
 
@@ -259,7 +260,7 @@ class WordListFragment : Fragment() {
     private fun observeSearchBarStatus(searchWrapper: ConstraintLayout) {
         wordViewModel.isSearchBarOpen().observe(requireActivity(), Observer {
             searchWrapper.display(it)
-            if (!it) search_field?.text?.clear()
+            if (!it) binding.searchField.text?.clear()
         })
     }
 
@@ -280,5 +281,10 @@ class WordListFragment : Fragment() {
         override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
             wordViewModel.setSearchedTerm(p0.toString())
         }
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 }
