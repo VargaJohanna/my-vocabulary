@@ -17,33 +17,33 @@ import com.vocabulary.myvocabulary.ext.show
 import com.vocabulary.myvocabulary.ext.stringToInt
 import com.vocabulary.myvocabulary.ui.dictionaries.Dictionary
 import com.vocabulary.myvocabulary.ui.words.Word
-import kotlinx.android.synthetic.main.dialog_add_quiz_size.view.*
-import kotlinx.android.synthetic.main.dialog_create_dictionary.view.*
-import kotlinx.android.synthetic.main.dialog_create_word.view.*
-import kotlinx.android.synthetic.main.dialog_direction_option_picker.view.*
-import kotlinx.android.synthetic.main.dialog_quote.view.*
-import kotlinx.android.synthetic.main.dialog_rename_dictionary.view.*
-import kotlinx.android.synthetic.main.dialog_rename_word.view.*
-import kotlinx.android.synthetic.main.dialog_start_quiz.view.*
+import com.vocabulary.myvocabulary.databinding.DialogAddQuizSizeBinding
+import com.vocabulary.myvocabulary.databinding.DialogCreateWordBinding
+import com.vocabulary.myvocabulary.databinding.DialogCreateDictionaryBinding
+import com.vocabulary.myvocabulary.databinding.DialogDirectionOptionPickerBinding
+import com.vocabulary.myvocabulary.databinding.DialogQuoteBinding
+import com.vocabulary.myvocabulary.databinding.DialogRenameDictionaryBinding
+import com.vocabulary.myvocabulary.databinding.DialogRenameWordBinding
+import com.vocabulary.myvocabulary.databinding.DialogStartQuizBinding
 
 class DialogFactory {
 
     fun buildWordEditDialog(
-            activity: Activity,
-            word: Word,
-            saveClick: (word: String, translation: String) -> Unit
+        activity: Activity,
+        word: Word,
+        saveClick: (word: String, translation: String) -> Unit
     ): AlertDialog {
-        val dialogView: View = activity.layoutInflater.inflate(R.layout.dialog_rename_word, null)
-        val editTextWord: EditText = dialogView.rename_word_edit
-        val editTextTranslation: EditText = dialogView.rename_translation_edit
-        val saveButton: Button = dialogView.rename_and_close_button
-        val cancelButton: TextView = dialogView.cancel_word_rename_button
-        val errorMessageWord: TextView = dialogView.word_rename_error
-        val errorMessageTranslation: TextView = dialogView.rename_translation_error
+        val binding = DialogRenameWordBinding.inflate(activity.layoutInflater)
+        val editTextWord: EditText = binding.renameWordEdit
+        val editTextTranslation: EditText = binding.renameTranslationEdit
+        val saveButton: Button = binding.renameAndCloseButton
+        val cancelButton: TextView = binding.cancelWordRenameButton
+        val errorMessageWord: TextView = binding.wordRenameError
+        val errorMessageTranslation: TextView = binding.renameTranslationError
 
         val dialogBuilder = AlertDialog.Builder(activity)
         return dialogBuilder.create().apply {
-            setView(dialogView)
+            setView(binding.root)
             editTextTranslation.requestFocus()
             errorMessageWord.show(false)
             errorMessageTranslation.show(false)
@@ -58,8 +58,8 @@ class DialogFactory {
                 if (inputTranslation.isNotEmpty()) {
                     errorMessageTranslation.show(false)
                     saveClick(
-                            inputWord,
-                            inputTranslation
+                        inputWord,
+                        inputTranslation
                     )
                 } else errorMessageTranslation.show(true)
             }
@@ -87,10 +87,10 @@ class DialogFactory {
     }
 
     fun buildDeleteWordDialog(
-            activity: Activity,
-            title: String,
-            message: String,
-            deleteClick: () -> Unit
+        activity: Activity,
+        title: String,
+        message: String,
+        deleteClick: () -> Unit
     ): AlertDialog.Builder {
         return AlertDialog.Builder(activity).apply {
             setTitle(title)
@@ -102,24 +102,23 @@ class DialogFactory {
     }
 
     fun buildStartQuizDialog(
-            dictionaryId: Long,
-            activity: Activity,
-            dictionaryName: String,
-            doItClick: (selectedDirection: Int, dictionaryId: Long, selectedQuizType: Int, quizSize: Int?) -> Unit
+        dictionaryId: Long,
+        activity: Activity,
+        dictionaryName: String,
+        doItClick: (selectedDirection: Int, dictionaryId: Long, selectedQuizType: Int, quizSize: Int?) -> Unit
     ): AlertDialog {
         var selectedDirection = 0
         var selectedQuizType = 0
-        val inflater = activity.layoutInflater
-        val dialogView: View = inflater.inflate(R.layout.dialog_start_quiz, null)
-        val directionRadioGroup: RadioGroup = dialogView.direction_radioGroup
-        val quizTypeRadioGroup: RadioGroup = dialogView.quiz_type_radioGroup
-        val doItButton: Button = dialogView.from_dictionary_lets_do_it
-        val cancelButton: Button = dialogView.from_dictionary_cancel
-        val customEditText: TextInputEditText = dialogView.custom_quiz_size
-        val textLayout: TextInputLayout = dialogView.custom_quiz_layout
+        val binding = DialogStartQuizBinding.inflate(activity.layoutInflater)
+        val directionRadioGroup: RadioGroup = binding.directionRadioGroup
+        val quizTypeRadioGroup: RadioGroup = binding.quizTypeRadioGroup
+        val doItButton: Button = binding.fromDictionaryLetsDoIt
+        val cancelButton: Button = binding.fromDictionaryCancel
+        val customEditText: TextInputEditText = binding.customQuizSize
+        val textLayout: TextInputLayout = binding.customQuizLayout
         val dialogBuilder = AlertDialog.Builder(activity)
         return dialogBuilder.create().apply {
-            setView(dialogView)
+            setView(binding.root)
             directionRadioGroup.setOnCheckedChangeListener { _, checkedId ->
                 selectedDirection = if (checkedId == R.id.from_dictionary_word_radio) 0 else 1
             }
@@ -129,18 +128,22 @@ class DialogFactory {
                         selectedQuizType = 0
                         textLayout.visibility = View.GONE
                     }
+
                     R.id.full_quiz_radio -> {
                         selectedQuizType = 1
                         textLayout.visibility = View.GONE
                     }
+
                     R.id.weakness_quiz_radio -> {
                         selectedQuizType = 2
                         textLayout.visibility = View.GONE
                     }
+
                     R.id.custom_quiz_radio -> {
                         selectedQuizType = 3
                         textLayout.visibility = View.VISIBLE
                     }
+
                     else -> throw IllegalStateException("Unknown quiz type: $this")
                 }
                 selectedQuizType = when (checkedTypeId) {
@@ -153,17 +156,27 @@ class DialogFactory {
             }
 
             doItButton.setOnClickListener {
-                if(selectedQuizType == 3) {
-                    customEditText.text?.let{
-                        if(it.isEmpty() || it.toString() == "0"){
+                if (selectedQuizType == 3) {
+                    customEditText.text?.let {
+                        if (it.isEmpty() || it.toString() == "0") {
                             textLayout.error = activity.getString(R.string.custom_dialog_error)
                         } else {
-                            doItClick(selectedDirection, dictionaryId, selectedQuizType, it.toString().stringToInt())
+                            doItClick(
+                                selectedDirection,
+                                dictionaryId,
+                                selectedQuizType,
+                                it.toString().stringToInt()
+                            )
                             dismiss()
                         }
                     }
                 } else {
-                    doItClick(selectedDirection, dictionaryId, selectedQuizType, customEditText.text.toString().stringToInt())
+                    doItClick(
+                        selectedDirection,
+                        dictionaryId,
+                        selectedQuizType,
+                        customEditText.text.toString().stringToInt()
+                    )
                     dismiss()
                 }
 
@@ -185,24 +198,23 @@ class DialogFactory {
     }
 
     fun buildWordCreateDialog(
-            activity: Activity,
-            createClick: (wordText: String, translationText: String) -> Unit,
-            addMoreClick: (wordText: String, translationText: String) -> Unit
+        activity: Activity,
+        createClick: (wordText: String, translationText: String) -> Unit,
+        addMoreClick: (wordText: String, translationText: String) -> Unit
 
     ): AlertDialog {
-        val inflater = activity.layoutInflater
-        val dialogView: View = inflater.inflate(R.layout.dialog_create_word, null)
-        val editTextWord: EditText = dialogView.new_word_edit
-        val editTextTranslation: EditText = dialogView.new_translation_edit
-        val saveButton: Button = dialogView.create_and_close_button
-        val addMoreButton: Button = dialogView.create_and_keep_adding_button
-        val cancelButton: TextView = dialogView.cancel_word_adding_button
-        val errorMessageWord: TextView = dialogView.word_name_error
-        val errorMessageTranslation: TextView = dialogView.word_translation_error
+        val binding = DialogCreateWordBinding.inflate(activity.layoutInflater)
+        val editTextWord: EditText = binding.newWordEdit
+        val editTextTranslation: EditText = binding.newTranslationEdit
+        val saveButton: Button = binding.createAndCloseButton
+        val addMoreButton: Button = binding.createAndKeepAddingButton
+        val cancelButton: TextView = binding.cancelWordAddingButton
+        val errorMessageWord: TextView = binding.wordNameError
+        val errorMessageTranslation: TextView = binding.wordTranslationError
 
         val dialogBuilder = AlertDialog.Builder(activity)
         return dialogBuilder.create().apply {
-            setView(dialogView)
+            setView(binding.root)
             editTextTranslation.requestFocus()
             errorMessageWord.show(false)
             errorMessageTranslation.show(false)
@@ -214,8 +226,9 @@ class DialogFactory {
                 if (inputTranslation.isNotEmpty()) {
                     errorMessageTranslation.show(false)
                     createClick(
-                            inputWord,
-                            inputTranslation)
+                        inputWord,
+                        inputTranslation
+                    )
                     editTextWord.setText("")
                     editTextTranslation.setText("")
                     editTextTranslation.requestFocus()
@@ -231,8 +244,8 @@ class DialogFactory {
                 if (inputTranslation.isNotEmpty()) {
                     errorMessageTranslation.show(false)
                     addMoreClick(
-                            inputWord,
-                            inputTranslation
+                        inputWord,
+                        inputTranslation
                     )
                     editTextWord.setText("")
                     editTextTranslation.setText("")
@@ -252,18 +265,18 @@ class DialogFactory {
     }
 
     fun buildDictionaryRenameDialog(
-            activity: Activity,
-            dictionary: Dictionary,
-            renameClick: (renameTo: String) -> Unit): AlertDialog {
-        val inflater = activity.layoutInflater
-        val dialogView: View = inflater.inflate(R.layout.dialog_rename_dictionary, null)
-        val editText: EditText = dialogView.rename_dictionary_edit
-        val renameButton: Button = dialogView.rename_dictionary_button
-        val cancelButton: Button = dialogView.cancel_dictionary_rename_dialog
-        val errorMessage: TextView = dialogView.dictionary_name_error_rename
+        activity: Activity,
+        dictionary: Dictionary,
+        renameClick: (renameTo: String) -> Unit
+    ): AlertDialog {
+        val binding = DialogRenameDictionaryBinding.inflate(activity.layoutInflater)
+        val editText: EditText = binding.renameDictionaryEdit
+        val renameButton: Button = binding.renameDictionaryButton
+        val cancelButton: Button = binding.cancelDictionaryRenameDialog
+        val errorMessage: TextView = binding.dictionaryNameErrorRename
         val dialogBuilder = AlertDialog.Builder(activity)
         return dialogBuilder.create().apply {
-            setView(dialogView)
+            setView(binding.root)
             errorMessage.show(false)
             setupTextChangedListener(editText, errorMessage)
             cancelButton.setOnClickListener {
@@ -284,20 +297,19 @@ class DialogFactory {
     }
 
     fun buildDictionaryCreateDialog(
-            activity: Activity,
-            title: String,
-            createClick: (nameToCreate: String) -> Unit
+        activity: Activity,
+        title: String,
+        createClick: (nameToCreate: String) -> Unit
     ): AlertDialog {
-        val inflater = activity.layoutInflater
-        val dialogView: View = inflater.inflate(R.layout.dialog_create_dictionary, null)
-        val editText: EditText = dialogView.new_dictionary_edit
-        val createButton: Button = dialogView.create_dictionary_button
-        val cancelButton: Button = dialogView.cancel_dictionary_creation
-        val errorMessage: TextView = dialogView.dictionary_name_error
+        val binding = DialogCreateDictionaryBinding.inflate(activity.layoutInflater)
+        val editText: EditText = binding.newDictionaryEdit
+        val createButton: Button = binding.createDictionaryButton
+        val cancelButton: Button = binding.cancelDictionaryCreation
+        val errorMessage: TextView = binding.dictionaryNameError
 
         val dialogBuilder = AlertDialog.Builder(activity)
         return dialogBuilder.create().apply {
-            setView(dialogView)
+            setView(binding.root)
             errorMessage.show(false)
             setupTextChangedListener(editText, errorMessage)
             createButton.setOnClickListener {
@@ -318,9 +330,9 @@ class DialogFactory {
     }
 
     fun buildInfoDialog(
-            activity: Activity,
-            title: String,
-            message: String
+        activity: Activity,
+        title: String,
+        message: String
     ): AlertDialog.Builder {
         return AlertDialog.Builder(activity).apply {
             setTitle(title)
@@ -332,19 +344,18 @@ class DialogFactory {
     }
 
     fun buildOptionsDialog(
-            activity: Activity,
-            doItClick: (selectedOption: Int) -> Unit
+        activity: Activity,
+        doItClick: (selectedOption: Int) -> Unit
     ): AlertDialog {
         var selectedOption = 0
-        val inflater = activity.layoutInflater
-        val dialogView: View = inflater.inflate(R.layout.dialog_direction_option_picker, null)
-        val radioGroup: RadioGroup = dialogView.radioGroup
-        val doItButton: Button = dialogView.lets_do_it_button
-        val cancelButton: Button = dialogView.cancel_direction_picker_dialog
-        val errorMessage: TextView = dialogView.option_picker_error
+        val binding = DialogDirectionOptionPickerBinding.inflate(activity.layoutInflater)
+        val radioGroup: RadioGroup = binding.radioGroup
+        val doItButton: Button = binding.letsDoItButton
+        val cancelButton: Button = binding.cancelDirectionPickerDialog
+        val errorMessage: TextView = binding.optionPickerError
         val dialogBuilder = AlertDialog.Builder(activity)
         return dialogBuilder.create().apply {
-            setView(dialogView)
+            setView(binding.root)
             radioGroup.setOnCheckedChangeListener { _, checkedId ->
                 errorMessage.show(false)
                 selectedOption = if (checkedId == R.id.word_radio) 0 else 1
@@ -365,19 +376,18 @@ class DialogFactory {
     }
 
     fun buildQuotesDialog(
-            activity: Activity,
-            titleText: String,
-            quoteText: String,
-            authorText: String
+        activity: Activity,
+        titleText: String,
+        quoteText: String,
+        authorText: String
     ): AlertDialog {
-        val inflater = activity.layoutInflater
-        val dialogView: View = inflater.inflate(R.layout.dialog_quote, null)
-        val thanksButton: Button = dialogView.quote_thanks_button
-        val quote: TextView = dialogView.quote_text
-        val author: TextView = dialogView.quote_author
+        val binding: DialogQuoteBinding = DialogQuoteBinding.inflate(activity.layoutInflater)
+        val thanksButton: Button = binding.quoteThanksButton
+        val quote: TextView = binding.quoteText
+        val author: TextView = binding.quoteAuthor
         val dialogBuilder = AlertDialog.Builder(activity)
         return dialogBuilder.create().apply {
-            setView(dialogView)
+            setView(binding.root)
             quote.text = activity.getString(R.string.quote_text, quoteText)
             author.text = authorText
             thanksButton.setOnClickListener {
@@ -388,21 +398,20 @@ class DialogFactory {
     }
 
     fun buildCustomQuizSizeDialog(
-            activity: Activity,
-            titleText: String,
-            doItClick: (size: Int) -> Unit
+        activity: Activity,
+        titleText: String,
+        doItClick: (size: Int) -> Unit
     ): AlertDialog {
-        val inflater = activity.layoutInflater
-        val dialogView: View = inflater.inflate(R.layout.dialog_add_quiz_size, null)
-        val startButton: Button = dialogView.start_button
-        val customSize: TextInputEditText = dialogView.quiz_size
-        val textLayout = dialogView.quiz_size_layout
+        val binding = DialogAddQuizSizeBinding.inflate(activity.layoutInflater)
+        val startButton: Button = binding.startButton
+        val customSize: TextInputEditText = binding.quizSize
+        val textLayout = binding.quizSizeLayout
         val dialogBuilder = MaterialAlertDialogBuilder(activity)
         return dialogBuilder.create().apply {
-            setView(dialogView)
+            setView(binding.root)
             startButton.setOnClickListener {
-                customSize.text?.let{
-                    if(it.isEmpty() || it.toString() == "0"){
+                customSize.text?.let {
+                    if (it.isEmpty() || it.toString() == "0") {
                         textLayout.error = activity.getString(R.string.custom_dialog_error)
                     } else {
                         doItClick(it.toString().toInt())
