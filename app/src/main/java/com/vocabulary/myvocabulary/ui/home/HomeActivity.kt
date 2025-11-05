@@ -13,13 +13,13 @@ import com.vocabulary.myvocabulary.ui.dictionaries.Dictionary
 import com.vocabulary.myvocabulary.ui.dictionaries.ShareDictionaryViewModel
 import com.vocabulary.myvocabulary.utils.DialogFactory
 import org.koin.android.ext.android.inject
-import androidx.activity.viewModels
+import org.koin.androidx.viewmodel.ext.android.viewModel
 import java.util.*
 
 class HomeActivity : AppCompatActivity() {
     private var importDialog: AlertDialog? = null
-    private val homeViewModel: HomeViewModel by viewModels()
-    private val shareViewModel: ShareDictionaryViewModel by viewModels()
+    private val homeViewModel: HomeViewModel by viewModel()
+    private val shareViewModel: ShareDictionaryViewModel by viewModel()
     private val dialogFactory: DialogFactory by inject()
 
     @SuppressLint("PrivateResource")
