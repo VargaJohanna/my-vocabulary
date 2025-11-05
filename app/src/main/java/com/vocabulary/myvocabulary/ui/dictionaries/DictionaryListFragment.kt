@@ -118,7 +118,7 @@ class DictionaryListFragment : Fragment(), DictionaryAdapter.ItemClickListener {
                     getString(R.string.create_new_dictionary_dialog_title)
             ) { nameToCreate ->
                 viewModel.insertDictionary(viewModel.createDictionaryObject(nameToCreate))
-                viewModel.newlyCreatedItemDetails.observe(requireActivity(), Observer { event ->
+                viewModel.newlyCreatedItemDetails.observe(viewLifecycleOwner, Observer { event ->
                     event.getContentIfNotHandled()?.let {
                         val action = DictionaryListFragmentDirections.actionDictionaryToWordList(it.dictionaryId, it.dictionaryName)
                         findNavController().navigate(action)

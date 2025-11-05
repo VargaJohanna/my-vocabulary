@@ -81,7 +81,7 @@ class QuizFragment : Fragment() {
     }
 
     private fun setNextButtonIconUpdateListener(fab: FloatingActionButton) {
-        quizViewModel.getUpdateIcon().observe(requireActivity(), Observer {
+        quizViewModel.getUpdateIcon().observe(viewLifecycleOwner, Observer {
             fab.setImageDrawable(
                 ContextCompat
                     .getDrawable(
@@ -94,7 +94,7 @@ class QuizFragment : Fragment() {
 
     private fun observeWordList(quizAdapter: QuizAdapter, progressBar: ProgressBar) {
         progressBar.show(true)
-        quizViewModel.getLiveWordList().observe(requireActivity(), Observer {
+        quizViewModel.getLiveWordList().observe(viewLifecycleOwner, Observer {
             if (!quizViewModel.isDictionaryEmpty) {
                 quizAdapter.updateList(it)
                 progressBar.show(false)

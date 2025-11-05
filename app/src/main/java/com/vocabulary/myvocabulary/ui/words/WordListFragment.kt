@@ -85,7 +85,7 @@ class WordListFragment : Fragment() {
                     wordViewModel.setSearchBarStatus(false)
                 }
             }
-            wordViewModel.isListEmpty().observe(requireActivity(), Observer { isListEmpty ->
+            wordViewModel.isListEmpty().observe(viewLifecycleOwner, Observer { isListEmpty ->
                 inflateToolbarMenu(isListEmpty, toolbar)
             })
         }
@@ -157,12 +157,23 @@ class WordListFragment : Fragment() {
 
     private fun observeWordList(progressBar: ProgressBar) {
         progressBar.show(true)
-        wordViewModel.getLiveWordList().observe(requireActivity(), Observer { data ->
+        wordViewModel.getLiveWordList().observe(viewLifecycleOwner, Observer { data ->
             val wordList = data.first
             val isSearchOpen = data.second
             val items = ArrayList<Item<out GroupieViewHolder>>()
-            items += wordList.map { WordItem(it) { selectedItem: WordItem -> onItemClick(selectedItem) } }
-            items += NumberOfWordsItem(String.format(getString(R.string.number_of_words), wordList.size))
+            items += wordList.map {
+                WordItem(it) { selectedItem: WordItem ->
+                    onItemClick(
+                        selectedItem
+                    )
+                }
+            }
+            items += NumberOfWordsItem(
+                String.format(
+                    getString(R.string.number_of_words),
+                    wordList.size
+                )
+            )
             wordAdapter.update(items)
 
             progressBar.show(false)
@@ -172,7 +183,7 @@ class WordListFragment : Fragment() {
     }
 
     private fun observeEmptyState() {
-        wordViewModel.isListEmpty().observe(requireActivity(), Observer {
+        wordViewModel.isListEmpty().observe(viewLifecycleOwner, Observer {
             showEmptyState(it)
         })
     }
@@ -258,7 +269,7 @@ class WordListFragment : Fragment() {
     }
 
     private fun observeSearchBarStatus(searchWrapper: ConstraintLayout) {
-        wordViewModel.isSearchBarOpen().observe(requireActivity(), Observer {
+        wordViewModel.isSearchBarOpen().observe(viewLifecycleOwner, Observer {
             searchWrapper.display(it)
             if (!it) binding.searchField.text?.clear()
         })

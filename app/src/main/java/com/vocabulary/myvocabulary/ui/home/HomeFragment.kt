@@ -45,7 +45,7 @@ class HomeFragment : Fragment() {
     }
 
     private fun showQuote(quoteButton: ImageButton) {
-        homeViewModel.liveQuote.observe(requireActivity(), Observer { quoteData ->
+        homeViewModel.liveQuote.observe(viewLifecycleOwner, Observer { quoteData ->
             if (quoteData != QuoteData.EMPTY) {
                 quoteButton.show(true)
                 quoteButton.setOnClickListener {
