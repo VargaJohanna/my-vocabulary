@@ -7,7 +7,10 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
@@ -43,17 +46,28 @@ fun ButtonCard(onButtonClick: () -> Unit, text: String) {
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Preview
 @Composable
 fun HomePreview() {
     val onClickDictionaries: () -> Unit = {}
     val onClickQuiz: () -> Unit = {}
-    FlowColumn(
-        modifier = Modifier.fillMaxSize(),
-        verticalArrangement = Arrangement.SpaceEvenly
+    Scaffold(
+        topBar = {
+            colors =
+            TopAppBar(
+                title = {Text("My Vocabulary")}
+            )
+        }
     ) {
-        ButtonCard( onButtonClick = onClickDictionaries, text = "Dictionaries")
 
-        ButtonCard( onButtonClick = onClickQuiz, text = "Quiz")
+        FlowColumn(
+            modifier = Modifier.fillMaxSize(),
+            verticalArrangement = Arrangement.SpaceEvenly
+        ) {
+            ButtonCard( onButtonClick = onClickDictionaries, text = "Dictionaries")
+
+            ButtonCard( onButtonClick = onClickQuiz, text = "Quiz")
+        }
     }
 }

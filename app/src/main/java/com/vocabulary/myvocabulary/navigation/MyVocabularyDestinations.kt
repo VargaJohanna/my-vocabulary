@@ -17,3 +17,6 @@ object Home: MyVocabularyDestinations {
 object DictionaryList: MyVocabularyDestinations {
     override val route: String = "dictionaryList"
 }
+object About: MyVocabularyDestinations {
+    override val route: String = "about"
+}
