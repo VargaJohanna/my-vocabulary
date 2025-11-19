@@ -4,6 +4,8 @@ plugins {
     id 'kotlin-kapt'
     id 'androidx.navigation.safeargs.kotlin'
     alias(libs.plugins.compose.compiler)
+    alias(libs.plugins.kotlin.serialization)
+
 }
 android {
     namespace = "com.vocabulary.myvocabulary"
@@ -164,5 +166,6 @@ dependencies {
     implementation libs.androidx.runtime.livedata
     implementation libs.androidx.lifecycle.viewmodel.compose
     implementation libs.androidx.runtime.rxjava2
+    implementation libs.androidx.compose.material.iconsExtended
 
 }

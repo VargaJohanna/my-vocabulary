@@ -16,20 +16,20 @@ fun MyVocabularyNavHost(
 ) {
     NavHost(
         navController = navController,
-        startDestination = Home.route,
+        startDestination = Home,
         modifier = modifier
     ) {
-        composable(route = Home.route) {
+        composable<Home> {
             HomeScreen(
-                onClickDictionaries = { navController.navigate(DictionaryList.route) }
+                onClickDictionaries = { navController.navigate(DictionaryList) }
             )
         }
 
-        composable (route = DictionaryList.route){
+        composable<DictionaryList> {
             DictionaryListScreen()
         }
 
-        composable (route = About.route){
+        composable<About> {
             AboutScreen()
         }
     }

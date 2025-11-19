@@ -52,22 +52,12 @@ fun ButtonCard(onButtonClick: () -> Unit, text: String) {
 fun HomePreview() {
     val onClickDictionaries: () -> Unit = {}
     val onClickQuiz: () -> Unit = {}
-    Scaffold(
-        topBar = {
-            colors =
-            TopAppBar(
-                title = {Text("My Vocabulary")}
-            )
-        }
+    FlowColumn(
+        modifier = Modifier.fillMaxSize(),
+        verticalArrangement = Arrangement.SpaceEvenly
     ) {
+        ButtonCard( onButtonClick = onClickDictionaries, text = "Dictionaries")
 
-        FlowColumn(
-            modifier = Modifier.fillMaxSize(),
-            verticalArrangement = Arrangement.SpaceEvenly
-        ) {
-            ButtonCard( onButtonClick = onClickDictionaries, text = "Dictionaries")
-
-            ButtonCard( onButtonClick = onClickQuiz, text = "Quiz")
-        }
+        ButtonCard( onButtonClick = onClickQuiz, text = "Quiz")
     }
 }

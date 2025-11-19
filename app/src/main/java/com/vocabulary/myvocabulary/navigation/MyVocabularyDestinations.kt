@@ -1,22 +1,18 @@
 package com.vocabulary.myvocabulary.navigation
 
+import kotlinx.serialization.Serializable
+
 /**
  * Contract for information needed on every MyVocabulary navigation destination
  */
-interface MyVocabularyDestinations {
-    val route: String
-}
+interface MyVocabularyDestinations
 
 /**
  * MyVocabulary app navigation destinations
  */
-object Home: MyVocabularyDestinations {
-    override val route: String = "home"
-}
-
-object DictionaryList: MyVocabularyDestinations {
-    override val route: String = "dictionaryList"
-}
-object About: MyVocabularyDestinations {
-    override val route: String = "about"
-}
+@Serializable
+object Home: MyVocabularyDestinations
+@Serializable
+object DictionaryList: MyVocabularyDestinations
+@Serializable
+object About: MyVocabularyDestinations

@@ -9,10 +9,21 @@ import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AlertDialog
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Info
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.Observer
 import androidx.navigation.compose.currentBackStackEntryAsState
@@ -119,14 +130,40 @@ class HomeActivity : ComponentActivity() {
 
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MyVocabularyApp() {
     ComposeTheme {
         val navController = rememberNavController()
         val currentBackStack by navController.currentBackStackEntryAsState()
         val currentDestination = currentBackStack?.destination
+        val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
 
-        Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
+        Scaffold(
+            modifier = Modifier
+                .fillMaxSize()
+                .nestedScroll(scrollBehavior.nestedScrollConnection),
+            topBar = {
+                TopAppBar(
+                    title = {Text(text = "My Vocabulary")},
+                    navigationIcon = {
+                        IconButton(onClick = {
+                            navController.navigateUp()
+                        }) {
+                            Icon(imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                                contentDescription = "Go back")
+                        }
+                    },
+                    actions = {
+                        IconButton(onClick = {}) {
+                            Icon(imageVector = Icons.Default.Info,
+                                contentDescription = "Info about developer")
+                        }
+                    },
+                    scrollBehavior = scrollBehavior
+                )
+            }
+            ) { innerPadding ->
             MyVocabularyNavHost(
                 navController = navController,
                 modifier = Modifier.padding(innerPadding))
