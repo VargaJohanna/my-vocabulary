@@ -111,5 +111,9 @@
     <string name="dictionary_title">Cím</string>
     <string name="custom_dialog_title">Hány szó legyen?</string>
     <string name="custom_dialog_error">Ennél kicsit  többet</string>
+    <string name="back_arrow">Vissza</string>
+    <string name="home_info">A fejlesztőröl</string>
+    <string name="about_appbar">Rólunk</string>
+
 
 </resources>

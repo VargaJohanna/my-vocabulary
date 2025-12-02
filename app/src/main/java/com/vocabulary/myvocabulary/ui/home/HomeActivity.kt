@@ -24,13 +24,17 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.Observer
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.findNavController
 import com.vocabulary.myvocabulary.R
+import com.vocabulary.myvocabulary.navigation.About
 import com.vocabulary.myvocabulary.navigation.MyVocabularyNavHost
+import com.vocabulary.myvocabulary.navigation.MyVocabularyTopAppBar
+import com.vocabulary.myvocabulary.ui.about.AboutScreen
 import com.vocabulary.myvocabulary.ui.dictionaries.Dictionary
 import com.vocabulary.myvocabulary.ui.dictionaries.ShareDictionaryViewModel
 import com.vocabulary.myvocabulary.ui.theme.ComposeTheme
@@ -135,8 +139,6 @@ class HomeActivity : ComponentActivity() {
 fun MyVocabularyApp() {
     ComposeTheme {
         val navController = rememberNavController()
-        val currentBackStack by navController.currentBackStackEntryAsState()
-        val currentDestination = currentBackStack?.destination
         val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
 
         Scaffold(
@@ -144,29 +146,16 @@ fun MyVocabularyApp() {
                 .fillMaxSize()
                 .nestedScroll(scrollBehavior.nestedScrollConnection),
             topBar = {
-                TopAppBar(
-                    title = {Text(text = "My Vocabulary")},
-                    navigationIcon = {
-                        IconButton(onClick = {
-                            navController.navigateUp()
-                        }) {
-                            Icon(imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                                contentDescription = "Go back")
-                        }
-                    },
-                    actions = {
-                        IconButton(onClick = {}) {
-                            Icon(imageVector = Icons.Default.Info,
-                                contentDescription = "Info about developer")
-                        }
-                    },
-                    scrollBehavior = scrollBehavior
+                MyVocabularyTopAppBar(
+                    navController = navController,
+                    scrollBehavior = scrollBehavior,
                 )
             }
-            ) { innerPadding ->
+        ) { innerPadding ->
             MyVocabularyNavHost(
                 navController = navController,
-                modifier = Modifier.padding(innerPadding))
+                modifier = Modifier.padding(innerPadding)
+            )
 
         }
 

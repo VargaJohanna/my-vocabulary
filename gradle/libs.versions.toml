@@ -3,9 +3,10 @@ activityCompose = "1.11.0"
 coreKtx = "1.8.1"
 ktx = "1.17.0"
 lifecycleViewmodelCompose = "2.9.4"
-kotlin = "2.0.0"
+kotlin = "2.2.0"
 serialization = "2.2.21"
 material3 = "1.4.0"
+lifecycleViewmodelKtx = "2.9.4"
 
 [libraries]
 androidx-activity-compose = { module = "androidx.activity:activity-compose", version.ref = "activityCompose" }
@@ -22,6 +23,7 @@ androidx-ui-tooling-preview = { module = "androidx.compose.ui:ui-tooling-preview
 core-ktx = { module = "com.google.android.play:core-ktx", version.ref = "coreKtx" }
 kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "serialization"}
 androidx-compose-material-iconsExtended = { group = "androidx.compose.material", name = "material-icons-extended" }
+androidx-lifecycle-viewmodel-ktx = { group = "androidx.lifecycle", name = "lifecycle-viewmodel-ktx", version.ref = "lifecycleViewmodelKtx" }
 
 [plugins]
 jetbrains-kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
