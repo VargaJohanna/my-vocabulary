@@ -4,6 +4,7 @@
 /.idea/caches/build_file_checksums.ser
 /.idea/libraries
 /.idea/*.xml
+/.idea/caches
 .DS_Store
 /build
 /captures
