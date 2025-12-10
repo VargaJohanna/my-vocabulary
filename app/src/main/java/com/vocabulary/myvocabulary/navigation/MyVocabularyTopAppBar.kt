@@ -24,14 +24,13 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import com.vocabulary.myvocabulary.R
 
-@Composable
 @OptIn(ExperimentalMaterial3Api::class)
+@Composable
 fun MyVocabularyTopAppBar(
     navController: NavController,
     scrollBehavior: TopAppBarScrollBehavior? = null,
     modifier: Modifier = Modifier
 ) {
-
     TopAppBar(
         title = { Text(text = stringResource(R.string.app_name)) },
         navigationIcon = {

@@ -10,6 +10,15 @@ import android.widget.ProgressBar
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.Toolbar
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.ListItem
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.ComposeView
 import androidx.core.view.forEach
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
@@ -29,6 +38,7 @@ import io.reactivex.disposables.CompositeDisposable
 import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import com.vocabulary.myvocabulary.databinding.FragmentDictionaryListBinding
+import com.vocabulary.myvocabulary.navigation.DictionaryList
 
 class DictionaryListFragment : Fragment(), DictionaryAdapter.ItemClickListener {
     private var _binding: FragmentDictionaryListBinding? = null
@@ -66,7 +76,6 @@ class DictionaryListFragment : Fragment(), DictionaryAdapter.ItemClickListener {
         val dictionaryAdapter = DictionaryAdapter(ArrayList(), this, true)
         shareViewModel.fetchCsvUri()
 
-        val dictionaryRecyclerView = view.findViewById<RecyclerView>(R.id.dictionary_recycler_view)
         val progressBar = view.findViewById<ProgressBar>(R.id.progress_bar)
         val dictionaryFab = view.findViewById<FloatingActionButton>(R.id.dictionary_fab)
         val importContainer = view.findViewById<LinearLayout>(R.id.import_container)
@@ -75,7 +84,7 @@ class DictionaryListFragment : Fragment(), DictionaryAdapter.ItemClickListener {
         val importFab = view.findViewById<FloatingActionButton>(R.id.import_fab)
         val dictionaryListToolbar = view.findViewById<Toolbar>(R.id.dictionary_list_toolbar)
 
-        generateDictionaryList(dictionaryAdapter, dictionaryRecyclerView)
+        generateDictionaryList(dictionaryAdapter, binding.composeView)
         observeList(dictionaryAdapter, progressBar)
         setFabOnClickListener(dictionaryFab, importContainer, createNewContainer)
         setCreateNewFabOnClickListener(createNewFab)
@@ -88,10 +97,10 @@ class DictionaryListFragment : Fragment(), DictionaryAdapter.ItemClickListener {
         })
     }
 
-    private fun generateDictionaryList(dictionaryAdapter: DictionaryAdapter, recyclerView: RecyclerView) {
-        recyclerView.apply {
-            layoutManager = LinearLayoutManager(requireContext(), RecyclerView.VERTICAL, false)
-            adapter = dictionaryAdapter
+    private fun generateDictionaryList(adapter: DictionaryAdapter, composeView: ComposeView) {
+
+        composeView.setContent {
+            adapter.DictionaryList()
         }
     }
 

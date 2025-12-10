@@ -114,5 +114,6 @@
     <string name="back_arrow">Go back</string>
     <string name="home_info">Info about developer</string>
     <string name="about_appbar">About</string>
+    <string name="dict_options_description">Dictionary Options Button</string>
 
 </resources>

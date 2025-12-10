@@ -3,6 +3,7 @@ package com.vocabulary.myvocabulary.ui.dictionaries
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.vocabulary.myvocabulary.ext.plusAssign
 import com.vocabulary.myvocabulary.repositories.dictionary.DictionaryRepository
 import com.vocabulary.myvocabulary.repositories.quiz.CustomQuizRepository
@@ -16,6 +17,9 @@ import com.vocabulary.myvocabulary.utils.Event
 import io.reactivex.Completable
 import io.reactivex.Single
 import io.reactivex.disposables.CompositeDisposable
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.launch
 import java.util.*
 
 class DictionaryListViewModel(
@@ -25,9 +29,9 @@ class DictionaryListViewModel(
         private val sortByRepository: SortDictionaryRepository,
         private val sortedListRepository: SortedListRepository,
         private val customQuizRepository: CustomQuizRepository
-
 ) : ViewModel() {
-
+    private val _dictionaries: MutableStateFlow<List<Dictionary>> = MutableStateFlow(emptyList())
+    val dictionaries: StateFlow<List<Dictionary>> = _dictionaries
     private val disposables = CompositeDisposable()
     private val _liveDictionaryList: MutableLiveData<List<Dictionary>> = MutableLiveData()
     val liveDictionaryList: LiveData<List<Dictionary>> = _liveDictionaryList
@@ -38,10 +42,14 @@ class DictionaryListViewModel(
     private val isListEmpty = MutableLiveData<Boolean>()
 
     init {
-        observeList()
+//        observeList()
         observeSortByData()
     }
-
+    fun fetchDictionaries() {
+        viewModelScope.launch {
+            observeList()
+        }
+    }
     fun insertDictionary(dictionary: Dictionary) {
         disposables += Single.fromCallable { dictionaryRepository.createDictionary(dictionary) }
                 .subscribeOn(rxSchedulers.io())
@@ -57,6 +65,7 @@ class DictionaryListViewModel(
                 .observeOn(rxSchedulers.main())
                 .subscribe {
                     _liveDictionaryList.postValue(it)
+                    _dictionaries.value = it
                     isListEmpty.value = it.isEmpty()
                 }
     }

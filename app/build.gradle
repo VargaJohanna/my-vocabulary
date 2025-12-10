@@ -65,13 +65,11 @@ dependencies {
     def mockito_core_version = "5.20.0"
     def mockito_kotlin_version = "2.2.0"
     def assertj_core_version = "3.27.6"
-    def koin_core_version = "4.1.0"
     def material_about_version = "0.2.3"
     def rx_preferences_version = "2.0.1"
     def retrofit_version = "3.0.0"
     def apache_csv_version = "1.14.1"
     def groupie_version = "2.10.1"
-    def play_core_kotlin_version = "1.8.1"
     def sandbox_version = "1.0.0-alpha13"
     def nav_latest_version = "2.9.6"
 
@@ -108,11 +106,6 @@ dependencies {
     testImplementation "androidx.arch.core:core-testing:$lifecycle_version"
     testImplementation "org.assertj:assertj-core:$assertj_core_version"
 
-    //ViewModel
-//    implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:2.10.0"
-//    implementation "androidx.lifecycle:lifecycle-extensions:$lifecycle_version"
-//    kapt "androidx.lifecycle:lifecycle-compiler:$lifecycle_version"
-
     //Navigation
     implementation libs.androidx.ktx
     implementation "androidx.navigation:navigation-fragment:$nav_latest_version"
@@ -122,8 +115,9 @@ dependencies {
     implementation "androidx.navigation:navigation-compose:$nav_latest_version"
 
     //Koin
-    implementation "io.insert-koin:koin-core:$koin_core_version"
-    implementation "io.insert-koin:koin-android:$koin_core_version"
+//    implementation "io.insert-koin:koin-core:$koin_core_version"
+//    implementation "io.insert-koin:koin-android:$koin_core_version"
+
 
     //Lottie animation
     implementation "com.airbnb.android:lottie:$lottie_version"
@@ -165,5 +159,11 @@ dependencies {
     implementation libs.androidx.lifecycle.viewmodel.compose
     implementation libs.androidx.runtime.rxjava2
     implementation libs.androidx.compose.material.iconsExtended
+    implementation libs.koin.android
+    implementation libs.koin.androidx.compose
+    implementation libs.koin.core
+    implementation libs.koin.compose
+
+
 
 }

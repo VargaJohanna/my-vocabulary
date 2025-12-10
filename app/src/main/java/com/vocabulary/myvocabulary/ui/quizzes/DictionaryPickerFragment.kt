@@ -69,10 +69,10 @@ class DictionaryPickerFragment : Fragment(), DictionaryAdapter.ItemClickListener
     }
 
     private fun generateDictionaryList(dictionaryAdapter: DictionaryAdapter, recyclerView: RecyclerView) {
-        recyclerView.apply {
-            layoutManager = LinearLayoutManager(requireContext(), RecyclerView.VERTICAL, false)
-            adapter = dictionaryAdapter
-        }
+//        recyclerView.apply {
+//            layoutManager = LinearLayoutManager(requireContext(), RecyclerView.VERTICAL, false)
+//            adapter = dictionaryAdapter
+//        }
     }
 
     private fun startQuiz(selectedOption: Int, dictionaryId: Long) {
