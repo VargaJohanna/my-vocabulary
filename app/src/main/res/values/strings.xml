@@ -101,8 +101,8 @@
     <string name="import_dictionary_dialog_title">Import dictionary</string>
     <string name="import_dictionary_menu">Import Dictionary</string>
     <string name="only_csv_import">Only CSV files can be imported.</string>
-    <string name="import_fab_label">Import from CSV file</string>
-    <string name="create_fab_label">Create new</string>
+    <string name="import_fab_label">Import</string>
+    <string name="create_fab_label">New</string>
     <string name="export_menu_label">Share</string>
     <string name="share_file_title">Share file</string>
     <string name="search">Search</string>
@@ -115,5 +115,6 @@
     <string name="home_info">Info about developer</string>
     <string name="about_appbar">About</string>
     <string name="dict_options_description">Dictionary Options Button</string>
+    <string name="dictionary_fab_description">Add dictionary</string>
 
 </resources>

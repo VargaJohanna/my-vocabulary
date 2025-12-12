@@ -102,7 +102,7 @@
     <string name="create_fab_label">Létrehozás</string>
     <string name="import_dictionary_menu">Szótár importálása</string>
     <string name="only_csv_import">Kizárólag CSV fájlok importálhatóak.</string>
-    <string name="import_fab_label">Importálás CSV fájlból</string>
+    <string name="import_fab_label">Import</string>
     <string name="export_menu_label">Megosztás</string>
     <string name="share_file_title">Megosztás</string>
     <string name="search">Keresés</string>
@@ -114,6 +114,8 @@
     <string name="back_arrow">Vissza</string>
     <string name="home_info">A fejlesztőröl</string>
     <string name="about_appbar">Rólunk</string>
+    <string name="dict_options_description">Szótár opciók</string>
+    <string name="dictionary_fab_description">Új szótár</string>
 
 
 </resources>
