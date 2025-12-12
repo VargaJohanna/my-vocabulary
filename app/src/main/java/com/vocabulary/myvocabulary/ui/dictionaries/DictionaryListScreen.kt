@@ -66,7 +66,6 @@ fun DictionaryListScreen() {
     var itemToDelete by remember { mutableStateOf<Dictionary?>(null) }
     var itemToEdit by remember { mutableStateOf<Dictionary?>(null) }
 
-
     ProvideAppBarTitle({ Text(stringResource(R.string.dictionaries_toolbar)) })
 
     Scaffold(
@@ -96,9 +95,9 @@ fun DictionaryListScreen() {
             onDismissRequest = {
                 showCreateDialog = false // Handle dismiss
             },
-            onConfirmation = {
+            onConfirmation = { newTitle ->
                 showCreateDialog = false // Handle confirmation
-                viewModel.insertDictionary(viewModel.createDictionaryObject(it))
+                viewModel.insertDictionary(viewModel.createDictionaryObject(newTitle))
                 //Also need to navigate to the newly created dictionary screen
             },
             dialogTitle = stringResource(R.string.create_new_dictionary_dialog_title)
