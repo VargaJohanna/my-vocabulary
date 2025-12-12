@@ -36,6 +36,7 @@ import com.vocabulary.myvocabulary.repositories.sortBy.dictionary.SortDictionary
 import com.vocabulary.myvocabulary.ui.words.WordDetailsViewModel
 import com.vocabulary.myvocabulary.ui.words.WordListViewModel
 import com.vocabulary.myvocabulary.utils.DialogFactory
+import com.vocabulary.myvocabulary.utils.ComposeDialogFactory
 import org.koin.core.module.dsl.viewModel
 import org.koin.dsl.module
 import retrofit2.Retrofit
@@ -103,5 +104,6 @@ val schedulerModule = module {
 
 val factoryModule = module {
     single { DialogFactory() }
+    single { ComposeDialogFactory() }
 }
 
