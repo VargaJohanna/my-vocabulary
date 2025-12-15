@@ -9,9 +9,11 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.toRoute
 import com.vocabulary.myvocabulary.ui.about.AboutScreen
 import com.vocabulary.myvocabulary.ui.dictionaries.DictionaryListScreen
 import com.vocabulary.myvocabulary.ui.home.HomeScreen
+import com.vocabulary.myvocabulary.ui.words.WordListScreen
 
 @Composable
 fun MyVocabularyNavHost(
@@ -42,8 +44,18 @@ fun MyVocabularyNavHost(
             }
 
             composable<DictionaryList> {
-                DictionaryListScreen()
+                DictionaryListScreen(
+                    onClickDictionaryItem = { dictionaryId, dictionaryName ->
+                        navController.navigate(WordList(dictionaryId, dictionaryName))
+                    }
+                )
             }
+
+            composable<WordList> {
+                val args = it.toRoute<WordList>()
+                WordListScreen(args.dictionaryId, args.dictionaryName)
+            }
+
 
             composable<About> {
                 AboutScreen()

@@ -11,8 +11,16 @@ interface MyVocabularyDestinations
  * MyVocabulary app navigation destinations
  */
 @Serializable
-object Home: MyVocabularyDestinations
+object Home : MyVocabularyDestinations
+
 @Serializable
-object DictionaryList: MyVocabularyDestinations
+object DictionaryList : MyVocabularyDestinations
+
 @Serializable
-object About: MyVocabularyDestinations
+data class WordList(
+    val dictionaryId: Long,
+    val dictionaryName: String
+) : MyVocabularyDestinations
+
+@Serializable
+object About : MyVocabularyDestinations

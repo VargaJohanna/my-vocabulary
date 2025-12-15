@@ -53,7 +53,9 @@ import org.koin.compose.viewmodel.koinViewModel
 import java.util.Calendar
 
 @Composable
-fun DictionaryListScreen() {
+fun DictionaryListScreen(
+    onClickDictionaryItem: (dictionaryId: Long, dictionaryName: String) -> Unit
+) {
     val viewModel: DictionaryListViewModel = koinViewModel()
     val dialogFactory: ComposeDialogFactory = koinInject()
 
@@ -85,6 +87,9 @@ fun DictionaryListScreen() {
                 },
                 onShowEditDialog = { dictionary ->
                     itemToEdit = dictionary
+                },
+                onDictionaryClick = { dictionary ->
+                    onClickDictionaryItem(dictionary.dictionaryId, dictionary.dictionaryName)
                 }
             )
         }
@@ -186,10 +191,12 @@ fun DictionaryItemView(
     dictionaryItem: Dictionary,
     modifier: Modifier = Modifier,
     onShowDeleteDialog: (Dictionary) -> Unit,
-    onShowEditDialog: (Dictionary) -> Unit
+    onShowEditDialog: (Dictionary) -> Unit,
+    onDictionaryClick: (Dictionary) -> Unit
 ) {
     val padding = 8.dp
     Card(
+        onClick = { onDictionaryClick(dictionaryItem) },
         modifier
             .fillMaxWidth()
             .padding(padding),
@@ -261,8 +268,9 @@ fun DictionaryOptionsButton(
 fun DictionaryLazyList(
     list: List<Dictionary>,
     onShowDeleteDialog: (Dictionary) -> Unit,
-    onShowEditDialog: (Dictionary) -> Unit
-    ) {
+    onShowEditDialog: (Dictionary) -> Unit,
+    onDictionaryClick: (Dictionary) -> Unit
+) {
     LazyColumn(
         Modifier.fillMaxSize(),
         contentPadding = PaddingValues(8.dp)
@@ -272,8 +280,9 @@ fun DictionaryLazyList(
                 dictionaryItem = item,
                 modifier = Modifier,
                 onShowDeleteDialog = onShowDeleteDialog,
-                onShowEditDialog = onShowEditDialog
-                )
+                onShowEditDialog = onShowEditDialog,
+                onDictionaryClick = onDictionaryClick
+            )
         }
     }
 }
@@ -294,23 +303,76 @@ fun DictionaryListScreenPreview() {
             ) {
             DictionaryLazyList(
                 list =
-                listOf(
-                    Dictionary(dictionaryId = 1L, dictionaryName = "Test", dictionaryCreated = Calendar.getInstance().time),
-                    Dictionary(dictionaryId = 2L, dictionaryName = "Test2", dictionaryCreated = Calendar.getInstance().time),
-                    Dictionary(dictionaryId = 3L, dictionaryName = "Test3", dictionaryCreated = Calendar.getInstance().time),
-                    Dictionary(dictionaryId = 4L, dictionaryName = "Test4", dictionaryCreated = Calendar.getInstance().time),
-                    Dictionary(dictionaryId = 5L, dictionaryName = "Test5", dictionaryCreated = Calendar.getInstance().time),
-                    Dictionary(dictionaryId = 5L, dictionaryName = "Test5", dictionaryCreated = Calendar.getInstance().time),
-                    Dictionary(dictionaryId = 5L, dictionaryName = "Test5", dictionaryCreated = Calendar.getInstance().time),
-                    Dictionary(dictionaryId = 5L, dictionaryName = "Test5", dictionaryCreated = Calendar.getInstance().time),
-                    Dictionary(dictionaryId = 5L, dictionaryName = "Test5", dictionaryCreated = Calendar.getInstance().time),
-                    Dictionary(dictionaryId = 5L, dictionaryName = "Test5", dictionaryCreated = Calendar.getInstance().time),
-                    Dictionary(dictionaryId = 5L, dictionaryName = "Test5", dictionaryCreated = Calendar.getInstance().time),
-                    Dictionary(dictionaryId = 5L, dictionaryName = "Test5", dictionaryCreated = Calendar.getInstance().time),
-                    Dictionary(dictionaryId = 5L, dictionaryName = "Test5", dictionaryCreated = Calendar.getInstance().time)
+                    listOf(
+                        Dictionary(
+                            dictionaryId = 1L,
+                            dictionaryName = "Test",
+                            dictionaryCreated = Calendar.getInstance().time
+                        ),
+                        Dictionary(
+                            dictionaryId = 2L,
+                            dictionaryName = "Test2",
+                            dictionaryCreated = Calendar.getInstance().time
+                        ),
+                        Dictionary(
+                            dictionaryId = 3L,
+                            dictionaryName = "Test3",
+                            dictionaryCreated = Calendar.getInstance().time
+                        ),
+                        Dictionary(
+                            dictionaryId = 4L,
+                            dictionaryName = "Test4",
+                            dictionaryCreated = Calendar.getInstance().time
+                        ),
+                        Dictionary(
+                            dictionaryId = 5L,
+                            dictionaryName = "Test5",
+                            dictionaryCreated = Calendar.getInstance().time
+                        ),
+                        Dictionary(
+                            dictionaryId = 5L,
+                            dictionaryName = "Test5",
+                            dictionaryCreated = Calendar.getInstance().time
+                        ),
+                        Dictionary(
+                            dictionaryId = 5L,
+                            dictionaryName = "Test5",
+                            dictionaryCreated = Calendar.getInstance().time
+                        ),
+                        Dictionary(
+                            dictionaryId = 5L,
+                            dictionaryName = "Test5",
+                            dictionaryCreated = Calendar.getInstance().time
+                        ),
+                        Dictionary(
+                            dictionaryId = 5L,
+                            dictionaryName = "Test5",
+                            dictionaryCreated = Calendar.getInstance().time
+                        ),
+                        Dictionary(
+                            dictionaryId = 5L,
+                            dictionaryName = "Test5",
+                            dictionaryCreated = Calendar.getInstance().time
+                        ),
+                        Dictionary(
+                            dictionaryId = 5L,
+                            dictionaryName = "Test5",
+                            dictionaryCreated = Calendar.getInstance().time
+                        ),
+                        Dictionary(
+                            dictionaryId = 5L,
+                            dictionaryName = "Test5",
+                            dictionaryCreated = Calendar.getInstance().time
+                        ),
+                        Dictionary(
+                            dictionaryId = 5L,
+                            dictionaryName = "Test5",
+                            dictionaryCreated = Calendar.getInstance().time
+                        )
                     ),
                 onShowDeleteDialog = {},
-                onShowEditDialog = {}
+                onShowEditDialog = {},
+                onDictionaryClick = {}
             )
 
         }
