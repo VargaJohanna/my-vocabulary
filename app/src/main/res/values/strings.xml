@@ -25,7 +25,7 @@
     <string name="dialog_rename_dictionary_dialog_title">Rename dictionary</string>
     <string name="word_list_dictionary_title_hint">Dictionary title</string>
     <string name="word_list_expression">Expression</string>
-    <string name="word_list_meaning">Meaning</string>
+    <string name="word_list_meaning">Translation</string>
     <string name="create_new_word_dialog_title">Create</string>
     <string name="edit_word_dialog_title">Edit</string>
     <string name="save_button_label">Save</string>

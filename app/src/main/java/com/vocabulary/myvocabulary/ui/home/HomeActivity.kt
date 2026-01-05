@@ -9,35 +9,22 @@ import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AlertDialog
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.Info
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.Observer
-import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.findNavController
 import com.vocabulary.myvocabulary.R
-import com.vocabulary.myvocabulary.navigation.About
 import com.vocabulary.myvocabulary.navigation.MyVocabularyNavHost
 import com.vocabulary.myvocabulary.navigation.MyVocabularyTopAppBar
-import com.vocabulary.myvocabulary.ui.about.AboutScreen
 import com.vocabulary.myvocabulary.ui.dictionaries.Dictionary
 import com.vocabulary.myvocabulary.ui.dictionaries.ShareDictionaryViewModel
-import com.vocabulary.myvocabulary.ui.theme.ComposeTheme
+import com.vocabulary.myvocabulary.ui.theme.MyVocabularyTheme
 import com.vocabulary.myvocabulary.utils.DialogFactory
 import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
@@ -137,7 +124,7 @@ class HomeActivity : ComponentActivity() {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MyVocabularyApp() {
-    ComposeTheme {
+    MyVocabularyTheme {
         val navController = rememberNavController()
         val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
 

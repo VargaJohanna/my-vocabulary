@@ -220,7 +220,6 @@ fun DictionaryItemView(
     }
 }
 
-
 @Composable
 fun DictionaryOptionsButton(
     dictionaryItem: Dictionary,
