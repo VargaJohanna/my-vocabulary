@@ -3,6 +3,7 @@ package com.vocabulary.myvocabulary.ui.words
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.vocabulary.myvocabulary.ext.plusAssign
 import com.vocabulary.myvocabulary.repositories.quiz.CustomQuizRepository
 import com.vocabulary.myvocabulary.repositories.quiz.QuizRepository
@@ -17,6 +18,9 @@ import io.reactivex.Completable
 import io.reactivex.Observable
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.functions.BiFunction
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.launch
 import java.util.*
 
 class WordListViewModel(
@@ -31,15 +35,19 @@ class WordListViewModel(
 
 ) : ViewModel() {
     private val disposables = CompositeDisposable()
+    private val _wordList: MutableStateFlow<Pair<List<Word>, Boolean>> = MutableStateFlow(Pair(emptyList(), false))
+    val wordList: StateFlow<Pair<List<Word>, Boolean>> = _wordList
     private val liveWordList: MutableLiveData<Pair<List<Word>, Boolean>> = MutableLiveData()
     var currentSortByData: SortByData = SortByData()
     private val isListEmpty: MutableLiveData<Boolean> = MutableLiveData()
     private val isSearchBarOpenCurrent: MutableLiveData<Boolean> = MutableLiveData()
 
-    init {
-        observeSearchBarStatus()
-        observeSortByData()
-        observeList()
+    fun fetchWordList() {
+        viewModelScope.launch {
+            observeList()
+            observeSearchBarStatus()
+            observeSortByData()
+        }
     }
 
     private fun observeSearchBarStatus() {
@@ -81,6 +89,9 @@ class WordListViewModel(
                     liveWordList.postValue(Pair(
                             first = t,
                             second = isSearchBarOpenCurrent.value ?: false))
+                    _wordList.value = Pair(
+                        first = t,
+                        second = isSearchBarOpenCurrent.value ?: false)
                 }
     }
 
