@@ -1,25 +1,41 @@
 package com.vocabulary.myvocabulary.utils
 
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.fitInside
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.text.input.TextFieldLineLimits
+import androidx.compose.foundation.text.input.delete
 import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.AlertDialogDefaults
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.ComposeCompilerApi
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.DialogProperties
 import com.vocabulary.myvocabulary.R
+import com.vocabulary.myvocabulary.ui.theme.dimens
 
 class ComposeDialogFactory {
     @Composable
@@ -165,6 +181,209 @@ class ComposeDialogFactory {
             }
         )
     }
+
+    @Composable
+    fun BuildCreateWordDialog(
+        onDismissRequest: () -> Unit,
+        onConfirmation: (newExpression: String, newTranslation: String) -> Unit,
+        onAddMore: (newExpression: String, newTranslation: String) -> Unit,
+        dialogTitle: String
+    ) {
+        val newWordState = rememberTextFieldState()
+        val newTranslationState = rememberTextFieldState()
+        var showError by remember { mutableStateOf(false) }
+        val focusRequester = remember{ FocusRequester() }
+
+        LaunchedEffect(Unit) {
+            focusRequester.requestFocus()
+        }
+
+        ThirdButtonAlertDialog(
+            title = { Text(text = dialogTitle) },
+            text = {
+                Column(
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    OutlinedTextField(
+                        state = newWordState,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(MaterialTheme.dimens.PaddingMedium),
+                        label = { Text(stringResource(R.string.create_expression_hint)) },
+                        isError = showError,
+                        supportingText = {
+                            if (showError) {
+                                Text(text = stringResource(R.string.please_enter_expression))
+                            }
+                        },
+                        inputTransformation = { showError = false },
+                        lineLimits = TextFieldLineLimits.SingleLine
+                    )
+
+                    OutlinedTextField(
+                        state = newTranslationState,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(MaterialTheme.dimens.PaddingMedium),
+                        label = { Text(stringResource(R.string.create_translation_hint)) },
+                        lineLimits = TextFieldLineLimits.SingleLine
+                    )
+                }
+            },
+            onDismissRequest = { onDismissRequest() },
+            neutralButton = {
+                TextButton(
+                    onClick = {
+                        if (newWordState.text.isEmpty()) {
+                            showError = true
+                        } else {
+                            onAddMore(newWordState.text.toString(), newTranslationState.text.toString())
+                            showError = false
+                            newWordState.edit { this.delete(0, this.length) }
+                            newTranslationState.edit { this.delete(0, this.length) }
+                            focusRequester.requestFocus()
+                        }
+                    }
+                ) {
+                    Text(stringResource(R.string.add_more_button_label))
+                }
+            },
+            negativeButton = {
+                TextButton(
+                    onClick = {
+                        onDismissRequest()
+                    }
+                ) {
+                    Text(stringResource(R.string.cancel_button_label))
+                }
+            },
+            positiveButton = {
+                TextButton(
+                    onClick = {
+                        if (newWordState.text.isEmpty()) {
+                            showError = true
+                        } else {
+                            onConfirmation(newWordState.text.toString(), newTranslationState.text.toString())
+                        }
+                    }
+                ) {
+                    Text(stringResource(R.string.save_button_label))
+                }
+            }
+        )
+    }
+
+    @Composable
+    fun ThirdButtonAlertDialog(
+        onDismissRequest: () -> Unit,
+        positiveButton: @Composable () -> Unit,
+        modifier: Modifier = Modifier,
+        negativeButton: @Composable (() -> Unit)? = null,
+        neutralButton: @Composable (() -> Unit)? = null,
+        icon: @Composable (() -> Unit)? = null,
+        title: @Composable (() -> Unit)? = null,
+        text: @Composable (() -> Unit)? = null,
+        shape: Shape = AlertDialogDefaults.shape,
+        containerColor: Color = AlertDialogDefaults.containerColor,
+        iconContentColor: Color = AlertDialogDefaults.iconContentColor,
+        titleContentColor: Color = AlertDialogDefaults.titleContentColor,
+        textContentColor: Color = AlertDialogDefaults.textContentColor,
+        tonalElevation: Dp = AlertDialogDefaults.TonalElevation,
+        properties: DialogProperties = DialogProperties()
+    ) {
+        AlertDialog(
+            onDismissRequest = onDismissRequest,
+            modifier = modifier,
+            confirmButton = { positiveButton() },
+            dismissButton = {
+                Row(
+                    horizontalArrangement = Arrangement.Start
+                ) {
+                    negativeButton?.let {
+                        it()
+                    }
+
+                    neutralButton?.let {
+                        it()
+                    }
+                }
+            },
+            icon = icon,
+            title = title,
+            text = text,
+            shape = shape,
+            containerColor = containerColor,
+            iconContentColor = iconContentColor,
+            titleContentColor = titleContentColor,
+            textContentColor = textContentColor,
+            tonalElevation = tonalElevation,
+            properties = properties
+        )
+    }
+}
+
+@Preview
+@Composable
+fun ThirdButtonAlertDialogWithNeutralPreview() {
+    val factory = ComposeDialogFactory()
+    val newWordState = rememberTextFieldState()
+    val newTranslationState = rememberTextFieldState()
+    var showError by remember { mutableStateOf(false) }
+    factory.ThirdButtonAlertDialog(
+        title = { Text("Create") },
+        text = {
+            Column(
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                OutlinedTextField(
+                    state = newWordState,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(MaterialTheme.dimens.PaddingMedium),
+                    label = { Text("new expression") },
+                    isError = showError,
+                    supportingText = {
+                        if (showError) {
+                            Text("new translation")
+                        }
+                    },
+                    inputTransformation = { showError = false },
+                    lineLimits = TextFieldLineLimits.SingleLine
+                )
+
+                OutlinedTextField(
+                    state = newTranslationState,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(MaterialTheme.dimens.PaddingMedium),
+                    label = { Text(stringResource(R.string.create_translation_hint)) },
+                    lineLimits = TextFieldLineLimits.SingleLine
+                )
+            }
+        },
+        onDismissRequest = { },
+        neutralButton = {
+            TextButton(
+                onClick = {}
+            ) {
+                Text(stringResource(R.string.add_more_button_label))
+            }
+        },
+        negativeButton = {
+            TextButton(
+                onClick = {}
+            ) {
+                Text(stringResource(R.string.cancel_button_label))
+            }
+        },
+        positiveButton = {
+            TextButton(
+                onClick = {}
+            ) {
+                Text(stringResource(R.string.save_button_label))
+            }
+        }
+    )
 }
 
 @Preview

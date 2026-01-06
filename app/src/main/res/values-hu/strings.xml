@@ -6,8 +6,8 @@
     <string name="add_a_title">Adj meg egy nevet</string>
     <string name="create_dictionary_hint">Írj be egy címet</string>
     <string name="rename_dictionary_hint">Írj be egy új címet</string>
-    <string name="create_word_hint">új jelentés</string>
-    <string name="create_translation_hint">új szó</string>
+    <string name="create_expression_hint">új szó</string>
+    <string name="create_translation_hint">új jelentés</string>
     <string name="quiz_size_hint">Szavak száma</string>
     <string name="create_new_dictionary_dialog_title">Új szótár létrehozása</string>
     <string name="create_button_label">Mentés</string>
@@ -15,7 +15,7 @@
     <string name="cancel_button_label">Kilépés</string>
     <string name="please_enter_a_title">Adj meg egy címet</string>
     <string name="please_enter_a_word">Adj meg egy jelentést</string>
-    <string name="please_enter_a_translation">Adj meg egy szót</string>
+    <string name="please_enter_expression">Adj meg egy szót</string>
     <string name="row_dictionary_options_dots">⋮</string>
     <string name="word_menu_edit_label">Módosítás</string>
     <string name="dialog_delete_word_title">Szó törlése</string>

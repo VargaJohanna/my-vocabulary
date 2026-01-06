@@ -6,8 +6,8 @@
     <string name="add_a_title">Add a title</string>
     <string name="create_dictionary_hint">Enter a title</string>
     <string name="rename_dictionary_hint">Enter a new title</string>
-    <string name="create_word_hint">new meaning</string>
-    <string name="create_translation_hint">new expression</string>
+    <string name="create_expression_hint">new expression</string>
+    <string name="create_translation_hint">new translation</string>
     <string name="quiz_size_hint">Number of words</string>
     <string name="create_new_dictionary_dialog_title">Create New Dictionary</string>
     <string name="create_button_label">Create</string>
@@ -15,7 +15,7 @@
     <string name="cancel_button_label">Cancel</string>
     <string name="please_enter_a_title">Please enter a title</string>
     <string name="please_enter_a_word">Please enter meaning</string>
-    <string name="please_enter_a_translation">Please enter expression</string>
+    <string name="please_enter_expression">Please enter expression</string>
     <string name="row_dictionary_options_dots">⋮</string>
     <string name="word_menu_edit_label">Edit</string>
     <string name="dialog_delete_word_title">Deleting word</string>
@@ -97,7 +97,7 @@
     <string name="result_stats">%1$d / %2$d - %3$d%%</string>
     <string name="thanks">Thanks</string>
     <string name="quote_text">\"%1$s\"</string>
-    <string name="word_hint">Add meaning</string>
+    <string name="word_hint">Add translation</string>
     <string name="import_dictionary_dialog_title">Import dictionary</string>
     <string name="import_dictionary_menu">Import Dictionary</string>
     <string name="only_csv_import">Only CSV files can be imported.</string>
