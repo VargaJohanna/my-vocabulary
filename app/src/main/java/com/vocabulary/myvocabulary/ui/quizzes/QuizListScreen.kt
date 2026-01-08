@@ -38,7 +38,6 @@ fun QuizListScreen() {
     val dialogFactory: ComposeDialogFactory = koinInject()
     val list = QuizTypes.getQuizTypes()
 
-
     QuizListContent(
         list = list,
         dialogFactory = dialogFactory
@@ -54,6 +53,8 @@ fun QuizListContent(
     var showInfoDialog by rememberSaveable { mutableStateOf(false) }
     var dialogTitle by rememberSaveable { mutableStateOf("") }
     var dialogText by rememberSaveable { mutableStateOf("") }
+    var isSheetOpen by rememberSaveable { mutableStateOf(false) }
+//    var clickedQuiz: QuizTypes by rememberSaveable { mutableStateOf(QuizTypes.QuickQuiz) }
 
     Scaffold(
         modifier = Modifier.fillMaxSize()
@@ -65,14 +66,27 @@ fun QuizListContent(
             contentPadding = PaddingValues(MaterialTheme.dimens.PaddingMedium)
         ) {
             items(list) { item ->
-                QuizCard(quizType = item,
+//                clickedQuiz = item
+                QuizCard(
+                    quizType = item,
                     onInfoClick = { title, info ->
                         dialogTitle = title
                         dialogText = info
                         showInfoDialog = true
-                    })
+                    },
+                    onTypeClick = {
+                        isSheetOpen = true
+                    }
+                )
             }
         }
+        if(isSheetOpen) {
+            DictionaryPickerBottomSheet(
+//                selectedQuiz = clickedQuiz,
+                onDismissRequest = { isSheetOpen = it }
+            )
+        }
+
     }
 
     if(showInfoDialog) {
@@ -87,9 +101,11 @@ fun QuizListContent(
 @Composable
 fun QuizCard(
     quizType: QuizTypes,
-    onInfoClick: (title: String, info: String) -> Unit) {
+    onInfoClick: (title: String, info: String) -> Unit,
+    onTypeClick: () -> Unit
+) {
     Card(
-        onClick = {},
+        onClick = { onTypeClick() },
         modifier = Modifier
             .padding(MaterialTheme.dimens.PaddingMedium)
             .fillMaxWidth(),

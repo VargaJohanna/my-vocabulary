@@ -31,7 +31,6 @@ import com.vocabulary.myvocabulary.ui.theme.dimens
 import com.vocabulary.myvocabulary.utils.DateTypeConverter
 import java.util.Calendar
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun WordDetailsBottomSheet(
     clickedWord: Word,
