@@ -10,7 +10,6 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
-import androidx.navigation.findNavController
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.vocabulary.myvocabulary.R
@@ -40,7 +39,7 @@ class WordDetailsFragment : Fragment() {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         _binding = FragmentWordDetailsBinding.inflate(inflater, container, false)
         val view = binding.root
-        wordDetailViewModel.getWordById(args.wordId)
+        wordDetailViewModel.fetchWordById(args.wordId)
         wordDetailViewModel.getCurrentWord().observe(requireActivity(), androidx.lifecycle.Observer {
             wordCurrent = it
             setView(it)

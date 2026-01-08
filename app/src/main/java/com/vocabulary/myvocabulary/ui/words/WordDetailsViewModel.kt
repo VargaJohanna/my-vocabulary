@@ -7,20 +7,28 @@ import com.vocabulary.myvocabulary.ext.plusAssign
 import com.vocabulary.myvocabulary.repositories.word.WordRepository
 import com.vocabulary.myvocabulary.rx.RxSchedulers
 import io.reactivex.disposables.CompositeDisposable
+import kotlinx.coroutines.flow.MutableStateFlow
+import java.util.Calendar
 
 class WordDetailsViewModel(
+        private val wordId: Long,
         private val wordRepository: WordRepository,
         private val rxSchedulers: RxSchedulers
 ) : ViewModel() {
 
     private val disposables = CompositeDisposable()
     private val currentWordLive: MutableLiveData<Word> = MutableLiveData()
+    private val _currentWord: MutableStateFlow<Word> = MutableStateFlow(Word(0, 0, "", "", 0, 0, 0, Calendar.getInstance().time))
+    val currentWord: MutableStateFlow<Word> = _currentWord
 
-    fun getWordById(id: Long) {
+    fun fetchWordById(id: Long) {
         disposables += wordRepository.getWordById(id)
                 .subscribeOn(rxSchedulers.io())
                 .observeOn(rxSchedulers.main())
-                .subscribe { t -> currentWordLive.postValue(t) }
+                .subscribe { t ->
+//                    currentWordLive.postValue(t)
+                    _currentWord.value = t
+                }
     }
 
     fun getCurrentWord(): LiveData<Word> = currentWordLive

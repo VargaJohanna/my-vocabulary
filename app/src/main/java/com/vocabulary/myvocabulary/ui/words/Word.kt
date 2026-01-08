@@ -1,8 +1,11 @@
 package com.vocabulary.myvocabulary.ui.words
 
+import android.os.Parcelable
 import com.vocabulary.myvocabulary.repositories.word.WordEntry
+import kotlinx.parcelize.Parcelize
 import java.util.*
 
+@Parcelize
 data class Word(
         val wordId: Long = 0,
         val containerDictionaryId: Long,
@@ -14,7 +17,7 @@ data class Word(
         val created: Date,
         val lastResult: Boolean = false,
         val lastGuess: String = ""
-)
+) : Parcelable
 
 fun Word.toWordEntry(): WordEntry {
     return if (wordId == 0L) {

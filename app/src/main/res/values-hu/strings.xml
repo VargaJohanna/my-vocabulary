@@ -53,7 +53,7 @@
     <string name="quizzes_toolbar">Kvízek</string>
     <string name="dictionary_menu_start_quiz">Kvíz indítása</string>
     <string name="word_details_toolbar">Adatok</string>
-    <string name="meaning_colon">Jelentés:</string>
+    <string name="translation_colon">Jelentés:</string>
     <string name="expression_colon">Szó:</string>
     <string name="word_detail_attempts_so_far">Próbák száma:</string>
     <string name="passed_colon">Helyes válaszok száma:</string>

@@ -110,7 +110,7 @@ fun DictionaryListScreen(
     }
 
     itemToDelete?.let { dictionary ->
-        dialogFactory.BuildDeleteDictionaryDialog(
+        dialogFactory.BuildDeleteDialog(
             onDismissRequest = { itemToDelete = null },
             onConfirmation = {
                 viewModel.deleteDictionary(dictionary)
@@ -165,7 +165,7 @@ fun FABMenu(onShowCreateDialog: () -> Unit) {
             icon = {
                 Icon(
                     imageVector = ImageVector.vectorResource(id = R.drawable.baseline_import_export_24),
-                    contentDescription = null
+                    contentDescription = "Import dictionary"
                 )
             }
         )
@@ -178,7 +178,7 @@ fun FABMenu(onShowCreateDialog: () -> Unit) {
             icon = {
                 Icon(
                     imageVector = ImageVector.vectorResource(id = R.drawable.outline_create_new_folder_24),
-                    contentDescription = null
+                    contentDescription = "Create new dictionary icon"
                 )
             }
         )
@@ -295,10 +295,10 @@ fun DictionaryListScreenPreview() {
                 Icon(Icons.Default.Add, contentDescription = "Add")
             }
         }
-    ) {
+    ) { paddingValues ->
         FlowColumn(
-            modifier = Modifier.fillMaxSize(),
-
+            modifier = Modifier.fillMaxSize()
+                .padding(paddingValues)
             ) {
             DictionaryLazyList(
                 list =

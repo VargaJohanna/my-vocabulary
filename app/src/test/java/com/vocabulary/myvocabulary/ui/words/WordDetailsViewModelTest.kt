@@ -25,7 +25,7 @@ class WordDetailsViewModelTest {
         val wordDetailsViewModel = givenWordDetailsViewModel()
         val requestedId = requestedId
 
-        wordDetailsViewModel.getWordById(requestedId)
+        wordDetailsViewModel.fetchWordById(requestedId)
 
         verify(wordRepository).getWordById(requestedId)
     }
@@ -33,7 +33,7 @@ class WordDetailsViewModelTest {
     @Test
     fun `should update currentWordLive when getWordById() is called`() {
         val wordDetailsViewModel = givenWordDetailsViewModel()
-        wordDetailsViewModel.getWordById(requestedId)
+        wordDetailsViewModel.fetchWordById(requestedId)
 
         wordDetailsViewModel.getCurrentWord().observeForever(mock())
 
@@ -42,6 +42,6 @@ class WordDetailsViewModelTest {
 
     private fun givenWordDetailsViewModel(): WordDetailsViewModel {
         whenever(wordRepository.getWordById(requestedId)).thenReturn(Single.just(singleWord))
-        return WordDetailsViewModel(wordRepository, TestScheduler())
+        return WordDetailsViewModel(1L, wordRepository, TestScheduler())
     }
 }

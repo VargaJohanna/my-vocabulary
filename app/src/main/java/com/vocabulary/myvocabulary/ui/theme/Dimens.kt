@@ -9,4 +9,5 @@ object Dimens {
     val PaddingExtraLarge = 28.dp
 
     val CardElevation = 3.dp
+    val CardElevationSmall = 2.dp
 }

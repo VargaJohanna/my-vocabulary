@@ -2,14 +2,9 @@ package com.vocabulary.myvocabulary.utils
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.fitInside
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.text.input.TextFieldLineLimits
 import androidx.compose.foundation.text.input.delete
 import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.material3.AlertDialog
@@ -31,7 +26,6 @@ import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.DialogProperties
 import com.vocabulary.myvocabulary.R
@@ -65,7 +59,6 @@ class ComposeDialogFactory {
                         }
                     },
                     inputTransformation = { showError = false },
-                    lineLimits = TextFieldLineLimits.SingleLine
                 )
             },
             onDismissRequest = {
@@ -97,7 +90,7 @@ class ComposeDialogFactory {
     }
 
     @Composable
-    fun BuildDeleteDictionaryDialog(
+    fun BuildDeleteDialog(
         onDismissRequest: () -> Unit,
         onConfirmation: () -> Unit,
         dialogTitle: String,
@@ -151,7 +144,6 @@ class ComposeDialogFactory {
                         }
                     },
                     inputTransformation = { showError = false },
-                    lineLimits = TextFieldLineLimits.SingleLine
                 )
             },
             onDismissRequest = {
@@ -217,7 +209,6 @@ class ComposeDialogFactory {
                             }
                         },
                         inputTransformation = { showError = false },
-                        lineLimits = TextFieldLineLimits.SingleLine
                     )
 
                     OutlinedTextField(
@@ -226,7 +217,6 @@ class ComposeDialogFactory {
                             .fillMaxWidth()
                             .padding(MaterialTheme.dimens.PaddingMedium),
                         label = { Text(stringResource(R.string.create_translation_hint)) },
-                        lineLimits = TextFieldLineLimits.SingleLine
                     )
                 }
             },
@@ -320,6 +310,76 @@ class ComposeDialogFactory {
             properties = properties
         )
     }
+
+    @Composable
+    fun BuildEditWordDialog(
+        onDismissRequest: () -> Unit,
+        onConfirmation: (newExpression: String, newTranslation: String) -> Unit,
+        expression: String,
+        translation: String
+    ) {
+        val editExpressionState = rememberTextFieldState(expression)
+
+        val editTranslationState = rememberTextFieldState(translation)
+        var showError by remember { mutableStateOf(false) }
+
+        AlertDialog(
+            title = {
+                Text(text = stringResource(R.string.edit_word_dialog_title))
+            },
+            text = {
+                Column(
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    // Need to pre-fill the textField with existence data
+                    OutlinedTextField(
+                        state = editExpressionState,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(MaterialTheme.dimens.PaddingMedium),
+                        label = { Text(stringResource(R.string.create_expression_hint)) },
+                        isError = showError,
+                        supportingText = {
+                            if (showError) {
+                                Text(text = stringResource(R.string.please_enter_expression))
+                            }
+                        },
+                        inputTransformation = { showError = false },
+                    )
+
+                    OutlinedTextField(
+//                        placeHolder = Text(stringResource(R.string.word_hint)),
+                        state = editTranslationState,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(MaterialTheme.dimens.PaddingMedium),
+//                        label = { Text(stringResource(R.string.create_translation_hint)) },
+                    )
+                }
+            },
+            onDismissRequest = { onDismissRequest() },
+            confirmButton = {
+                TextButton (
+                    onClick = {
+                        if(editExpressionState.text.isEmpty()) {
+                            showError = true
+                        } else {
+                            onConfirmation(editExpressionState.text.toString(), editTranslationState.text.toString())
+                        }
+                    }
+                ) {
+                    Text(stringResource(R.string.save_button_label))
+                }
+            },
+            dismissButton = {
+                TextButton(
+                    onClick = { onDismissRequest() }
+                ) {
+                    Text(stringResource(R.string.cancel_button_label))
+                }
+            }
+        )
+    }
 }
 
 @Preview
@@ -348,7 +408,6 @@ fun ThirdButtonAlertDialogWithNeutralPreview() {
                         }
                     },
                     inputTransformation = { showError = false },
-                    lineLimits = TextFieldLineLimits.SingleLine
                 )
 
                 OutlinedTextField(
@@ -357,7 +416,6 @@ fun ThirdButtonAlertDialogWithNeutralPreview() {
                         .fillMaxWidth()
                         .padding(MaterialTheme.dimens.PaddingMedium),
                     label = { Text(stringResource(R.string.create_translation_hint)) },
-                    lineLimits = TextFieldLineLimits.SingleLine
                 )
             }
         },
