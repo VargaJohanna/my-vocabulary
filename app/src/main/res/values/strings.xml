@@ -1,7 +1,7 @@
 <resources>
     <string name="app_name">My Vocabulary</string>
     <string name="example_dictionary_name">Example Dictionary</string>
-    <string name="dictionaries_button">DICTIONARIES</string>
+    <string name="library_button">LIBRARY</string>
     <string name="quizzes_button">QUIZZES</string>
     <string name="add_a_title">Add a title</string>
     <string name="create_dictionary_hint">Enter a title</string>

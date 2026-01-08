@@ -28,9 +28,11 @@ fun HomeScreen(
         modifier = Modifier.fillMaxSize(),
         verticalArrangement = Arrangement.SpaceEvenly
     ) {
-        ButtonCard( onButtonClick = onClickDictionaries, text = "Dictionaries")
+        ButtonCard(
+            onButtonClick = onClickDictionaries,
+            text =  stringResource(R.string.library_button))
 
-        ButtonCard( onButtonClick = onClickQuiz, text = "Quiz")
+        ButtonCard( onButtonClick = onClickQuiz, text = stringResource(R.string.quizzes_button))
     }
 }
 

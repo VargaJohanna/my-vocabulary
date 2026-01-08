@@ -73,7 +73,7 @@
         android:background="?selectableItemBackground"
         android:backgroundTint="#00ffffff"
         android:gravity="center"
-        android:text="@string/dictionaries_button"
+        android:text="@string/library_button"
         android:textColor="@color/primary_text"
         android:textSize="@dimen/text_size_large"
         android:textStyle="bold"
