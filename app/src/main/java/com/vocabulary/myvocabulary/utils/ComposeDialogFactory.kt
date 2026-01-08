@@ -399,6 +399,27 @@ class ComposeDialogFactory {
             }
         )
     }
+
+    @Composable
+    fun BuildInfoDialog(
+        onDismissRequest: () -> Unit,
+        dialogTitle: String,
+        dialogText: String
+    ) {
+        AlertDialog(
+            title = { Text(dialogTitle) } ,
+            text = { Text(dialogText) },
+            onDismissRequest = { onDismissRequest() },
+            confirmButton = {
+                TextButton(
+                    onClick = onDismissRequest
+                ) {
+                    Text(stringResource(R.string.info_dialog))
+                }
+            }
+        )
+
+    }
 }
 
 @Preview

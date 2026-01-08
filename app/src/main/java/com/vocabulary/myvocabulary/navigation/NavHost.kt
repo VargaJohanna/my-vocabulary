@@ -13,6 +13,7 @@ import androidx.navigation.toRoute
 import com.vocabulary.myvocabulary.ui.about.AboutScreen
 import com.vocabulary.myvocabulary.ui.dictionaries.DictionaryListScreen
 import com.vocabulary.myvocabulary.ui.home.HomeScreen
+import com.vocabulary.myvocabulary.ui.quizzes.QuizListScreen
 import com.vocabulary.myvocabulary.ui.words.WordListScreen
 
 @Composable
@@ -39,7 +40,11 @@ fun MyVocabularyNavHost(
                         navController.navigate(
                             DictionaryList
                         )
+                    },
+                    onClickQuiz = {
+                        navController.navigate(QuizList)
                     }
+
                 )
             }
 
@@ -59,6 +64,10 @@ fun MyVocabularyNavHost(
 
             composable<About> {
                 AboutScreen()
+            }
+
+            composable<QuizList> {
+                QuizListScreen()
             }
         }
     }

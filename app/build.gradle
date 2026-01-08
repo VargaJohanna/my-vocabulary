@@ -74,6 +74,7 @@ dependencies {
     def sandbox_version = "1.0.0-alpha13"
     def nav_latest_version = "2.9.6"
 
+    implementation(libs.kotlin.reflect)
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
     implementation "androidx.constraintlayout:constraintlayout:$constraint_layout_version"
     implementation "com.google.android.material:material:$material_version"

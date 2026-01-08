@@ -5,6 +5,12 @@ sealed class QuizTypes {
     object FullQuiz : QuizTypes()
     object WeakestQuiz : QuizTypes()
     object CustomQuiz : QuizTypes()
+
+    companion object {
+        fun getQuizTypes(): List<QuizTypes> {
+            return QuizTypes::class.sealedSubclasses.mapNotNull { it.objectInstance }
+        }
+    }
 }
 
 fun Int.toQuizType(): QuizTypes {

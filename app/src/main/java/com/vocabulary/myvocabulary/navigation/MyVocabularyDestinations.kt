@@ -24,3 +24,6 @@ data class WordList(
 
 @Serializable
 object About : MyVocabularyDestinations
+
+@Serializable
+object QuizList : MyVocabularyDestinations

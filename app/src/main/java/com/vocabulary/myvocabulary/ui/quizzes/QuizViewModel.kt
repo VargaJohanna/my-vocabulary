@@ -9,6 +9,8 @@ import com.vocabulary.myvocabulary.repositories.quiz.QuizRepository
 import com.vocabulary.myvocabulary.rx.RxSchedulers
 import com.vocabulary.myvocabulary.ui.words.Word
 import io.reactivex.disposables.CompositeDisposable
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 
 class QuizViewModel(
         val dictionaryId: Long,
@@ -24,6 +26,9 @@ class QuizViewModel(
     private var listIsFinished = false
     val directionType = optionType.toDirectionType()
     private val liveSubWordList = MutableLiveData<List<FocusableWord>>()
+    private val subWordList: MutableStateFlow<List<FocusableWord>> = MutableStateFlow(emptyList())
+    private val _quizList: MutableStateFlow<List<FocusableWord>> = MutableStateFlow(emptyList())
+    val quizList: StateFlow<List<FocusableWord>> = _quizList
     private var focusableWordList = mutableListOf<FocusableWord>()
     var isDictionaryEmpty = false
 
