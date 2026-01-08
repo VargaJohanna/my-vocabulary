@@ -184,7 +184,7 @@ class ComposeDialogFactory {
         val newWordState = rememberTextFieldState()
         val newTranslationState = rememberTextFieldState()
         var showError by remember { mutableStateOf(false) }
-        val focusRequester = remember{ FocusRequester() }
+        val focusRequester = remember { FocusRequester() }
 
         LaunchedEffect(Unit) {
             focusRequester.requestFocus()
@@ -227,7 +227,10 @@ class ComposeDialogFactory {
                         if (newWordState.text.isEmpty()) {
                             showError = true
                         } else {
-                            onAddMore(newWordState.text.toString(), newTranslationState.text.toString())
+                            onAddMore(
+                                newWordState.text.toString(),
+                                newTranslationState.text.toString()
+                            )
                             showError = false
                             newWordState.edit { this.delete(0, this.length) }
                             newTranslationState.edit { this.delete(0, this.length) }
@@ -253,7 +256,10 @@ class ComposeDialogFactory {
                         if (newWordState.text.isEmpty()) {
                             showError = true
                         } else {
-                            onConfirmation(newWordState.text.toString(), newTranslationState.text.toString())
+                            onConfirmation(
+                                newWordState.text.toString(),
+                                newTranslationState.text.toString()
+                            )
                         }
                     }
                 ) {
@@ -331,13 +337,12 @@ class ComposeDialogFactory {
                 Column(
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    // Need to pre-fill the textField with existence data
                     OutlinedTextField(
                         state = editExpressionState,
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(MaterialTheme.dimens.PaddingMedium),
-                        label = { Text(stringResource(R.string.create_expression_hint)) },
+                        label = { Text(stringResource(R.string.word_list_expression)) },
                         isError = showError,
                         supportingText = {
                             if (showError) {
@@ -348,23 +353,37 @@ class ComposeDialogFactory {
                     )
 
                     OutlinedTextField(
-//                        placeHolder = Text(stringResource(R.string.word_hint)),
                         state = editTranslationState,
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(MaterialTheme.dimens.PaddingMedium),
-//                        label = { Text(stringResource(R.string.create_translation_hint)) },
+                        label = {
+                            if (editTranslationState.text.isEmpty()) {
+                                Text(
+                                    text = stringResource(R.string.word_list_meaning),
+                                    color = Color.Gray
+                                )
+                            } else {
+                                Text(
+                                    text = stringResource(R.string.word_list_meaning),
+                                    color = Color.Black
+                                )
+                            }
+                        }
                     )
                 }
             },
             onDismissRequest = { onDismissRequest() },
             confirmButton = {
-                TextButton (
+                TextButton(
                     onClick = {
-                        if(editExpressionState.text.isEmpty()) {
+                        if (editExpressionState.text.isEmpty()) {
                             showError = true
                         } else {
-                            onConfirmation(editExpressionState.text.toString(), editTranslationState.text.toString())
+                            onConfirmation(
+                                editExpressionState.text.toString(),
+                                editTranslationState.text.toString()
+                            )
                         }
                     }
                 ) {

@@ -114,7 +114,7 @@ fun WordDetailsBottomSheetContent(
                 elevation = CardDefaults.cardElevation(defaultElevation = MaterialTheme.dimens.CardElevationSmall)
             ) {
                 if (clickedWord.translation.isEmpty()) {
-                    Text(text = stringResource(R.string.word_hint), color = Color.Gray, modifier = Modifier.padding(MaterialTheme.dimens.PaddingLarge))
+                    Text(text = stringResource(R.string.word_list_meaning), color = Color.Gray, modifier = Modifier.padding(MaterialTheme.dimens.PaddingLarge))
                 } else {
                     Text(text = clickedWord.translation,
                         modifier = Modifier.padding(MaterialTheme.dimens.PaddingLarge)

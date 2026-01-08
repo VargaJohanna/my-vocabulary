@@ -182,7 +182,7 @@ fun WordListScreenContent(
                 isSheetOpen = false
                              },
             dialogTitle = stringResource(R.string.dialog_delete_word_title) ,
-            message = stringResource(R.string.verify_deletion) + "\n\"${clickedWordToEdit.translation} - ${clickedWordToEdit.word}\" ?"
+            message = stringResource(R.string.verify_deletion) + "\n\"${clickedWordToEdit.word} - ${clickedWordToEdit.translation}\" ?"
         )
     }
 }
