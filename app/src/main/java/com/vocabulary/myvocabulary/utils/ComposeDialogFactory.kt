@@ -5,12 +5,15 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.selection.selectable
+import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.foundation.text.input.delete
 import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.AlertDialogDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -19,11 +22,13 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -407,7 +412,7 @@ class ComposeDialogFactory {
         dialogText: String
     ) {
         AlertDialog(
-            title = { Text(dialogTitle) } ,
+            title = { Text(dialogTitle) },
             text = { Text(dialogText) },
             onDismissRequest = { onDismissRequest() },
             confirmButton = {
@@ -420,6 +425,85 @@ class ComposeDialogFactory {
         )
 
     }
+
+    @Composable
+    fun BuildChooseDirectionDialog(
+        onDismissRequest: () -> Unit,
+        onConfirmation: (selectedOption: Int) -> Unit
+    ) {
+        var option by remember { mutableStateOf(0) }
+        AlertDialog(
+            title = {
+                Text(text = stringResource(R.string.dialog_pick_direction))
+            },
+            text = {
+                val radioOptions = listOf(
+                    stringResource(R.string.word_list_meaning),
+                    stringResource(R.string.word_list_expression)
+                )
+                val (selectedOption, onOptionSelected) = remember { mutableStateOf(radioOptions[0]) }
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .selectableGroup()
+                ) {
+                    radioOptions.forEach { text ->
+                        Row(
+                            Modifier
+                                .fillMaxWidth()
+                                .selectable(
+                                    selected = (text == selectedOption),
+                                    onClick = {
+                                        onOptionSelected(text)
+                                        option = if (text == radioOptions[0]) 0 else 1
+                                    },
+                                    role = Role.RadioButton
+                                )
+                                .padding(MaterialTheme.dimens.PaddingLarge),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            RadioButton(
+                                selected = (text == selectedOption),
+                                onClick = null
+                            )
+
+                            Text(
+                                text = text,
+                                style = MaterialTheme.typography.bodyLarge,
+                                modifier = Modifier.padding(start = MaterialTheme.dimens.PaddingMedium)
+                            )
+                        }
+                    }
+                }
+            },
+            onDismissRequest = { onDismissRequest() },
+            confirmButton = {
+                TextButton(
+                    onClick = { onConfirmation(option) }
+                ) {
+                    Text(stringResource(R.string.dialog_lets_do_it))
+                }
+            },
+            dismissButton = {
+                TextButton(
+                    onClick = { onDismissRequest() }
+                ) {
+                    Text(stringResource(R.string.cancel_button_label))
+                }
+            }
+        )
+    }
+}
+
+@Preview
+@Composable
+fun BuildChooseDirectionDialogPreview() {
+    val factory = ComposeDialogFactory()
+
+    factory.BuildChooseDirectionDialog(
+        onDismissRequest = {},
+        onConfirmation = {}
+    )
 }
 
 @Preview

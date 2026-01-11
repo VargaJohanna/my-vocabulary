@@ -31,30 +31,38 @@ import com.vocabulary.myvocabulary.ui.theme.MyVocabularyTheme
 import com.vocabulary.myvocabulary.ui.theme.dimens
 import com.vocabulary.myvocabulary.utils.ComposeDialogFactory
 import org.koin.compose.koinInject
-import org.w3c.dom.Text
 
 @Composable
-fun QuizListScreen() {
+fun QuizListScreen(
+    onStartQuiz: (quizType: Int, dictionaryId: Long, direction: Int) -> Unit
+) {
     val dialogFactory: ComposeDialogFactory = koinInject()
     val list = QuizTypes.getQuizTypes()
 
     QuizListContent(
         list = list,
-        dialogFactory = dialogFactory
+        dialogFactory = dialogFactory,
+        onStartQuiz = { quizType, dictionaryId, direction ->
+            onStartQuiz(quizType, dictionaryId, direction)
+        }
     )
 }
 
 @Composable
 fun QuizListContent(
     list: List<QuizTypes>,
-    dialogFactory: ComposeDialogFactory
+    dialogFactory: ComposeDialogFactory,
+    onStartQuiz: (quizType: Int, dictionaryId: Long, direction: Int) -> Unit
 ) {
     ProvideAppBarTitle { Text(stringResource(R.string.quiz_toolbar)) }
     var showInfoDialog by rememberSaveable { mutableStateOf(false) }
     var dialogTitle by rememberSaveable { mutableStateOf("") }
     var dialogText by rememberSaveable { mutableStateOf("") }
     var isSheetOpen by rememberSaveable { mutableStateOf(false) }
-//    var clickedQuiz: QuizTypes by rememberSaveable { mutableStateOf(QuizTypes.QuickQuiz) }
+    var showDirectionDialog by rememberSaveable { mutableStateOf(false) }
+    var selectedQuiz: Int by rememberSaveable { mutableStateOf(0) }
+    var selectedDictionaryId: Long by rememberSaveable { mutableStateOf(0L) }
+    var selectedDirection by rememberSaveable { mutableStateOf(0) }
 
     Scaffold(
         modifier = Modifier.fillMaxSize()
@@ -66,7 +74,7 @@ fun QuizListContent(
             contentPadding = PaddingValues(MaterialTheme.dimens.PaddingMedium)
         ) {
             items(list) { item ->
-//                clickedQuiz = item
+                selectedQuiz = item.toInt()
                 QuizCard(
                     quizType = item,
                     onInfoClick = { title, info ->
@@ -82,8 +90,9 @@ fun QuizListContent(
         }
         if(isSheetOpen) {
             DictionaryPickerBottomSheet(
-//                selectedQuiz = clickedQuiz,
-                onDismissRequest = { isSheetOpen = it }
+                onDismissRequest = { isSheetOpen = it },
+                selectedDictionaryId = { selectedDictionaryId = it },
+                showDialog = {showDirectionDialog = it}
             )
         }
 
@@ -94,6 +103,20 @@ fun QuizListContent(
             onDismissRequest = { showInfoDialog = false },
             dialogTitle = dialogTitle,
             dialogText = dialogText
+        )
+    }
+
+    if(showDirectionDialog) {
+        dialogFactory.BuildChooseDirectionDialog(
+            onDismissRequest = {
+                showDirectionDialog = false
+                               },
+            onConfirmation = { direction ->
+                selectedDirection = direction
+                onStartQuiz(selectedQuiz, selectedDictionaryId, selectedDirection)
+                showDirectionDialog = false
+                isSheetOpen = false
+            }
         )
     }
 }
@@ -158,7 +181,8 @@ fun QuizListScreenPreview() {
         )
         QuizListContent(
             list = previewList,
-            dialogFactory = ComposeDialogFactory()
+            dialogFactory = ComposeDialogFactory(),
+            onStartQuiz = { _, _, _ -> }
         )
     }
 }

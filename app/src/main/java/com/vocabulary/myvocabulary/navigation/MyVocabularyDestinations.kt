@@ -27,3 +27,10 @@ object About : MyVocabularyDestinations
 
 @Serializable
 object QuizList : MyVocabularyDestinations
+
+@Serializable
+data class Quiz(
+    val quizType: Int,
+    val dictionaryId: Long,
+    val direction: Int
+) : MyVocabularyDestinations
