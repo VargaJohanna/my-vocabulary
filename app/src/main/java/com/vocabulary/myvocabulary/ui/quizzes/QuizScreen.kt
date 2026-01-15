@@ -1,7 +1,15 @@
 package com.vocabulary.myvocabulary.ui.quizzes
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.slideInVertically
+import androidx.compose.foundation.gestures.Orientation
+import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -9,7 +17,9 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.input.rememberTextFieldState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material.icons.filled.Check
@@ -36,6 +46,9 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.platform.LocalWindowInfo
+import androidx.compose.ui.platform.rememberNestedScrollInteropConnection
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -101,7 +114,8 @@ fun QuizScreenContent(
     var focusedWordId by rememberSaveable { mutableStateOf(0L) }
 
     Scaffold(
-        modifier = Modifier.fillMaxSize(),
+        modifier = Modifier
+            .fillMaxSize(),
         floatingActionButton = {
             FabMenu(
                 onNextClicked = { nextClicked = true },
@@ -116,21 +130,24 @@ fun QuizScreenContent(
         }
     )
     { paddingValues ->
-        Column(
+        Box(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(paddingValues),
-            verticalArrangement = Arrangement.spacedBy((-90).dp)
+                .padding(paddingValues)
+                .verticalScroll(rememberScrollState()),
         ) {
             if (quizList.isNotEmpty()) {
                 val currentFocusedId = quizList.getOrNull(rollingIndex - 1)?.wordId ?: 0L
-                quizList.subList(0, rollingIndex).toList().forEach { word ->
-                    val isThisCardHidden = word.wordId != currentFocusedId
+                quizList.subList(0, rollingIndex).toList().forEachIndexed { index, word ->
+                    val isThisCardActive = word.wordId == currentFocusedId
                     FocusCard(
+                        modifier = Modifier
+                            .padding(top = (index * 20).dp)
+                            .align(Alignment.TopCenter),
                         word = word,
-                        hideMe = isThisCardHidden,
+                        isActive = isThisCardActive,
                         editTextContent = {
-                            if (isThisCardHidden.not()) {
+                            if (isThisCardActive) {
                                 guessContent = it
                                 focusedWordId = word.wordId
                             }
@@ -138,8 +155,6 @@ fun QuizScreenContent(
                         askTranslation = direction.toDirectionType() == QuizDirectionType.AskTranslation
                     )
                 }
-            } else {
-//                CircularProgressIndicator()
             }
         }
     }
@@ -166,60 +181,73 @@ fun QuizScreenContent(
 
 @Composable
 fun FocusCard(
+    modifier: Modifier = Modifier,
     word: Word,
     editTextContent: (String) -> Unit,
-    //hideMe: hide the content of the previous cards when a new card is called
-    hideMe: Boolean,
-    askTranslation: Boolean
+    isActive: Boolean,
+    askTranslation: Boolean,
 ) {
     val editState = rememberTextFieldState("")
     val focusRequester = remember { FocusRequester() }
     val question = if (askTranslation) { word.translation } else { word.word }
+    var isVisible by remember { mutableStateOf(false) }
 
-    LaunchedEffect(hideMe) {
-        if (!hideMe) {
+    LaunchedEffect(Unit) { isVisible = true }
+
+    LaunchedEffect(isActive) {
+        if (isActive) {
             focusRequester.requestFocus()
         }
     }
-
     LaunchedEffect(editState.text) {
         editTextContent(editState.text.toString())
     }
 
-    Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(MaterialTheme.dimens.PaddingLarge),
-        elevation = CardDefaults.cardElevation(defaultElevation = MaterialTheme.dimens.CardElevationSmall)
+    AnimatedVisibility(
+        visible = isVisible,
+        enter = slideInVertically(
+            initialOffsetY = { fullHeight -> fullHeight },
+            animationSpec = tween(durationMillis = 500)
+        ) + fadeIn(animationSpec = tween(durationMillis = 500)),
+        modifier = Modifier.fillMaxSize()
     ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(IntrinsicSize.Min)
-                .alpha((if (hideMe) 0f else 1f)),
-            horizontalArrangement = Arrangement.SpaceEvenly,
-        ) {
-            Text(
-                modifier = Modifier
-                    .padding(MaterialTheme.dimens.PaddingLarge)
-                    .align(Alignment.CenterVertically)
-                    .weight(1f),
-                text = question,
-            )
+        Box(modifier = Modifier.fillMaxSize()) {
+            Card(
+                modifier = modifier
+                    .fillMaxWidth()
+                    .padding(MaterialTheme.dimens.PaddingLarge),
+                elevation = CardDefaults.cardElevation(defaultElevation = if (isActive) 8.dp else 2.dp),
+            ) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(IntrinsicSize.Min)
+                        .alpha((if (isActive) 1f else 0f)),
+                    horizontalArrangement = Arrangement.SpaceEvenly,
+                ) {
+                    Text(
+                        modifier = Modifier
+                            .padding(MaterialTheme.dimens.PaddingLarge)
+                            .align(Alignment.CenterVertically)
+                            .weight(1f),
+                        text = question,
+                    )
+                    VerticalDivider(
+                        thickness = 1.dp,
+                        modifier = Modifier.padding(MaterialTheme.dimens.PaddingMedium),
+                    )
+                    TextField(
+                        modifier = Modifier
+                            .padding(MaterialTheme.dimens.PaddingLarge)
+                            .weight(1f)
+                            .focusRequester(focusRequester),
+                        state = editState,
+                        enabled = isActive,
+                        placeholder = { Text(stringResource(R.string.quiz_hint_enter_solution)) },
+                    )
+                }
+            }
 
-            VerticalDivider(
-                thickness = 1.dp,
-                modifier = Modifier.padding(MaterialTheme.dimens.PaddingMedium),
-            )
-
-            TextField(
-                modifier = Modifier
-                    .padding(MaterialTheme.dimens.PaddingLarge)
-                    .weight(1f)
-                    .focusRequester(focusRequester),
-                state = editState,
-                placeholder = { Text(stringResource(R.string.quiz_hint_enter_solution)) },
-            )
         }
     }
 }
