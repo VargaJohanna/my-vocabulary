@@ -116,6 +116,7 @@
     <string name="about_appbar">Rólunk</string>
     <string name="dict_options_description">Szótár opciók</string>
     <string name="dictionary_fab_description">Új szótár</string>
+    <string name="quiz_fab_next">Következő</string>
 
 
 </resources>

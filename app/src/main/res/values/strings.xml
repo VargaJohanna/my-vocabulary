@@ -41,7 +41,7 @@
     <string name="dialog_lets_do_it">"Let's do it"</string>
     <string name="dialog_option_picker_error">"Please select one of the options!"</string>
     <string name="dialog_quiz_type_error">"Please select one of the quiz types!"</string>
-    <string name="quiz_hint_enter_solution">Enter solution</string>
+    <string name="quiz_hint_enter_solution">Your answer</string>
     <string name="result_fragment_title">Results</string>
     <string name="tick_description">Correct answer icon</string>
     <string name="wrong_answer_icon_description">Wrong answer icon</string>
@@ -116,5 +116,6 @@
     <string name="about_appbar">About</string>
     <string name="dict_options_description">Dictionary Options Button</string>
     <string name="dictionary_fab_description">Add dictionary</string>
+    <string name="quiz_fab_next">Quiz Next</string>
 
 </resources>

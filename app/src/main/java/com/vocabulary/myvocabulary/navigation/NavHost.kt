@@ -68,15 +68,15 @@ fun MyVocabularyNavHost(
 
             composable<QuizList> {
                 QuizListScreen(
-                    onStartQuiz = { quizType, dictionaryId, direction ->
-                        navController.navigate(Quiz(quizType, dictionaryId, direction))
+                    onStartQuiz = { quizType, dictionaryId, direction, failedOnly ->
+                        navController.navigate(Quiz(quizType, dictionaryId, direction, failedOnly))
                     }
                 )
             }
 
             composable<Quiz> {
                 val args = it.toRoute<Quiz>()
-                QuizScreen(args.quizType, args.dictionaryId, args.direction)
+                QuizScreen(args.quizType, args.dictionaryId, args.direction, args.failedOnly)
             }
         }
     }

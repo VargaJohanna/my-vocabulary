@@ -21,13 +21,25 @@ class QuizRepositoryImpl(
             QuizTypes.QuickQuiz -> resetQuickQuizList(dictionaryId)
             QuizTypes.WeakestQuiz -> resetWeakestFive(dictionaryId)
             QuizTypes.CustomQuiz -> resetCustomQuizList(dictionaryId)
+        }.ignoreElement()
+    }
+
+    override fun setQuizList(dictionaryId: Long, quizType: QuizTypes): Completable {
+        return when (quizType) {
+            QuizTypes.FullQuiz -> resetFullQuizList(dictionaryId)
+            QuizTypes.QuickQuiz -> resetQuickQuizList(dictionaryId)
+            QuizTypes.WeakestQuiz -> resetWeakestFive(dictionaryId)
+            QuizTypes.CustomQuiz -> resetCustomQuizList(dictionaryId)
         }.toCompletable()
     }
 
     private fun resetFullQuizList(dictionaryId: Long): Single<List<Word>> {
         return wordRepository.getObservableWordList(dictionaryId)
                 .firstOrError()
-                .map { list -> list.filter { it.word.isNotEmpty() } }
+                .map { list ->
+                    list.filter { it.word.isNotEmpty() }
+
+                }
                 .doOnSuccess {
                     _quizList.onNext(it)
                 }

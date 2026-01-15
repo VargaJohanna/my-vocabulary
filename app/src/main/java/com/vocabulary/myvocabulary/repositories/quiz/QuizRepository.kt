@@ -9,4 +9,6 @@ interface QuizRepository {
     val quizList: Observable<List<Word>>
     fun updateQuizList(list: List<Word>)
     fun resetQuizList(dictionaryId: Long, quizType: QuizTypes): Completable
+
+    fun setQuizList(dictionaryId: Long, quizType: QuizTypes): Completable
 }

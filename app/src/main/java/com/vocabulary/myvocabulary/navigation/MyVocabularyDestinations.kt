@@ -32,5 +32,6 @@ object QuizList : MyVocabularyDestinations
 data class Quiz(
     val quizType: Int,
     val dictionaryId: Long,
-    val direction: Int
+    val direction: Int,
+    val failedOnly: Boolean
 ) : MyVocabularyDestinations

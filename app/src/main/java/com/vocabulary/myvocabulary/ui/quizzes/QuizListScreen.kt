@@ -34,16 +34,18 @@ import org.koin.compose.koinInject
 
 @Composable
 fun QuizListScreen(
-    onStartQuiz: (quizType: Int, dictionaryId: Long, direction: Int) -> Unit
+    onStartQuiz: (quizType: Int, dictionaryId: Long, direction: Int, failedOnly: Boolean) -> Unit
 ) {
+
     val dialogFactory: ComposeDialogFactory = koinInject()
     val list = QuizTypes.getQuizTypes()
 
     QuizListContent(
         list = list,
         dialogFactory = dialogFactory,
-        onStartQuiz = { quizType, dictionaryId, direction ->
-            onStartQuiz(quizType, dictionaryId, direction)
+        onStartQuiz = { quizType, dictionaryId, direction, failedOnly->
+
+            onStartQuiz(quizType, dictionaryId, direction, failedOnly)
         }
     )
 }
@@ -52,8 +54,9 @@ fun QuizListScreen(
 fun QuizListContent(
     list: List<QuizTypes>,
     dialogFactory: ComposeDialogFactory,
-    onStartQuiz: (quizType: Int, dictionaryId: Long, direction: Int) -> Unit
+    onStartQuiz: (quizType: Int, dictionaryId: Long, direction: Int, failedOnly: Boolean) -> Unit
 ) {
+
     ProvideAppBarTitle { Text(stringResource(R.string.quiz_toolbar)) }
     var showInfoDialog by rememberSaveable { mutableStateOf(false) }
     var dialogTitle by rememberSaveable { mutableStateOf("") }
@@ -74,7 +77,6 @@ fun QuizListContent(
             contentPadding = PaddingValues(MaterialTheme.dimens.PaddingMedium)
         ) {
             items(list) { item ->
-                selectedQuiz = item.toInt()
                 QuizCard(
                     quizType = item,
                     onInfoClick = { title, info ->
@@ -83,6 +85,7 @@ fun QuizListContent(
                         showInfoDialog = true
                     },
                     onTypeClick = {
+                        selectedQuiz = item.toInt()
                         isSheetOpen = true
                     }
                 )
@@ -113,7 +116,7 @@ fun QuizListContent(
                                },
             onConfirmation = { direction ->
                 selectedDirection = direction
-                onStartQuiz(selectedQuiz, selectedDictionaryId, selectedDirection)
+                onStartQuiz(selectedQuiz, selectedDictionaryId, selectedDirection, false)
                 showDirectionDialog = false
                 isSheetOpen = false
             }
@@ -182,7 +185,7 @@ fun QuizListScreenPreview() {
         QuizListContent(
             list = previewList,
             dialogFactory = ComposeDialogFactory(),
-            onStartQuiz = { _, _, _ -> }
+            onStartQuiz = { _, _, _, _ -> }
         )
     }
 }
