@@ -117,6 +117,8 @@
     <string name="dict_options_description">Szótár opciók</string>
     <string name="dictionary_fab_description">Új szótár</string>
     <string name="quiz_fab_next">Következő</string>
+    <string name="once_more">Még egyszer</string>
+    <string name="exit_fab_label">Kilépés</string>
 
 
 </resources>

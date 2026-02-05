@@ -18,7 +18,9 @@ private val DarkColorScheme = darkColorScheme(
     secondary = PurpleGrey80,
     tertiary = Pink80,
     surfaceVariant = CardBackgroundDark,
-    onSurfaceVariant = Color.Black
+    onSurfaceVariant = Color.Black,
+    errorContainer = ErrorBackground,
+    onErrorContainer = ErrorText,
 )
 
 private val LightColorScheme = lightColorScheme(
@@ -26,7 +28,11 @@ private val LightColorScheme = lightColorScheme(
     secondary = PurpleGrey40,
     tertiary = Pink40,
     surfaceVariant = Pink80,
-    onSurfaceVariant = Color.Black
+    onSurfaceVariant = Color.Black,
+    errorContainer = ErrorBackground,
+    onErrorContainer = ErrorText,
+
+)
 
 
     /* Other default colors to override
@@ -38,7 +44,7 @@ private val LightColorScheme = lightColorScheme(
     onBackground = Color(0xFF1C1B1F),
     onSurface = Color(0xFF1C1B1F),
     */
-)
+
 private val LocalDimens = staticCompositionLocalOf { Dimens }
 
 @Composable

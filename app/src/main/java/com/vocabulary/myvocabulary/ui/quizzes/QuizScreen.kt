@@ -1,25 +1,17 @@
 package com.vocabulary.myvocabulary.ui.quizzes
-
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.core.tween
-import androidx.compose.animation.expandVertically
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.slideInVertically
-import androidx.compose.foundation.gestures.Orientation
-import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.IntrinsicSize
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.text.input.rememberTextFieldState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material.icons.filled.Check
@@ -46,9 +38,6 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.input.nestedscroll.nestedScroll
-import androidx.compose.ui.platform.LocalWindowInfo
-import androidx.compose.ui.platform.rememberNestedScrollInteropConnection
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -66,7 +55,8 @@ fun QuizScreen(
     quizType: Int,
     dictionaryId: Long,
     direction: Int,
-    failedOnly: Boolean
+    failedOnly: Boolean,
+    onQuizFinished: (Long, Int) -> Unit
 ) {
 
     val quizViewModel: QuizViewModel = koinViewModel {
@@ -88,7 +78,9 @@ fun QuizScreen(
         onGuessSaved = { id, guess ->
             resultViewModel.latestGuess(lastGuess = GuessedWord(id, guess))
         },
-        onListFinished = {})
+        onListFinished = {
+            onQuizFinished(dictionaryId, direction)
+        })
 }
 
 @Composable
@@ -113,6 +105,14 @@ fun QuizScreenContent(
     //focusedWordId: the id of the word that is actually in focus
     var focusedWordId by rememberSaveable { mutableStateOf(0L) }
 
+    val listState = rememberLazyListState()
+
+    LaunchedEffect(rollingIndex) {
+        if (rollingIndex > 1) {
+            listState.animateScrollToItem(rollingIndex - 1)
+        }
+    }
+
     Scaffold(
         modifier = Modifier
             .fillMaxSize(),
@@ -120,30 +120,33 @@ fun QuizScreenContent(
             FabMenu(
                 onNextClicked = { nextClicked = true },
                 iconToDisplay = {
-                    if (isFabIconNext) {
-                        Icons.AutoMirrored.Filled.ArrowForward
-                    } else {
-                        Icons.Default.Check
-                    }
+                    if (isFabIconNext) Icons.AutoMirrored.Filled.ArrowForward
+                    else Icons.Default.Check
                 }
             )
         }
     )
     { paddingValues ->
-        Box(
+        LazyColumn(
+            state = listState,
             modifier = Modifier
                 .fillMaxSize()
-                .padding(paddingValues)
-                .verticalScroll(rememberScrollState()),
+                .padding(paddingValues),
+            verticalArrangement = Arrangement.spacedBy((-80).dp),
+            contentPadding = PaddingValues(bottom = 100.dp)
         ) {
-            if (quizList.isNotEmpty()) {
+            if(quizList.isNotEmpty()) {
                 val currentFocusedId = quizList.getOrNull(rollingIndex - 1)?.wordId ?: 0L
-                quizList.subList(0, rollingIndex).toList().forEachIndexed { index, word ->
+                items(
+                    count = rollingIndex,
+                    key = { index -> quizList[index].wordId }
+                ) { index ->
+                    val word = quizList[index]
                     val isThisCardActive = word.wordId == currentFocusedId
+
                     FocusCard(
                         modifier = Modifier
-                            .padding(top = (index * 20).dp)
-                            .align(Alignment.TopCenter),
+                            .fillMaxWidth(),
                         word = word,
                         isActive = isThisCardActive,
                         editTextContent = {
@@ -153,6 +156,11 @@ fun QuizScreenContent(
                             }
                         },
                         askTranslation = direction.toDirectionType() == QuizDirectionType.AskTranslation
+                    )
+                }
+                item {
+                    androidx.compose.foundation.layout.Spacer(
+                        modifier = Modifier.height(300.dp)
                     )
                 }
             }
@@ -190,9 +198,6 @@ fun FocusCard(
     val editState = rememberTextFieldState("")
     val focusRequester = remember { FocusRequester() }
     val question = if (askTranslation) { word.translation } else { word.word }
-    var isVisible by remember { mutableStateOf(false) }
-
-    LaunchedEffect(Unit) { isVisible = true }
 
     LaunchedEffect(isActive) {
         if (isActive) {
@@ -203,52 +208,53 @@ fun FocusCard(
         editTextContent(editState.text.toString())
     }
 
-    AnimatedVisibility(
-        visible = isVisible,
-        enter = slideInVertically(
-            initialOffsetY = { fullHeight -> fullHeight },
-            animationSpec = tween(durationMillis = 500)
-        ) + fadeIn(animationSpec = tween(durationMillis = 500)),
-        modifier = Modifier.fillMaxSize()
+//    AnimatedVisibility(
+//        visible = isVisible,
+//        enter = slideInVertically(
+//            initialOffsetY = { fullHeight -> fullHeight },
+//            animationSpec = tween(durationMillis = 500)
+//        ) + fadeIn(animationSpec = tween(durationMillis = 500)),
+//        modifier = Modifier.fillMaxSize()
+//    ) {
+//    }
+    Box(modifier = Modifier.fillMaxSize()
     ) {
-        Box(modifier = Modifier.fillMaxSize()) {
-            Card(
-                modifier = modifier
+        Card(
+            modifier = modifier
+                .fillMaxWidth()
+                .padding(MaterialTheme.dimens.PaddingLarge),
+            elevation = CardDefaults.cardElevation(defaultElevation = if (isActive) 8.dp else 2.dp),
+        ) {
+            Row(
+                modifier = Modifier
                     .fillMaxWidth()
-                    .padding(MaterialTheme.dimens.PaddingLarge),
-                elevation = CardDefaults.cardElevation(defaultElevation = if (isActive) 8.dp else 2.dp),
+                    .height(IntrinsicSize.Min)
+                    .alpha((if (isActive) 1f else 0f)),
+                horizontalArrangement = Arrangement.SpaceEvenly,
             ) {
-                Row(
+                Text(
                     modifier = Modifier
-                        .fillMaxWidth()
-                        .height(IntrinsicSize.Min)
-                        .alpha((if (isActive) 1f else 0f)),
-                    horizontalArrangement = Arrangement.SpaceEvenly,
-                ) {
-                    Text(
-                        modifier = Modifier
-                            .padding(MaterialTheme.dimens.PaddingLarge)
-                            .align(Alignment.CenterVertically)
-                            .weight(1f),
-                        text = question,
-                    )
-                    VerticalDivider(
-                        thickness = 1.dp,
-                        modifier = Modifier.padding(MaterialTheme.dimens.PaddingMedium),
-                    )
-                    TextField(
-                        modifier = Modifier
-                            .padding(MaterialTheme.dimens.PaddingLarge)
-                            .weight(1f)
-                            .focusRequester(focusRequester),
-                        state = editState,
-                        enabled = isActive,
-                        placeholder = { Text(stringResource(R.string.quiz_hint_enter_solution)) },
-                    )
-                }
+                        .padding(MaterialTheme.dimens.PaddingLarge)
+                        .align(Alignment.CenterVertically)
+                        .weight(1f),
+                    text = question,
+                )
+                VerticalDivider(
+                    thickness = 1.dp,
+                    modifier = Modifier.padding(MaterialTheme.dimens.PaddingMedium),
+                )
+                TextField(
+                    modifier = Modifier
+                        .padding(MaterialTheme.dimens.PaddingLarge)
+                        .weight(1f)
+                        .focusRequester(focusRequester),
+                    state = editState,
+                    enabled = isActive,
+                    placeholder = { Text(stringResource(R.string.quiz_hint_enter_solution)) },
+                )
             }
-
         }
+
     }
 }
 

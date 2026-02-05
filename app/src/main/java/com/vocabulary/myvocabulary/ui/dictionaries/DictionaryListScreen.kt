@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Clear
@@ -47,6 +48,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.vocabulary.myvocabulary.R
 import com.vocabulary.myvocabulary.navigation.ProvideAppBarTitle
+import com.vocabulary.myvocabulary.ui.theme.dimens
 import com.vocabulary.myvocabulary.utils.ComposeDialogFactory
 import org.koin.compose.koinInject
 import org.koin.compose.viewmodel.koinViewModel
@@ -194,7 +196,7 @@ fun DictionaryItemView(
     onShowEditDialog: (Dictionary) -> Unit,
     onDictionaryClick: (Dictionary) -> Unit
 ) {
-    val padding = 8.dp
+    val padding = MaterialTheme.dimens.PaddingMedium
     Card(
         onClick = { onDictionaryClick(dictionaryItem) },
         modifier
@@ -208,10 +210,11 @@ fun DictionaryItemView(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
-                modifier = Modifier.padding(28.dp),
+                modifier = Modifier.padding(MaterialTheme.dimens.PaddingLarge)
+                    .weight(0.7f),
                 text = dictionaryItem.dictionaryName,
                 fontSize = 20.sp,
-                textAlign = TextAlign.Center
+                textAlign = TextAlign.Center,
             )
 
             DictionaryOptionsButton(dictionaryItem, onShowDeleteDialog, onShowEditDialog)
@@ -228,7 +231,9 @@ fun DictionaryOptionsButton(
 ) {
     var expanded by remember { mutableStateOf(false) }
     Box {
-        IconButton(onClick = { expanded = !expanded }, modifier = Modifier.padding(16.dp)) {
+        IconButton(
+            onClick = { expanded = !expanded },
+            modifier = Modifier.padding(MaterialTheme.dimens.PaddingLarge)) {
             Icon(
                 imageVector = Icons.Default.MoreVert,
                 contentDescription = stringResource(R.string.dict_options_description),
@@ -270,9 +275,12 @@ fun DictionaryLazyList(
     onShowEditDialog: (Dictionary) -> Unit,
     onDictionaryClick: (Dictionary) -> Unit
 ) {
+    val state = rememberLazyListState()
+
     LazyColumn(
-        Modifier.fillMaxSize(),
-        contentPadding = PaddingValues(8.dp)
+        state = state,
+        modifier = Modifier.fillMaxSize(),
+        contentPadding = PaddingValues(MaterialTheme.dimens.PaddingMedium)
     ) {
         items(list) { item ->
             DictionaryItemView(
@@ -305,7 +313,7 @@ fun DictionaryListScreenPreview() {
                     listOf(
                         Dictionary(
                             dictionaryId = 1L,
-                            dictionaryName = "Test",
+                            dictionaryName = "Test that's very very very long and I want to see the option button",
                             dictionaryCreated = Calendar.getInstance().time
                         ),
                         Dictionary(

@@ -15,6 +15,7 @@ import com.vocabulary.myvocabulary.ui.dictionaries.DictionaryListScreen
 import com.vocabulary.myvocabulary.ui.home.HomeScreen
 import com.vocabulary.myvocabulary.ui.quizzes.QuizListScreen
 import com.vocabulary.myvocabulary.ui.quizzes.QuizScreen
+import com.vocabulary.myvocabulary.ui.results.ResultScreen
 import com.vocabulary.myvocabulary.ui.words.WordListScreen
 
 @Composable
@@ -76,7 +77,15 @@ fun MyVocabularyNavHost(
 
             composable<Quiz> {
                 val args = it.toRoute<Quiz>()
-                QuizScreen(args.quizType, args.dictionaryId, args.direction, args.failedOnly)
+                QuizScreen(args.quizType, args.dictionaryId, args.direction, args.failedOnly,
+                    onQuizFinished = { dictionaryId, direction ->
+                        navController.navigate(Result(dictionaryId,direction))
+                    })
+            }
+
+            composable<Result> {
+                val args = it.toRoute<Result>()
+                ResultScreen(args.dictionaryId, args.direction)
             }
         }
     }

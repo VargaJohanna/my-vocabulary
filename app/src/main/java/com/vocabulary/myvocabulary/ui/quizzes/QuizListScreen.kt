@@ -93,7 +93,7 @@ fun QuizListContent(
         }
         if(isSheetOpen) {
             DictionaryPickerBottomSheet(
-                onDismissRequest = { isSheetOpen = it },
+                onDismissRequestBottomSheet = { isSheetOpen = it },
                 selectedDictionaryId = { selectedDictionaryId = it },
                 showDialog = {showDirectionDialog = it}
             )

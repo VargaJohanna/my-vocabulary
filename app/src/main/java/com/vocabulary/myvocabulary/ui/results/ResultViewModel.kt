@@ -3,6 +3,7 @@ package com.vocabulary.myvocabulary.ui.results
 import android.content.SharedPreferences
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.f2prateek.rx.preferences2.RxSharedPreferences
 import com.vocabulary.myvocabulary.ext.plusAssign
 import com.vocabulary.myvocabulary.repositories.guessedWord.GuessedMapData
@@ -20,6 +21,8 @@ import io.reactivex.Completable
 import io.reactivex.Observable
 import io.reactivex.Single
 import io.reactivex.disposables.CompositeDisposable
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.launch
 import java.util.Locale
 import java.util.Locale.getDefault
 
@@ -34,6 +37,7 @@ class ResultViewModel(
 ) : ViewModel() {
     private val disposables = CompositeDisposable()
     private val liveGuessedWordList: MutableLiveData<List<Word>> = MutableLiveData()
+    private val guessedWordList: MutableStateFlow<List<Word>> = MutableStateFlow(emptyList())
     var directionResult: QuizDirectionType = QuizDirectionType.AskWord
     var isAllPassed = true
     val openedAppCounter: Int = preferences.getInt(COUNTER_KEY, 0)
@@ -41,6 +45,12 @@ class ResultViewModel(
     override fun onCleared() {
         disposables.clear()
         super.onCleared()
+    }
+
+    fun fetchGuessedList() {
+        viewModelScope.launch {
+            observeGuessedWordMap()
+        }
     }
 
     fun observeGuessedWordMap() {
@@ -62,6 +72,7 @@ class ResultViewModel(
                 .observeOn(rxSchedulers.main())
                 .subscribe { guessList ->
                     liveGuessedWordList.postValue(guessList)
+                    guessedWordList.value = guessList
                     quizRepository.updateQuizList(guessList)
                 }
     }
@@ -78,14 +89,14 @@ class ResultViewModel(
 
     private fun evaluate(it: Word, entry: MutableMap.MutableEntry<Long, String>): Word {
         return if (directionResult == QuizDirectionType.AskWord) {
-            if (it.translation.lowercase(getDefault()) == entry.value.lowercase(getDefault())) {
+            if (it.translation.equals(entry.value, ignoreCase = true)) {
                 it.copy(lastResult = true, lastGuess = entry.value, beenAsked = it.beenAsked + 1, passed = it.passed + 1)
             } else {
                 setAllPassedValue(false)
                 it.copy(lastResult = false, lastGuess = entry.value, beenAsked = it.beenAsked + 1, failed = it.failed + 1)
             }
         } else {
-            if (it.word.lowercase(getDefault()) == entry.value.lowercase(getDefault())) {
+            if (it.word.equals(entry.value, ignoreCase = true)) {
                 it.copy(lastResult = true, lastGuess = entry.value, beenAsked = it.beenAsked + 1, passed = it.passed + 1)
             } else {
                 setAllPassedValue(false)
@@ -100,11 +111,14 @@ class ResultViewModel(
 
     fun getLiveGuessedList() = liveGuessedWordList
 
+    fun getGuessedList() = guessedWordList
+
 
     fun resetGuessedWordCollections() {
         guessedWordRepository.resetGuessedWordMap()
-        liveGuessedWordList.postValue(mutableListOf())
-        setAllPassedValue(true)
+//        liveGuessedWordList.postValue(mutableListOf())
+        guessedWordList.value = emptyList()
+        setAllPassedValue(true) // It's true until in evaluation it's turned false
     }
 
     fun setDirection(direction: QuizDirectionType) {

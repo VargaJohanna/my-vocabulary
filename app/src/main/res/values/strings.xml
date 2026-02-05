@@ -117,5 +117,7 @@
     <string name="dict_options_description">Dictionary Options Button</string>
     <string name="dictionary_fab_description">Add dictionary</string>
     <string name="quiz_fab_next">Quiz Next</string>
+    <string name="once_more">Once More</string>
+    <string name="exit_fab_label">Exit</string>
 
 </resources>

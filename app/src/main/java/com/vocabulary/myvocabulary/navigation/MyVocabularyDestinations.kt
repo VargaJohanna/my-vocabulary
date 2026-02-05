@@ -35,3 +35,9 @@ data class Quiz(
     val direction: Int,
     val failedOnly: Boolean
 ) : MyVocabularyDestinations
+
+@Serializable
+data class Result(
+    val dictionaryId: Long,
+    val direction: Int,
+) : MyVocabularyDestinations

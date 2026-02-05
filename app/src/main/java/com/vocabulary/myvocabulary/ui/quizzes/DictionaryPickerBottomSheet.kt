@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -28,7 +29,7 @@ import java.util.Calendar
 
 @Composable
 fun DictionaryPickerBottomSheet(
-    onDismissRequest: (isSheetOpen: Boolean) -> Unit,
+    onDismissRequestBottomSheet: (isSheetOpen: Boolean) -> Unit,
     selectedDictionaryId: (id: Long) -> Unit,
     showDialog: (isDialogOpen: Boolean) -> Unit,
 ) {
@@ -40,7 +41,7 @@ fun DictionaryPickerBottomSheet(
     val dictionaryList by viewModel.dictionaries.collectAsState()
     DictionaryPickerContent(
         dictionaryList = dictionaryList,
-        onDismissRequest = onDismissRequest,
+        onDismissRequestBottomSheet = onDismissRequestBottomSheet,
         showQuizDirectionDialog = { showDialog(it) },
         onSelectedDictionary = { id ->
             selectedDictionaryId(id)
@@ -53,15 +54,17 @@ fun DictionaryPickerBottomSheet(
 @Composable
 fun DictionaryPickerContent(
     dictionaryList: List<Dictionary>,
-    onDismissRequest: (isSheetOpen: Boolean) -> Unit,
+    onDismissRequestBottomSheet: (isSheetOpen: Boolean) -> Unit,
     showQuizDirectionDialog: (isDialogOpen: Boolean) -> Unit,
     onSelectedDictionary: (id: Long) -> Unit,
 ) {
     val sheetState = rememberModalBottomSheetState()
+    val listState = rememberLazyListState()
+
 
     ModalBottomSheet(
         sheetState = sheetState,
-        onDismissRequest = { onDismissRequest(false) },
+        onDismissRequest = { onDismissRequestBottomSheet(false) },
     ) {
         Text(
             text = stringResource(R.string.quiz_dictionary_picker_title),
@@ -72,6 +75,7 @@ fun DictionaryPickerContent(
         )
 
         LazyColumn(
+            state = listState,
             modifier = Modifier
                 .padding(MaterialTheme.dimens.PaddingMedium)
         ) {
@@ -169,7 +173,7 @@ fun DictionaryPickerPreview() {
     MaterialTheme {
         DictionaryPickerContent(
             dictionaryList = previewList,
-            onDismissRequest = {},
+            onDismissRequestBottomSheet = {},
             showQuizDirectionDialog = { },
             onSelectedDictionary = {}
         )

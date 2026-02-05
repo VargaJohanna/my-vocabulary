@@ -30,17 +30,13 @@ class QuizViewModel(
     private val isFabIconUpdated = MutableStateFlow(false)
     private var lastIndexOfSubList = 1
     private var listIsFinished = false
-    val direction = optionType.toDirectionType()
-//    private val liveSubWordList = MutableLiveData<List<FocusableWord>>()
-//    private val subWordList: MutableStateFlow<List<FocusableWord>> = MutableStateFlow(emptyList())
     private val _quizList: MutableStateFlow<List<Word>> = MutableStateFlow(emptyList())
     val quizList: StateFlow<List<Word>> = _quizList
-//    private var focusableWordList = mutableListOf<FocusableWord>()
     var isDictionaryEmpty = false
 
     fun fetchQuizList() {
         viewModelScope.launch {
-            observeQuizList(false)
+            observeQuizList()
         }
     }
 
@@ -51,38 +47,22 @@ class QuizViewModel(
         }
     }
 
-    private fun observeQuizList(failedOnly: Boolean) {
+    private fun observeQuizList() {
         disposables += quizRepository.quizList
                 .subscribeOn(rxSchedulers.io())
                 .observeOn(rxSchedulers.main())
                 .subscribe {
                     isDictionaryEmpty = it.isEmpty()
-//                    focusableWordList.clear()
-//                    it.forEachIndexed { index: Int, word: Word ->
-//                        val newFocusableWord = QuizViewModel.FocusableWord(word, index == 0)
-//                        if (!getFocusableWordList().contains(newFocusableWord) && word.containerDictionaryId == dictionaryId) {
-//                            if (!failedOnly || !word.lastResult) getFocusableWordList().add(newFocusableWord)
-//                        }
-//                    }
                     if (it.isNotEmpty()) {
-//                        focusableWordList.shuffle()
-//                        liveSubWordList.postValue(getFocusableWordList().subList(0, 1))
                         updateIcon.postValue(getFocusableWordList().size == 1)
                         listIsFinished = getFocusableWordList().size == 1
-//                        subWordList.value = getFocusableWordList().subList(0, 1)
                         isFabIconUpdated.value = getFocusableWordList().size == 1
                         _quizList.value = it
                     } else {
-//                        liveSubWordList.postValue(emptyList())
-//                        subWordList.value = emptyList()
                         _quizList.value = emptyList()
-
                     }
                 }
     }
-
-//    fun getLiveWordList(): LiveData<List<FocusableWord>> = liveSubWordList
-//    fun getFlowWordList(): MutableStateFlow<List<FocusableWord>> = subWordList
 
     override fun onCleared() {
         disposables.clear()
@@ -94,9 +74,6 @@ class QuizViewModel(
             lastIndexOfSubList += 1
             setFocusableValue(lastIndexOfSubList)
             listIsFinished = lastIndexOfSubList == getFocusableWordList().size
-//            liveSubWordList.postValue(getFocusableWordList().subList(0, lastIndexOfSubList))
-
-//            subWordList.value = getFocusableWordList().subList(0, lastIndexOfSubList)
             updateIcon.postValue(lastIndexOfSubList == getFocusableWordList().size)
             isFabIconUpdated.value = lastIndexOfSubList == getFocusableWordList().size
         }
