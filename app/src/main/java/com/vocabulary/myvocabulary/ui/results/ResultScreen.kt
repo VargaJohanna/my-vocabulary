@@ -1,7 +1,6 @@
 package com.vocabulary.myvocabulary.ui.results
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
@@ -47,6 +46,7 @@ import com.vocabulary.myvocabulary.R
 import com.vocabulary.myvocabulary.navigation.ProvideAppBarTitle
 import com.vocabulary.myvocabulary.ui.quizzes.QuizDirectionType
 import com.vocabulary.myvocabulary.ui.quizzes.toDirectionType
+import com.vocabulary.myvocabulary.ui.quizzes.toQuizType
 import com.vocabulary.myvocabulary.ui.theme.dimens
 import com.vocabulary.myvocabulary.ui.words.Word
 import org.koin.compose.viewmodel.koinViewModel
@@ -58,6 +58,9 @@ import kotlin.math.round
 fun ResultScreen(
     dictionaryId: Long,
     direction: Int,
+    quizType: Int,
+    onRestartQuiz: (quizType: Int, dictionaryId: Long, direction: Int, failedOnly: Boolean) -> Unit,
+    onExit: () -> Unit
 ) {
 
     val resultViewModel: ResultViewModel = koinViewModel {
@@ -72,7 +75,20 @@ fun ResultScreen(
 
     ResultScreenContent(
         resultList = resultList,
-        directionType = direction.toDirectionType()
+        directionType = direction.toDirectionType(),
+        onExit = { onExit() },
+        onRestartNew = {
+            resultViewModel.resetGuessedWordCollections()
+            resultViewModel.startNew(dictionaryId, quizType.toQuizType())
+            resultViewModel.dispose()
+            onRestartQuiz(quizType, dictionaryId, direction, false)
+        },
+        onRestartFailedOnly = {
+            resultViewModel.resetGuessedWordCollections()
+            resultViewModel.dispose()
+            onRestartQuiz(quizType, dictionaryId, direction, true)
+        },
+        passedQuiz =  resultViewModel.isAllPassed
     )
 }
 
@@ -82,6 +98,10 @@ fun ResultScreenContent(
     resultList: List<Word>,
     isFabOpen: Boolean = false,
     directionType: QuizDirectionType,
+    onExit: () -> Unit,
+    onRestartNew: () -> Unit,
+    onRestartFailedOnly: () -> Unit,
+    passedQuiz: Boolean
 ) {
     ProvideAppBarTitle { Text(stringResource(R.string.result_fragment_title)) }
     val passes = resultList.filter { it.lastResult }.size
@@ -96,9 +116,10 @@ fun ResultScreenContent(
             FabMenu(
                 expanded = expanded,
                 onExpandedChange = { expanded = it },
-                onExit = {  },
-                onRestartNew = {  },
-                onRestartFailedOnly = {  }
+                onExit = onExit,
+                onRestartNew = onRestartNew,
+                onRestartFailedOnly = onRestartFailedOnly,
+                passedQuiz = passedQuiz
             )
         }
     ) { paddingValues ->
@@ -119,7 +140,8 @@ fun ResultScreenContent(
                     passes,
                     all,
                     round(((passes.toFloat() / all.toFloat()) * 100)).toInt()
-                ))
+                )
+            )
             ResultLazyList(
                 list = resultList,
                 paddingValues = PaddingValues(0.dp),
@@ -143,7 +165,8 @@ fun ResultLazyList(
 
     LazyColumn(
         state = state,
-        modifier = modifier.fillMaxSize()
+        modifier = modifier
+            .fillMaxSize()
             .padding(paddingValues),
         contentPadding = paddingValues
     ) {
@@ -169,9 +192,10 @@ fun ResultListItemPassed(
     modifier: Modifier = Modifier,
     question: String,
     answer: String,
-){
+) {
     Row(
-        modifier = modifier.padding(MaterialTheme.dimens.PaddingSmall)
+        modifier = modifier
+            .padding(MaterialTheme.dimens.PaddingSmall)
             .fillMaxWidth()
 
     ) {
@@ -185,7 +209,8 @@ fun ResultListItemPassed(
                 horizontalArrangement = Arrangement.SpaceEvenly
             ) {
                 Text(
-                    modifier = Modifier.padding(MaterialTheme.dimens.PaddingLarge)
+                    modifier = Modifier
+                        .padding(MaterialTheme.dimens.PaddingLarge)
                         .weight(0.5f)
                         .align(Alignment.CenterVertically),
                     text = question,
@@ -194,11 +219,15 @@ fun ResultListItemPassed(
 
                 VerticalDivider(
                     thickness = 1.dp,
-                    modifier = Modifier.padding(top = MaterialTheme.dimens.PaddingMedium, bottom = MaterialTheme.dimens.PaddingMedium)
+                    modifier = Modifier.padding(
+                        top = MaterialTheme.dimens.PaddingMedium,
+                        bottom = MaterialTheme.dimens.PaddingMedium
+                    )
                 )
 
                 Text(
-                    modifier = Modifier.padding(MaterialTheme.dimens.PaddingLarge)
+                    modifier = Modifier
+                        .padding(MaterialTheme.dimens.PaddingLarge)
                         .weight(0.5f)
                         .align(Alignment.CenterVertically),
                     text = answer,
@@ -209,7 +238,8 @@ fun ResultListItemPassed(
         }
 
         Icon(
-            modifier = Modifier.padding(MaterialTheme.dimens.PaddingMedium)
+            modifier = Modifier
+                .padding(MaterialTheme.dimens.PaddingMedium)
                 .align(Alignment.CenterVertically),
             imageVector = Icons.Default.Done,
             contentDescription = stringResource(R.string.result_start_over_label),
@@ -224,14 +254,15 @@ fun ResultListItemFailed(
     question: String,
     answer: String,
     solution: String
-){
+) {
     Row(
-        modifier = modifier.padding(MaterialTheme.dimens.PaddingSmall)
+        modifier = modifier
+            .padding(MaterialTheme.dimens.PaddingSmall)
             .fillMaxWidth()
     ) {
         Card(
             modifier = Modifier.weight(0.8f)
-        ){
+        ) {
             Row(
                 modifier = modifier
                     .fillMaxWidth()
@@ -240,7 +271,8 @@ fun ResultListItemFailed(
                 horizontalArrangement = Arrangement.SpaceEvenly
             ) {
                 Text(
-                    modifier = modifier.padding(MaterialTheme.dimens.PaddingLarge)
+                    modifier = modifier
+                        .padding(MaterialTheme.dimens.PaddingLarge)
                         .weight(0.5f)
                         .align(Alignment.CenterVertically),
                     text = question,
@@ -252,7 +284,8 @@ fun ResultListItemFailed(
                     modifier = modifier.padding(MaterialTheme.dimens.PaddingMedium)
                 )
                 Column(
-                    modifier = Modifier.weight(0.5f)
+                    modifier = Modifier
+                        .weight(0.5f)
                         .padding(MaterialTheme.dimens.PaddingMedium)
 
                 ) {
@@ -270,7 +303,8 @@ fun ResultListItemFailed(
             }
         }
         Icon(
-            modifier = Modifier.padding(MaterialTheme.dimens.PaddingMedium)
+            modifier = Modifier
+                .padding(MaterialTheme.dimens.PaddingMedium)
                 .align(Alignment.CenterVertically),
             imageVector = Icons.Default.Close,
             contentDescription = stringResource(R.string.result_start_over_label),
@@ -286,11 +320,12 @@ fun FabMenu(
     onExpandedChange: (Boolean) -> Unit,
     onExit: () -> Unit,
     onRestartNew: () -> Unit,
-    onRestartFailedOnly: () -> Unit
+    onRestartFailedOnly: () -> Unit,
+    passedQuiz: Boolean
 ) {
 
     FloatingActionButtonMenu(
-        expanded =  expanded ,
+        expanded = expanded,
         button = {
             ToggleFloatingActionButton(
                 checked = expanded,
@@ -321,19 +356,22 @@ fun FabMenu(
                 )
             }
         )
-        FloatingActionButtonMenuItem(
-            onClick = {
-                onExpandedChange(false)
-                onRestartFailedOnly()
-            },
-            text = { Text(stringResource(R.string.result_failed_ones_only_label)) },
-            icon = {
-                Icon(
-                    imageVector = ImageVector.vectorResource(id = R.drawable.ic_failed_only),
-                    contentDescription = stringResource(R.string.result_failed_ones_only_label)
-                )
-            }
-        )
+
+        if (passedQuiz.not()) {
+            FloatingActionButtonMenuItem(
+                onClick = {
+                    onExpandedChange(false)
+                    onRestartFailedOnly()
+                },
+                text = { Text(stringResource(R.string.result_failed_ones_only_label)) },
+                icon = {
+                    Icon(
+                        imageVector = ImageVector.vectorResource(id = R.drawable.ic_failed_only),
+                        contentDescription = stringResource(R.string.result_failed_ones_only_label)
+                    )
+                }
+            )
+        }
         FloatingActionButtonMenuItem(
             onClick = {
                 onExpandedChange(false)
@@ -354,13 +392,40 @@ fun FabMenu(
 @Composable
 fun ResultScreenPreview() {
     val list = listOf(
-        Word(wordId = 1, containerDictionaryId = 1, word = "new", translation = "novus", beenAsked = 0, failed = 0, passed = 0, created = Calendar.getInstance().time, lastResult = false, lastGuess = "bad"),
-        Word(wordId = 2, containerDictionaryId = 1, word = "body", translation = "corpus", beenAsked = 0, failed = 0, passed = 0, created = Calendar.getInstance().time, lastResult = true, lastGuess = "corpus"),
+        Word(
+            wordId = 1,
+            containerDictionaryId = 1,
+            word = "new",
+            translation = "novus",
+            beenAsked = 0,
+            failed = 0,
+            passed = 0,
+            created = Calendar.getInstance().time,
+            lastResult = false,
+            lastGuess = "bad"
+        ),
+        Word(
+            wordId = 2,
+            containerDictionaryId = 1,
+            word = "body",
+            translation = "corpus",
+            beenAsked = 0,
+            failed = 0,
+            passed = 0,
+            created = Calendar.getInstance().time,
+            lastResult = true,
+            lastGuess = "corpus"
+        ),
         Word(3, 1, "day", "diem", 0, 0, 0, Calendar.getInstance().time),
     )
 
     ResultScreenContent(
         resultList = list,
         isFabOpen = true,
-        directionType = QuizDirectionType.AskTranslation)
+        directionType = QuizDirectionType.AskTranslation,
+        onExit = {},
+        onRestartNew = {},
+        onRestartFailedOnly = {},
+        passedQuiz = true
+    )
 }

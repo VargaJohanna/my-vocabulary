@@ -23,7 +23,6 @@ fun MyVocabularyNavHost(
     navController: NavHostController,
     modifier: Modifier = Modifier
 ) {
-    val navController = rememberNavController()
     val localNavController = staticCompositionLocalOf<NavController> {
         error("NavController not provided")
     }
@@ -77,15 +76,31 @@ fun MyVocabularyNavHost(
 
             composable<Quiz> {
                 val args = it.toRoute<Quiz>()
-                QuizScreen(args.quizType, args.dictionaryId, args.direction, args.failedOnly,
-                    onQuizFinished = { dictionaryId, direction ->
-                        navController.navigate(Result(dictionaryId,direction))
+                QuizScreen(
+                    args.quizType, args.dictionaryId, args.direction, args.failedOnly,
+                    onQuizFinished = { dictionaryId, direction, quizType ->
+                        navController.navigate(Result(dictionaryId, direction, quizType))
                     })
             }
 
             composable<Result> {
                 val args = it.toRoute<Result>()
-                ResultScreen(args.dictionaryId, args.direction)
+                ResultScreen(
+                    args.dictionaryId, args.direction, args.quizType,
+                    onRestartQuiz = { quizType, dictionaryId, direction, failedOnly ->
+                        navController.navigate(
+                            Quiz(quizType, dictionaryId, direction, failedOnly)
+                        ) {
+                            popUpTo<Result> { inclusive = true }
+                        }
+                    },
+                    onExit = {
+                        navController.navigate(Home) {
+                            popUpTo<Home> { inclusive = true }
+                            launchSingleTop = true
+                        }
+                    }
+                )
             }
         }
     }

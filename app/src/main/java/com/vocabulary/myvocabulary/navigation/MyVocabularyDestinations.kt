@@ -40,4 +40,5 @@ data class Quiz(
 data class Result(
     val dictionaryId: Long,
     val direction: Int,
+    val quizType: Int,
 ) : MyVocabularyDestinations

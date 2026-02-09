@@ -17,6 +17,7 @@ import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -56,7 +57,7 @@ fun QuizScreen(
     dictionaryId: Long,
     direction: Int,
     failedOnly: Boolean,
-    onQuizFinished: (Long, Int) -> Unit
+    onQuizFinished: (Long, Int, Int) -> Unit
 ) {
 
     val quizViewModel: QuizViewModel = koinViewModel {
@@ -73,14 +74,20 @@ fun QuizScreen(
     }
     val quizList by quizViewModel.quizList.collectAsState()
 
-    QuizScreenContent(
-        dictionaryId, direction, failedOnly, quizList,
-        onGuessSaved = { id, guess ->
-            resultViewModel.latestGuess(lastGuess = GuessedWord(id, guess))
-        },
-        onListFinished = {
-            onQuizFinished(dictionaryId, direction)
-        })
+    if (quizList.isNotEmpty()) {
+        QuizScreenContent(
+            dictionaryId, direction, failedOnly, quizList,
+            onGuessSaved = { id, guess ->
+                resultViewModel.latestGuess(lastGuess = GuessedWord(id, guess))
+            },
+            onListFinished = {
+                onQuizFinished(dictionaryId, direction, quizType)
+            })
+    } else {
+        Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+            CircularProgressIndicator()
+        }
+    }
 }
 
 @Composable
@@ -139,24 +146,25 @@ fun QuizScreenContent(
                 val currentFocusedId = quizList.getOrNull(rollingIndex - 1)?.wordId ?: 0L
                 items(
                     count = rollingIndex,
-                    key = { index -> quizList[index].wordId }
+                    key = { index -> quizList.getOrNull(index)?.wordId ?: "fallback_$index" }
                 ) { index ->
-                    val word = quizList[index]
-                    val isThisCardActive = word.wordId == currentFocusedId
-
-                    FocusCard(
-                        modifier = Modifier
-                            .fillMaxWidth(),
-                        word = word,
-                        isActive = isThisCardActive,
-                        editTextContent = {
-                            if (isThisCardActive) {
-                                guessContent = it
-                                focusedWordId = word.wordId
-                            }
-                        },
-                        askTranslation = direction.toDirectionType() == QuizDirectionType.AskTranslation
-                    )
+                    val word = quizList.getOrNull(index)
+                    if (word != null) {
+                        val isThisCardActive = word.wordId == currentFocusedId
+                        FocusCard(
+                            modifier = Modifier
+                                .fillMaxWidth(),
+                            word = word,
+                            isActive = isThisCardActive,
+                            editTextContent = {
+                                if (isThisCardActive) {
+                                    guessContent = it
+                                    focusedWordId = word.wordId
+                                }
+                            },
+                            askTranslation = direction.toDirectionType() == QuizDirectionType.AskTranslation
+                        )
+                    }
                 }
                 item {
                     androidx.compose.foundation.layout.Spacer(

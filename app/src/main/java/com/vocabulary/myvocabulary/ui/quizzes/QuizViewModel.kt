@@ -20,7 +20,7 @@ import kotlinx.coroutines.launch
 class QuizViewModel(
         val dictionaryId: Long,
         val optionType: Int,
-        failedOnly: Boolean,
+        val failedOnly: Boolean,
         private val rxSchedulers: RxSchedulers,
         private val quizRepository: QuizRepository
 ) : ViewModel() {
@@ -36,28 +36,36 @@ class QuizViewModel(
 
     fun fetchQuizList() {
         viewModelScope.launch {
-            observeQuizList()
+            observeQuizList(failedOnly)
         }
     }
 
     fun startQuiz(quizType: QuizTypes, dictionaryId: Long) {
         viewModelScope.launch {
-            quizRepository.setQuizList(dictionaryId, quizType)
-                .subscribe()
+            if(failedOnly.not()) {
+                quizRepository.setQuizList(dictionaryId, quizType)
+                    .subscribe()
+            }
         }
     }
 
-    private fun observeQuizList() {
+    private fun observeQuizList(failedOnly: Boolean) {
         disposables += quizRepository.quizList
                 .subscribeOn(rxSchedulers.io())
                 .observeOn(rxSchedulers.main())
-                .subscribe {
-                    isDictionaryEmpty = it.isEmpty()
-                    if (it.isNotEmpty()) {
+                .subscribe { list ->
+                    isDictionaryEmpty = list.isEmpty()
+                    if (list.isNotEmpty()) {
+                        val filteredList = if (failedOnly) {
+                            list.filter { word -> !word.lastResult }
+                        } else {
+                            list
+                        }
+                        _quizList.value = filteredList.shuffled()
+
                         updateIcon.postValue(getFocusableWordList().size == 1)
                         listIsFinished = getFocusableWordList().size == 1
                         isFabIconUpdated.value = getFocusableWordList().size == 1
-                        _quizList.value = it
                     } else {
                         _quizList.value = emptyList()
                     }
