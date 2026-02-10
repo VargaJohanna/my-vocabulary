@@ -1,5 +1,6 @@
 package com.vocabulary.myvocabulary.ui.results
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -67,6 +68,16 @@ fun ResultScreen(
         parametersOf(dictionaryId)
     }
 
+    val handleExit = {
+        resultViewModel.resetGuessedWordCollections()
+        resultViewModel.dispose()
+        onExit()
+    }
+
+    BackHandler(enabled = true) {
+        handleExit()
+    }
+
     LaunchedEffect(Unit) {
         resultViewModel.fetchGuessedList()
     }
@@ -76,7 +87,7 @@ fun ResultScreen(
     ResultScreenContent(
         resultList = resultList,
         directionType = direction.toDirectionType(),
-        onExit = { onExit() },
+        onExit = handleExit,
         onRestartNew = {
             resultViewModel.resetGuessedWordCollections()
             resultViewModel.startNew(dictionaryId, quizType.toQuizType())

@@ -110,7 +110,7 @@
     <string name="number_of_words">Number of words: %1$d</string>
     <string name="dictionary_title">Title</string>
     <string name="custom_dialog_title">Enter number of words to be asked</string>
-    <string name="custom_dialog_error">It should be more than that</string>
+    <string name="custom_dialog_error">Please only use numbers higher than 0</string>
     <string name="back_arrow">Go back</string>
     <string name="home_info">Info about developer</string>
     <string name="about_appbar">About</string>
@@ -119,5 +119,6 @@
     <string name="quiz_fab_next">Quiz Next</string>
     <string name="once_more">Once More</string>
     <string name="exit_fab_label">Exit</string>
+    <string name="add_a_number">Add a number</string>
 
 </resources>

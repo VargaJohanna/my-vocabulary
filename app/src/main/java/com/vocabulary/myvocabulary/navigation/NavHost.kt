@@ -79,7 +79,10 @@ fun MyVocabularyNavHost(
                 QuizScreen(
                     args.quizType, args.dictionaryId, args.direction, args.failedOnly,
                     onQuizFinished = { dictionaryId, direction, quizType ->
-                        navController.navigate(Result(dictionaryId, direction, quizType))
+                        navController.navigate(Result(dictionaryId, direction, quizType)) {
+                            popUpTo<Quiz> { inclusive = true }
+                            launchSingleTop = true
+                        }
                     })
             }
 
@@ -91,12 +94,13 @@ fun MyVocabularyNavHost(
                         navController.navigate(
                             Quiz(quizType, dictionaryId, direction, failedOnly)
                         ) {
-                            popUpTo<Result> { inclusive = true }
+                            popUpTo<Quiz> { inclusive = true }
+                            launchSingleTop = true
                         }
                     },
                     onExit = {
                         navController.navigate(Home) {
-                            popUpTo<Home> { inclusive = true }
+                            popUpTo<Home> { inclusive = false }
                             launchSingleTop = true
                         }
                     }

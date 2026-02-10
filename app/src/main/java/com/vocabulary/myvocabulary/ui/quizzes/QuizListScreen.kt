@@ -19,6 +19,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -39,14 +40,16 @@ fun QuizListScreen(
 
     val dialogFactory: ComposeDialogFactory = koinInject()
     val list = QuizTypes.getQuizTypes()
+    val quizListViewModel: QuizListViewModel = koinInject()
 
     QuizListContent(
         list = list,
         dialogFactory = dialogFactory,
-        onStartQuiz = { quizType, dictionaryId, direction, failedOnly->
+        onStartQuiz = { quizType, dictionaryId, direction, failedOnly ->
 
             onStartQuiz(quizType, dictionaryId, direction, failedOnly)
-        }
+        },
+        onCustomSelected = { quizListViewModel.addCustomQuizSize(size = it) }
     )
 }
 
@@ -54,11 +57,13 @@ fun QuizListScreen(
 fun QuizListContent(
     list: List<QuizTypes>,
     dialogFactory: ComposeDialogFactory,
-    onStartQuiz: (quizType: Int, dictionaryId: Long, direction: Int, failedOnly: Boolean) -> Unit
+    onStartQuiz: (quizType: Int, dictionaryId: Long, direction: Int, failedOnly: Boolean) -> Unit,
+    onCustomSelected: (size: Int) -> Unit
 ) {
 
     ProvideAppBarTitle { Text(stringResource(R.string.quiz_toolbar)) }
     var showInfoDialog by rememberSaveable { mutableStateOf(false) }
+    var showCustomDialog by rememberSaveable { mutableStateOf(false) }
     var dialogTitle by rememberSaveable { mutableStateOf("") }
     var dialogText by rememberSaveable { mutableStateOf("") }
     var isSheetOpen by rememberSaveable { mutableStateOf(false) }
@@ -67,6 +72,9 @@ fun QuizListContent(
     var selectedDictionaryId: Long by rememberSaveable { mutableStateOf(0L) }
     var selectedDirection by rememberSaveable { mutableStateOf(0) }
 
+    val sortedList = remember(list) {
+        list.sortedBy { it.toInt() }
+    }
     Scaffold(
         modifier = Modifier.fillMaxSize()
     ) { paddingValues ->
@@ -76,7 +84,7 @@ fun QuizListContent(
                 .fillMaxSize(),
             contentPadding = PaddingValues(MaterialTheme.dimens.PaddingMedium)
         ) {
-            items(list) { item ->
+            items(sortedList) { item ->
                 QuizCard(
                     quizType = item,
                     onInfoClick = { title, info ->
@@ -87,21 +95,22 @@ fun QuizListContent(
                     onTypeClick = {
                         selectedQuiz = item.toInt()
                         isSheetOpen = true
-                    }
+                    },
+                    onCustomClick = { showCustomDialog = true }
                 )
             }
         }
-        if(isSheetOpen) {
+        if (isSheetOpen) {
             DictionaryPickerBottomSheet(
                 onDismissRequestBottomSheet = { isSheetOpen = it },
                 selectedDictionaryId = { selectedDictionaryId = it },
-                showDialog = {showDirectionDialog = it}
+                showDialog = { showDirectionDialog = it }
             )
         }
 
     }
 
-    if(showInfoDialog) {
+    if (showInfoDialog) {
         dialogFactory.BuildInfoDialog(
             onDismissRequest = { showInfoDialog = false },
             dialogTitle = dialogTitle,
@@ -109,16 +118,31 @@ fun QuizListContent(
         )
     }
 
-    if(showDirectionDialog) {
+    if (showDirectionDialog) {
         dialogFactory.BuildChooseDirectionDialog(
             onDismissRequest = {
                 showDirectionDialog = false
-                               },
+            },
             onConfirmation = { direction ->
                 selectedDirection = direction
                 onStartQuiz(selectedQuiz, selectedDictionaryId, selectedDirection, false)
                 showDirectionDialog = false
                 isSheetOpen = false
+            }
+        )
+    }
+
+    if (showCustomDialog) {
+        dialogFactory.BuildCustomQuizSizeDialog(
+            onDismissRequest = {
+                showCustomDialog = false
+                isSheetOpen = false
+            },
+            onConfirmation = { size ->
+                onCustomSelected(size)
+                selectedQuiz = QuizTypes.CustomQuiz.toInt()
+                isSheetOpen = true
+                showCustomDialog = false
             }
         )
     }
@@ -128,10 +152,17 @@ fun QuizListContent(
 fun QuizCard(
     quizType: QuizTypes,
     onInfoClick: (title: String, info: String) -> Unit,
-    onTypeClick: () -> Unit
+    onTypeClick: () -> Unit,
+    onCustomClick: () -> Unit
 ) {
     Card(
-        onClick = { onTypeClick() },
+        onClick = {
+            if (quizType == QuizTypes.CustomQuiz) {
+                onCustomClick()
+            } else {
+                onTypeClick()
+            }
+        },
         modifier = Modifier
             .padding(MaterialTheme.dimens.PaddingMedium)
             .fillMaxWidth(),
@@ -139,10 +170,25 @@ fun QuizCard(
     ) {
 
         val quiz: Pair<String, String> = when (quizType) {
-            QuizTypes.QuickQuiz -> Pair(stringResource(R.string.quiz_list_quick_one), stringResource(R.string.ask_everything_info))
-            QuizTypes.FullQuiz -> Pair(stringResource(R.string.quiz_list_ask_me_everything), stringResource(R.string.quick_list_info))
-            QuizTypes.WeakestQuiz -> Pair(stringResource(R.string.quiz_list_weaknesses), stringResource(R.string.weaknesses_info))
-            QuizTypes.CustomQuiz -> Pair(stringResource(R.string.quiz_list_custom), stringResource(R.string.custom_info))
+            QuizTypes.QuickQuiz -> Pair(
+                stringResource(R.string.quiz_list_quick_one),
+                stringResource(R.string.ask_everything_info)
+            )
+
+            QuizTypes.FullQuiz -> Pair(
+                stringResource(R.string.quiz_list_ask_me_everything),
+                stringResource(R.string.quick_list_info)
+            )
+
+            QuizTypes.WeakestQuiz -> Pair(
+                stringResource(R.string.quiz_list_weaknesses),
+                stringResource(R.string.weaknesses_info)
+            )
+
+            QuizTypes.CustomQuiz -> Pair(
+                stringResource(R.string.quiz_list_custom),
+                stringResource(R.string.custom_info)
+            )
         }
 
         Box(
@@ -158,11 +204,12 @@ fun QuizCard(
 
             IconButton(
                 onClick = { onInfoClick(quiz.first, quiz.second) },
-                modifier = Modifier.padding(MaterialTheme.dimens.PaddingSmall)
+                modifier = Modifier
+                    .padding(MaterialTheme.dimens.PaddingSmall)
                     .align(Alignment.TopEnd),
             ) {
                 Icon(
-                    imageVector =Icons.Default.Info,
+                    imageVector = Icons.Default.Info,
                     contentDescription = "Quiz Info Button"
                 )
             }
@@ -185,7 +232,8 @@ fun QuizListScreenPreview() {
         QuizListContent(
             list = previewList,
             dialogFactory = ComposeDialogFactory(),
-            onStartQuiz = { _, _, _, _ -> }
+            onStartQuiz = { _, _, _, _ -> },
+            onCustomSelected = {}
         )
     }
 }

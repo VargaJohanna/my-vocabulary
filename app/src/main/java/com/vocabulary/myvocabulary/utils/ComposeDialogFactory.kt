@@ -493,6 +493,60 @@ class ComposeDialogFactory {
             }
         )
     }
+
+    @Composable
+    fun BuildCustomQuizSizeDialog(
+        onDismissRequest: () -> Unit,
+        onConfirmation: (size: Int) -> Unit
+    ) {
+        val editedSize = rememberTextFieldState()
+        var showError by remember { mutableStateOf(false) }
+        AlertDialog(
+            title = {
+                Text(text = stringResource(R.string.custom_dialog_title))
+            },
+            text = {
+                OutlinedTextField(
+                    state = editedSize,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(8.dp),
+                    label = { Text(stringResource(R.string.add_a_number)) },
+                    isError = showError,
+                    supportingText = {
+                        if (showError) {
+                            Text(text = stringResource(R.string.custom_dialog_error))
+                        }
+                    },
+                    inputTransformation = { showError = false },
+                )
+            },
+            onDismissRequest = {
+                onDismissRequest()
+            },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        if (editedSize.text.isEmpty()) {
+                            showError = true
+                        } else {
+                            try {
+                                if(editedSize.text.toString().toInt() > 0) {
+                                    onConfirmation(editedSize.text.toString().toInt())
+                                } else {
+                                        showError = true
+                                }
+                            } catch (e: NumberFormatException) {
+                                showError = true
+                            }
+                        }
+                    }
+                ) {
+                    Text(stringResource(R.string.save_button_label))
+                }
+            }
+        )
+    }
 }
 
 @Preview

@@ -33,6 +33,7 @@ import com.vocabulary.myvocabulary.repositories.share.ShareDictionaryRepository
 import com.vocabulary.myvocabulary.repositories.share.ShareDictionaryRepositoryImpl
 import com.vocabulary.myvocabulary.repositories.sortBy.dictionary.SortDictionaryRepository
 import com.vocabulary.myvocabulary.repositories.sortBy.dictionary.SortDictionaryRepositoryImpl
+import com.vocabulary.myvocabulary.ui.quizzes.QuizListViewModel
 import com.vocabulary.myvocabulary.ui.words.WordDetailsViewModel
 import com.vocabulary.myvocabulary.ui.words.WordListViewModel
 import com.vocabulary.myvocabulary.utils.DialogFactory
@@ -96,6 +97,7 @@ val viewModelModule = module {
     viewModel { (wordId: Long) -> WordDetailsViewModel(wordId,get(), get()) }
     viewModel { HomeViewModel(get(), get(), get(), get(), get()) }
     viewModel { ShareDictionaryViewModel(get(), get(), get(), get()) }
+    viewModel { QuizListViewModel(get()) }
 }
 
 val schedulerModule = module {
