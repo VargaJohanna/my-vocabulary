@@ -19,8 +19,10 @@ import io.reactivex.Single
 import io.reactivex.disposables.CompositeDisposable
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import java.util.*
+import java.util.concurrent.TimeUnit
 
 class DictionaryListViewModel(
         private val dictionaryRepository: DictionaryRepository,
@@ -37,17 +39,27 @@ class DictionaryListViewModel(
     val liveDictionaryList: LiveData<List<Dictionary>> = _liveDictionaryList
     private val _newlyCreatedItemDetails = MutableLiveData<Event<DictionaryDetails>>()
     val newlyCreatedItemDetails: LiveData<Event<DictionaryDetails>> = _newlyCreatedItemDetails
+    private val _newDictionary = MutableStateFlow<Event<DictionaryDetails?>>(Event(null)
+    )
+    val newDictionary: StateFlow<Event<DictionaryDetails?>> = _newDictionary
     private lateinit var dictionaryName: String
     var currentSortByData: SortDictionaryData = SortDictionaryData()
     private val isListEmpty = MutableLiveData<Boolean>()
+    private val _isLoading = MutableStateFlow(false)
+    val isLoading: StateFlow<Boolean> = _isLoading.asStateFlow()
+
 
     init {
-//        observeList()
         observeSortByData()
     }
     fun fetchDictionaries() {
         viewModelScope.launch {
-            observeList()
+            _isLoading.value = true
+            try {
+                observeList()
+            } finally {
+                _isLoading.value = false
+            }
         }
     }
     fun insertDictionary(dictionary: Dictionary) {
@@ -55,7 +67,9 @@ class DictionaryListViewModel(
                 .subscribeOn(rxSchedulers.io())
                 .observeOn(rxSchedulers.main())
                 .subscribe { t: Long ->
-                    _newlyCreatedItemDetails.value = Event(DictionaryDetails(t, dictionary.dictionaryName))
+                    val details = DictionaryDetails(t, dictionary.dictionaryName)
+                    _newlyCreatedItemDetails.value = Event(details)
+                    _newDictionary.value = Event(details)
                 }
     }
 
@@ -70,7 +84,11 @@ class DictionaryListViewModel(
                 }
     }
 
-    override fun onCleared() {
+    fun clearNewDictionary() {
+        _newDictionary.value = Event(null)
+    }
+
+    public override fun onCleared() {
         disposables.clear()
         super.onCleared()
     }

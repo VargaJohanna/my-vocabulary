@@ -1,5 +1,6 @@
 package com.vocabulary.myvocabulary.ui.dictionaries
 
+import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.FlowColumn
@@ -17,6 +18,7 @@ import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
@@ -36,6 +38,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -46,6 +49,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.vocabulary.myvocabulary.Constants
 import com.vocabulary.myvocabulary.R
 import com.vocabulary.myvocabulary.navigation.ProvideAppBarTitle
 import com.vocabulary.myvocabulary.ui.theme.dimens
@@ -56,15 +60,35 @@ import java.util.Calendar
 
 @Composable
 fun DictionaryListScreen(
-    onClickDictionaryItem: (dictionaryId: Long, dictionaryName: String) -> Unit
+    navigateToWordList: (dictionaryId: Long, dictionaryName: String) -> Unit
 ) {
     val viewModel: DictionaryListViewModel = koinViewModel()
     val dialogFactory: ComposeDialogFactory = koinInject()
+    val newDictionary by viewModel.newDictionary.collectAsState()
+    var isSavePressed by rememberSaveable { mutableStateOf(false) }
+    var isClickable by remember { mutableStateOf(true) }
+    val screenEntryTime = remember { System.currentTimeMillis() }
+    var isNavigating by remember { mutableStateOf(false) }
 
     LaunchedEffect(Unit) {
         viewModel.fetchDictionaries()
     }
 
+    LaunchedEffect(newDictionary) {
+        newDictionary.getContentIfNotHandled()?.let { details ->
+            if (isSavePressed && details != null) {
+                navigateToWordList(details.dictionaryId, details.dictionaryName)
+            }
+            isSavePressed = false
+            viewModel.clearNewDictionary()
+        }
+    }
+
+    LaunchedEffect(Unit) {
+        isClickable = true
+    }
+
+    val isLoading by viewModel.isLoading.collectAsState()
     val dictionaryList by viewModel.dictionaries.collectAsState()
     var showCreateDialog by remember { mutableStateOf(false) }
     var itemToDelete by remember { mutableStateOf<Dictionary?>(null) }
@@ -91,21 +115,40 @@ fun DictionaryListScreen(
                     itemToEdit = dictionary
                 },
                 onDictionaryClick = { dictionary ->
-                    onClickDictionaryItem(dictionary.dictionaryId, dictionary.dictionaryName)
-                }
+                    val currentTime = System.currentTimeMillis()
+                    if (!isNavigating && (currentTime - screenEntryTime > Constants.NAV_GHOST_CLICK_THRESHOLD)) {
+                        isNavigating = true
+                        navigateToWordList(dictionary.dictionaryId, dictionary.dictionaryName)
+                    }
+                },
+                isClickable = isClickable
             )
+            if (!isLoading && dictionaryList.isEmpty()) {
+                Text(
+                    text = stringResource(R.string.no_dictionaries_found),
+                    style = MaterialTheme.typography.bodyLarge,
+                    color = MaterialTheme.colorScheme.outline
+                )
+            }
+
+            if (isLoading) {
+                Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                    CircularProgressIndicator()
+                }
+            }
+
         }
     }
 
     if (showCreateDialog) {
         dialogFactory.BuildCreateDictionaryDialog(
             onDismissRequest = {
-                showCreateDialog = false // Handle dismiss
+                showCreateDialog = false
             },
             onConfirmation = { newTitle ->
-                showCreateDialog = false // Handle confirmation
+                isSavePressed = true
+                showCreateDialog = false
                 viewModel.insertDictionary(viewModel.createDictionaryObject(newTitle))
-                //Also need to navigate to the newly created dictionary screen
             },
             dialogTitle = stringResource(R.string.create_new_dictionary_dialog_title)
         )
@@ -194,15 +237,21 @@ fun DictionaryItemView(
     modifier: Modifier = Modifier,
     onShowDeleteDialog: (Dictionary) -> Unit,
     onShowEditDialog: (Dictionary) -> Unit,
-    onDictionaryClick: (Dictionary) -> Unit
+    onDictionaryClick: (Dictionary) -> Unit,
+    isClickable: Boolean
 ) {
     val padding = MaterialTheme.dimens.PaddingMedium
     Card(
-        onClick = { onDictionaryClick(dictionaryItem) },
+        onClick = {
+            if (isClickable) {
+                onDictionaryClick(dictionaryItem)
+            }
+        },
         modifier
             .fillMaxWidth()
             .padding(padding),
         elevation = CardDefaults.cardElevation(defaultElevation = 3.dp),
+        enabled = isClickable
     ) {
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -210,7 +259,8 @@ fun DictionaryItemView(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
-                modifier = Modifier.padding(MaterialTheme.dimens.PaddingLarge)
+                modifier = Modifier
+                    .padding(MaterialTheme.dimens.PaddingLarge)
                     .weight(0.7f),
                 text = dictionaryItem.dictionaryName,
                 fontSize = 20.sp,
@@ -221,6 +271,7 @@ fun DictionaryItemView(
 
         }
     }
+
 }
 
 @Composable
@@ -233,7 +284,8 @@ fun DictionaryOptionsButton(
     Box {
         IconButton(
             onClick = { expanded = !expanded },
-            modifier = Modifier.padding(MaterialTheme.dimens.PaddingLarge)) {
+            modifier = Modifier.padding(MaterialTheme.dimens.PaddingLarge)
+        ) {
             Icon(
                 imageVector = Icons.Default.MoreVert,
                 contentDescription = stringResource(R.string.dict_options_description),
@@ -273,7 +325,8 @@ fun DictionaryLazyList(
     list: List<Dictionary>,
     onShowDeleteDialog: (Dictionary) -> Unit,
     onShowEditDialog: (Dictionary) -> Unit,
-    onDictionaryClick: (Dictionary) -> Unit
+    onDictionaryClick: (Dictionary) -> Unit,
+    isClickable: Boolean
 ) {
     val state = rememberLazyListState()
 
@@ -288,7 +341,8 @@ fun DictionaryLazyList(
                 modifier = Modifier,
                 onShowDeleteDialog = onShowDeleteDialog,
                 onShowEditDialog = onShowEditDialog,
-                onDictionaryClick = onDictionaryClick
+                onDictionaryClick = onDictionaryClick,
+                isClickable = isClickable
             )
         }
     }
@@ -305,9 +359,10 @@ fun DictionaryListScreenPreview() {
         }
     ) { paddingValues ->
         FlowColumn(
-            modifier = Modifier.fillMaxSize()
+            modifier = Modifier
+                .fillMaxSize()
                 .padding(paddingValues)
-            ) {
+        ) {
             DictionaryLazyList(
                 list =
                     listOf(
@@ -379,7 +434,8 @@ fun DictionaryListScreenPreview() {
                     ),
                 onShowDeleteDialog = {},
                 onShowEditDialog = {},
-                onDictionaryClick = {}
+                onDictionaryClick = {},
+                isClickable = true
             )
 
         }

@@ -21,13 +21,14 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewmodel.compose.LocalViewModelStoreOwner
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import com.vocabulary.myvocabulary.R
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MyVocabularyTopAppBar(
-    navController: NavController,
+    navController: NavHostController,
     scrollBehavior: TopAppBarScrollBehavior? = null,
     modifier: Modifier = Modifier
 ) {

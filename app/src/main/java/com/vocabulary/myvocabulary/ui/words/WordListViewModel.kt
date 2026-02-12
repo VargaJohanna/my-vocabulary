@@ -1,5 +1,6 @@
 package com.vocabulary.myvocabulary.ui.words
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -74,7 +75,10 @@ class WordListViewModel(
         disposables += Completable.fromCallable { wordRepository.createWord(word) }
                 .subscribeOn(rxSchedulers.io())
                 .observeOn(rxSchedulers.main())
-                .subscribe()
+                .subscribe({},
+                    {throwable ->
+                        Log.e("DB_ERROR", "Could NOT insert word: ${throwable.message}")
+                    })
     }
 
     private fun observeList() {

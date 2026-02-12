@@ -14,7 +14,7 @@ val ErrorBackground = Color(0xFFFFDAD6)
 val ErrorText = Color(0xFFE00007)
 
 // In ui/theme/Color.kt
-val CardBackgroundLight = Color(0xFFF8F8F8)
+val CardBackgroundLight = Purple80
 val CardBackgroundDark = Color(0xFF2C2C2E)
 
 val LightGreen = Color(0x732ECC71)

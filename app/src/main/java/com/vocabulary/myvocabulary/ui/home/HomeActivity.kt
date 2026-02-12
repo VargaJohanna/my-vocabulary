@@ -17,8 +17,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.Observer
+import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
-import androidx.navigation.findNavController
 import com.vocabulary.myvocabulary.R
 import com.vocabulary.myvocabulary.navigation.MyVocabularyNavHost
 import com.vocabulary.myvocabulary.navigation.MyVocabularyTopAppBar
@@ -39,31 +39,17 @@ class HomeActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        enableEdgeToEdge()
         setContent {
-            enableEdgeToEdge()
-            MyVocabularyApp()
+            MyVocabularyTheme {
+                val navController = rememberNavController()
+                MyVocabularyApp(navController)
+            }
 
         }
-//        setContentView(R.layout.activity_home)
         manageIntent(intent?.data)
         homeViewModel.openedAppCount()
-        importDictionary()
 
-        val callback = object : OnBackPressedCallback(true) {
-            override fun handleOnBackPressed() {
-                val navController = findNavController(R.id.home_nav_host_fragment)
-                val isOnWordListScreen =
-                    navController.currentDestination?.id == R.id.wordListFragment
-
-                if (isOnWordListScreen && homeViewModel.searchBarState()) {
-                    homeViewModel.setSearchBarState(false)
-                } else {
-                    isEnabled = false
-                    onBackPressedDispatcher.onBackPressed()
-                }
-            }
-        }
-        onBackPressedDispatcher.addCallback(this, callback)
     }
 
 //TODO: What is this for?
@@ -109,7 +95,7 @@ class HomeActivity : ComponentActivity() {
                                     shareViewModel.parseDataAndCreateWords(it.dictionaryId, this)
 
                                     importDialog?.dismiss()
-                                    findNavController(R.id.home_nav_host_fragment).navigate(R.id.dictionaryListFragment)
+//                                    findNavController(R.id.home_nav_host_fragment).navigate(R.id.dictionaryListFragment)
                                 }
                             })
                     }
@@ -123,29 +109,27 @@ class HomeActivity : ComponentActivity() {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MyVocabularyApp() {
-    MyVocabularyTheme {
-        val navController = rememberNavController()
-        val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
+fun MyVocabularyApp(navController: NavHostController) {
+    val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
 
-        Scaffold(
-            modifier = Modifier
-                .fillMaxSize()
-                .nestedScroll(scrollBehavior.nestedScrollConnection),
-            topBar = {
-                MyVocabularyTopAppBar(
-                    navController = navController,
-                    scrollBehavior = scrollBehavior,
-                )
-            }
-        ) { innerPadding ->
-            MyVocabularyNavHost(
+    Scaffold(
+        modifier = Modifier
+            .fillMaxSize()
+            .nestedScroll(scrollBehavior.nestedScrollConnection),
+        topBar = {
+            MyVocabularyTopAppBar(
                 navController = navController,
-                modifier = Modifier.padding(innerPadding)
+                scrollBehavior = scrollBehavior,
             )
-
         }
+    ) { innerPadding ->
+        MyVocabularyNavHost(
+            navController = navController,
+            modifier = Modifier.padding(innerPadding)
+        )
 
     }
+
+
 }
 

@@ -31,7 +31,6 @@ private val LightColorScheme = lightColorScheme(
     onSurfaceVariant = Color.Black,
     errorContainer = ErrorBackground,
     onErrorContainer = ErrorText,
-
 )
 
 

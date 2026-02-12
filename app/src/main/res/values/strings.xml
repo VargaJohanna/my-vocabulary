@@ -120,5 +120,6 @@
     <string name="once_more">Once More</string>
     <string name="exit_fab_label">Exit</string>
     <string name="add_a_number">Add a number</string>
+    <string name="no_dictionaries_found">There are no dictionaries in the library</string>
 
 </resources>
