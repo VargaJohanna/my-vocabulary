@@ -16,19 +16,19 @@ import androidx.compose.ui.platform.LocalContext
 private val DarkColorScheme = darkColorScheme(
     primary = Purple80,
     secondary = PurpleGrey80,
-    tertiary = Pink80,
+    tertiary = CornFlowerBlue,
+    onTertiary = CornFlowerBlue700,
     surfaceVariant = CardBackgroundDark,
-    onSurfaceVariant = Color.Black,
-    errorContainer = ErrorBackground,
-    onErrorContainer = ErrorText,
+    errorContainer = ErrorBackgroundDark,
+    onErrorContainer = ErrorTextDark,
 )
 
 private val LightColorScheme = lightColorScheme(
     primary = Purple40,
     secondary = PurpleGrey40,
-    tertiary = Pink40,
-    surfaceVariant = Pink80,
-    onSurfaceVariant = Color.Black,
+    tertiary = Jasmine,
+    onTertiary = JasmineDarker,
+    surfaceVariant = CardBackgroundLight,
     errorContainer = ErrorBackground,
     onErrorContainer = ErrorText,
 )

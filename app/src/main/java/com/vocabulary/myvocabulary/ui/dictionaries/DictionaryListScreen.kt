@@ -182,22 +182,25 @@ fun DictionaryListScreen(
 @Composable
 fun FABMenu(onShowCreateDialog: () -> Unit) {
     var expanded by remember { mutableStateOf(false) }
+    val colorScheme = MaterialTheme.colorScheme
 
     FloatingActionButtonMenu(
         expanded = expanded,
         button = {
             ToggleFloatingActionButton(
                 checked = expanded,
-                onCheckedChange = { expanded = it }
+                onCheckedChange = { expanded = it },
+                containerColor = {
+                    if (expanded) {
+                        colorScheme.onTertiary
+                    } else {
+                        colorScheme.tertiary
+                    }
+                },
             ) {
                 Icon(
                     imageVector = if (expanded) Icons.Default.Clear else Icons.Default.Add,
                     contentDescription = stringResource(R.string.dictionary_fab_description),
-                    tint = if (expanded) {
-                        MaterialTheme.colorScheme.onPrimary
-                    } else {
-                        MaterialTheme.colorScheme.onPrimaryContainer
-                    }
                 )
             }
         }
@@ -251,7 +254,10 @@ fun DictionaryItemView(
             .fillMaxWidth()
             .padding(padding),
         elevation = CardDefaults.cardElevation(defaultElevation = 3.dp),
-        enabled = isClickable
+        enabled = isClickable,
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surfaceVariant
+        )
     ) {
         Row(
             modifier = Modifier.fillMaxWidth(),

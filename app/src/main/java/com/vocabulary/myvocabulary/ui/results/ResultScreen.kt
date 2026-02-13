@@ -245,17 +245,17 @@ fun ResultListItemPassed(
                     style = MaterialTheme.typography.bodyLarge,
                     color = MaterialTheme.colorScheme.onPrimaryContainer
                 )
+                Icon(
+                    modifier = Modifier
+                        .padding(MaterialTheme.dimens.PaddingMedium)
+                        .align(Alignment.CenterVertically),
+                    imageVector = Icons.Default.Done,
+                    contentDescription = stringResource(R.string.result_start_over_label),
+                    tint = MaterialTheme.colorScheme.onPrimaryContainer
+                )
             }
         }
 
-        Icon(
-            modifier = Modifier
-                .padding(MaterialTheme.dimens.PaddingMedium)
-                .align(Alignment.CenterVertically),
-            imageVector = Icons.Default.Done,
-            contentDescription = stringResource(R.string.result_start_over_label),
-            tint = MaterialTheme.colorScheme.onPrimaryContainer
-        )
     }
 }
 
@@ -311,16 +311,16 @@ fun ResultListItemFailed(
                     )
                 }
 
+                Icon(
+                    modifier = Modifier
+                        .padding(MaterialTheme.dimens.PaddingMedium)
+                        .align(Alignment.CenterVertically),
+                    imageVector = Icons.Default.Close,
+                    contentDescription = stringResource(R.string.result_start_over_label),
+                    tint = MaterialTheme.colorScheme.onErrorContainer
+                )
             }
         }
-        Icon(
-            modifier = Modifier
-                .padding(MaterialTheme.dimens.PaddingMedium)
-                .align(Alignment.CenterVertically),
-            imageVector = Icons.Default.Close,
-            contentDescription = stringResource(R.string.result_start_over_label),
-            tint = MaterialTheme.colorScheme.onErrorContainer
-        )
     }
 }
 
@@ -334,13 +334,20 @@ fun FabMenu(
     onRestartFailedOnly: () -> Unit,
     passedQuiz: Boolean
 ) {
-
+    val colorScheme = MaterialTheme.colorScheme
     FloatingActionButtonMenu(
         expanded = expanded,
         button = {
             ToggleFloatingActionButton(
                 checked = expanded,
-                onCheckedChange = { onExpandedChange(it) }
+                onCheckedChange = { onExpandedChange(it) },
+                containerColor = {
+                    if (expanded) {
+                        colorScheme.onTertiary
+                    } else {
+                        colorScheme.tertiary
+                    }
+                }
             ) {
                 Icon(
                     imageVector = Icons.Default.Replay,
