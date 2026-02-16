@@ -26,7 +26,9 @@ data class WordList(
 object About : MyVocabularyDestinations
 
 @Serializable
-object QuizList : MyVocabularyDestinations
+data class QuizList(
+    val dictionaryId: Long?,
+) : MyVocabularyDestinations
 
 @Serializable
 data class Quiz(

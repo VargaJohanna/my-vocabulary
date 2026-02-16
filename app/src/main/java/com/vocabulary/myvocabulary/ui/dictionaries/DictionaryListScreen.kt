@@ -1,6 +1,5 @@
 package com.vocabulary.myvocabulary.ui.dictionaries
 
-import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.FlowColumn
@@ -60,7 +59,8 @@ import java.util.Calendar
 
 @Composable
 fun DictionaryListScreen(
-    navigateToWordList: (dictionaryId: Long, dictionaryName: String) -> Unit
+    navigateToWordList: (dictionaryId: Long, dictionaryName: String) -> Unit,
+    onStartQuiz: (dictionaryId: Long) -> Unit
 ) {
     val viewModel: DictionaryListViewModel = koinViewModel()
     val dialogFactory: ComposeDialogFactory = koinInject()
@@ -121,7 +121,10 @@ fun DictionaryListScreen(
                         navigateToWordList(dictionary.dictionaryId, dictionary.dictionaryName)
                     }
                 },
-                isClickable = isClickable
+                isClickable = isClickable,
+                onStartQuiz = { dictionaryId ->
+                    onStartQuiz(dictionaryId)
+                }
             )
             if (!isLoading && dictionaryList.isEmpty()) {
                 Text(
@@ -241,7 +244,8 @@ fun DictionaryItemView(
     onShowDeleteDialog: (Dictionary) -> Unit,
     onShowEditDialog: (Dictionary) -> Unit,
     onDictionaryClick: (Dictionary) -> Unit,
-    isClickable: Boolean
+    isClickable: Boolean,
+    onStartQuiz: (dictionaryId: Long) -> Unit
 ) {
     val padding = MaterialTheme.dimens.PaddingMedium
     Card(
@@ -273,7 +277,7 @@ fun DictionaryItemView(
                 textAlign = TextAlign.Center,
             )
 
-            DictionaryOptionsButton(dictionaryItem, onShowDeleteDialog, onShowEditDialog)
+            DictionaryOptionsButton(dictionaryItem, onShowDeleteDialog, onShowEditDialog, onStartQuiz)
 
         }
     }
@@ -284,7 +288,8 @@ fun DictionaryItemView(
 fun DictionaryOptionsButton(
     dictionaryItem: Dictionary,
     onShowDeleteDialog: (Dictionary) -> Unit,
-    onShowEditDialog: (Dictionary) -> Unit
+    onShowEditDialog: (Dictionary) -> Unit,
+    onStartQuiz: (dictionaryId: Long) -> Unit
 ) {
     var expanded by remember { mutableStateOf(false) }
     Box {
@@ -302,7 +307,7 @@ fun DictionaryOptionsButton(
             onDismissRequest = { expanded = false }) {
             DropdownMenuItem(
                 text = { Text(stringResource(R.string.dictionary_menu_start_quiz)) },
-                onClick = { /* Do something... */ }
+                onClick = { onStartQuiz(dictionaryItem.dictionaryId) }
             )
 
             HorizontalDivider()
@@ -332,7 +337,8 @@ fun DictionaryLazyList(
     onShowDeleteDialog: (Dictionary) -> Unit,
     onShowEditDialog: (Dictionary) -> Unit,
     onDictionaryClick: (Dictionary) -> Unit,
-    isClickable: Boolean
+    isClickable: Boolean,
+    onStartQuiz: (dictionaryId: Long) -> Unit
 ) {
     val state = rememberLazyListState()
 
@@ -348,7 +354,8 @@ fun DictionaryLazyList(
                 onShowDeleteDialog = onShowDeleteDialog,
                 onShowEditDialog = onShowEditDialog,
                 onDictionaryClick = onDictionaryClick,
-                isClickable = isClickable
+                isClickable = isClickable,
+                onStartQuiz = onStartQuiz
             )
         }
     }
@@ -441,7 +448,8 @@ fun DictionaryListScreenPreview() {
                 onShowDeleteDialog = {},
                 onShowEditDialog = {},
                 onDictionaryClick = {},
-                isClickable = true
+                isClickable = true,
+                onStartQuiz = {}
             )
 
         }

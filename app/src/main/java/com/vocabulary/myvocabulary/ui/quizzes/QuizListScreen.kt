@@ -17,6 +17,8 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -35,6 +37,7 @@ import org.koin.compose.koinInject
 
 @Composable
 fun QuizListScreen(
+    dictionaryIdFromArgs: Long?,
     onStartQuiz: (quizType: Int, dictionaryId: Long, direction: Int, failedOnly: Boolean) -> Unit
 ) {
 
@@ -49,7 +52,8 @@ fun QuizListScreen(
 
             onStartQuiz(quizType, dictionaryId, direction, failedOnly)
         },
-        onCustomSelected = { quizListViewModel.addCustomQuizSize(size = it) }
+        onCustomSelected = { quizListViewModel.addCustomQuizSize(size = it) },
+        dictionaryIdFromArgs = dictionaryIdFromArgs
     )
 }
 
@@ -58,7 +62,8 @@ fun QuizListContent(
     list: List<QuizTypes>,
     dialogFactory: ComposeDialogFactory,
     onStartQuiz: (quizType: Int, dictionaryId: Long, direction: Int, failedOnly: Boolean) -> Unit,
-    onCustomSelected: (size: Int) -> Unit
+    onCustomSelected: (size: Int) -> Unit,
+    dictionaryIdFromArgs: Long?
 ) {
 
     ProvideAppBarTitle { Text(stringResource(R.string.quiz_toolbar)) }
@@ -71,6 +76,16 @@ fun QuizListContent(
     var selectedQuiz: Int by rememberSaveable { mutableStateOf(0) }
     var selectedDictionaryId: Long by rememberSaveable { mutableStateOf(0L) }
     var selectedDirection by rememberSaveable { mutableStateOf(0) }
+//    State to track if we should skip the DictionaryPicker
+    var hasDictionaryArg by rememberSaveable { mutableStateOf(false) }
+    var argDictionaryId by rememberSaveable { mutableStateOf(0L) }
+
+    LaunchedEffect(dictionaryIdFromArgs) {
+        dictionaryIdFromArgs?.let { id ->
+            hasDictionaryArg = true
+            argDictionaryId = id
+        }
+    }
 
     val sortedList = remember(list) {
         list.sortedBy { it.toInt() }
@@ -100,13 +115,18 @@ fun QuizListContent(
                 )
             }
         }
-        if (isSheetOpen) {
+        if (isSheetOpen && !hasDictionaryArg) {
             DictionaryPickerBottomSheet(
                 onDismissRequestBottomSheet = { isSheetOpen = it },
                 selectedDictionaryId = { selectedDictionaryId = it },
                 showDialog = { showDirectionDialog = it }
             )
+        } else if (isSheetOpen && hasDictionaryArg) {
+            selectedDictionaryId = argDictionaryId
+            isSheetOpen = false
+            showDirectionDialog = true
         }
+
 
     }
 
@@ -236,7 +256,8 @@ fun QuizListScreenPreview() {
             list = previewList,
             dialogFactory = ComposeDialogFactory(),
             onStartQuiz = { _, _, _, _ -> },
-            onCustomSelected = {}
+            onCustomSelected = {},
+            dictionaryIdFromArgs = null
         )
     }
 }

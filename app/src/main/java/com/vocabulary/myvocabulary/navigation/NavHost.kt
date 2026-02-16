@@ -36,10 +36,14 @@ fun MyVocabularyNavHost(
         startDestination = Home,
         modifier = modifier,
         enterTransition = {
-            fadeIn(animationSpec = tween(Constants.CLICK_DEBOUNCE_TIME.toInt())) + slideInHorizontally(animationSpec = tween(300))
+            fadeIn(animationSpec = tween(Constants.CLICK_DEBOUNCE_TIME.toInt())) + slideInHorizontally(
+                animationSpec = tween(300)
+            )
         },
         exitTransition = {
-            fadeOut(animationSpec = tween(Constants.CLICK_DEBOUNCE_TIME.toInt())) + slideOutHorizontally(animationSpec = tween(300))
+            fadeOut(animationSpec = tween(Constants.CLICK_DEBOUNCE_TIME.toInt())) + slideOutHorizontally(
+                animationSpec = tween(300)
+            )
         }
     ) {
 
@@ -53,7 +57,7 @@ fun MyVocabularyNavHost(
                     }
                 },
                 onClickQuiz = {
-                    navController.navigate(QuizList) {
+                    navController.navigate(QuizList(null)) {
                         launchSingleTop = true
                     }
                 }
@@ -65,6 +69,11 @@ fun MyVocabularyNavHost(
             DictionaryListScreen(
                 navigateToWordList = { dictionaryId, dictionaryName ->
                     navController.navigate(WordList(dictionaryId, dictionaryName)) {
+                        launchSingleTop = true
+                    }
+                },
+                onStartQuiz = { dictionaryId ->
+                    navController.navigate(QuizList(dictionaryId)) {
                         launchSingleTop = true
                     }
                 }
@@ -81,7 +90,9 @@ fun MyVocabularyNavHost(
         }
 
         composable<QuizList> {
+            val args = it.toRoute<QuizList>()
             QuizListScreen(
+                dictionaryIdFromArgs = args.dictionaryId,
                 onStartQuiz = { quizType, dictionaryId, direction, failedOnly ->
                     navController.navigate(Quiz(quizType, dictionaryId, direction, failedOnly))
                 }
