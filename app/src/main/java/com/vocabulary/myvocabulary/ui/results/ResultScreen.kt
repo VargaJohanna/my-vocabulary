@@ -3,6 +3,7 @@ package com.vocabulary.myvocabulary.ui.results
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.PaddingValues
@@ -24,7 +25,6 @@ import androidx.compose.material3.FloatingActionButtonMenu
 import androidx.compose.material3.FloatingActionButtonMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.ToggleFloatingActionButton
 import androidx.compose.material3.VerticalDivider
@@ -60,7 +60,8 @@ fun ResultScreen(
     direction: Int,
     quizType: Int,
     onRestartQuiz: (quizType: Int, dictionaryId: Long, direction: Int, failedOnly: Boolean) -> Unit,
-    onExit: () -> Unit
+    onExit: () -> Unit,
+    onUpdateFab: (@Composable () -> Unit) -> Unit
 ) {
 
     val resultViewModel: ResultViewModel = koinViewModel {
@@ -98,7 +99,8 @@ fun ResultScreen(
             resultViewModel.dispose()
             onRestartQuiz(quizType, dictionaryId, direction, true)
         },
-        passedQuiz =  resultViewModel.isAllPassed
+        passedQuiz =  resultViewModel.isAllPassed,
+        onUpdateFab = onUpdateFab
     )
 }
 
@@ -111,7 +113,8 @@ fun ResultScreenContent(
     onExit: () -> Unit,
     onRestartNew: () -> Unit,
     onRestartFailedOnly: () -> Unit,
-    passedQuiz: Boolean
+    passedQuiz: Boolean,
+    onUpdateFab: (@Composable () -> Unit) -> Unit,
 ) {
     val passes = resultList.filter { it.lastResult }.size
     val all = resultList.size
@@ -119,9 +122,8 @@ fun ResultScreenContent(
 
     LaunchedEffect(isFabOpen) { expanded = isFabOpen }
 
-    Scaffold(
-        modifier = modifier.fillMaxSize(),
-        floatingActionButton = {
+    LaunchedEffect(Unit) {
+        onUpdateFab {
             FabMenu(
                 expanded = expanded,
                 onExpandedChange = { expanded = it },
@@ -131,12 +133,14 @@ fun ResultScreenContent(
                 passedQuiz = passedQuiz
             )
         }
-    ) { paddingValues ->
+    }
 
+    Box(
+        modifier = modifier.fillMaxSize()
+    ) {
         Column(
             modifier = Modifier
-                .fillMaxSize()
-                .padding(paddingValues),
+                .fillMaxSize(),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text(
@@ -156,11 +160,8 @@ fun ResultScreenContent(
                 paddingValues = PaddingValues(0.dp),
                 directionType = directionType
             )
-
         }
-
     }
-
 }
 
 @Composable
@@ -442,6 +443,7 @@ fun ResultScreenPreview() {
         onExit = {},
         onRestartNew = {},
         onRestartFailedOnly = {},
-        passedQuiz = true
+        passedQuiz = true,
+        onUpdateFab = {}
     )
 }

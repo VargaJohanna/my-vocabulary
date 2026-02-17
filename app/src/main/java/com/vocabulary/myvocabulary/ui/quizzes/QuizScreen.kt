@@ -21,7 +21,6 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.VerticalDivider
@@ -56,7 +55,8 @@ fun QuizScreen(
     dictionaryId: Long,
     direction: Int,
     failedOnly: Boolean,
-    onQuizFinished: (Long, Int, Int) -> Unit
+    onQuizFinished: (Long, Int, Int) -> Unit,
+    onUpdateFab: (@Composable () -> Unit) -> Unit
 ) {
 
     val quizViewModel: QuizViewModel = koinViewModel {
@@ -81,7 +81,9 @@ fun QuizScreen(
             },
             onListFinished = {
                 onQuizFinished(dictionaryId, direction, quizType)
-            })
+            },
+            onUpdateFab = onUpdateFab
+            )
     } else {
         Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
             CircularProgressIndicator()
@@ -96,7 +98,8 @@ fun QuizScreenContent(
     failedOnly: Boolean,
     quizList: List<Word>,
     onGuessSaved: (Long, String) -> Unit,
-    onListFinished: () -> Unit
+    onListFinished: () -> Unit,
+    onUpdateFab: (@Composable () -> Unit) -> Unit,
 ) {
     //rollingIndex: looping through the quizList so the cards can be shown one by one
     var rollingIndex by rememberSaveable { mutableStateOf(1) }
@@ -118,10 +121,8 @@ fun QuizScreenContent(
         }
     }
 
-    Scaffold(
-        modifier = Modifier
-            .fillMaxSize(),
-        floatingActionButton = {
+    LaunchedEffect(Unit) {
+        onUpdateFab {
             FabMenu(
                 onNextClicked = { nextClicked = true },
                 iconToDisplay = {
@@ -130,13 +131,17 @@ fun QuizScreenContent(
                 }
             )
         }
+    }
+
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
     )
-    { paddingValues ->
+    {
         LazyColumn(
             state = listState,
             modifier = Modifier
-                .fillMaxSize()
-                .padding(paddingValues),
+                .fillMaxSize(),
             verticalArrangement = Arrangement.spacedBy((-80).dp),
             contentPadding = PaddingValues(bottom = 100.dp)
         ) {
@@ -295,6 +300,7 @@ fun QuizScreenPreview() {
         failedOnly = false,
         quizList = previewWords,
         onGuessSaved = { _, _ -> },
-        onListFinished = {}
+        onListFinished = { },
+        onUpdateFab = { }
     )
 }

@@ -79,6 +79,8 @@ fun MyVocabularyNavHost(
                         )
                     }
                 }
+
+                onUpdateFab { }
             }
 
             HomeScreen(
@@ -151,6 +153,9 @@ fun MyVocabularyNavHost(
                 }
 
                 onBackClick { navController.popBackStack() }
+
+                onUpdateFab { }
+
             }
             WordListScreen(
                 dictionaryId = args.dictionaryId,
@@ -165,6 +170,9 @@ fun MyVocabularyNavHost(
                 onUpdateActions { }
 
                 onBackClick { navController.popBackStack() }
+
+                onUpdateFab { }
+
             }
             AboutScreen()
         }
@@ -177,6 +185,9 @@ fun MyVocabularyNavHost(
                 onUpdateActions { }
 
                 onBackClick { navController.popBackStack() }
+
+                onUpdateFab { }
+
             }
             QuizListScreen(
                 dictionaryIdFromArgs = args.dictionaryId,
@@ -209,7 +220,9 @@ fun MyVocabularyNavHost(
                         popUpTo<Quiz> { inclusive = true }
                         launchSingleTop = true
                     }
-                })
+                },
+                onUpdateFab = onUpdateFab
+            )
         }
 
         composable<Result> {
@@ -238,7 +251,8 @@ fun MyVocabularyNavHost(
                         popUpTo<Home> { inclusive = false }
                         launchSingleTop = true
                     }
-                }
+                },
+                onUpdateFab = onUpdateFab
             )
         }
     }
