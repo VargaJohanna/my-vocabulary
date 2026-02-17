@@ -144,7 +144,11 @@ fun MyVocabularyNavHost(
                 }
 
                 onUpdateActions {
-                    IconButton(onClick = { /* Handle Menu Click */ }) {
+                    IconButton(onClick = {
+                        navController.navigate(QuizList(args.dictionaryId)) {
+                            launchSingleTop = true
+                        }
+                    }) {
                         Icon(
                             Icons.Default.Quiz,
                             contentDescription = stringResource(R.string.start_button_label)
