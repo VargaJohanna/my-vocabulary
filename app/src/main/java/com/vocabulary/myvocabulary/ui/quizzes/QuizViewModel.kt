@@ -39,7 +39,6 @@ class QuizViewModel(
             observeQuizList(failedOnly)
         }
     }
-
     fun startQuiz(quizType: QuizTypes, dictionaryId: Long) {
         viewModelScope.launch {
             if(failedOnly.not()) {
@@ -72,7 +71,7 @@ class QuizViewModel(
                 }
     }
 
-    override fun onCleared() {
+    public override fun onCleared() {
         disposables.clear()
         super.onCleared()
     }

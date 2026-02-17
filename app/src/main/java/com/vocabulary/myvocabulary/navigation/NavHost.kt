@@ -199,29 +199,40 @@ fun MyVocabularyNavHost(
 
         composable<Quiz> {
             val args = it.toRoute<Quiz>()
+            var screenCleanup: (() -> Unit)? = null
 
             LaunchedEffect(Unit) {
                 onUpdateTitle { Text(stringResource(R.string.quiz_toolbar)) }
 
                 onUpdateActions { }
-
-                onBackClick {
-                    navController.navigate(QuizList(dictionaryId = null)) {
-                        popUpTo<QuizList> { inclusive = true }
-                        launchSingleTop = true
-                    }
-                }
             }
 
             QuizScreen(
                 args.quizType, args.dictionaryId, args.direction, args.failedOnly,
+                onRegisterExitLogic = { cleanup ->
+                    screenCleanup = cleanup
+                    onBackClick {
+                        screenCleanup.invoke() // Run ViewModel cleanup
+                        navController.navigate(QuizList(dictionaryId = null)) {
+                            popUpTo<QuizList> { inclusive = true }
+                            launchSingleTop = true
+                        }
+                    }
+                },
                 onQuizFinished = { dictionaryId, direction, quizType ->
                     navController.navigate(Result(dictionaryId, direction, quizType)) {
                         popUpTo<Quiz> { inclusive = true }
                         launchSingleTop = true
                     }
                 },
-                onUpdateFab = onUpdateFab
+                onUpdateFab = onUpdateFab,
+                onExit = {
+                    screenCleanup?.invoke()
+                    navController.navigate(QuizList(dictionaryId = null)) {
+                        popUpTo<QuizList> { inclusive = true }
+                        launchSingleTop = true
+                    }
+                }
             )
         }
 

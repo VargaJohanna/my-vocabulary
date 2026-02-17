@@ -1,4 +1,6 @@
 package com.vocabulary.myvocabulary.ui.quizzes
+
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.IntrinsicSize
@@ -56,7 +58,9 @@ fun QuizScreen(
     direction: Int,
     failedOnly: Boolean,
     onQuizFinished: (Long, Int, Int) -> Unit,
-    onUpdateFab: (@Composable () -> Unit) -> Unit
+    onUpdateFab: (@Composable () -> Unit) -> Unit,
+    onExit: () -> Unit,
+    onRegisterExitLogic: (() -> Unit) -> Unit
 ) {
 
     val quizViewModel: QuizViewModel = koinViewModel {
@@ -71,6 +75,8 @@ fun QuizScreen(
         quizViewModel.fetchQuizList()
         quizViewModel.startQuiz(quizType.toQuizType(), dictionaryId)
     }
+
+
     val quizList by quizViewModel.quizList.collectAsState()
 
     if (quizList.isNotEmpty()) {
@@ -83,11 +89,30 @@ fun QuizScreen(
                 onQuizFinished(dictionaryId, direction, quizType)
             },
             onUpdateFab = onUpdateFab
-            )
+        )
     } else {
+        // Show message that list is empty?
         Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
             CircularProgressIndicator()
         }
+    }
+
+    val handleExit = {
+        resultViewModel.resetGuessedWordCollections()
+        resultViewModel.dispose()
+        quizViewModel.onCleared()
+    }
+
+// Pass handleExit logic up to the NavHost
+    LaunchedEffect(Unit) {
+        onRegisterExitLogic {
+            handleExit()
+        }
+    }
+
+    BackHandler(enabled = true) {
+        handleExit()
+        onExit()
     }
 }
 
@@ -136,8 +161,7 @@ fun QuizScreenContent(
     Box(
         modifier = Modifier
             .fillMaxSize()
-    )
-    {
+    ) {
         LazyColumn(
             state = listState,
             modifier = Modifier
@@ -145,7 +169,7 @@ fun QuizScreenContent(
             verticalArrangement = Arrangement.spacedBy((-80).dp),
             contentPadding = PaddingValues(bottom = 100.dp)
         ) {
-            if(quizList.isNotEmpty()) {
+            if (quizList.isNotEmpty()) {
                 val currentFocusedId = quizList.getOrNull(rollingIndex - 1)?.wordId ?: 0L
                 items(
                     count = rollingIndex,
@@ -208,7 +232,11 @@ fun FocusCard(
 ) {
     val editState = rememberTextFieldState("")
     val focusRequester = remember { FocusRequester() }
-    val question = if (askTranslation) { word.translation } else { word.word }
+    val question = if (askTranslation) {
+        word.translation
+    } else {
+        word.word
+    }
 
     LaunchedEffect(isActive) {
         if (isActive) {
@@ -228,7 +256,8 @@ fun FocusCard(
 //        modifier = Modifier.fillMaxSize()
 //    ) {
 //    }
-    Box(modifier = Modifier.fillMaxSize()
+    Box(
+        modifier = Modifier.fillMaxSize()
     ) {
         Card(
             modifier = modifier
