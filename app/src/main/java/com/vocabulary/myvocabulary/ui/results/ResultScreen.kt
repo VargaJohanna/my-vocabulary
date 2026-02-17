@@ -44,7 +44,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.vocabulary.myvocabulary.R
-import com.vocabulary.myvocabulary.navigation.ProvideAppBarTitle
 import com.vocabulary.myvocabulary.ui.quizzes.QuizDirectionType
 import com.vocabulary.myvocabulary.ui.quizzes.toDirectionType
 import com.vocabulary.myvocabulary.ui.quizzes.toQuizType
@@ -114,7 +113,6 @@ fun ResultScreenContent(
     onRestartFailedOnly: () -> Unit,
     passedQuiz: Boolean
 ) {
-    ProvideAppBarTitle { Text(stringResource(R.string.result_fragment_title)) }
     val passes = resultList.filter { it.lastResult }.size
     val all = resultList.size
     var expanded by remember { mutableStateOf(isFabOpen) }

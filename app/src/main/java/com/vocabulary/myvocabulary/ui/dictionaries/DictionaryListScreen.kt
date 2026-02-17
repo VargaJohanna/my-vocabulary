@@ -32,6 +32,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.ToggleFloatingActionButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -50,7 +51,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.vocabulary.myvocabulary.Constants
 import com.vocabulary.myvocabulary.R
-import com.vocabulary.myvocabulary.navigation.ProvideAppBarTitle
 import com.vocabulary.myvocabulary.ui.theme.dimens
 import com.vocabulary.myvocabulary.utils.ComposeDialogFactory
 import org.koin.compose.koinInject
@@ -60,6 +60,7 @@ import java.util.Calendar
 @Composable
 fun DictionaryListScreen(
     navigateToWordList: (dictionaryId: Long, dictionaryName: String) -> Unit,
+    onUpdateFab: (@Composable () -> Unit) -> Unit,
     onStartQuiz: (dictionaryId: Long) -> Unit
 ) {
     val viewModel: DictionaryListViewModel = koinViewModel()
@@ -94,52 +95,46 @@ fun DictionaryListScreen(
     var itemToDelete by remember { mutableStateOf<Dictionary?>(null) }
     var itemToEdit by remember { mutableStateOf<Dictionary?>(null) }
 
-    ProvideAppBarTitle({ Text(stringResource(R.string.dictionaries_toolbar)) })
-
-    Scaffold(
-        floatingActionButton = {
+    LaunchedEffect(Unit) {
+        onUpdateFab {
             FABMenu(onShowCreateDialog = { showCreateDialog = true })
         }
-    ) { paddingValues ->
-        Box(
-            modifier = Modifier
-                .padding(paddingValues)
-                .fillMaxSize()
-        ) {
-            DictionaryLazyList(
-                list = dictionaryList,
-                onShowDeleteDialog = { dictionary ->
-                    itemToDelete = dictionary
-                },
-                onShowEditDialog = { dictionary ->
-                    itemToEdit = dictionary
-                },
-                onDictionaryClick = { dictionary ->
-                    val currentTime = System.currentTimeMillis()
-                    if (!isNavigating && (currentTime - screenEntryTime > Constants.NAV_GHOST_CLICK_THRESHOLD)) {
-                        isNavigating = true
-                        navigateToWordList(dictionary.dictionaryId, dictionary.dictionaryName)
-                    }
-                },
-                isClickable = isClickable,
-                onStartQuiz = { dictionaryId ->
-                    onStartQuiz(dictionaryId)
+    }
+
+    Box(
+        modifier = Modifier.fillMaxSize()
+    ) {
+        DictionaryLazyList(
+            list = dictionaryList,
+            onShowDeleteDialog = { dictionary ->
+                itemToDelete = dictionary
+            },
+            onShowEditDialog = { dictionary ->
+                itemToEdit = dictionary
+            },
+            onDictionaryClick = { dictionary ->
+                val currentTime = System.currentTimeMillis()
+                if (!isNavigating && (currentTime - screenEntryTime > Constants.NAV_GHOST_CLICK_THRESHOLD)) {
+                    isNavigating = true
+                    navigateToWordList(dictionary.dictionaryId, dictionary.dictionaryName)
                 }
+            },
+            isClickable = isClickable,
+            onStartQuiz = { dictionaryId ->
+                onStartQuiz(dictionaryId)
+            }
+        )
+        if (isLoading) {
+            CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
+        }
+
+        if (!isLoading && dictionaryList.isEmpty()) {
+            Text(
+                text = stringResource(R.string.no_dictionaries_found),
+                style = MaterialTheme.typography.bodyLarge,
+                color = MaterialTheme.colorScheme.outline,
+                modifier = Modifier.align(Alignment.Center)
             )
-            if (!isLoading && dictionaryList.isEmpty()) {
-                Text(
-                    text = stringResource(R.string.no_dictionaries_found),
-                    style = MaterialTheme.typography.bodyLarge,
-                    color = MaterialTheme.colorScheme.outline
-                )
-            }
-
-            if (isLoading) {
-                Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                    CircularProgressIndicator()
-                }
-            }
-
         }
     }
 

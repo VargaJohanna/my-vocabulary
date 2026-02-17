@@ -16,14 +16,12 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.vocabulary.myvocabulary.R
-import com.vocabulary.myvocabulary.navigation.ProvideAppBarTitle
 
 @Composable
 fun HomeScreen(
     onClickDictionaries: () -> Unit = {},
     onClickQuiz: () -> Unit = {}
 ) {
-    ProvideAppBarTitle ( { stringResource(R.string.app_name) })
     FlowColumn(
         modifier = Modifier.fillMaxSize(),
         verticalArrangement = Arrangement.SpaceEvenly

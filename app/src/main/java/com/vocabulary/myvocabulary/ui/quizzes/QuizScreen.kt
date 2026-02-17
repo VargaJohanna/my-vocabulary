@@ -43,7 +43,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.vocabulary.myvocabulary.R
-import com.vocabulary.myvocabulary.navigation.ProvideAppBarTitle
 import com.vocabulary.myvocabulary.ui.results.ResultViewModel
 import com.vocabulary.myvocabulary.ui.theme.dimens
 import com.vocabulary.myvocabulary.ui.words.Word
@@ -99,7 +98,6 @@ fun QuizScreenContent(
     onGuessSaved: (Long, String) -> Unit,
     onListFinished: () -> Unit
 ) {
-    ProvideAppBarTitle { Text(stringResource(R.string.quiz_toolbar)) }
     //rollingIndex: looping through the quizList so the cards can be shown one by one
     var rollingIndex by rememberSaveable { mutableStateOf(1) }
     //guessContent: the given answer by the user

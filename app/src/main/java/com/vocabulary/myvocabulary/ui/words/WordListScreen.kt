@@ -1,6 +1,7 @@
 package com.vocabulary.myvocabulary.ui.words
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.PaddingValues
@@ -21,7 +22,6 @@ import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import com.vocabulary.myvocabulary.R
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
@@ -38,7 +38,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.vocabulary.myvocabulary.navigation.ProvideAppBarTitle
 import com.vocabulary.myvocabulary.ui.theme.MyVocabularyTheme
 import com.vocabulary.myvocabulary.ui.theme.dimens
 import com.vocabulary.myvocabulary.utils.ComposeDialogFactory
@@ -50,8 +49,9 @@ import java.util.Calendar
 @Composable
 fun WordListScreen(
     dictionaryId: Long,
-    dictionaryName: String
-) {
+    onUpdateFab: (@Composable () -> Unit) -> Unit,
+
+    ) {
     val viewModel: WordListViewModel = koinViewModel(
         parameters = { parametersOf(dictionaryId) }
     )
@@ -64,7 +64,6 @@ fun WordListScreen(
     val wordList by viewModel.wordList.collectAsState()
 
     WordListScreenContent(
-        dictionaryName = dictionaryName,
         wordList = wordList.first,
         dialogFactory = dialogFactory,
         onInsertWord = { newWord, newTranslation ->
@@ -75,36 +74,39 @@ fun WordListScreen(
         },
         onDeleteWord = { word ->
             viewModel.deleteWord(word)
-        }
+        },
+        onUpdateFab = onUpdateFab
     )
 }
 
 
 @Composable
 fun WordListScreenContent(
-    dictionaryName: String,
     wordList: List<Word>,
     dialogFactory: ComposeDialogFactory,
     onInsertWord: (String, String) -> Unit,
     onEditWord: (Word) -> Unit,
-    onDeleteWord: (Word) -> Unit
+    onDeleteWord: (Word) -> Unit,
+    onUpdateFab: (@Composable () -> Unit) -> Unit,
 ) {
     var showCreateDialog by remember { mutableStateOf(false) }
 
-    ProvideAppBarTitle { Text(dictionaryName) }
     var isSheetOpen by rememberSaveable { mutableStateOf(false) }
     var clickedWordToEdit by rememberSaveable { mutableStateOf(Word(0, 0, "", "", 0, 0, 0, Calendar.getInstance().time)) }
     var showEditDialog by rememberSaveable { mutableStateOf(false) }
     var showDeleteDialog by rememberSaveable { mutableStateOf(false) }
 
-    Scaffold(
-        floatingActionButton = {
+    LaunchedEffect(Unit) {
+        onUpdateFab {
             FabMenu(onShowCreateDialog = { showCreateDialog = true })
         }
-    ) { paddingValues ->
+    }
+
+    Box(
+        modifier = Modifier.fillMaxSize()
+    ) {
         Column(
             modifier = Modifier
-                .padding(paddingValues)
                 .fillMaxSize(),
         ) {
             Row(
@@ -296,12 +298,12 @@ fun WordListScreenPreview() {
     // Wrap it in your app's theme for consistent styling.
     MyVocabularyTheme {
         WordListScreenContent(
-            dictionaryName = "Test Dictionary",
             wordList = previewWords,
             dialogFactory = ComposeDialogFactory(),
             onInsertWord = { _, _ -> /* Do nothing in preview */ },
             onDeleteWord = {_ -> },
-            onEditWord = { _ -> }
+            onEditWord = { _ -> },
+            onUpdateFab = {}
         )
     }
 }
