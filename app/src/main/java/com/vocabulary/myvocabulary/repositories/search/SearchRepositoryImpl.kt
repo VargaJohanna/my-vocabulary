@@ -11,9 +11,6 @@ class SearchRepositoryImpl : SearchRepository {
     private val _searchedTerm: BehaviorSubject<String> = BehaviorSubject.createDefault("")
     override val searchedTerm: Observable<String> = _searchedTerm
 
-    private val _searchBarStateFlow = MutableStateFlow(false)
-    val searchBarStateFlow = _searchBarStateFlow.asStateFlow()
-
     override fun setSearchedTerm(search: String) {
         _searchedTerm.onNext(search)
     }
