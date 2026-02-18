@@ -184,9 +184,6 @@ fun QuizCard(
             .padding(MaterialTheme.dimens.PaddingMedium)
             .fillMaxWidth(),
         elevation = CardDefaults.cardElevation(defaultElevation = MaterialTheme.dimens.CardElevationSmall),
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surfaceVariant
-        )
     ) {
 
         val quiz: Pair<String, String> = when (quizType) {

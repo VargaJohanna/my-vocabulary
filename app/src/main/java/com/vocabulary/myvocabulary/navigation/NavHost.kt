@@ -8,10 +8,10 @@ import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Sort
+import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.Info
-import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Quiz
-import androidx.compose.material.icons.filled.Sort
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
@@ -19,8 +19,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.capitalize
-import androidx.compose.ui.text.toUpperCase
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -43,7 +41,9 @@ fun MyVocabularyNavHost(
     onUpdateActions: (@Composable RowScope.() -> Unit) -> Unit,
     onUpdateTitle: (@Composable () -> Unit) -> Unit,
     onUpdateFab: (@Composable () -> Unit) -> Unit,
-    onBackClick: (() -> Unit) -> Unit
+    onBackClick: (() -> Unit) -> Unit,
+    onToggleSearch: (Boolean) -> Unit,
+    isSearchVisible: Boolean
 
 ) {
 
@@ -134,7 +134,7 @@ fun MyVocabularyNavHost(
         composable<WordList> {
             val args = it.toRoute<WordList>()
 
-            LaunchedEffect(Unit) {
+            LaunchedEffect(isSearchVisible, args.dictionaryName) {
                 onUpdateTitle {
                     Text(args.dictionaryName.replaceFirstChar {
                         if (it.isLowerCase()) it.titlecase(
@@ -144,6 +144,15 @@ fun MyVocabularyNavHost(
                 }
 
                 onUpdateActions {
+                    IconButton(onClick = {
+                        onToggleSearch(!isSearchVisible)
+                    }) {
+                        Icon(
+                            imageVector = if (isSearchVisible) Icons.Default.Clear else Icons.Default.Search,
+                            contentDescription = "Toggle Search"
+                        )
+                    }
+
                     IconButton(onClick = {
                         navController.navigate(QuizList(args.dictionaryId)) {
                             launchSingleTop = true
@@ -156,14 +165,22 @@ fun MyVocabularyNavHost(
                     }
                 }
 
-                onBackClick { navController.popBackStack() }
+                onBackClick {
+                    if (isSearchVisible) {
+                        onToggleSearch(false)
+                    } else {
+                        navController.popBackStack()
+                    }
+                }
 
                 onUpdateFab { }
-
             }
+
             WordListScreen(
                 dictionaryId = args.dictionaryId,
-                onUpdateFab = onUpdateFab
+                onUpdateFab = onUpdateFab,
+                isSearchVisible = isSearchVisible,
+                onToggleSearch = onToggleSearch,
             )
         }
 

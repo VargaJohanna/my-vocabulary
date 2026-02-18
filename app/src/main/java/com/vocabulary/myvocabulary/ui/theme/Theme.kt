@@ -15,34 +15,17 @@ import androidx.compose.ui.platform.LocalContext
 
 private val DarkColorScheme = darkColorScheme(
     primary = Purple80,
-    secondary = PurpleGrey80,
-    tertiary = CornFlowerBlue,
-    onTertiary = CornFlowerBlue700,
-    surfaceVariant = CardBackgroundDark,
+    secondary = Teal200,
     errorContainer = ErrorBackgroundDark,
     onErrorContainer = ErrorTextDark,
 )
 
 private val LightColorScheme = lightColorScheme(
     primary = Purple40,
-    secondary = PurpleGrey40,
-    tertiary = Jasmine,
-    onTertiary = JasmineDarker,
-    surfaceVariant = CardBackgroundLight,
+    secondary = Teal200,
     errorContainer = ErrorBackground,
     onErrorContainer = ErrorText,
 )
-
-
-    /* Other default colors to override
-    background = Color(0xFFFFFBFE),
-    surface = Color(0xFFFFFBFE),
-    onPrimary = Color.White,
-    onSecondary = Color.White,
-    onTertiary = Color.White,
-    onBackground = Color(0xFF1C1B1F),
-    onSurface = Color(0xFF1C1B1F),
-    */
 
 private val LocalDimens = staticCompositionLocalOf { Dimens }
 

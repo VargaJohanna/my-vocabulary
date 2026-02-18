@@ -16,6 +16,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
@@ -120,6 +121,7 @@ fun MyVocabularyApp() {
     var appBarBackAction by remember { mutableStateOf<@Composable () -> Unit>({})}
     var screenFab by remember { mutableStateOf<@Composable () -> Unit>({}) }
     var currentBackAction by remember { mutableStateOf<() -> Unit>({ navController.popBackStack() }) }
+    var isSearchVisible by rememberSaveable { mutableStateOf(false) }
 
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
 
@@ -144,6 +146,8 @@ fun MyVocabularyApp() {
             onUpdateActions = { appBarActions = it },
             onUpdateTitle = { appBarTitle = it },
             onUpdateFab = { screenFab = it },
+            isSearchVisible = isSearchVisible,
+            onToggleSearch = { isSearchVisible = it },
             modifier = Modifier.padding(innerPadding),
             onBackClick = { newAction ->
                 currentBackAction = newAction }

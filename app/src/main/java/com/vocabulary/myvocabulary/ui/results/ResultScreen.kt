@@ -122,7 +122,7 @@ fun ResultScreenContent(
 
     LaunchedEffect(isFabOpen) { expanded = isFabOpen }
 
-    LaunchedEffect(Unit) {
+    LaunchedEffect(passedQuiz) {
         onUpdateFab {
             FabMenu(
                 expanded = expanded,
@@ -333,29 +333,16 @@ fun FabMenu(
     onRestartFailedOnly: () -> Unit,
     passedQuiz: Boolean
 ) {
-    val colorScheme = MaterialTheme.colorScheme
     FloatingActionButtonMenu(
         expanded = expanded,
         button = {
             ToggleFloatingActionButton(
                 checked = expanded,
-                onCheckedChange = { onExpandedChange(it) },
-                containerColor = {
-                    if (expanded) {
-                        colorScheme.onTertiary
-                    } else {
-                        colorScheme.tertiary
-                    }
-                }
+                onCheckedChange = { onExpandedChange(it) }
             ) {
                 Icon(
                     imageVector = Icons.Default.Replay,
                     contentDescription = stringResource(R.string.result_start_over_label),
-                    tint = if (expanded) {
-                        MaterialTheme.colorScheme.onPrimary
-                    } else {
-                        MaterialTheme.colorScheme.onPrimaryContainer
-                    }
                 )
             }
         }

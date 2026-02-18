@@ -1,7 +1,7 @@
 package com.vocabulary.myvocabulary.ui.words
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.PaddingValues
@@ -16,11 +16,17 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Clear
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.DockedSearchBar
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.SearchBarDefaults
 import com.vocabulary.myvocabulary.R
 import androidx.compose.material3.Text
 import androidx.compose.material3.VerticalDivider
@@ -33,7 +39,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -50,18 +55,22 @@ import java.util.Calendar
 fun WordListScreen(
     dictionaryId: Long,
     onUpdateFab: (@Composable () -> Unit) -> Unit,
-
-    ) {
+    isSearchVisible: Boolean,
+    onToggleSearch: (Boolean) -> Unit,
+) {
     val viewModel: WordListViewModel = koinViewModel(
         parameters = { parametersOf(dictionaryId) }
     )
     val dialogFactory: ComposeDialogFactory = koinInject()
+    val wordList by viewModel.wordList.collectAsState()
 
     LaunchedEffect(Unit) {
         viewModel.fetchWordList()
     }
 
-    val wordList by viewModel.wordList.collectAsState()
+    BackHandler(enabled = isSearchVisible) {
+        onToggleSearch(false)
+    }
 
     WordListScreenContent(
         wordList = wordList.first,
@@ -75,11 +84,17 @@ fun WordListScreen(
         onDeleteWord = { word ->
             viewModel.deleteWord(word)
         },
-        onUpdateFab = onUpdateFab
+        onUpdateFab = onUpdateFab,
+
+        onSearch = { searchTerm ->
+            viewModel.setSearchedTerm(searchTerm)
+        },
+        isSearchVisible = isSearchVisible
     )
 }
 
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun WordListScreenContent(
     wordList: List<Word>,
@@ -88,62 +103,126 @@ fun WordListScreenContent(
     onEditWord: (Word) -> Unit,
     onDeleteWord: (Word) -> Unit,
     onUpdateFab: (@Composable () -> Unit) -> Unit,
+    isSearchVisible: Boolean,
+    onSearch: (String) -> Unit
 ) {
     var showCreateDialog by remember { mutableStateOf(false) }
-
     var isSheetOpen by rememberSaveable { mutableStateOf(false) }
-    var clickedWordToEdit by rememberSaveable { mutableStateOf(Word(0, 0, "", "", 0, 0, 0, Calendar.getInstance().time)) }
+    var clickedWordToEdit by rememberSaveable {
+        mutableStateOf(
+            Word(
+                0,
+                0,
+                "",
+                "",
+                0,
+                0,
+                0,
+                Calendar.getInstance().time
+            )
+        )
+    }
     var showEditDialog by rememberSaveable { mutableStateOf(false) }
     var showDeleteDialog by rememberSaveable { mutableStateOf(false) }
+    var searchQuery by rememberSaveable { mutableStateOf("") }
 
     LaunchedEffect(Unit) {
         onUpdateFab {
             FabMenu(onShowCreateDialog = { showCreateDialog = true })
         }
     }
-
-    Box(
-        modifier = Modifier.fillMaxSize()
-    ) {
-        Column(
-            modifier = Modifier
-                .fillMaxSize(),
-        ) {
-            Row(
-                horizontalArrangement = Arrangement.SpaceAround,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(MaterialTheme.dimens.PaddingMedium)
-            ) {
-                Text(
-                    text = stringResource(R.string.word_list_expression),
-                    style = MaterialTheme.typography.titleMedium,
-                    color = MaterialTheme.colorScheme.primary
-                )
-                Text(
-                    text = stringResource(R.string.word_list_meaning),
-                    style = MaterialTheme.typography.titleMedium,
-                    color = MaterialTheme.colorScheme.primary
-                )
-            }
-            WordLazyList(
-                list = wordList,
-                onClick = { sheetState, clickedWord ->
-                    isSheetOpen = sheetState
-                    clickedWordToEdit = clickedWord
-                    }
-            )
-
-            if (isSheetOpen) {
-                WordDetailsBottomSheet(
-                    clickedWord = clickedWordToEdit,
-                    onDismissRequest = { isSheetOpen = it },
-                    showEditDialog = { showEditDialog = it },
-                    showDelete = { showDeleteDialog = it }
-                )
-            }
+    LaunchedEffect(isSearchVisible) {
+        if (!isSearchVisible) {
+            searchQuery = ""
+            onSearch("")
         }
     }
+
+    Column(
+        modifier = Modifier
+            .fillMaxSize(),
+    ) {
+        if (isSearchVisible) {
+            DockedSearchBar(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = MaterialTheme.dimens.PaddingLarge),
+                expanded = false,
+                onExpandedChange = { },
+                content = {},
+                inputField = {
+                    SearchBarDefaults.InputField(
+                        query = searchQuery,
+                        onQueryChange = {
+                            searchQuery = it
+                            onSearch(it)
+                        },
+                        onSearch = {
+                            onSearch(searchQuery)
+                        },
+                        expanded = false,
+                        onExpandedChange = { },
+                        placeholder = { Text(stringResource(R.string.search_hint)) },
+                        leadingIcon = {
+                            Icon(
+                                imageVector = Icons.Default.Search,
+                                contentDescription = stringResource(R.string.search)
+                            )
+                        },
+                        trailingIcon = {
+                            if (searchQuery.isNotEmpty()) {
+                                IconButton(
+                                    onClick = {
+                                        searchQuery = ""
+                                        onSearch("")
+                                    }
+                                ) {
+                                    Icon(
+                                        imageVector = Icons.Default.Clear,
+                                        contentDescription = stringResource(R.string.clear_search)
+                                    )
+                                }
+                            }
+                        }
+                    )
+                }
+            )
+        }
+        Row(
+            horizontalArrangement = Arrangement.SpaceAround,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(MaterialTheme.dimens.PaddingMedium)
+        ) {
+            Text(
+                text = stringResource(R.string.word_list_expression),
+                style = MaterialTheme.typography.titleMedium,
+                color = MaterialTheme.colorScheme.primary
+            )
+            Text(
+                text = stringResource(R.string.word_list_meaning),
+                style = MaterialTheme.typography.titleMedium,
+                color = MaterialTheme.colorScheme.primary
+            )
+        }
+        WordLazyList(
+            list = wordList,
+            onClick = { sheetState, clickedWord ->
+                isSheetOpen = sheetState
+                clickedWordToEdit = clickedWord
+            }
+        )
+
+        if (isSheetOpen) {
+            WordDetailsBottomSheet(
+                clickedWord = clickedWordToEdit,
+                onDismissRequest = { isSheetOpen = it },
+                showEditDialog = { showEditDialog = it },
+                showDelete = { showDeleteDialog = it }
+            )
+        }
+    }
+
 
     if (showCreateDialog) {
         dialogFactory.BuildCreateWordDialog(
@@ -167,7 +246,12 @@ fun WordListScreenContent(
                 showEditDialog = false
             },
             onConfirmation = { editedExpression, editedTranslation ->
-                onEditWord(clickedWordToEdit.copy(word = editedExpression, translation = editedTranslation))
+                onEditWord(
+                    clickedWordToEdit.copy(
+                        word = editedExpression,
+                        translation = editedTranslation
+                    )
+                )
                 showEditDialog = false
                 isSheetOpen = false
             },
@@ -183,8 +267,8 @@ fun WordListScreenContent(
                 onDeleteWord(clickedWordToEdit)
                 showDeleteDialog = false
                 isSheetOpen = false
-                             },
-            dialogTitle = stringResource(R.string.dialog_delete_word_title) ,
+            },
+            dialogTitle = stringResource(R.string.dialog_delete_word_title),
             message = stringResource(R.string.verify_deletion) + "\n\"${clickedWordToEdit.word} - ${clickedWordToEdit.translation}\" ?"
         )
     }
@@ -277,7 +361,6 @@ fun WordCard(
                     modifier = Modifier.padding(MaterialTheme.dimens.PaddingLarge),
                     text = wordItem.translation.ifEmpty { stringResource(R.string.word_hint) },
                     style = MaterialTheme.typography.bodyLarge,
-                    color = if (wordItem.translation.isNotBlank()) Color.Black else Color.Gray
                 )
             }
         }
@@ -301,9 +384,11 @@ fun WordListScreenPreview() {
             wordList = previewWords,
             dialogFactory = ComposeDialogFactory(),
             onInsertWord = { _, _ -> /* Do nothing in preview */ },
-            onDeleteWord = {_ -> },
+            onDeleteWord = { _ -> },
             onEditWord = { _ -> },
-            onUpdateFab = {}
+            onUpdateFab = {},
+            onSearch = {},
+            isSearchVisible = true
         )
     }
 }

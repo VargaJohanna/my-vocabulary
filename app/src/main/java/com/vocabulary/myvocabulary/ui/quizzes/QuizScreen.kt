@@ -146,7 +146,7 @@ fun QuizScreenContent(
         }
     }
 
-    LaunchedEffect(Unit) {
+    LaunchedEffect(isFabIconNext) {
         onUpdateFab {
             FabMenu(
                 onNextClicked = { nextClicked = true },

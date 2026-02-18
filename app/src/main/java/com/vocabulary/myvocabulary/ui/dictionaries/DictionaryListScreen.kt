@@ -180,7 +180,6 @@ fun DictionaryListScreen(
 @Composable
 fun FABMenu(onShowCreateDialog: () -> Unit) {
     var expanded by remember { mutableStateOf(false) }
-    val colorScheme = MaterialTheme.colorScheme
 
     FloatingActionButtonMenu(
         expanded = expanded,
@@ -188,13 +187,6 @@ fun FABMenu(onShowCreateDialog: () -> Unit) {
             ToggleFloatingActionButton(
                 checked = expanded,
                 onCheckedChange = { expanded = it },
-                containerColor = {
-                    if (expanded) {
-                        colorScheme.onTertiary
-                    } else {
-                        colorScheme.tertiary
-                    }
-                },
             ) {
                 Icon(
                     imageVector = if (expanded) Icons.Default.Clear else Icons.Default.Add,
@@ -254,9 +246,6 @@ fun DictionaryItemView(
             .padding(padding),
         elevation = CardDefaults.cardElevation(defaultElevation = 3.dp),
         enabled = isClickable,
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surfaceVariant
-        )
     ) {
         Row(
             modifier = Modifier.fillMaxWidth(),

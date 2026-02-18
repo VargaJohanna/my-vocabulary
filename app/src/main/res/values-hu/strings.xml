@@ -121,6 +121,7 @@
     <string name="exit_fab_label">Kilépés</string>
     <string name="add_a_number">Adj meg egy számot</string>
     <string name="no_dictionaries_found">A könyvtár jelenleg üres</string>
+    <string name="clear_search">Keresés törlése</string>
 
 
 </resources>

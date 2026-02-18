@@ -21,6 +21,7 @@ import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.functions.BiFunction
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import java.util.*
 
@@ -33,7 +34,6 @@ class WordListViewModel(
         private val quizRepository: QuizRepository,
         private val searchRepository: SearchRepository,
         private val customQuizRepository: CustomQuizRepository
-
 ) : ViewModel() {
     private val disposables = CompositeDisposable()
     private val _wordList: MutableStateFlow<Pair<List<Word>, Boolean>> = MutableStateFlow(Pair(emptyList(), false))
@@ -42,6 +42,9 @@ class WordListViewModel(
     var currentSortByData: SortByData = SortByData()
     private val isListEmpty: MutableLiveData<Boolean> = MutableLiveData()
     private val isSearchBarOpenCurrent: MutableLiveData<Boolean> = MutableLiveData()
+
+    private val _searchBarState: MutableStateFlow<Boolean> = MutableStateFlow(false)
+    val searchBarState: StateFlow<Boolean> = _searchBarState
 
     fun fetchWordList() {
         viewModelScope.launch {
@@ -89,13 +92,14 @@ class WordListViewModel(
                 .subscribeOn(rxSchedulers.io())
                 .observeOn(rxSchedulers.main())
                 .subscribe { t ->
-                    isListEmpty.postValue(t.isEmpty() && !(isSearchBarOpenCurrent.value ?: false))
+                    isListEmpty.postValue(t.isEmpty() && !_searchBarState.value)
                     liveWordList.postValue(Pair(
                             first = t,
                             second = isSearchBarOpenCurrent.value ?: false))
                     _wordList.value = Pair(
                         first = t,
-                        second = isSearchBarOpenCurrent.value ?: false)
+                        second = _searchBarState.value
+                    )
                 }
     }
 
