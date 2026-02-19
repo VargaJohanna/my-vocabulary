@@ -81,7 +81,8 @@ fun QuizScreen(
 
     if (quizList.isNotEmpty()) {
         QuizScreenContent(
-            dictionaryId, direction, failedOnly, quizList,
+            direction =  direction,
+            quizList = quizList,
             onGuessSaved = { id, guess ->
                 resultViewModel.latestGuess(lastGuess = GuessedWord(id, guess))
             },
@@ -118,9 +119,7 @@ fun QuizScreen(
 
 @Composable
 fun QuizScreenContent(
-    dictionaryId: Long,
     direction: Int,
-    failedOnly: Boolean,
     quizList: List<Word>,
     onGuessSaved: (Long, String) -> Unit,
     onListFinished: () -> Unit,
@@ -324,9 +323,7 @@ fun QuizScreenPreview() {
     )
 
     QuizScreenContent(
-        dictionaryId = 1,
         direction = 0,
-        failedOnly = false,
         quizList = previewWords,
         onGuessSaved = { _, _ -> },
         onListFinished = { },

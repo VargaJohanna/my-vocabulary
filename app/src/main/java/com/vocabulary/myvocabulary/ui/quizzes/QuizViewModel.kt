@@ -18,11 +18,11 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
 class QuizViewModel(
-        val dictionaryId: Long,
-        val optionType: Int,
-        val failedOnly: Boolean,
-        private val rxSchedulers: RxSchedulers,
-        private val quizRepository: QuizRepository
+    val dictionaryId: Long,
+    val optionType: Int,
+    val failedOnly: Boolean,
+    private val rxSchedulers: RxSchedulers,
+    private val quizRepository: QuizRepository
 ) : ViewModel() {
 
     private val disposables = CompositeDisposable()
@@ -39,9 +39,10 @@ class QuizViewModel(
             observeQuizList(failedOnly)
         }
     }
+
     fun startQuiz(quizType: QuizTypes, dictionaryId: Long) {
         viewModelScope.launch {
-            if(failedOnly.not()) {
+            if (failedOnly.not()) {
                 quizRepository.setQuizList(dictionaryId, quizType)
                     .subscribe()
             }
@@ -50,25 +51,28 @@ class QuizViewModel(
 
     private fun observeQuizList(failedOnly: Boolean) {
         disposables += quizRepository.quizList
-                .subscribeOn(rxSchedulers.io())
-                .observeOn(rxSchedulers.main())
-                .subscribe { list ->
-                    isDictionaryEmpty = list.isEmpty()
-                    if (list.isNotEmpty()) {
-                        val filteredList = if (failedOnly) {
-                            list.filter { word -> !word.lastResult }
-                        } else {
-                            list
-                        }
-                        _quizList.value = filteredList.shuffled()
+            .subscribeOn(rxSchedulers.io())
+            .observeOn(rxSchedulers.main())
+            .subscribe { list ->
+                isDictionaryEmpty = list.isEmpty()
 
-                        updateIcon.postValue(getFocusableWordList().size == 1)
-                        listIsFinished = getFocusableWordList().size == 1
-                        isFabIconUpdated.value = getFocusableWordList().size == 1
-                    } else {
-                        _quizList.value = emptyList()
-                    }
+
+
+                if (list.isNotEmpty()) {
+                    val filteredList = list.filter { word ->
+                        val isValid = word.word.isNotBlank() && word.translation.isNotBlank()
+                        val matchesCriteria = if (failedOnly) !word.lastResult else true
+                        isValid && matchesCriteria
+                    }.shuffled()
+                    _quizList.value = filteredList.shuffled()
+
+                    updateIcon.postValue(getFocusableWordList().size == 1)
+                    listIsFinished = getFocusableWordList().size == 1
+                    isFabIconUpdated.value = getFocusableWordList().size == 1
+                } else {
+                    _quizList.value = emptyList()
                 }
+            }
     }
 
     public override fun onCleared() {
@@ -111,7 +115,7 @@ class QuizViewModel(
     fun getListIsFinished() = listIsFinished
 
     data class FocusableWord(
-            val word: Word,
-            val isFocused: Boolean
+        val word: Word,
+        val isFocused: Boolean
     )
 }

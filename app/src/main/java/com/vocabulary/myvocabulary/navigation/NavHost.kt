@@ -179,6 +179,8 @@ fun MyVocabularyNavHost(
                     }
 
                     IconButton(onClick = {
+                        onToggleSearch(false)
+                        onToggleSort(false)
                         navController.navigate(QuizList(args.dictionaryId)) {
                             launchSingleTop = true
                         }
