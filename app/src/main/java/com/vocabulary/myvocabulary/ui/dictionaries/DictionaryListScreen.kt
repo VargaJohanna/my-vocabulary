@@ -2,19 +2,23 @@ package com.vocabulary.myvocabulary.ui.dictionaries
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.FlowColumn
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Clear
+import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material.icons.filled.SortByAlpha
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -32,7 +36,6 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.ToggleFloatingActionButton
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -51,6 +54,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.vocabulary.myvocabulary.Constants
 import com.vocabulary.myvocabulary.R
+import com.vocabulary.myvocabulary.repositories.sortBy.dictionary.SortByDictionaryOptions
 import com.vocabulary.myvocabulary.ui.theme.dimens
 import com.vocabulary.myvocabulary.utils.ComposeDialogFactory
 import org.koin.compose.koinInject
@@ -61,18 +65,31 @@ import java.util.Calendar
 fun DictionaryListScreen(
     navigateToWordList: (dictionaryId: Long, dictionaryName: String) -> Unit,
     onUpdateFab: (@Composable () -> Unit) -> Unit,
-    onStartQuiz: (dictionaryId: Long) -> Unit
+    onStartQuiz: (dictionaryId: Long) -> Unit,
+    isSortOpen: Boolean,
+    onToggleSort: (Boolean) -> Unit
 ) {
     val viewModel: DictionaryListViewModel = koinViewModel()
     val dialogFactory: ComposeDialogFactory = koinInject()
     val newDictionary by viewModel.newDictionary.collectAsState()
     var isSavePressed by rememberSaveable { mutableStateOf(false) }
+    //isClickable: Set it to true when navigation is done to prevent ghost clicking
     var isClickable by remember { mutableStateOf(true) }
+    //screenEntryTime: save entry time to add 5 ms wait to prevent ghost clicking
     val screenEntryTime = remember { System.currentTimeMillis() }
     var isNavigating by remember { mutableStateOf(false) }
+    val isLoading by viewModel.isLoading.collectAsState()
+    val dictionaryList by viewModel.dictionaries.collectAsState()
+    var showCreateDialog by remember { mutableStateOf(false) }
+    var itemToDelete by remember { mutableStateOf<Dictionary?>(null) }
+    var itemToEdit by remember { mutableStateOf<Dictionary?>(null) }
 
     LaunchedEffect(Unit) {
         viewModel.fetchDictionaries()
+        isClickable = true
+        onUpdateFab {
+            FABMenu(onShowCreateDialog = { showCreateDialog = true })
+        }
     }
 
     LaunchedEffect(newDictionary) {
@@ -85,25 +102,44 @@ fun DictionaryListScreen(
         }
     }
 
-    LaunchedEffect(Unit) {
-        isClickable = true
+    val sortByDate = {
+        viewModel.setSortBy(
+            viewModel.currentSortByData.copy(
+                sortByOption = SortByDictionaryOptions.SortByDate,
+                dateDescending = !viewModel.currentSortByData.dateDescending
+            )
+        )
     }
 
-    val isLoading by viewModel.isLoading.collectAsState()
-    val dictionaryList by viewModel.dictionaries.collectAsState()
-    var showCreateDialog by remember { mutableStateOf(false) }
-    var itemToDelete by remember { mutableStateOf<Dictionary?>(null) }
-    var itemToEdit by remember { mutableStateOf<Dictionary?>(null) }
-
-    LaunchedEffect(Unit) {
-        onUpdateFab {
-            FABMenu(onShowCreateDialog = { showCreateDialog = true })
-        }
+    val sortByTitle = {
+        viewModel.setSortBy(
+            viewModel.currentSortByData.copy(
+                sortByOption = SortByDictionaryOptions.SortByTitle,
+                titleDescending = !viewModel.currentSortByData.titleDescending
+            )
+        )
     }
 
     Box(
         modifier = Modifier.fillMaxSize()
     ) {
+        Column {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .wrapContentSize(Alignment.TopEnd)
+                    .padding(horizontal = MaterialTheme.dimens.PaddingLarge)
+            ) {
+                SortMenu(
+                    onSortByDate = sortByDate,
+                    onSortByTitle = sortByTitle,
+                    isSortOpen = isSortOpen,
+                    onToggleSort = { toggle ->
+                        onToggleSort(toggle)
+                    }
+                )
+            }
+        }
         DictionaryLazyList(
             list = dictionaryList,
             onShowDeleteDialog = { dictionary ->
@@ -172,6 +208,41 @@ fun DictionaryListScreen(
                 itemToEdit = null
             },
             dialogTitle = stringResource(R.string.renaming_dictionary_title) + " \"${item.dictionaryName}\""
+        )
+    }
+}
+
+@Composable
+fun SortMenu(
+    onSortByDate: () -> Unit,
+    onSortByTitle: () -> Unit,
+    isSortOpen: Boolean,
+    onToggleSort: (Boolean) -> Unit
+) {
+    DropdownMenu(
+        expanded = isSortOpen,
+        onDismissRequest = { onToggleSort(false) }
+    ) {
+        DropdownMenuItem(
+            text = { Text(stringResource(R.string.sort_by_date)) },
+            onClick = {
+                onSortByDate()
+                onToggleSort(false)
+            },
+            leadingIcon = { Icon(
+                imageVector = Icons.Default.DateRange,
+                contentDescription = stringResource(R.string.sort_by_date)) }
+
+        )
+        DropdownMenuItem(
+            text = { Text(stringResource(R.string.sort_by_title)) },
+            onClick = {
+                onSortByTitle()
+                onToggleSort(false)
+            },
+            leadingIcon = { Icon(
+                imageVector = Icons.Default.SortByAlpha,
+                contentDescription = stringResource(R.string.sort_by_title)) }
         )
     }
 }
@@ -261,7 +332,12 @@ fun DictionaryItemView(
                 textAlign = TextAlign.Center,
             )
 
-            DictionaryOptionsButton(dictionaryItem, onShowDeleteDialog, onShowEditDialog, onStartQuiz)
+            DictionaryOptionsButton(
+                dictionaryItem,
+                onShowDeleteDialog,
+                onShowEditDialog,
+                onStartQuiz
+            )
 
         }
     }

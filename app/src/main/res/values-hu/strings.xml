@@ -92,7 +92,7 @@
     <string name="example_translation_pax">pax</string>
     <string name="example_translation_domo">domo</string>
     <string name="example_translation_mare">mare</string>
-    <string name="sort_by_date">Létrehozás</string>
+    <string name="sort_by_date">Rendezés dátum szerint</string>
     <string name="empty_dictionary_state_message">Adj hozzá kifejezéseket, és itt fognak megjelenni.</string>
     <string name="result_stats">%1$d / %2$d - %3$d%%</string>
     <string name="thanks">"Köszönöm"</string>
@@ -122,6 +122,9 @@
     <string name="add_a_number">Adj meg egy számot</string>
     <string name="no_dictionaries_found">A könyvtár jelenleg üres</string>
     <string name="clear_search">Keresés törlése</string>
+    <string name="sort_by_title">Rendezés ABC szerint</string>
+    <string name="sort_by_expression">Rendezés \"Szó\" szerint</string>
+    <string name="sort_by_translation">Rendezés \"Jelentés\" szerint</string>
 
 
 </resources>

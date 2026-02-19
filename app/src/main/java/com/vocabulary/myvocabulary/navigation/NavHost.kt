@@ -43,7 +43,9 @@ fun MyVocabularyNavHost(
     onUpdateFab: (@Composable () -> Unit) -> Unit,
     onBackClick: (() -> Unit) -> Unit,
     onToggleSearch: (Boolean) -> Unit,
-    isSearchVisible: Boolean
+    isSearchVisible: Boolean,
+    onToggleSort: (Boolean) -> Unit,
+    isSortOpen: Boolean
 
 ) {
 
@@ -106,8 +108,18 @@ fun MyVocabularyNavHost(
                     Text(stringResource(R.string.dictionaries_toolbar))
                 }
 
+                onBackClick {
+                    if(isSortOpen) {
+                        onToggleSort(false)
+                    } else {
+                        navController.popBackStack()
+                    }
+                }
+            }
+
+            LaunchedEffect(isSortOpen) {
                 onUpdateActions {
-                    IconButton(onClick = { /* Handle Menu Click */ }) {
+                    IconButton(onClick = { onToggleSort(!isSortOpen) } ) {
                         Icon(
                             Icons.AutoMirrored.Filled.Sort,
                             contentDescription = "Sort Dictionaries"
@@ -127,14 +139,16 @@ fun MyVocabularyNavHost(
                         launchSingleTop = true
                     }
                 },
-                onUpdateFab = onUpdateFab
+                onUpdateFab = onUpdateFab,
+                isSortOpen = isSortOpen,
+                onToggleSort = onToggleSort
             )
         }
 
         composable<WordList> {
             val args = it.toRoute<WordList>()
 
-            LaunchedEffect(isSearchVisible, args.dictionaryName) {
+            LaunchedEffect(isSearchVisible, args.dictionaryName, isSortOpen) {
                 onUpdateTitle {
                     Text(args.dictionaryName.replaceFirstChar {
                         if (it.isLowerCase()) it.titlecase(
@@ -146,10 +160,21 @@ fun MyVocabularyNavHost(
                 onUpdateActions {
                     IconButton(onClick = {
                         onToggleSearch(!isSearchVisible)
+                        onToggleSort(false)
                     }) {
                         Icon(
                             imageVector = if (isSearchVisible) Icons.Default.Clear else Icons.Default.Search,
                             contentDescription = "Toggle Search"
+                        )
+                    }
+
+                    IconButton(onClick = {
+                        onToggleSort(!isSortOpen)
+                        onToggleSearch(false)
+                    } ) {
+                        Icon(
+                            Icons.AutoMirrored.Filled.Sort,
+                            contentDescription = "Sort Word List"
                         )
                     }
 
@@ -171,6 +196,12 @@ fun MyVocabularyNavHost(
                     } else {
                         navController.popBackStack()
                     }
+
+                    if (isSortOpen) {
+                        onToggleSort(false)
+                    } else {
+                        navController.popBackStack()
+                    }
                 }
 
                 onUpdateFab { }
@@ -181,6 +212,8 @@ fun MyVocabularyNavHost(
                 onUpdateFab = onUpdateFab,
                 isSearchVisible = isSearchVisible,
                 onToggleSearch = onToggleSearch,
+                isSortOpen = isSortOpen,
+                onToggleSort = onToggleSort
             )
         }
 

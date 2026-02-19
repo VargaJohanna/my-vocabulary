@@ -2,6 +2,7 @@ package com.vocabulary.myvocabulary.ui.words
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.PaddingValues
@@ -11,16 +12,21 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Clear
+import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.filled.SortByAlpha
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.DockedSearchBar
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
@@ -38,11 +44,13 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.vocabulary.myvocabulary.repositories.sortBy.SortByOptions
 import com.vocabulary.myvocabulary.ui.theme.MyVocabularyTheme
 import com.vocabulary.myvocabulary.ui.theme.dimens
 import com.vocabulary.myvocabulary.utils.ComposeDialogFactory
@@ -57,6 +65,8 @@ fun WordListScreen(
     onUpdateFab: (@Composable () -> Unit) -> Unit,
     isSearchVisible: Boolean,
     onToggleSearch: (Boolean) -> Unit,
+    isSortOpen: Boolean,
+    onToggleSort: (Boolean) -> Unit
 ) {
     val viewModel: WordListViewModel = koinViewModel(
         parameters = { parametersOf(dictionaryId) }
@@ -89,10 +99,31 @@ fun WordListScreen(
         onSearch = { searchTerm ->
             viewModel.setSearchedTerm(searchTerm)
         },
-        isSearchVisible = isSearchVisible
+        isSearchVisible = isSearchVisible,
+        isSortOpen = isSortOpen,
+        onToggleSort = { toggle ->
+            onToggleSort(toggle)
+        },
+        sortByDate = {
+            viewModel.setSortBy(viewModel.currentSortByData.copy(
+                sortByOption = SortByOptions.SortByDate,
+                dateDescending = !viewModel.currentSortByData.dateDescending)
+            )
+        },
+        sortByExpression = {
+            viewModel.setSortBy(viewModel.currentSortByData.copy(
+                sortByOption = SortByOptions.SortByWord,
+                wordDescending = !viewModel.currentSortByData.wordDescending)
+            )
+        },
+        sortByTranslation = {
+            viewModel.setSortBy(viewModel.currentSortByData.copy(
+                sortByOption = SortByOptions.SortByTranslation,
+                translationDescending = !viewModel.currentSortByData.translationDescending)
+            )
+        }
     )
 }
-
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -104,7 +135,12 @@ fun WordListScreenContent(
     onDeleteWord: (Word) -> Unit,
     onUpdateFab: (@Composable () -> Unit) -> Unit,
     isSearchVisible: Boolean,
-    onSearch: (String) -> Unit
+    onSearch: (String) -> Unit,
+    isSortOpen: Boolean,
+    onToggleSort: (Boolean) -> Unit,
+    sortByDate: () -> Unit,
+    sortByExpression: () -> Unit,
+    sortByTranslation: () -> Unit
 ) {
     var showCreateDialog by remember { mutableStateOf(false) }
     var isSheetOpen by rememberSaveable { mutableStateOf(false) }
@@ -188,6 +224,22 @@ fun WordListScreenContent(
                 }
             )
         }
+        Column {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .wrapContentSize(Alignment.TopEnd)
+                    .padding(horizontal = MaterialTheme.dimens.PaddingLarge)
+            ) {
+                SortMenu(
+                    onSortByDate = sortByDate,
+                    onSortByExpression = sortByExpression,
+                    onSortByTranslation = sortByTranslation,
+                    isSortOpen = isSortOpen,
+                    onToggleSort = onToggleSort
+                )
+            }
+        }
         Row(
             horizontalArrangement = Arrangement.SpaceAround,
             modifier = Modifier
@@ -270,6 +322,52 @@ fun WordListScreenContent(
             },
             dialogTitle = stringResource(R.string.dialog_delete_word_title),
             message = stringResource(R.string.verify_deletion) + "\n\"${clickedWordToEdit.word} - ${clickedWordToEdit.translation}\" ?"
+        )
+    }
+}
+
+@Composable
+fun SortMenu(
+    onSortByDate: () -> Unit,
+    onSortByExpression: () -> Unit,
+    onSortByTranslation: () -> Unit,
+    isSortOpen: Boolean,
+    onToggleSort: (Boolean) -> Unit
+) {
+    DropdownMenu(
+        expanded = isSortOpen,
+        onDismissRequest = { onToggleSort(false) }
+    ) {
+        DropdownMenuItem(
+            text = { Text(stringResource(R.string.sort_by_date)) },
+            onClick = {
+                onSortByDate()
+                onToggleSort(false)
+            },
+            leadingIcon = { Icon(
+                imageVector = Icons.Default.DateRange,
+                contentDescription = stringResource(R.string.sort_by_date)) }
+
+        )
+        DropdownMenuItem(
+            text = { Text(stringResource(R.string.sort_by_expression)) },
+            onClick = {
+                onSortByExpression()
+                onToggleSort(false)
+            },
+            leadingIcon = { Icon(
+                imageVector = Icons.Default.SortByAlpha,
+                contentDescription = stringResource(R.string.sort_by_expression)) }
+        )
+        DropdownMenuItem(
+            text = { Text(stringResource(R.string.sort_by_translation)) },
+            onClick = {
+                onSortByTranslation()
+                onToggleSort(false)
+            },
+            leadingIcon = { Icon(
+                imageVector = Icons.Default.SortByAlpha,
+                contentDescription = stringResource(R.string.sort_by_translation)) }
         )
     }
 }
@@ -388,7 +486,12 @@ fun WordListScreenPreview() {
             onEditWord = { _ -> },
             onUpdateFab = {},
             onSearch = {},
-            isSearchVisible = true
+            isSearchVisible = false,
+            isSortOpen = true,
+            onToggleSort = {},
+            sortByDate = {},
+            sortByExpression = {},
+            sortByTranslation = {}
         )
     }
 }

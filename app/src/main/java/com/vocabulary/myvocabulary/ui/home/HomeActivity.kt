@@ -122,6 +122,8 @@ fun MyVocabularyApp() {
     var screenFab by remember { mutableStateOf<@Composable () -> Unit>({}) }
     var currentBackAction by remember { mutableStateOf<() -> Unit>({ navController.popBackStack() }) }
     var isSearchVisible by rememberSaveable { mutableStateOf(false) }
+    var isSortOpen by rememberSaveable { mutableStateOf(false) }
+    var sortMenu by remember { mutableStateOf<@Composable () -> Unit>({}) }
 
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
 
@@ -150,7 +152,10 @@ fun MyVocabularyApp() {
             onToggleSearch = { isSearchVisible = it },
             modifier = Modifier.padding(innerPadding),
             onBackClick = { newAction ->
-                currentBackAction = newAction }
+                currentBackAction = newAction
+            },
+            isSortOpen = isSortOpen,
+            onToggleSort = { isSortOpen = it }
         )
 
     }

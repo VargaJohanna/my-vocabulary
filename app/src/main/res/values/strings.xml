@@ -92,7 +92,7 @@
     <string name="example_translation_pax">pax</string>
     <string name="example_translation_domo">domo</string>
     <string name="example_translation_mare">mare</string>
-    <string name="sort_by_date">Date</string>
+    <string name="sort_by_date">Sort by Created Date</string>
     <string name="empty_dictionary_state_message">Add an expression and it will show up here.</string>
     <string name="result_stats">%1$d / %2$d - %3$d%%</string>
     <string name="thanks">Thanks</string>
@@ -122,5 +122,8 @@
     <string name="add_a_number">Add a number</string>
     <string name="no_dictionaries_found">There are no dictionaries in the library</string>
     <string name="clear_search">Clear search</string>
+    <string name="sort_by_title">Sort A-Z</string>
+    <string name="sort_by_expression">Sort by Expression</string>
+    <string name="sort_by_translation">Sort by Translation</string>
 
 </resources>
