@@ -125,5 +125,6 @@
     <string name="sort_by_title">Sort A-Z</string>
     <string name="sort_by_expression">Sort by Expression</string>
     <string name="sort_by_translation">Sort by Translation</string>
+    <string name="empty_list_snackbar">No words found for this quiz.</string>
 
 </resources>

@@ -23,7 +23,6 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
@@ -34,7 +33,6 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -100,13 +98,6 @@ fun QuizScreen(
         }
     }
 
-    if (quizList.isEmpty()) {
-        LaunchedEffect(Unit) {
-            onShowSnackbar("No words found for this quiz.")
-            onExit()
-        }
-    }
-
     val handleExit = {
         resultViewModel.resetGuessedWordCollections()
         resultViewModel.dispose()
@@ -119,7 +110,15 @@ fun QuizScreen(
             handleExit()
         }
     }
-
+// Show snakcbar in case the list is empty
+    val snackbarMessage = stringResource(R.string.empty_list_snackbar)
+    if (quizList.isEmpty() && !quizViewModel.isLoading.value) {
+        LaunchedEffect(Unit) {
+            onShowSnackbar(snackbarMessage)
+            handleExit()
+            onExit()
+        }
+    }
     BackHandler(enabled = true) {
         handleExit()
         onExit()
