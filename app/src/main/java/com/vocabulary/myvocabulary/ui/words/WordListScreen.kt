@@ -51,6 +51,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.vocabulary.myvocabulary.repositories.sortBy.SortByOptions
+import com.vocabulary.myvocabulary.ui.lottie.NewDictionaryAnimation
 import com.vocabulary.myvocabulary.ui.theme.MyVocabularyTheme
 import com.vocabulary.myvocabulary.ui.theme.dimens
 import com.vocabulary.myvocabulary.utils.ComposeDialogFactory
@@ -161,12 +162,18 @@ fun WordListScreenContent(
     var showEditDialog by rememberSaveable { mutableStateOf(false) }
     var showDeleteDialog by rememberSaveable { mutableStateOf(false) }
     var searchQuery by rememberSaveable { mutableStateOf("") }
+    var runNewAnimation by rememberSaveable { mutableStateOf(false) }
 
     LaunchedEffect(Unit) {
         onUpdateFab {
             FabMenu(onShowCreateDialog = { showCreateDialog = true })
         }
+
+        if(wordList.isEmpty()) {
+            runNewAnimation = true
+        }
     }
+
     LaunchedEffect(isSearchVisible) {
         if (!isSearchVisible) {
             searchQuery = ""
@@ -323,6 +330,10 @@ fun WordListScreenContent(
             dialogTitle = stringResource(R.string.dialog_delete_word_title),
             message = stringResource(R.string.verify_deletion) + "\n\"${clickedWordToEdit.word} - ${clickedWordToEdit.translation}\" ?"
         )
+    }
+
+    if(runNewAnimation) {
+        NewDictionaryAnimation()
     }
 }
 

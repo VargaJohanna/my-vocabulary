@@ -44,6 +44,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.vocabulary.myvocabulary.R
+import com.vocabulary.myvocabulary.ui.lottie.FailedAnimation
+import com.vocabulary.myvocabulary.ui.lottie.SuccessAnimation
 import com.vocabulary.myvocabulary.ui.quizzes.QuizDirectionType
 import com.vocabulary.myvocabulary.ui.quizzes.toDirectionType
 import com.vocabulary.myvocabulary.ui.quizzes.toQuizType
@@ -162,6 +164,12 @@ fun ResultScreenContent(
             )
         }
     }
+
+    if(passedQuiz) {
+        SuccessAnimation()
+    } else {
+        FailedAnimation()
+    }
 }
 
 @Composable
@@ -169,7 +177,7 @@ fun ResultLazyList(
     modifier: Modifier = Modifier,
     list: List<Word>,
     paddingValues: PaddingValues,
-    directionType: QuizDirectionType
+    directionType: QuizDirectionType,
 ) {
     val state = rememberLazyListState()
 

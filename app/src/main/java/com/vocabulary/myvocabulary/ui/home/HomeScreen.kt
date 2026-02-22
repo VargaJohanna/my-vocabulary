@@ -1,6 +1,7 @@
 package com.vocabulary.myvocabulary.ui.home
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.FlowColumn
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -22,15 +23,21 @@ fun HomeScreen(
     onClickDictionaries: () -> Unit = {},
     onClickQuiz: () -> Unit = {}
 ) {
-    FlowColumn(
-        modifier = Modifier.fillMaxSize(),
-        verticalArrangement = Arrangement.SpaceEvenly
-    ) {
-        ButtonCard(
-            onButtonClick = onClickDictionaries,
-            text =  stringResource(R.string.library_button))
 
-        ButtonCard( onButtonClick = onClickQuiz, text = stringResource(R.string.quizzes_button))
+    Box(
+        modifier = Modifier.fillMaxSize()
+    ) {
+        FlowColumn(
+            modifier = Modifier.fillMaxSize(),
+            verticalArrangement = Arrangement.SpaceEvenly
+        ) {
+            ButtonCard(
+                onButtonClick = onClickDictionaries,
+                text =  stringResource(R.string.library_button))
+
+            ButtonCard( onButtonClick = onClickQuiz, text = stringResource(R.string.quizzes_button))
+        }
+
     }
 }
 

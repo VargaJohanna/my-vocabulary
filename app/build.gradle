@@ -55,6 +55,7 @@ dependencies {
     def lifecycle_version = "2.2.0"
     def nav_version = "2.9.5"
     def lottie_version = "6.6.10"
+    def lottie_compose_version = "6.7.1"
     def constraint_layout_version = "2.2.1"
     def material_version = "1.13.0"
     def card_view_version = "1.0.0"
@@ -118,6 +119,7 @@ dependencies {
 
     //Lottie animation
     implementation "com.airbnb.android:lottie:$lottie_version"
+    implementation "com.airbnb.android:lottie-compose:$lottie_compose_version"
 
     //About page
     implementation "com.github.jrvansuita:MaterialAbout:$material_about_version"
