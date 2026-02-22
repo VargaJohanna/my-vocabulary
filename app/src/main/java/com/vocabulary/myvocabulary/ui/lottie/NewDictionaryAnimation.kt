@@ -13,6 +13,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -20,40 +21,38 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.tooling.preview.Preview
 import com.airbnb.lottie.compose.LottieAnimation
 import com.airbnb.lottie.compose.LottieCompositionSpec
+import com.airbnb.lottie.compose.LottieConstants
 import com.airbnb.lottie.compose.animateLottieCompositionAsState
 import com.airbnb.lottie.compose.rememberLottieComposition
 import com.vocabulary.myvocabulary.R
 import com.vocabulary.myvocabulary.ui.theme.dimens
 
 @Composable
-fun NewDictionaryAnimation() {
-    var speed by remember { mutableStateOf(3f) }
-    var isVisible by remember { mutableStateOf(true) }
-
+fun NewDictionaryAnimation(
+    showAnimation: Boolean
+) {
+    var speed by remember { mutableStateOf(2f) }
+    var show by rememberSaveable() { mutableStateOf(false) }
     val composition by rememberLottieComposition(
-
         LottieCompositionSpec
             .RawRes(R.raw.dancing_book)
     )
 
     val progress by animateLottieCompositionAsState(
         composition,
-        iterations = 1,
-        isPlaying = isVisible,
+        iterations = LottieConstants.IterateForever,
+        isPlaying = true,
         speed = speed,
-        restartOnPlay = false
-
+        restartOnPlay = true
     )
 
-    LaunchedEffect(progress) {
-        if (progress == 1f) {
-            isVisible = false
-        }
+    LaunchedEffect(showAnimation) {
+        show = showAnimation
     }
     AnimatedVisibility(
-        visible = isVisible,
-        enter = fadeIn(animationSpec = tween(500)),
-        exit = fadeOut(animationSpec = tween(1000))
+        visible = show,
+        enter = fadeIn(animationSpec = tween(1000)),
+        exit = fadeOut(animationSpec = tween(800))
     ) {
         Box(
             modifier = Modifier.fillMaxWidth(),
@@ -72,10 +71,11 @@ fun NewDictionaryAnimation() {
         }
     }
 
+
 }
 
 @Preview
 @Composable
 fun NewDictionaryAnimationPreview() {
-    NewDictionaryAnimation()
+    NewDictionaryAnimation(false)
 }

@@ -168,16 +168,20 @@ fun WordListScreenContent(
         onUpdateFab {
             FabMenu(onShowCreateDialog = { showCreateDialog = true })
         }
-
-        if(wordList.isEmpty()) {
-            runNewAnimation = true
-        }
     }
 
     LaunchedEffect(isSearchVisible) {
         if (!isSearchVisible) {
             searchQuery = ""
             onSearch("")
+        }
+    }
+
+    LaunchedEffect(wordList) {
+        if(wordList.isEmpty()) {
+            runNewAnimation = true
+        } else {
+            runNewAnimation = false
         }
     }
 
@@ -333,7 +337,10 @@ fun WordListScreenContent(
     }
 
     if(runNewAnimation) {
-        NewDictionaryAnimation()
+        NewDictionaryAnimation(true)
+    } else {
+        NewDictionaryAnimation(false)
+
     }
 }
 
