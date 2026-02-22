@@ -45,7 +45,8 @@ fun MyVocabularyNavHost(
     onToggleSearch: (Boolean) -> Unit,
     isSearchVisible: Boolean,
     onToggleSort: (Boolean) -> Unit,
-    isSortOpen: Boolean
+    isSortOpen: Boolean,
+    onShowSnackbar: (String) -> Unit
 
 ) {
 
@@ -83,6 +84,7 @@ fun MyVocabularyNavHost(
                 }
 
                 onUpdateFab { }
+
             }
 
             HomeScreen(
@@ -228,7 +230,6 @@ fun MyVocabularyNavHost(
                 onBackClick { navController.popBackStack() }
 
                 onUpdateFab { }
-
             }
             AboutScreen()
         }
@@ -243,7 +244,6 @@ fun MyVocabularyNavHost(
                 onBackClick { navController.popBackStack() }
 
                 onUpdateFab { }
-
             }
             QuizListScreen(
                 dictionaryIdFromArgs = args.dictionaryId,
@@ -288,7 +288,8 @@ fun MyVocabularyNavHost(
                         popUpTo<QuizList> { inclusive = true }
                         launchSingleTop = true
                     }
-                }
+                },
+                onShowSnackbar = onShowSnackbar
             )
         }
 

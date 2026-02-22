@@ -5,17 +5,21 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.result.launch
 import androidx.appcompat.app.AlertDialog
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
@@ -30,6 +34,7 @@ import com.vocabulary.myvocabulary.ui.dictionaries.Dictionary
 import com.vocabulary.myvocabulary.ui.dictionaries.ShareDictionaryViewModel
 import com.vocabulary.myvocabulary.ui.theme.MyVocabularyTheme
 import com.vocabulary.myvocabulary.utils.DialogFactory
+import kotlinx.coroutines.launch
 import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import java.util.*
@@ -124,6 +129,9 @@ fun MyVocabularyApp() {
     var isSearchVisible by rememberSaveable { mutableStateOf(false) }
     var isSortOpen by rememberSaveable { mutableStateOf(false) }
     var sortMenu by remember { mutableStateOf<@Composable () -> Unit>({}) }
+    var snackbar by remember { mutableStateOf<@Composable () -> Unit>({}) }
+    val snackbarHostState = remember { SnackbarHostState() }
+    val scope = rememberCoroutineScope()
 
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
 
@@ -140,7 +148,8 @@ fun MyVocabularyApp() {
                 onBackClick = { currentBackAction() }
             )
         },
-        floatingActionButton = screenFab
+        floatingActionButton = screenFab,
+        snackbarHost = { SnackbarHost(snackbarHostState) }
 
     ) { innerPadding ->
         MyVocabularyNavHost(
@@ -155,7 +164,10 @@ fun MyVocabularyApp() {
                 currentBackAction = newAction
             },
             isSortOpen = isSortOpen,
-            onToggleSort = { isSortOpen = it }
+            onToggleSort = { isSortOpen = it },
+            onShowSnackbar = { message ->
+                scope.launch { snackbarHostState.showSnackbar(message) }
+            }
         )
 
     }

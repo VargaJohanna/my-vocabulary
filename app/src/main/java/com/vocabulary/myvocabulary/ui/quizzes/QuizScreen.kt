@@ -23,6 +23,8 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.SnackbarDuration
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.VerticalDivider
@@ -32,6 +34,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -60,9 +63,9 @@ fun QuizScreen(
     onQuizFinished: (Long, Int, Int) -> Unit,
     onUpdateFab: (@Composable () -> Unit) -> Unit,
     onExit: () -> Unit,
-    onRegisterExitLogic: (() -> Unit) -> Unit
+    onRegisterExitLogic: (() -> Unit) -> Unit,
+    onShowSnackbar: (String) -> Unit
 ) {
-
     val quizViewModel: QuizViewModel = koinViewModel {
         parametersOf(dictionaryId, direction, failedOnly)
     }
@@ -76,8 +79,8 @@ fun QuizScreen(
         quizViewModel.startQuiz(quizType.toQuizType(), dictionaryId)
     }
 
-
     val quizList by quizViewModel.quizList.collectAsState()
+    val snackbarHostState = remember { SnackbarHostState() }
 
     if (quizList.isNotEmpty()) {
         QuizScreenContent(
@@ -92,9 +95,15 @@ fun QuizScreen(
             onUpdateFab = onUpdateFab
         )
     } else {
-        // Show message that list is empty?
-        Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+        Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
             CircularProgressIndicator()
+        }
+    }
+
+    if (quizList.isEmpty()) {
+        LaunchedEffect(Unit) {
+            onShowSnackbar("No words found for this quiz.")
+            onExit()
         }
     }
 

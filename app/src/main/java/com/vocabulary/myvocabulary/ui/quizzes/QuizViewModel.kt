@@ -24,7 +24,6 @@ class QuizViewModel(
     private val rxSchedulers: RxSchedulers,
     private val quizRepository: QuizRepository
 ) : ViewModel() {
-
     private val disposables = CompositeDisposable()
     private val updateIcon = MutableLiveData<Boolean>()
     private val isFabIconUpdated = MutableStateFlow(false)
@@ -33,8 +32,11 @@ class QuizViewModel(
     private val _quizList: MutableStateFlow<List<Word>> = MutableStateFlow(emptyList())
     val quizList: StateFlow<List<Word>> = _quizList
     var isDictionaryEmpty = false
+    private val _isLoading: MutableStateFlow<Boolean> = MutableStateFlow(false)
+    var isLoading: StateFlow<Boolean> = _isLoading
 
     fun fetchQuizList() {
+        _isLoading.value = true
         viewModelScope.launch {
             observeQuizList(failedOnly)
         }
@@ -53,26 +55,29 @@ class QuizViewModel(
         disposables += quizRepository.quizList
             .subscribeOn(rxSchedulers.io())
             .observeOn(rxSchedulers.main())
-            .subscribe { list ->
-                isDictionaryEmpty = list.isEmpty()
+            .subscribe(
+                { list ->
+                    isDictionaryEmpty = list.isEmpty()
+                    if (list.isNotEmpty()) {
+                        val filteredList = list.filter { word ->
+                            val isValid = word.word.isNotBlank() && word.translation.isNotBlank()
+                            val matchesCriteria = if (failedOnly) !word.lastResult else true
+                            isValid && matchesCriteria
+                        }.shuffled()
+                        _quizList.value = filteredList.shuffled()
 
-
-
-                if (list.isNotEmpty()) {
-                    val filteredList = list.filter { word ->
-                        val isValid = word.word.isNotBlank() && word.translation.isNotBlank()
-                        val matchesCriteria = if (failedOnly) !word.lastResult else true
-                        isValid && matchesCriteria
-                    }.shuffled()
-                    _quizList.value = filteredList.shuffled()
-
-                    updateIcon.postValue(getFocusableWordList().size == 1)
-                    listIsFinished = getFocusableWordList().size == 1
-                    isFabIconUpdated.value = getFocusableWordList().size == 1
-                } else {
-                    _quizList.value = emptyList()
-                }
-            }
+                        updateIcon.postValue(getFocusableWordList().size == 1)
+                        listIsFinished = getFocusableWordList().size == 1
+                        isFabIconUpdated.value = getFocusableWordList().size == 1
+                    } else {
+                        _quizList.value = emptyList()
+                    }
+                    _isLoading.value = false
+                },
+                { error ->
+                    Log.e("QuizViewModel", "Error fetching quiz list", error)
+                    _isLoading.value = false
+                })
     }
 
     public override fun onCleared() {
