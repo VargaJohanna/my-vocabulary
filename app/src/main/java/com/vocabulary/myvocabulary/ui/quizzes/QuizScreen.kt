@@ -23,6 +23,9 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarDuration
+import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
@@ -33,6 +36,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -40,6 +44,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.geometry.isEmpty
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -62,7 +67,6 @@ fun QuizScreen(
     onUpdateFab: (@Composable () -> Unit) -> Unit,
     onExit: () -> Unit,
     onRegisterExitLogic: (() -> Unit) -> Unit,
-    onShowSnackbar: (String) -> Unit
 ) {
     val quizViewModel: QuizViewModel = koinViewModel {
         parametersOf(dictionaryId, direction, failedOnly)
@@ -71,6 +75,7 @@ fun QuizScreen(
     val resultViewModel: ResultViewModel = koinViewModel {
         parametersOf(dictionaryId)
     }
+    val snackbarHostState = remember { SnackbarHostState() }
 
     LaunchedEffect(dictionaryId, quizType) {
         quizViewModel.fetchQuizList()
@@ -78,25 +83,7 @@ fun QuizScreen(
     }
 
     val quizList by quizViewModel.quizList.collectAsState()
-    val snackbarHostState = remember { SnackbarHostState() }
-
-    if (quizList.isNotEmpty()) {
-        QuizScreenContent(
-            direction =  direction,
-            quizList = quizList,
-            onGuessSaved = { id, guess ->
-                resultViewModel.latestGuess(lastGuess = GuessedWord(id, guess))
-            },
-            onListFinished = {
-                onQuizFinished(dictionaryId, direction, quizType)
-            },
-            onUpdateFab = onUpdateFab
-        )
-    } else {
-        Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-            CircularProgressIndicator()
-        }
-    }
+    val snackbarMessage = stringResource(R.string.empty_list_snackbar)
 
     val handleExit = {
         resultViewModel.resetGuessedWordCollections()
@@ -104,21 +91,47 @@ fun QuizScreen(
         quizViewModel.onCleared()
     }
 
+    Scaffold(
+        snackbarHost = { SnackbarHost(hostState = snackbarHostState) }
+    ) { padding ->
+        Box(modifier = Modifier.padding(padding)) {
+            if(quizViewModel.isLoading.value) {
+                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                    CircularProgressIndicator()
+                }
+            } else if(quizList.isNotEmpty()) {
+                QuizScreenContent(
+                    direction =  direction,
+                    quizList = quizList,
+                    onGuessSaved = { id, guess ->
+                        resultViewModel.latestGuess(lastGuess = GuessedWord(id, guess))
+                    },
+                    onListFinished = {
+                        onQuizFinished(dictionaryId, direction, quizType)
+                    },
+                    onUpdateFab = onUpdateFab
+                )
+            } else {
+                LaunchedEffect(Unit) {
+                    snackbarHostState.showSnackbar(
+                        message = snackbarMessage,
+                        duration = SnackbarDuration.Short
+                    )
+                    handleExit()
+                    onExit()
+                }
+            }
+        }
+    }
+
+
 // Pass handleExit logic up to the NavHost
     LaunchedEffect(Unit) {
         onRegisterExitLogic {
             handleExit()
         }
     }
-// Show snakcbar in case the list is empty
-    val snackbarMessage = stringResource(R.string.empty_list_snackbar)
-    if (quizList.isEmpty() && !quizViewModel.isLoading.value) {
-        LaunchedEffect(Unit) {
-            onShowSnackbar(snackbarMessage)
-            handleExit()
-            onExit()
-        }
-    }
+
     BackHandler(enabled = true) {
         handleExit()
         onExit()

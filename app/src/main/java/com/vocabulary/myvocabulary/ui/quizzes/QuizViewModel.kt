@@ -30,14 +30,12 @@ class QuizViewModel(
     private val _quizList: MutableStateFlow<List<Word>> = MutableStateFlow(emptyList())
     val quizList: StateFlow<List<Word>> = _quizList
     var isDictionaryEmpty = false
-    private val _isLoading: MutableStateFlow<Boolean> = MutableStateFlow(false)
-    var isLoading: StateFlow<Boolean> = _isLoading
+    private val _isLoading: MutableStateFlow<Boolean> = MutableStateFlow(true)
+    val isLoading: StateFlow<Boolean> = _isLoading
 
     fun fetchQuizList() {
         _isLoading.value = true
-        viewModelScope.launch {
-            observeQuizList(failedOnly)
-        }
+        observeQuizList(failedOnly)
     }
 
     fun startQuiz(quizType: QuizTypes, dictionaryId: Long) {
@@ -75,7 +73,8 @@ class QuizViewModel(
                 { error ->
                     Log.e("QuizViewModel", "Error fetching quiz list", error)
                     _isLoading.value = false
-                })
+                }
+            )
     }
 
     public override fun onCleared() {

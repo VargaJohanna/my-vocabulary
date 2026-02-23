@@ -128,9 +128,6 @@ fun MyVocabularyApp() {
     var isSearchVisible by rememberSaveable { mutableStateOf(false) }
     var isSortOpen by rememberSaveable { mutableStateOf(false) }
     var sortMenu by remember { mutableStateOf<@Composable () -> Unit>({}) }
-    var snackbar by remember { mutableStateOf<@Composable () -> Unit>({}) }
-    val snackbarHostState = remember { SnackbarHostState() }
-    val scope = rememberCoroutineScope()
 
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
 
@@ -148,7 +145,6 @@ fun MyVocabularyApp() {
             )
         },
         floatingActionButton = screenFab,
-        snackbarHost = { SnackbarHost(snackbarHostState) }
 
     ) { innerPadding ->
         MyVocabularyNavHost(
@@ -164,9 +160,6 @@ fun MyVocabularyApp() {
             },
             isSortOpen = isSortOpen,
             onToggleSort = { isSortOpen = it },
-            onShowSnackbar = { message ->
-                scope.launch { snackbarHostState.showSnackbar(message) }
-            }
         )
 
     }

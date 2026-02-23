@@ -46,8 +46,6 @@ fun MyVocabularyNavHost(
     isSearchVisible: Boolean,
     onToggleSort: (Boolean) -> Unit,
     isSortOpen: Boolean,
-    onShowSnackbar: (String) -> Unit
-
 ) {
 
     NavHost(
@@ -288,8 +286,7 @@ fun MyVocabularyNavHost(
                         popUpTo<QuizList> { inclusive = true }
                         launchSingleTop = true
                     }
-                },
-                onShowSnackbar = onShowSnackbar
+                }
             )
         }
 
