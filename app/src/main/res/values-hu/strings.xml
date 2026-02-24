@@ -126,6 +126,7 @@
     <string name="sort_by_expression">Rendezés \"Szó\" szerint</string>
     <string name="sort_by_translation">Rendezés \"Jelentés\" szerint</string>
     <string name="empty_list_snackbar">Ez a szótár üres.</string>
+    <string name="home_label">Otthon</string>
 
 
 </resources>

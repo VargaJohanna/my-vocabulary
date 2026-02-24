@@ -10,30 +10,38 @@ import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.NavigationBar
+import androidx.compose.material3.NavigationBarDefaults
+import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SnackbarHost
-import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.Observer
+import androidx.navigation.NavDestination.Companion.hasRoute
+import androidx.navigation.NavDestination.Companion.hierarchy
+import androidx.navigation.NavGraph.Companion.findStartDestination
+import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.vocabulary.myvocabulary.R
+import com.vocabulary.myvocabulary.navigation.Home
+import com.vocabulary.myvocabulary.navigation.MyVocabularyDestinations
 import com.vocabulary.myvocabulary.navigation.MyVocabularyNavHost
 import com.vocabulary.myvocabulary.navigation.MyVocabularyTopAppBar
 import com.vocabulary.myvocabulary.ui.dictionaries.Dictionary
 import com.vocabulary.myvocabulary.ui.dictionaries.ShareDictionaryViewModel
 import com.vocabulary.myvocabulary.ui.theme.MyVocabularyTheme
 import com.vocabulary.myvocabulary.utils.DialogFactory
-import kotlinx.coroutines.launch
 import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import java.util.*
@@ -128,7 +136,7 @@ fun MyVocabularyApp() {
     var isSearchVisible by rememberSaveable { mutableStateOf(false) }
     var isSortOpen by rememberSaveable { mutableStateOf(false) }
     var sortMenu by remember { mutableStateOf<@Composable () -> Unit>({}) }
-
+    val startDestination = Home
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
 
     Scaffold(
@@ -145,10 +153,44 @@ fun MyVocabularyApp() {
             )
         },
         floatingActionButton = screenFab,
+        bottomBar = {
+            val navBackStackEntry by navController.currentBackStackEntryAsState()
+            val currentDestination = navBackStackEntry?.destination
+            NavigationBar(windowInsets = NavigationBarDefaults.windowInsets) {
+                MyVocabularyDestinations.entries.forEach { destination ->
+                    val isSelected = currentDestination?.hierarchy?.any {
+                        it.hasRoute(destination.route::class)
+                    } == true
+                    NavigationBarItem(
+                        selected = isSelected,
+                        onClick = {
+                            navController.navigate(route = destination.route) {
+                                popUpTo(navController.graph.findStartDestination().id) {
+                                    saveState = true
+                                }
+                                // Avoid multiple copies of the same destination
+                                launchSingleTop = true
+                                // Restore state when re-selecting a previously selected item
+                                restoreState = true
+                            }
+                        },
+                        icon = {
+                            Icon(
+                                destination.icon,
+                                contentDescription = destination.contentDescription
+                            )
+                        },
+                        label = {
+                            Text(text = stringResource(id = destination.label))}
+                    )
+                }
+            }
+        }
 
     ) { innerPadding ->
         MyVocabularyNavHost(
             navController = navController,
+            startDestination = startDestination,
             onUpdateActions = { appBarActions = it },
             onUpdateTitle = { appBarTitle = it },
             onUpdateFab = { screenFab = it },

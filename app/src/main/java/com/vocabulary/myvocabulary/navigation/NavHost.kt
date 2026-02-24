@@ -37,6 +37,7 @@ import java.util.Locale.getDefault
 @Composable
 fun MyVocabularyNavHost(
     navController: NavHostController,
+    startDestination: Any,
     modifier: Modifier = Modifier,
     onUpdateActions: (@Composable RowScope.() -> Unit) -> Unit,
     onUpdateTitle: (@Composable () -> Unit) -> Unit,
@@ -50,7 +51,7 @@ fun MyVocabularyNavHost(
 
     NavHost(
         navController = navController,
-        startDestination = Home,
+        startDestination = startDestination,
         modifier = modifier,
         enterTransition = {
             fadeIn(animationSpec = tween(Constants.CLICK_DEBOUNCE_TIME.toInt())) + slideInHorizontally(
