@@ -19,13 +19,13 @@ enum class MyVocabularyDestinations(
     val contentDescription: String? = null
 ) {
     HOME(
-        route = Home, // Assuming Home is a serializable object/class
+        route = Home,
         icon = Icons.Default.Home,
         label = R.string.home_label,
         contentDescription = "Navigate to Home"
     ),
     DICTIONARIES(
-        route = DictionaryList, // Use the serializable object
+        route = DictionaryList,
         icon = Icons.AutoMirrored.Filled.MenuBook,
         label = R.string.library_button,
         contentDescription = "Navigate to Dictionaries"
