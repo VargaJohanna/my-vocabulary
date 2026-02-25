@@ -19,7 +19,7 @@ import com.vocabulary.myvocabulary.ui.words.toWordEntry
 import com.vocabulary.myvocabulary.utils.DateTypeConverter
 import java.util.*
 
-@Database(entities = [DictionaryEntry::class, WordEntry::class], version = 5, exportSchema = false)
+@Database(entities = [DictionaryEntry::class, WordEntry::class], version = 6, exportSchema = false)
 @TypeConverters(DateTypeConverter::class)
 abstract class AppDatabase : RoomDatabase() {
     abstract fun dictionaryDao(): DictionaryDao
@@ -28,8 +28,20 @@ abstract class AppDatabase : RoomDatabase() {
     companion object {
         val MIGRATION_4_5 = object : Migration(4, 5) {
             override fun migrate(db: SupportSQLiteDatabase) {
-                // We add the column as NULLABLE so existing rows just get a 'null' value
                 db.execSQL("ALTER TABLE dictionaries ADD COLUMN dictionary_last_practiced INTEGER")
+            }
+        }
+        val MIGRATION_5_6 = object : Migration(5, 6) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL("ALTER TABLE dictionaries ADD COLUMN dictionary_last_result INTEGER")
+                db.execSQL("ALTER TABLE dictionaries ADD COLUMN dictionary_finished_count INTEGER NOT NULL DEFAULT 0")
+            }
+        }
+        val MIGRATION_4_6 = object : Migration(4, 6) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL("ALTER TABLE dictionaries ADD COLUMN dictionary_last_practiced INTEGER")
+                db.execSQL("ALTER TABLE dictionaries ADD COLUMN dictionary_last_result INTEGER")
+                db.execSQL("ALTER TABLE dictionaries ADD COLUMN dictionary_finished_count INTEGER NOT NULL DEFAULT 0")
             }
         }
 
@@ -47,6 +59,8 @@ abstract class AppDatabase : RoomDatabase() {
                 AppDatabase::class.java, "appdatabase.db"
             )
                 .addMigrations(MIGRATION_4_5)
+                .addMigrations(MIGRATION_5_6)
+                .addMigrations(MIGRATION_4_6)
                 .addCallback(object : Callback() {
                     override fun onCreate(db: SupportSQLiteDatabase) {
                         super.onCreate(db)
@@ -64,7 +78,9 @@ abstract class AppDatabase : RoomDatabase() {
                             dictionaryId = 1L,
                             dictionaryName = context.getString(R.string.example_dictionary_title),
                             dictionaryCreated = Calendar.getInstance().time,
-                            dictionaryLastPracticed = null
+                            dictionaryLastPracticed = null,
+                            dictionaryLastResult = null,
+                            dictionaryFinishedCount = 0
                         ).toDictionaryEntry()
 
                     private fun getListOfDefaultWords(context: Context): List<WordEntry> {

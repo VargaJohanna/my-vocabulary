@@ -443,79 +443,105 @@ fun DictionaryListScreenPreview() {
                             dictionaryId = 1L,
                             dictionaryName = "Test that's very very very long and I want to see the option button",
                             dictionaryCreated = Calendar.getInstance().time,
-                            dictionaryLastPracticed = null
+                            dictionaryLastPracticed = null,
+                            dictionaryLastResult = null,
+                            dictionaryFinishedCount = 0
                         ),
                         Dictionary(
                             dictionaryId = 2L,
                             dictionaryName = "Test2",
                             dictionaryCreated = Calendar.getInstance().time,
-                            dictionaryLastPracticed = null
+                            dictionaryLastPracticed = null,
+                            dictionaryLastResult = null,
+                            dictionaryFinishedCount = 0
                         ),
                         Dictionary(
                             dictionaryId = 3L,
                             dictionaryName = "Test3",
                             dictionaryCreated = Calendar.getInstance().time,
-                            dictionaryLastPracticed = null
+                            dictionaryLastPracticed = null,
+                            dictionaryLastResult = null,
+                            dictionaryFinishedCount = 0
                         ),
                         Dictionary(
                             dictionaryId = 4L,
                             dictionaryName = "Test4",
                             dictionaryCreated = Calendar.getInstance().time,
-                            dictionaryLastPracticed = null
+                            dictionaryLastPracticed = null,
+                            dictionaryLastResult = null,
+                            dictionaryFinishedCount = 0
                         ),
                         Dictionary(
                             dictionaryId = 5L,
                             dictionaryName = "Test5",
                             dictionaryCreated = Calendar.getInstance().time,
-                            dictionaryLastPracticed = null
+                            dictionaryLastPracticed = null,
+                            dictionaryLastResult = null,
+                            dictionaryFinishedCount = 0
                         ),
                         Dictionary(
                             dictionaryId = 5L,
                             dictionaryName = "Test5",
                             dictionaryCreated = Calendar.getInstance().time,
-                            dictionaryLastPracticed = null
+                            dictionaryLastPracticed = null,
+                            dictionaryLastResult = null,
+                            dictionaryFinishedCount = 0
                         ),
                         Dictionary(
                             dictionaryId = 5L,
                             dictionaryName = "Test5",
                             dictionaryCreated = Calendar.getInstance().time,
-                            dictionaryLastPracticed = null
+                            dictionaryLastPracticed = null,
+                            dictionaryLastResult = null,
+                            dictionaryFinishedCount = 0
                         ),
                         Dictionary(
                             dictionaryId = 5L,
                             dictionaryName = "Test5",
                             dictionaryCreated = Calendar.getInstance().time,
-                            dictionaryLastPracticed = null
+                            dictionaryLastPracticed = null,
+                            dictionaryLastResult = null,
+                            dictionaryFinishedCount = 0
                         ),
                         Dictionary(
                             dictionaryId = 5L,
                             dictionaryName = "Test5",
                             dictionaryCreated = Calendar.getInstance().time,
-                            dictionaryLastPracticed = null
+                            dictionaryLastPracticed = null,
+                            dictionaryLastResult = null,
+                            dictionaryFinishedCount = 0
                         ),
                         Dictionary(
                             dictionaryId = 5L,
                             dictionaryName = "Test5",
                             dictionaryCreated = Calendar.getInstance().time,
-                            dictionaryLastPracticed = null
+                            dictionaryLastPracticed = null,
+                            dictionaryLastResult = null,
+                            dictionaryFinishedCount = 0
                         ),
                         Dictionary(
                             dictionaryId = 5L,
                             dictionaryName = "Test5",
                             dictionaryCreated = Calendar.getInstance().time,
-                            dictionaryLastPracticed = null
+                            dictionaryLastPracticed = null,
+                            dictionaryLastResult = null,
+                            dictionaryFinishedCount = 0
                         ),
                         Dictionary(
                             dictionaryId = 5L,
                             dictionaryName = "Test5",
                             dictionaryCreated = Calendar.getInstance().time,
-                            dictionaryLastPracticed = null
+                            dictionaryLastPracticed = null,
+                            dictionaryLastResult = null,
+                            dictionaryFinishedCount = 0
                         ),
                         Dictionary(
                             dictionaryId = 5L,
                             dictionaryName = "Test5",
                             dictionaryCreated = Calendar.getInstance().time,
-                            dictionaryLastPracticed = null
+                            dictionaryLastPracticed = null,
+                            dictionaryLastResult = null,
+                            dictionaryFinishedCount = 0
                         )
                     ),
                 onShowDeleteDialog = {},

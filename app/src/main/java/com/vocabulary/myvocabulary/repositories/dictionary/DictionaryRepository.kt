@@ -12,6 +12,6 @@ interface  DictionaryRepository {
     fun deleteDictionary(dictionary: Dictionary)
     fun updateDictionary(dictionary: Dictionary)
     fun getDictionaryById(dictionaryId: Long): Single<Dictionary>
-
     fun onQuizFinished(dictionaryId: Long?)
+    fun saveQuizStats(id: Long, scorePercentage: Int)
 }

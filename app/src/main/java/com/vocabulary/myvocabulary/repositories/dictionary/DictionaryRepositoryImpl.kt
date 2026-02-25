@@ -4,6 +4,7 @@ import android.util.Log
 import com.vocabulary.myvocabulary.rx.RxSchedulers
 import com.vocabulary.myvocabulary.ui.dictionaries.Dictionary
 import com.vocabulary.myvocabulary.ui.dictionaries.toDictionaryEntry
+import io.reactivex.Completable
 import io.reactivex.Observable
 import io.reactivex.Single
 import io.reactivex.subjects.BehaviorSubject
@@ -50,9 +51,26 @@ class DictionaryRepositoryImpl(
     override fun onQuizFinished(dictionaryId: Long?) {
         val currentDate = Calendar.getInstance().time
         dictionaryId?.let { id ->
-            rxSchedulers.io().scheduleDirect {
+            Completable.fromAction {
                 dictionaryDao.updateLastPracticed(id, currentDate)
             }
+                .subscribeOn(rxSchedulers.io())
+                .subscribe(
+                    {}, // Success: Do nothing
+                    { error -> Log.e("Repo", "Error updating last practiced", error) }
+                )
         }
+    }
+
+    override fun saveQuizStats(id: Long, scorePercentage: Int) {
+        val now = Calendar.getInstance().time
+        Completable.fromAction {
+            dictionaryDao.updateDictionaryStats(id, now, scorePercentage)
+        }
+            .subscribeOn(rxSchedulers.io())
+            .subscribe(
+                {}, // Success: Do nothing
+                { error -> Log.e("Repo", "Error saving quiz stats", error) }
+            )
     }
 }
