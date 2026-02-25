@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.f2prateek.rx.preferences2.RxSharedPreferences
 import com.vocabulary.myvocabulary.ext.plusAssign
+import com.vocabulary.myvocabulary.repositories.dictionary.DictionaryRepository
 import com.vocabulary.myvocabulary.repositories.guessedWord.GuessedMapData
 import com.vocabulary.myvocabulary.repositories.guessedWord.GuessedWordRepository
 import com.vocabulary.myvocabulary.repositories.quiz.CustomQuizRepository
@@ -25,14 +26,16 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import java.util.Locale
 import java.util.Locale.getDefault
+import kotlin.math.round
 
 class ResultViewModel(
-        val dictionaryId: Long,
-        private val wordRepository: WordRepository,
-        private val rxSchedulers: RxSchedulers,
-        private val quizRepository: QuizRepository,
-        private val guessedWordRepository: GuessedWordRepository,
-        preferences: SharedPreferences
+    val dictionaryId: Long,
+    private val wordRepository: WordRepository,
+    private val dictionaryRepository: DictionaryRepository,
+    private val rxSchedulers: RxSchedulers,
+    private val quizRepository: QuizRepository,
+    private val guessedWordRepository: GuessedWordRepository,
+    preferences: SharedPreferences
 
 ) : ViewModel() {
     private val disposables = CompositeDisposable()
@@ -41,6 +44,9 @@ class ResultViewModel(
     var directionResult: QuizDirectionType = QuizDirectionType.AskWord
     var isAllPassed = true
     val openedAppCounter: Int = preferences.getInt(COUNTER_KEY, 0)
+
+    private val numOfPassed: MutableStateFlow<Int> = MutableStateFlow(0)
+    private val resultPercentage: MutableStateFlow<Int> = MutableStateFlow(0)
 
     override fun onCleared() {
         disposables.clear()
@@ -74,6 +80,8 @@ class ResultViewModel(
                     liveGuessedWordList.postValue(guessList)
                     guessedWordList.value = guessList
                     quizRepository.updateQuizList(guessList)
+                    numOfPassed.value = guessList.filter { it.lastResult }.size
+                    resultPercentage.value = round(((numOfPassed.value.toFloat() / guessList.size.toFloat()) * 100)).toInt()
                 }
     }
 
@@ -136,4 +144,16 @@ class ResultViewModel(
     fun latestGuess(lastGuess: GuessedWord) {
         guessedWordRepository.addToGuessedWordMap(lastGuess)
     }
+
+    fun saveLastPracticeOfDictionary(dictionaryId: Long) {
+        dictionaryRepository.onQuizFinished(dictionaryId)
+    }
+
+    fun saveQuizStats(id: Long, scorePercentage: Int) {
+        dictionaryRepository.saveQuizStats(id, scorePercentage)
+    }
+
+    fun getNumOfPassed() = numOfPassed
+
+    fun getResultPercentage() = resultPercentage
 }

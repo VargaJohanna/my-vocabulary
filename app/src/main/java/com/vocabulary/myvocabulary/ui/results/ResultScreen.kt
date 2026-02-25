@@ -70,6 +70,11 @@ fun ResultScreen(
         parametersOf(dictionaryId)
     }
 
+    val resultList by resultViewModel.getGuessedList().collectAsState()
+    val numOfPassed by resultViewModel.getNumOfPassed().collectAsState()
+    val numOfWords = resultList.size
+    val resultPercentage by resultViewModel.getResultPercentage().collectAsState()
+
     val handleExit = {
         resultViewModel.resetGuessedWordCollections()
         resultViewModel.dispose()
@@ -82,9 +87,10 @@ fun ResultScreen(
 
     LaunchedEffect(Unit) {
         resultViewModel.fetchGuessedList()
+        resultViewModel.saveLastPracticeOfDictionary(dictionaryId)
+        resultViewModel.saveQuizStats(dictionaryId, resultPercentage)
     }
 
-    val resultList by resultViewModel.getGuessedList().collectAsState()
 
     ResultScreenContent(
         resultList = resultList,
@@ -102,7 +108,10 @@ fun ResultScreen(
             onRestartQuiz(quizType, dictionaryId, direction, true)
         },
         passedQuiz =  resultViewModel.isAllPassed,
-        onUpdateFab = onUpdateFab
+        onUpdateFab = onUpdateFab,
+        numOfPassed = numOfPassed,
+        numOfWords = numOfWords,
+        resultPercentage = resultPercentage
     )
 }
 
@@ -117,9 +126,10 @@ fun ResultScreenContent(
     onRestartFailedOnly: () -> Unit,
     passedQuiz: Boolean,
     onUpdateFab: (@Composable () -> Unit) -> Unit,
+    numOfPassed: Int,
+    numOfWords: Int,
+    resultPercentage: Int = 0
 ) {
-    val passes = resultList.filter { it.lastResult }.size
-    val all = resultList.size
     var expanded by remember { mutableStateOf(isFabOpen) }
 
     LaunchedEffect(isFabOpen) { expanded = isFabOpen }
@@ -152,9 +162,9 @@ fun ResultScreenContent(
                 textAlign = TextAlign.Center,
                 text = String.format(
                     stringResource(R.string.result_stats),
-                    passes,
-                    all,
-                    round(((passes.toFloat() / all.toFloat()) * 100)).toInt()
+                    numOfPassed,
+                    numOfWords,
+                    resultPercentage
                 )
             )
             ResultLazyList(
@@ -439,6 +449,9 @@ fun ResultScreenPreview() {
         onRestartNew = {},
         onRestartFailedOnly = {},
         passedQuiz = true,
-        onUpdateFab = {}
+        onUpdateFab = {},
+        numOfPassed = 2,
+        numOfWords = 3,
+        resultPercentage = 66
     )
 }
