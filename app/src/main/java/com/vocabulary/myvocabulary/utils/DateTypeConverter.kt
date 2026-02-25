@@ -10,10 +10,14 @@ import java.util.*
 
 class DateTypeConverter {
     @TypeConverter
-    fun toDate(value: Long): Date = Date(value)
+    fun toDate(value: Long?): Date? {
+        return value?.let { Date(it) }
+    }
 
     @TypeConverter
-    fun toLong(value: Date): Long = value.time
+    fun toLong(value: Date?): Long? {
+        return value?.time
+    }
 
     fun formatDate(date: Date): String {
         return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {

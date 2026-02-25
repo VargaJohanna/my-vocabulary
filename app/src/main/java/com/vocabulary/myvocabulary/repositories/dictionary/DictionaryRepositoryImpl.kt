@@ -1,11 +1,13 @@
 package com.vocabulary.myvocabulary.repositories.dictionary
 
+import android.util.Log
 import com.vocabulary.myvocabulary.rx.RxSchedulers
 import com.vocabulary.myvocabulary.ui.dictionaries.Dictionary
 import com.vocabulary.myvocabulary.ui.dictionaries.toDictionaryEntry
 import io.reactivex.Observable
 import io.reactivex.Single
 import io.reactivex.subjects.BehaviorSubject
+import java.util.Calendar
 
 class DictionaryRepositoryImpl(
         private val dictionaryDao: DictionaryDao,
@@ -25,7 +27,9 @@ class DictionaryRepositoryImpl(
                 }
                 .subscribeOn(rxSchedulers.io())
                 .observeOn(rxSchedulers.main())
-                .subscribe { _allDictionaries.onNext(it) }
+                .subscribe (
+                    { _allDictionaries.onNext(it) },
+                    { error -> Log.e("Repo", "Database error", error) })
     }
 
     override fun createDictionary(dictionary: Dictionary) = dictionaryDao.insertDictionary(dictionary.toDictionaryEntry())
@@ -41,5 +45,14 @@ class DictionaryRepositoryImpl(
             }
         }
                 .firstOrError()
+    }
+
+    override fun onQuizFinished(dictionaryId: Long?) {
+        val currentDate = Calendar.getInstance().time
+        dictionaryId?.let { id ->
+            rxSchedulers.io().scheduleDirect {
+                dictionaryDao.updateLastPracticed(id, currentDate)
+            }
+        }
     }
 }

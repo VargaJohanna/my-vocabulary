@@ -94,11 +94,11 @@ fun DictionaryListPreview() {
     LazyColumn(Modifier
         .fillMaxSize()) {
         items(listOf(
-            Dictionary(dictionaryId = 1L, dictionaryName = "Test", dictionaryCreated = Calendar.getInstance().time),
-            Dictionary(dictionaryId = 2L, dictionaryName = "Test2", dictionaryCreated = Calendar.getInstance().time),
-            Dictionary(dictionaryId = 3L, dictionaryName = "Test3", dictionaryCreated = Calendar.getInstance().time),
-            Dictionary(dictionaryId = 4L, dictionaryName = "Test4", dictionaryCreated = Calendar.getInstance().time),
-            Dictionary(dictionaryId = 5L, dictionaryName = "Test5", dictionaryCreated = Calendar.getInstance().time),
+            Dictionary(dictionaryId = 1L, dictionaryName = "Test", dictionaryCreated = Calendar.getInstance().time, null),
+            Dictionary(dictionaryId = 2L, dictionaryName = "Test2", dictionaryCreated = Calendar.getInstance().time, null),
+            Dictionary(dictionaryId = 3L, dictionaryName = "Test3", dictionaryCreated = Calendar.getInstance().time, null),
+            Dictionary(dictionaryId = 4L, dictionaryName = "Test4", dictionaryCreated = Calendar.getInstance().time, null),
+            Dictionary(dictionaryId = 5L, dictionaryName = "Test5", dictionaryCreated = Calendar.getInstance().time, null),
 
         )) { item ->
             DictionaryItem(item)

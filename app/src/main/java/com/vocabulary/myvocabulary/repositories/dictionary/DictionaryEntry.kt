@@ -10,10 +10,12 @@ data class DictionaryEntry(
         @PrimaryKey(autoGenerate = true)
         @ColumnInfo(name = "dictionary_id") var dictionaryId: Long,
         @ColumnInfo(name = "dictionary_name") var dictionaryName: String,
-        @ColumnInfo(name = "dictionary_created") @TypeConverters(DateTypeConverter::class) var dictionaryCreated: Date)
+        @ColumnInfo(name = "dictionary_created") @TypeConverters(DateTypeConverter::class) var dictionaryCreated: Date,
+        @ColumnInfo(name = "dictionary_last_practiced") @TypeConverters(DateTypeConverter::class) var dictionaryLastPracticed: Date? = null
+)
 {
     @Ignore
     constructor(dictionaryName: String, dictionaryCreated: Date) : this(0, dictionaryName, dictionaryCreated)
 }
 
-fun DictionaryEntry.toDictionary() = Dictionary(dictionaryId, dictionaryName, dictionaryCreated)
+fun DictionaryEntry.toDictionary() = Dictionary(dictionaryId, dictionaryName, dictionaryCreated, dictionaryLastPracticed)

@@ -101,7 +101,8 @@ class HomeActivity : ComponentActivity() {
                         shareViewModel.createDictionary(
                             Dictionary(
                                 dictionaryName = nameToCreate,
-                                dictionaryCreated = Calendar.getInstance().time
+                                dictionaryCreated = Calendar.getInstance().time,
+                                dictionaryLastPracticed = null
                             )
                         )
 

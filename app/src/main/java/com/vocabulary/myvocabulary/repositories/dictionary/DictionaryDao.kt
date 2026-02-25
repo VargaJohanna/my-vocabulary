@@ -2,6 +2,7 @@ package com.vocabulary.myvocabulary.repositories.dictionary
 
 import androidx.room.*
 import io.reactivex.Observable
+import java.util.Date
 
 @Dao
 interface DictionaryDao {
@@ -19,4 +20,7 @@ interface DictionaryDao {
 
     @Query("SELECT count(*) FROM dictionaries")
     fun getNumberOfDictionaries(): Observable<Int>
+
+    @Query("UPDATE dictionaries SET dictionary_last_practiced = :date WHERE dictionary_id = :id")
+    fun updateLastPracticed(id: Long, date: Date)
 }
