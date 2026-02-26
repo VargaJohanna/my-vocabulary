@@ -104,7 +104,8 @@ class HomeActivity : ComponentActivity() {
                                 dictionaryCreated = Calendar.getInstance().time,
                                 dictionaryLastPracticed = null,
                                 dictionaryLastResult = null,
-                                dictionaryFinishedCount = 0
+                                dictionaryFinishedCount = 0,
+                                dictionaryTotalScore = 0
                             )
                         )
 

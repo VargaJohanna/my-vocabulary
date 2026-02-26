@@ -9,13 +9,19 @@ data class Dictionary(
         val dictionaryCreated: Date,
         val dictionaryLastPracticed: Date?,
         val dictionaryLastResult: Int?,
-        val dictionaryFinishedCount: Int
-)
+        val dictionaryFinishedCount: Int,
+        val dictionaryTotalScore: Int
+) {
+    val averageResult: Float
+        get() = if (dictionaryFinishedCount > 0) {
+            dictionaryTotalScore.toFloat() / dictionaryFinishedCount
+        } else 0f
+}
 
 fun Dictionary.toDictionaryEntry(): DictionaryEntry {
     return if (dictionaryId == 0L) {
         DictionaryEntry(dictionaryName, dictionaryCreated, )
     } else {
-        DictionaryEntry(dictionaryId, dictionaryName, dictionaryCreated, dictionaryLastPracticed, dictionaryLastResult, dictionaryFinishedCount)
+        DictionaryEntry(dictionaryId, dictionaryName, dictionaryCreated, dictionaryLastPracticed, dictionaryLastResult, dictionaryFinishedCount, dictionaryTotalScore)
     }
 }

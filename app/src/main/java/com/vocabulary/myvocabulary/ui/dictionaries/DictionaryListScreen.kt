@@ -445,7 +445,8 @@ fun DictionaryListScreenPreview() {
                             dictionaryCreated = Calendar.getInstance().time,
                             dictionaryLastPracticed = null,
                             dictionaryLastResult = null,
-                            dictionaryFinishedCount = 0
+                            dictionaryFinishedCount = 0,
+                            dictionaryTotalScore = 0
                         ),
                         Dictionary(
                             dictionaryId = 2L,
@@ -453,7 +454,8 @@ fun DictionaryListScreenPreview() {
                             dictionaryCreated = Calendar.getInstance().time,
                             dictionaryLastPracticed = null,
                             dictionaryLastResult = null,
-                            dictionaryFinishedCount = 0
+                            dictionaryFinishedCount = 0,
+                            dictionaryTotalScore = 0
                         ),
                         Dictionary(
                             dictionaryId = 3L,
@@ -461,7 +463,8 @@ fun DictionaryListScreenPreview() {
                             dictionaryCreated = Calendar.getInstance().time,
                             dictionaryLastPracticed = null,
                             dictionaryLastResult = null,
-                            dictionaryFinishedCount = 0
+                            dictionaryFinishedCount = 0,
+                            dictionaryTotalScore = 0
                         ),
                         Dictionary(
                             dictionaryId = 4L,
@@ -469,7 +472,8 @@ fun DictionaryListScreenPreview() {
                             dictionaryCreated = Calendar.getInstance().time,
                             dictionaryLastPracticed = null,
                             dictionaryLastResult = null,
-                            dictionaryFinishedCount = 0
+                            dictionaryFinishedCount = 0,
+                            dictionaryTotalScore = 0
                         ),
                         Dictionary(
                             dictionaryId = 5L,
@@ -477,7 +481,8 @@ fun DictionaryListScreenPreview() {
                             dictionaryCreated = Calendar.getInstance().time,
                             dictionaryLastPracticed = null,
                             dictionaryLastResult = null,
-                            dictionaryFinishedCount = 0
+                            dictionaryFinishedCount = 0,
+                            dictionaryTotalScore = 0
                         ),
                         Dictionary(
                             dictionaryId = 5L,
@@ -485,7 +490,8 @@ fun DictionaryListScreenPreview() {
                             dictionaryCreated = Calendar.getInstance().time,
                             dictionaryLastPracticed = null,
                             dictionaryLastResult = null,
-                            dictionaryFinishedCount = 0
+                            dictionaryFinishedCount = 0,
+                            dictionaryTotalScore = 0
                         ),
                         Dictionary(
                             dictionaryId = 5L,
@@ -493,7 +499,8 @@ fun DictionaryListScreenPreview() {
                             dictionaryCreated = Calendar.getInstance().time,
                             dictionaryLastPracticed = null,
                             dictionaryLastResult = null,
-                            dictionaryFinishedCount = 0
+                            dictionaryFinishedCount = 0,
+                            dictionaryTotalScore = 0
                         ),
                         Dictionary(
                             dictionaryId = 5L,
@@ -501,7 +508,8 @@ fun DictionaryListScreenPreview() {
                             dictionaryCreated = Calendar.getInstance().time,
                             dictionaryLastPracticed = null,
                             dictionaryLastResult = null,
-                            dictionaryFinishedCount = 0
+                            dictionaryFinishedCount = 0,
+                            dictionaryTotalScore = 0
                         ),
                         Dictionary(
                             dictionaryId = 5L,
@@ -509,7 +517,8 @@ fun DictionaryListScreenPreview() {
                             dictionaryCreated = Calendar.getInstance().time,
                             dictionaryLastPracticed = null,
                             dictionaryLastResult = null,
-                            dictionaryFinishedCount = 0
+                            dictionaryFinishedCount = 0,
+                            dictionaryTotalScore = 0
                         ),
                         Dictionary(
                             dictionaryId = 5L,
@@ -517,7 +526,8 @@ fun DictionaryListScreenPreview() {
                             dictionaryCreated = Calendar.getInstance().time,
                             dictionaryLastPracticed = null,
                             dictionaryLastResult = null,
-                            dictionaryFinishedCount = 0
+                            dictionaryFinishedCount = 0,
+                            dictionaryTotalScore = 0
                         ),
                         Dictionary(
                             dictionaryId = 5L,
@@ -525,7 +535,8 @@ fun DictionaryListScreenPreview() {
                             dictionaryCreated = Calendar.getInstance().time,
                             dictionaryLastPracticed = null,
                             dictionaryLastResult = null,
-                            dictionaryFinishedCount = 0
+                            dictionaryFinishedCount = 0,
+                            dictionaryTotalScore = 0
                         ),
                         Dictionary(
                             dictionaryId = 5L,
@@ -533,7 +544,8 @@ fun DictionaryListScreenPreview() {
                             dictionaryCreated = Calendar.getInstance().time,
                             dictionaryLastPracticed = null,
                             dictionaryLastResult = null,
-                            dictionaryFinishedCount = 0
+                            dictionaryFinishedCount = 0,
+                            dictionaryTotalScore = 0
                         ),
                         Dictionary(
                             dictionaryId = 5L,
@@ -541,7 +553,8 @@ fun DictionaryListScreenPreview() {
                             dictionaryCreated = Calendar.getInstance().time,
                             dictionaryLastPracticed = null,
                             dictionaryLastResult = null,
-                            dictionaryFinishedCount = 0
+                            dictionaryFinishedCount = 0,
+                            dictionaryTotalScore = 0
                         )
                     ),
                 onShowDeleteDialog = {},

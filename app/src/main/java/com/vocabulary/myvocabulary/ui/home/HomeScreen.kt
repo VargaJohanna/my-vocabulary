@@ -18,6 +18,8 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
@@ -28,7 +30,11 @@ import com.vocabulary.myvocabulary.R
 import com.vocabulary.myvocabulary.ui.theme.MyVocabularyTheme
 import com.vocabulary.myvocabulary.ui.theme.dimens
 import com.vocabulary.myvocabulary.ui.words.Word
+import com.vocabulary.myvocabulary.utils.DateTypeConverter
+import org.koin.compose.viewmodel.koinViewModel
 import java.util.Calendar
+import java.util.Date
+import kotlin.math.round
 import kotlin.text.ifEmpty
 
 @Composable
@@ -36,60 +42,74 @@ fun HomeScreen(
     onClickDictionaries: () -> Unit = {},
     onClickQuiz: () -> Unit = {}
 ) {
+    val homeViewModel: HomeViewModel = koinViewModel()
+    val lastPracticedDictionary = homeViewModel.lastPracticedDictionary.collectAsState()
 
+    val lastPracticedDate = lastPracticedDictionary.value?.dictionaryLastPracticed?.let { date ->
+        DateTypeConverter().formatDate(date)
+    }
+
+    val avgResult = lastPracticedDictionary.value?.averageResult?.let {
+        round(it)
+    }
+
+    Box(
+        modifier = Modifier.fillMaxSize()
+    ) {
+
+        HomeScreenContent(
+            lastPracticedDictionary = lastPracticedDictionary.value?.dictionaryName,
+            lastPracticedDate = lastPracticedDate,
+            avgResult = avgResult ?: 0f
+
+        )
+    }
+}
+
+@Composable
+fun HomeScreenContent(
+    lastPracticedDictionary: String?,
+    lastPracticedDate: String?,
+    avgResult: Float
+) {
     Box(
         modifier = Modifier.fillMaxSize()
     ) {
         FlowColumn(
             modifier = Modifier.fillMaxSize(),
         ) {
-            Card(
-                modifier = Modifier.fillMaxWidth()
-                    .padding(MaterialTheme.dimens.PaddingMedium)
-            ) {
-                Text( text = "Most practiced:",
-                    modifier = Modifier.fillMaxWidth()
-                        .padding(MaterialTheme.dimens.PaddingMedium),
-                    style = MaterialTheme.typography.titleMedium
+            if (lastPracticedDictionary != null) {
+                DictionaryStatsCard(
+                    labelFirst = stringResource(R.string.last_practiced_label),
+                    valueFirst = lastPracticedDictionary ?: "",
+                    labelSecond = stringResource(R.string.average_rate_label),
+                    valueSecond = "$avgResult %",
+                    labelThird = stringResource(R.string.last_time_practiced_label),
+                    valueThird = lastPracticedDate ?: ""
                 )
-                Text( text = "Average rate:",
-                    modifier = Modifier.fillMaxWidth()
-                        .padding(MaterialTheme.dimens.PaddingMedium),
-                    style = MaterialTheme.typography.titleMedium
+            } else {
+                PlaceholderCard()
+            }
+
+            if (lastPracticedDictionary != null) {
+                DictionaryStatsCard(
+                    labelFirst = stringResource(R.string.most_practiced_label),
+                    valueFirst = lastPracticedDictionary ?: "",
+                    labelSecond = stringResource(R.string.average_rate_label),
+                    valueSecond = "5",
+                    labelThird = stringResource(R.string.last_time_practiced_label),
+                    valueThird = ""
                 )
-                Text( text = "Last time practiced:",
-                    modifier = Modifier.fillMaxWidth()
-                        .padding(MaterialTheme.dimens.PaddingMedium),
-                    style = MaterialTheme.typography.titleMedium
-                )
+            } else {
+                PlaceholderCard()
             }
 
             Card(
                 modifier = Modifier.fillMaxWidth()
                     .padding(MaterialTheme.dimens.PaddingMedium)
             ) {
-                Text( text = "Least practiced:",
-                    modifier = Modifier.fillMaxWidth()
-                        .padding(MaterialTheme.dimens.PaddingMedium),
-                    style = MaterialTheme.typography.titleMedium
-                )
-                Text( text = "Average rate:",
-                    modifier = Modifier.fillMaxWidth()
-                        .padding(MaterialTheme.dimens.PaddingMedium),
-                    style = MaterialTheme.typography.titleMedium
-                )
-                Text( text = "Last time practiced:",
-                    modifier = Modifier.fillMaxWidth()
-                        .padding(MaterialTheme.dimens.PaddingMedium),
-                    style = MaterialTheme.typography.titleMedium
-                )
-            }
-
-            Card(
-                modifier = Modifier.fillMaxWidth()
-                    .padding(MaterialTheme.dimens.PaddingMedium)
-            ) {
-                Text( text = "Memorise: ",
+                Text(
+                    text = "Memorise: ",
                     modifier = Modifier.fillMaxWidth()
                         .padding(MaterialTheme.dimens.PaddingMedium),
                     style = MaterialTheme.typography.titleMedium
@@ -115,11 +135,81 @@ fun HomeScreen(
 
                 )
             }
+        }
+    }
+}
 
+@Composable
+fun DictionaryStatsCard(
+    labelFirst: String,
+    valueFirst: String,
+    labelSecond: String,
+    valueSecond: String,
+    labelThird: String,
+    valueThird: String
+) {
+    Card(
+        modifier = Modifier.fillMaxWidth()
+            .padding(MaterialTheme.dimens.PaddingMedium)
+    ) {
+        Row(
+            modifier = Modifier.fillMaxWidth()
+                .padding(MaterialTheme.dimens.PaddingMedium)
+                .align(Alignment.CenterHorizontally)
+        ) {
+            Text( text = labelFirst,
+                modifier = Modifier.padding(MaterialTheme.dimens.PaddingMedium)
+                    .align(Alignment.Top),
+                style = MaterialTheme.typography.titleMedium
+            )
+
+            Text( text = valueFirst,
+                modifier = Modifier.padding(MaterialTheme.dimens.PaddingMedium)
+                    .align(Alignment.Top),
+                style = MaterialTheme.typography.bodyMedium
+            )
 
         }
+        Row(
+            modifier = Modifier.fillMaxWidth()
+                .padding(MaterialTheme.dimens.PaddingMedium)
+                .align(Alignment.CenterHorizontally)
+        ) {
+            Text( text = labelSecond,
+                modifier = Modifier.padding(MaterialTheme.dimens.PaddingMedium)
+                    .align(Alignment.Top),
+                style = MaterialTheme.typography.titleMedium
+            )
+            Text( text = valueSecond,
+                modifier = Modifier.padding(MaterialTheme.dimens.PaddingMedium)
+                    .align(Alignment.Top),
+                style = MaterialTheme.typography.bodyMedium
+            )
 
+        }
+        Row(
+            modifier = Modifier.fillMaxWidth()
+                .padding(MaterialTheme.dimens.PaddingMedium)
+                .align(Alignment.CenterHorizontally)
+        ) {
+            Text( text = labelThird,
+                modifier = Modifier.padding(MaterialTheme.dimens.PaddingMedium)
+                    .align(Alignment.Top),
+                style = MaterialTheme.typography.titleMedium
+            )
+            Text( text = valueThird,
+                modifier = Modifier.padding(MaterialTheme.dimens.PaddingMedium)
+                    .align(Alignment.Top),
+                style = MaterialTheme.typography.bodyMedium
+            )
+
+        }
     }
+}
+
+@Composable
+fun PlaceholderCard() {
+
 }
 
 @Composable
@@ -182,9 +272,9 @@ fun ButtonCard(onButtonClick: () -> Unit, text: String) {
 @Preview
 @Composable
 fun HomePreview() {
-    HomeScreen(
-        onClickDictionaries = {},
-        onClickQuiz = {}
-
+    HomeScreenContent(
+        lastPracticedDictionary = "English",
+        lastPracticedDate = DateTypeConverter().formatDate(Calendar.getInstance().time),
+        avgResult = 78f
     )
 }

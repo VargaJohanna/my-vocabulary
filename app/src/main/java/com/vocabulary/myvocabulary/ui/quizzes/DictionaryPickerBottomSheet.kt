@@ -124,7 +124,8 @@ fun DictionaryPickerPreview() {
             dictionaryCreated = Calendar.getInstance().time,
             dictionaryLastPracticed = null,
             dictionaryLastResult = null,
-            dictionaryFinishedCount = 0
+            dictionaryFinishedCount = 0,
+            dictionaryTotalScore = 0
         ),
         Dictionary(
             dictionaryId = 2L,
@@ -132,7 +133,8 @@ fun DictionaryPickerPreview() {
             dictionaryCreated = Calendar.getInstance().time,
             dictionaryLastPracticed = null,
             dictionaryLastResult = null,
-            dictionaryFinishedCount = 0
+            dictionaryFinishedCount = 0,
+            dictionaryTotalScore = 0
         ),
         Dictionary(
             dictionaryId = 3L,
@@ -140,7 +142,8 @@ fun DictionaryPickerPreview() {
             dictionaryCreated = Calendar.getInstance().time,
             dictionaryLastPracticed = null,
             dictionaryLastResult = null,
-            dictionaryFinishedCount = 0
+            dictionaryFinishedCount = 0,
+            dictionaryTotalScore = 0
         ),
         Dictionary(
             dictionaryId = 4L,
@@ -148,7 +151,8 @@ fun DictionaryPickerPreview() {
             dictionaryCreated = Calendar.getInstance().time,
             dictionaryLastPracticed = null,
             dictionaryLastResult = null,
-            dictionaryFinishedCount = 0
+            dictionaryFinishedCount = 0,
+            dictionaryTotalScore = 0
         ),
         Dictionary(
             dictionaryId = 5L,
@@ -156,7 +160,8 @@ fun DictionaryPickerPreview() {
             dictionaryCreated = Calendar.getInstance().time,
             dictionaryLastPracticed = null,
             dictionaryLastResult = null,
-            dictionaryFinishedCount = 0
+            dictionaryFinishedCount = 0,
+            dictionaryTotalScore = 0
         ),
         Dictionary(
             dictionaryId = 5L,
@@ -164,7 +169,8 @@ fun DictionaryPickerPreview() {
             dictionaryCreated = Calendar.getInstance().time,
             dictionaryLastPracticed = null,
             dictionaryLastResult = null,
-            dictionaryFinishedCount = 0
+            dictionaryFinishedCount = 0,
+            dictionaryTotalScore = 0
         ),
         Dictionary(
             dictionaryId = 5L,
@@ -172,7 +178,8 @@ fun DictionaryPickerPreview() {
             dictionaryCreated = Calendar.getInstance().time,
             dictionaryLastPracticed = null,
             dictionaryLastResult = null,
-            dictionaryFinishedCount = 0
+            dictionaryFinishedCount = 0,
+            dictionaryTotalScore = 0
         ),
         Dictionary(
             dictionaryId = 5L,
@@ -180,7 +187,8 @@ fun DictionaryPickerPreview() {
             dictionaryCreated = Calendar.getInstance().time,
             dictionaryLastPracticed = null,
             dictionaryLastResult = null,
-            dictionaryFinishedCount = 0
+            dictionaryFinishedCount = 0,
+            dictionaryTotalScore = 0
         ),
         Dictionary(
             dictionaryId = 5L,
@@ -188,7 +196,8 @@ fun DictionaryPickerPreview() {
             dictionaryCreated = Calendar.getInstance().time,
             dictionaryLastPracticed = null,
             dictionaryLastResult = null,
-            dictionaryFinishedCount = 0
+            dictionaryFinishedCount = 0,
+            dictionaryTotalScore = 0
         ),
         Dictionary(
             dictionaryId = 5L,
@@ -196,7 +205,8 @@ fun DictionaryPickerPreview() {
             dictionaryCreated = Calendar.getInstance().time,
             dictionaryLastPracticed = null,
             dictionaryLastResult = null,
-            dictionaryFinishedCount = 0
+            dictionaryFinishedCount = 0,
+            dictionaryTotalScore = 0
         )
     )
 

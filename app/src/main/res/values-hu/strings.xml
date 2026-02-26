@@ -127,6 +127,10 @@
     <string name="sort_by_translation">Rendezés \"Jelentés\" szerint</string>
     <string name="empty_list_snackbar">Ez a szótár üres.</string>
     <string name="home_label">Otthon</string>
+    <string name="last_practiced_label">Utoljára gyakorolt:</string>
+    <string name="average_rate_label">Átlag eredmény:</string>
+    <string name="last_time_practiced_label">Utoljára gyakorolt:</string>
+    <string name="most_practiced_label">Legtöbbet gyakorolt:</string>
 
 
 </resources>

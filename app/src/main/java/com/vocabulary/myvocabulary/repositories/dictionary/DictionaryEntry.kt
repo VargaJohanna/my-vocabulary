@@ -13,11 +13,12 @@ data class DictionaryEntry(
         @ColumnInfo(name = "dictionary_created") @TypeConverters(DateTypeConverter::class) var dictionaryCreated: Date,
         @ColumnInfo(name = "dictionary_last_practiced") @TypeConverters(DateTypeConverter::class) var dictionaryLastPracticed: Date? = null,
         @ColumnInfo(name = "dictionary_last_result") var dictionaryLastResult: Int? = null,
-        @ColumnInfo(name = "dictionary_finished_count") var dictionaryFinishedCount: Int = 0
+        @ColumnInfo(name = "dictionary_finished_count") var dictionaryFinishedCount: Int = 0,
+        @ColumnInfo(name = "dictionary_total_score") var dictionaryTotalScore: Int = 0
 )
 {
     @Ignore
     constructor(dictionaryName: String, dictionaryCreated: Date) : this(0, dictionaryName, dictionaryCreated)
 }
 
-fun DictionaryEntry.toDictionary() = Dictionary(dictionaryId, dictionaryName, dictionaryCreated, dictionaryLastPracticed, dictionaryLastResult, dictionaryFinishedCount)
+fun DictionaryEntry.toDictionary() = Dictionary(dictionaryId, dictionaryName, dictionaryCreated, dictionaryLastPracticed, dictionaryLastResult, dictionaryFinishedCount, dictionaryTotalScore)
