@@ -31,11 +31,14 @@ class HomeViewModel(
     private val openedAppCounter: Int = preferences.getInt(COUNTER_KEY, 0)
     private val _lastPracticedDictionary = MutableStateFlow<Dictionary?>(Dictionary(dictionaryId = 0, dictionaryName = "", dictionaryCreated = Calendar.getInstance().time, dictionaryLastPracticed = null, dictionaryLastResult = null, dictionaryFinishedCount = 0, dictionaryTotalScore = 0))
     val lastPracticedDictionary: StateFlow<Dictionary?> = _lastPracticedDictionary
+    private val _mostPracticedDictionary = MutableStateFlow<Dictionary?>(Dictionary(dictionaryId = 0, dictionaryName = "", dictionaryCreated = Calendar.getInstance().time, dictionaryLastPracticed = null, dictionaryLastResult = null, dictionaryFinishedCount = 0, dictionaryTotalScore = 0))
+    val mostPracticedDictionary: StateFlow<Dictionary?> = _lastPracticedDictionary
 
 
     init {
         observeQuote()
         getLastPracticedDictionary()
+        getMostPracticedDictionary()
     }
 
     private fun observeQuote() {
@@ -77,11 +80,14 @@ class HomeViewModel(
     }
 
 
-    fun getAverageRate(dictionaryId: Long) {
+    fun getMostPracticedDictionary() {
+        val dictionaries = dictionaryRepository.allDictionariesFlow.value ?: emptyList()
 
+        val mostPracticed = dictionaries
+            .maxByOrNull { it.dictionaryFinishedCount }
 
+        _mostPracticedDictionary.value = mostPracticed
     }
-
 
 
     companion object {

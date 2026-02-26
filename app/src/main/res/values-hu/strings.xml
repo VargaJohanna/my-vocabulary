@@ -131,6 +131,8 @@
     <string name="average_rate_label">Átlag eredmény:</string>
     <string name="last_time_practiced_label">Utoljára gyakorolt:</string>
     <string name="most_practiced_label">Legtöbbet gyakorolt:</string>
+    <string name="last_practiced_placeholder">A legutóbbi gyakorlásod statisztikái itt fognak megjelenni. Kezdjünk bele!</string>
+    <string name="most_practiced_placeholder">Ha már több szótárt is használtál, itt látod majd a legtöbbet gyakoroltakat.</string>
 
 
 </resources>

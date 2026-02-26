@@ -1,5 +1,6 @@
 package com.vocabulary.myvocabulary.ui.home
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -12,7 +13,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -21,19 +21,20 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.vocabulary.myvocabulary.R
-import com.vocabulary.myvocabulary.ui.theme.MyVocabularyTheme
 import com.vocabulary.myvocabulary.ui.theme.dimens
 import com.vocabulary.myvocabulary.ui.words.Word
 import com.vocabulary.myvocabulary.utils.DateTypeConverter
 import org.koin.compose.viewmodel.koinViewModel
 import java.util.Calendar
-import java.util.Date
 import kotlin.math.round
 import kotlin.text.ifEmpty
 
@@ -44,12 +45,21 @@ fun HomeScreen(
 ) {
     val homeViewModel: HomeViewModel = koinViewModel()
     val lastPracticedDictionary = homeViewModel.lastPracticedDictionary.collectAsState()
+    val mostPracticedDictionary = homeViewModel.mostPracticedDictionary.collectAsState()
 
-    val lastPracticedDate = lastPracticedDictionary.value?.dictionaryLastPracticed?.let { date ->
+    val lastPracticedDateLast = lastPracticedDictionary.value?.dictionaryLastPracticed?.let { date ->
         DateTypeConverter().formatDate(date)
     }
 
-    val avgResult = lastPracticedDictionary.value?.averageResult?.let {
+    val lastPracticedDateMost = mostPracticedDictionary.value?.dictionaryLastPracticed?.let { date ->
+        DateTypeConverter().formatDate(date)
+    }
+
+    val avgResultLast = lastPracticedDictionary.value?.averageResult?.let {
+        round(it)
+    }
+    
+    val avgResultMost = mostPracticedDictionary.value?.averageResult?.let {
         round(it)
     }
 
@@ -59,9 +69,11 @@ fun HomeScreen(
 
         HomeScreenContent(
             lastPracticedDictionary = lastPracticedDictionary.value?.dictionaryName,
-            lastPracticedDate = lastPracticedDate,
-            avgResult = avgResult ?: 0f
-
+            lastPracticedDateLast = lastPracticedDateLast,
+            avgResultLast = avgResultLast ?: 0f,
+            mostPracticedDictionary = mostPracticedDictionary.value?.dictionaryName,
+            avgResultMost = avgResultMost ?: 0f,
+            lastPracticedDateMost = lastPracticedDateMost
         )
     }
 }
@@ -69,8 +81,11 @@ fun HomeScreen(
 @Composable
 fun HomeScreenContent(
     lastPracticedDictionary: String?,
-    lastPracticedDate: String?,
-    avgResult: Float
+    lastPracticedDateLast: String?,
+    avgResultLast: Float,
+    mostPracticedDictionary: String?,
+    avgResultMost: Float,
+    lastPracticedDateMost: String?,
 ) {
     Box(
         modifier = Modifier.fillMaxSize()
@@ -83,34 +98,42 @@ fun HomeScreenContent(
                     labelFirst = stringResource(R.string.last_practiced_label),
                     valueFirst = lastPracticedDictionary ?: "",
                     labelSecond = stringResource(R.string.average_rate_label),
-                    valueSecond = "$avgResult %",
+                    valueSecond = "$avgResultLast %",
                     labelThird = stringResource(R.string.last_time_practiced_label),
-                    valueThird = lastPracticedDate ?: ""
+                    valueThird = lastPracticedDateLast ?: ""
                 )
             } else {
-                PlaceholderCard()
+                PlaceholderCard(
+                    title = stringResource(R.string.last_practiced_label),
+                    body = stringResource(R.string.last_practiced_placeholder)
+                )
             }
 
-            if (lastPracticedDictionary != null) {
+            if (mostPracticedDictionary != null) {
                 DictionaryStatsCard(
                     labelFirst = stringResource(R.string.most_practiced_label),
-                    valueFirst = lastPracticedDictionary ?: "",
+                    valueFirst = mostPracticedDictionary ?: "",
                     labelSecond = stringResource(R.string.average_rate_label),
-                    valueSecond = "5",
+                    valueSecond = "$avgResultMost %",
                     labelThird = stringResource(R.string.last_time_practiced_label),
-                    valueThird = ""
+                    valueThird = lastPracticedDateMost ?: ""
                 )
             } else {
-                PlaceholderCard()
+                PlaceholderCard(
+                    title = stringResource(R.string.most_practiced_label),
+                    body = stringResource(R.string.most_practiced_placeholder)
+                )
             }
 
             Card(
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier
+                    .fillMaxWidth()
                     .padding(MaterialTheme.dimens.PaddingMedium)
             ) {
                 Text(
                     text = "Memorise: ",
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier
+                        .fillMaxWidth()
                         .padding(MaterialTheme.dimens.PaddingMedium),
                     style = MaterialTheme.typography.titleMedium
                 )
@@ -149,56 +172,66 @@ fun DictionaryStatsCard(
     valueThird: String
 ) {
     Card(
-        modifier = Modifier.fillMaxWidth()
+        modifier = Modifier
+            .fillMaxWidth()
             .padding(MaterialTheme.dimens.PaddingMedium)
     ) {
         Row(
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier
+                .fillMaxWidth()
                 .padding(MaterialTheme.dimens.PaddingMedium)
                 .align(Alignment.CenterHorizontally)
         ) {
             Text( text = labelFirst,
-                modifier = Modifier.padding(MaterialTheme.dimens.PaddingMedium)
+                modifier = Modifier
+                    .padding(MaterialTheme.dimens.PaddingMedium)
                     .align(Alignment.Top),
                 style = MaterialTheme.typography.titleMedium
             )
 
             Text( text = valueFirst,
-                modifier = Modifier.padding(MaterialTheme.dimens.PaddingMedium)
+                modifier = Modifier
+                    .padding(MaterialTheme.dimens.PaddingMedium)
                     .align(Alignment.Top),
                 style = MaterialTheme.typography.bodyMedium
             )
 
         }
         Row(
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier
+                .fillMaxWidth()
                 .padding(MaterialTheme.dimens.PaddingMedium)
                 .align(Alignment.CenterHorizontally)
         ) {
             Text( text = labelSecond,
-                modifier = Modifier.padding(MaterialTheme.dimens.PaddingMedium)
+                modifier = Modifier
+                    .padding(MaterialTheme.dimens.PaddingMedium)
                     .align(Alignment.Top),
                 style = MaterialTheme.typography.titleMedium
             )
             Text( text = valueSecond,
-                modifier = Modifier.padding(MaterialTheme.dimens.PaddingMedium)
+                modifier = Modifier
+                    .padding(MaterialTheme.dimens.PaddingMedium)
                     .align(Alignment.Top),
                 style = MaterialTheme.typography.bodyMedium
             )
 
         }
         Row(
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier
+                .fillMaxWidth()
                 .padding(MaterialTheme.dimens.PaddingMedium)
                 .align(Alignment.CenterHorizontally)
         ) {
             Text( text = labelThird,
-                modifier = Modifier.padding(MaterialTheme.dimens.PaddingMedium)
+                modifier = Modifier
+                    .padding(MaterialTheme.dimens.PaddingMedium)
                     .align(Alignment.Top),
                 style = MaterialTheme.typography.titleMedium
             )
             Text( text = valueThird,
-                modifier = Modifier.padding(MaterialTheme.dimens.PaddingMedium)
+                modifier = Modifier
+                    .padding(MaterialTheme.dimens.PaddingMedium)
                     .align(Alignment.Top),
                 style = MaterialTheme.typography.bodyMedium
             )
@@ -208,7 +241,55 @@ fun DictionaryStatsCard(
 }
 
 @Composable
-fun PlaceholderCard() {
+fun PlaceholderCard(
+    title: String,
+    body: String
+) {
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(MaterialTheme.dimens.PaddingMedium),
+    ) {
+        Box(
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Image(
+                painter = painterResource(id = R.drawable.ic_vecteezy_desert_dunes_at_sunset_with_cloud_vector_egyptian_landscape_25738879),
+                contentDescription = "Placeholder card background",
+                modifier = Modifier
+                    .matchParentSize()
+                    .alpha(0.2f),
+                contentScale = ContentScale.FillWidth,
+                alignment = Alignment.BottomEnd
+            )
+
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(MaterialTheme.dimens.PaddingMedium)
+            ) {
+                Text(
+                    text = title,
+                    modifier = Modifier
+                        .padding(MaterialTheme.dimens.PaddingLarge)
+                        .align(Alignment.Start),
+                    style = MaterialTheme.typography.titleMedium
+                )
+
+                Text(
+                    text = body,
+                    modifier = Modifier
+                        .padding(MaterialTheme.dimens.PaddingLarge)
+                        .align(Alignment.CenterHorizontally),
+                    style = MaterialTheme.typography.bodyMedium
+                )
+            }
+        }
+
+
+
+
+    }
 
 }
 
@@ -254,27 +335,16 @@ fun WordCard(
     }
 }
 
-@Composable
-fun ButtonCard(onButtonClick: () -> Unit, text: String) {
-    Row(modifier = Modifier
-        .padding(all = 32.dp)
-        .fillMaxWidth()
-    ) {
-        Button(onClick =  onButtonClick ,
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            Text(text, modifier = Modifier.padding(32.dp), fontSize = 32.sp)
-        }
-    }
-}
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Preview
 @Composable
 fun HomePreview() {
     HomeScreenContent(
-        lastPracticedDictionary = "English",
-        lastPracticedDate = DateTypeConverter().formatDate(Calendar.getInstance().time),
-        avgResult = 78f
+        lastPracticedDictionary = null,
+        lastPracticedDateLast = DateTypeConverter().formatDate(Calendar.getInstance().time),
+        avgResultLast = 78f,
+        mostPracticedDictionary = "Spanish",
+        avgResultMost = 33f,
+        lastPracticedDateMost = DateTypeConverter().formatDate(Calendar.getInstance().time)
     )
 }
