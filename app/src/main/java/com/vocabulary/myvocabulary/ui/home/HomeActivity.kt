@@ -157,39 +157,6 @@ fun MyVocabularyApp() {
             )
         },
         floatingActionButton = screenFab,
-        bottomBar = {
-            val navBackStackEntry by navController.currentBackStackEntryAsState()
-            val currentDestination = navBackStackEntry?.destination
-            NavigationBar(windowInsets = NavigationBarDefaults.windowInsets) {
-                MyVocabularyDestinations.entries.forEach { destination ->
-                    val isSelected = currentDestination?.hierarchy?.any {
-                        it.hasRoute(destination.route::class)
-                    } == true
-                    NavigationBarItem(
-                        selected = isSelected,
-                        onClick = {
-                            navController.navigate(route = destination.route) {
-                                popUpTo(navController.graph.findStartDestination().id) {
-                                    saveState = true
-                                }
-                                // Avoid multiple copies of the same destination
-                                launchSingleTop = true
-                                // Restore state when re-selecting a previously selected item
-                                restoreState = true
-                            }
-                        },
-                        icon = {
-                            Icon(
-                                destination.icon,
-                                contentDescription = destination.contentDescription
-                            )
-                        },
-                        label = {
-                            Text(text = stringResource(id = destination.label))}
-                    )
-                }
-            }
-        }
 
     ) { innerPadding ->
         MyVocabularyNavHost(
@@ -200,7 +167,7 @@ fun MyVocabularyApp() {
             onUpdateFab = { screenFab = it },
             isSearchVisible = isSearchVisible,
             onToggleSearch = { isSearchVisible = it },
-            modifier = Modifier.padding(innerPadding),
+            modifier = Modifier.padding(top = innerPadding.calculateTopPadding(), bottom = 0.dp),
             onBackClick = { newAction ->
                 currentBackAction = newAction
             },

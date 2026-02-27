@@ -87,19 +87,7 @@ fun MyVocabularyNavHost(
             }
 
             HomeScreen(
-                onClickDictionaries = {
-                    navController.navigate(
-                        DictionaryList
-                    ) {
-                        launchSingleTop = true
-                    }
-                },
-                onClickQuiz = {
-                    navController.navigate(QuizList(null)) {
-                        launchSingleTop = true
-                    }
-                }
-
+                navController = navController
             )
         }
 

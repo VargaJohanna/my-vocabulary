@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -14,7 +15,12 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.NavigationBar
+import androidx.compose.material3.NavigationBarDefaults
+import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
@@ -28,7 +34,13 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavDestination.Companion.hasRoute
+import androidx.navigation.NavDestination.Companion.hierarchy
+import androidx.navigation.NavGraph.Companion.findStartDestination
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.currentBackStackEntryAsState
 import com.vocabulary.myvocabulary.R
+import com.vocabulary.myvocabulary.navigation.MyVocabularyDestinations
 import com.vocabulary.myvocabulary.ui.dictionaries.Dictionary
 import com.vocabulary.myvocabulary.ui.theme.dimens
 import com.vocabulary.myvocabulary.ui.words.Word
@@ -40,8 +52,7 @@ import kotlin.text.ifEmpty
 
 @Composable
 fun HomeScreen(
-    onClickDictionaries: () -> Unit = {},
-    onClickQuiz: () -> Unit = {}
+    navController: NavHostController,
 ) {
     val homeViewModel: HomeViewModel = koinViewModel()
     val lastPracticedDictionary by homeViewModel.lastPracticedDictionary.collectAsState()
@@ -50,17 +61,49 @@ fun HomeScreen(
     val memoriseList by homeViewModel.memoriseList.collectAsState()
     val numOfDictionary by homeViewModel.numOfDictionaries.collectAsState()
 
-    Box(
-        modifier = Modifier.fillMaxSize()
-    ) {
+    Scaffold(
+        bottomBar = {
+            val navBackStackEntry by navController.currentBackStackEntryAsState()
+            val currentDestination = navBackStackEntry?.destination
 
-        HomeScreenContent(
-            lastPracticed = lastPracticedDictionary,
-            mostPracticed = mostPracticedDictionary,
-            leastPracticed = leastPracticedDictionary,
-            memoriseList = memoriseList,
-            numOfDictionary = numOfDictionary
-        )
+            NavigationBar(windowInsets = NavigationBarDefaults.windowInsets) {
+                MyVocabularyDestinations.entries.forEach { destination ->
+                    val isSelected = currentDestination?.hierarchy?.any {
+                        it.hasRoute(destination.route::class)
+                    } == true
+
+                    NavigationBarItem(
+                        selected = isSelected,
+                        onClick = {
+                            navController.navigate(route = destination.route) {
+                                popUpTo(navController.graph.findStartDestination().id) {
+                                    saveState = true
+                                }
+                                launchSingleTop = true
+                                restoreState = true
+                            }
+                        },
+                        icon = { Icon(destination.icon, contentDescription = null) },
+                        label = { Text(text = stringResource(id = destination.label)) }
+                    )
+                }
+            }
+        }
+    ) {
+        innerPadding ->
+        Box(
+            modifier = Modifier.fillMaxSize()
+        ) {
+            HomeScreenContent(
+                lastPracticed = lastPracticedDictionary,
+                mostPracticed = mostPracticedDictionary,
+                leastPracticed = leastPracticedDictionary,
+                memoriseList = memoriseList,
+                numOfDictionary = numOfDictionary,
+                contentPadding = innerPadding
+            )
+        }
+
     }
 }
 
@@ -70,111 +113,119 @@ fun HomeScreenContent(
     mostPracticed: Dictionary?,
     leastPracticed: Dictionary?,
     memoriseList: List<Word>,
-    numOfDictionary: Int
+    numOfDictionary: Int,
+    contentPadding: PaddingValues
 
 ) {
-    Box(
-        modifier = Modifier.fillMaxSize()
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .verticalScroll(rememberScrollState())
+            .padding(0.dp)
     ) {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .verticalScroll(rememberScrollState())
-        ) {
-            if (lastPracticed != null) {
-                val lastPracticedDate = lastPracticed.dictionaryLastPracticed?.let { date ->
-                    DateTypeConverter().formatDate(date)
-                }
-                DictionaryStatsCard(
-                    labelFirst = stringResource(R.string.last_practiced_label),
-                    valueFirst = lastPracticed.dictionaryName,
-                    labelSecond = stringResource(R.string.average_rate_label),
-                    valueSecond = "${round(lastPracticed.averageResult)} %",
-                    labelThird = stringResource(R.string.last_time_practiced_label),
-                    valueThird = lastPracticedDate ?: ""
-                )
-            } else {
-                PlaceholderCard(
-                    title = stringResource(R.string.last_practiced_label),
-                    body = stringResource(R.string.last_practiced_placeholder),
-                )
+        if (lastPracticed != null) {
+            val lastPracticedDate = lastPracticed.dictionaryLastPracticed?.let { date ->
+                DateTypeConverter().formatDate(date)
             }
+            DictionaryStatsCard(
+                labelFirst = stringResource(R.string.last_practiced_label),
+                valueFirst = lastPracticed.dictionaryName,
+                labelSecond = stringResource(R.string.average_rate_label),
+                valueSecond = "${round(lastPracticed.averageResult)} %",
+                labelThird = stringResource(R.string.last_time_practiced_label),
+                valueThird = lastPracticedDate ?: ""
+            )
+        } else {
+            PlaceholderCard(
+                title = stringResource(R.string.last_practiced_label),
+                body = stringResource(R.string.last_practiced_placeholder),
+            )
+        }
 
-            if (mostPracticed != null && numOfDictionary > 2) {
-                val mostPracticedDate = mostPracticed.dictionaryLastPracticed?.let { date ->
-                    DateTypeConverter().formatDate(date)
-                }
-                DictionaryStatsCard(
-                    labelFirst = stringResource(R.string.most_practiced_label),
-                    valueFirst = mostPracticed.dictionaryName,
-                    labelSecond = stringResource(R.string.average_rate_label),
-                    valueSecond = "${round(mostPracticed.averageResult)} %",
-                    labelThird = stringResource(R.string.last_time_practiced_label),
-                    valueThird = mostPracticedDate ?: ""
-                )
-            } else {
-                PlaceholderCard(
-                    title = stringResource(R.string.most_practiced_label),
-                    body = stringResource(R.string.most_practiced_placeholder),
-                )
+        if (mostPracticed != null && numOfDictionary > 2) {
+            val mostPracticedDate = mostPracticed.dictionaryLastPracticed?.let { date ->
+                DateTypeConverter().formatDate(date)
             }
+            DictionaryStatsCard(
+                labelFirst = stringResource(R.string.most_practiced_label),
+                valueFirst = mostPracticed.dictionaryName,
+                labelSecond = stringResource(R.string.average_rate_label),
+                valueSecond = "${round(mostPracticed.averageResult)} %",
+                labelThird = stringResource(R.string.last_time_practiced_label),
+                valueThird = mostPracticedDate ?: ""
+            )
+        } else {
+            PlaceholderCard(
+                title = stringResource(R.string.most_practiced_label),
+                body = stringResource(R.string.most_practiced_placeholder),
+            )
+        }
 
-            if (leastPracticed != null) {
-                Card(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(
-                            horizontal = MaterialTheme.dimens.PaddingMedium,
-                            vertical = MaterialTheme.dimens.PaddingSmall
-                        )
+        if (leastPracticed != null) {
+            Card(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(
+                        horizontal = MaterialTheme.dimens.PaddingMedium,
+                        vertical = MaterialTheme.dimens.PaddingSmall
+                    )
+            ) {
+                Box(
+                    modifier = Modifier.fillMaxWidth()
                 ) {
-                    Box(
-                        modifier = Modifier.fillMaxWidth()
-                    ) {
-                        Image(
-                            painter = painterResource(id = R.drawable.ic_vecteezy_abstract_gray_background),
-                            contentDescription = "Placeholder card background",
-                            modifier = Modifier
-                                .matchParentSize()
-                                .alpha(0.4f),
-                            contentScale = ContentScale.FillHeight,
-                            alignment = Alignment.BottomEnd
-                        )
+                    Image(
+                        painter = painterResource(id = R.drawable.ic_vecteezy_abstract_gray_background),
+                        contentDescription = "Placeholder card background",
+                        modifier = Modifier
+                            .matchParentSize()
+                            .alpha(0.4f),
+                        contentScale = ContentScale.FillHeight,
+                        alignment = Alignment.BottomEnd
+                    )
 
-                        Column(
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(MaterialTheme.dimens.PaddingLarge)
+
+                    ) {
+                        Text(
+                            text = stringResource(R.string.memorise_label),
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .padding(MaterialTheme.dimens.PaddingLarge)
-
-                        ) {
-                            Text(
-                                text = stringResource(R.string.memorise_label),
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(
-                                        start = MaterialTheme.dimens.PaddingMedium,
-                                        end = MaterialTheme.dimens.PaddingMedium,
-                                        top = MaterialTheme.dimens.PaddingMedium,
-                                        bottom = MaterialTheme.dimens.PaddingMedium
-                                    ),
-                                style = MaterialTheme.typography.titleMedium
+                                .padding(
+                                    start = MaterialTheme.dimens.PaddingMedium,
+                                    end = MaterialTheme.dimens.PaddingMedium,
+                                    top = MaterialTheme.dimens.PaddingMedium,
+                                    bottom = MaterialTheme.dimens.PaddingMedium
+                                ),
+                            style = MaterialTheme.typography.titleMedium
+                        )
+                        Text(
+                            text = stringResource(R.string.memorise_placeholder),
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(
+                                    horizontal = MaterialTheme.dimens.PaddingMedium,
+                                    vertical = MaterialTheme.dimens.PaddingSmall,
+                                ),
+                            style = MaterialTheme.typography.bodyMedium
+                        )
+                        for (word in memoriseList) {
+                            WordCard(
+                                modifier = Modifier,
+                                wordItem = word
                             )
-                            for (word in memoriseList) {
-                                WordCard(
-                                    modifier = Modifier,
-                                    wordItem = word
-                                )
-                            }
                         }
                     }
                 }
-
-            } else {
-                PlaceholderCard(
-                    title = stringResource(R.string.memorise_label),
-                    body = stringResource(R.string.memorise_placeholder),
-                )
             }
+
+        } else {
+            PlaceholderCard(
+                title = stringResource(R.string.memorise_label),
+                body = stringResource(R.string.memorise_placeholder),
+            )
         }
     }
 }
@@ -374,8 +425,10 @@ fun WordCard(
     Column(
         modifier = modifier
             .fillMaxWidth()
-            .padding(horizontal = MaterialTheme.dimens.PaddingMedium,
-                vertical = MaterialTheme.dimens.PaddingMedium)
+            .padding(
+                horizontal = MaterialTheme.dimens.PaddingMedium,
+                vertical = MaterialTheme.dimens.PaddingMedium
+            )
     ) {
         Row(
             modifier = Modifier
@@ -465,6 +518,7 @@ fun HomePreview() {
             dictionaryTotalScore = 0,
         ),
         memoriseList = wordList,
-        numOfDictionary = 1
+        numOfDictionary = 1,
+        contentPadding = PaddingValues(0.dp)
     )
 }
