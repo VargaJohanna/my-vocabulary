@@ -8,8 +8,6 @@ import kotlinx.coroutines.flow.StateFlow
 
 interface  DictionaryRepository {
     val allDictionaries: Observable<List<Dictionary>>
-
-    val allDictionariesFlow: StateFlow<List<Dictionary>>
     val numberOfDictionaries: Observable<Int>
     fun createDictionary(dictionary: Dictionary): Long
     fun deleteDictionary(dictionary: Dictionary)

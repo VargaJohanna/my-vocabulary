@@ -91,7 +91,6 @@ fun ResultScreen(
         resultViewModel.saveQuizStats(dictionaryId, resultPercentage)
     }
 
-
     ResultScreenContent(
         resultList = resultList,
         directionType = direction.toDirectionType(),

@@ -19,8 +19,6 @@ class DictionaryRepositoryImpl(
 ) : DictionaryRepository {
     private val _allDictionaries = BehaviorSubject.create<List<Dictionary>>()
     override val allDictionaries: Observable<List<Dictionary>> = _allDictionaries
-    private val _allDictionariesFlow : MutableStateFlow<List<Dictionary>> = MutableStateFlow(emptyList())
-    override val allDictionariesFlow : StateFlow<List<Dictionary>> = _allDictionariesFlow
     override val numberOfDictionaries: Observable<Int> = allDictionaries.map { it.size }
 
     init {
@@ -33,9 +31,9 @@ class DictionaryRepositoryImpl(
                 .subscribeOn(rxSchedulers.io())
                 .observeOn(rxSchedulers.main())
                 .subscribe (
-                    {
-                        _allDictionaries.onNext(it)
-                        _allDictionariesFlow.value = it},
+                    { list ->
+                        _allDictionaries.onNext(list)
+                    },
                     { error -> Log.e("Repo", "Database error", error) })
     }
 

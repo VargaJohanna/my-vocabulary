@@ -130,8 +130,10 @@
     <string name="last_practiced_label">Last practiced:</string>
     <string name="average_rate_label">Average rate:</string>
     <string name="last_time_practiced_label">Last time practiced:</string>
-    <string name="most_practiced_label">Most pracrticed:</string>
+    <string name="most_practiced_label">Most practiced:</string>
     <string name="last_practiced_placeholder">Your latest session stats will show up here. Let’s get practicing!</string>
     <string name="most_practiced_placeholder">Once you’ve used a few dictionaries, your most-practiced ones will appear here.</string>
+    <string name="memorise_label">Memorise:</string>
+    <string name="memorise_placeholder">These are the words and expressions to review. Keep going — you’ve got this!</string>
 
 </resources>
