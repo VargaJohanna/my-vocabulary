@@ -1,19 +1,15 @@
 package com.vocabulary.myvocabulary.ui.results
 
 import android.content.SharedPreferences
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.f2prateek.rx.preferences2.RxSharedPreferences
 import com.vocabulary.myvocabulary.ext.plusAssign
 import com.vocabulary.myvocabulary.repositories.dictionary.DictionaryRepository
 import com.vocabulary.myvocabulary.repositories.guessedWord.GuessedMapData
 import com.vocabulary.myvocabulary.repositories.guessedWord.GuessedWordRepository
-import com.vocabulary.myvocabulary.repositories.quiz.CustomQuizRepository
 import com.vocabulary.myvocabulary.repositories.quiz.QuizRepository
 import com.vocabulary.myvocabulary.repositories.word.WordRepository
 import com.vocabulary.myvocabulary.rx.RxSchedulers
-import com.vocabulary.myvocabulary.ui.home.HomeViewModel.Companion.COUNTER_KEY
 import com.vocabulary.myvocabulary.ui.quizzes.GuessedWord
 import com.vocabulary.myvocabulary.ui.quizzes.QuizDirectionType
 import com.vocabulary.myvocabulary.ui.quizzes.QuizTypes
@@ -24,8 +20,6 @@ import io.reactivex.Single
 import io.reactivex.disposables.CompositeDisposable
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
-import java.util.Locale
-import java.util.Locale.getDefault
 import kotlin.math.round
 
 class ResultViewModel(
@@ -35,15 +29,11 @@ class ResultViewModel(
     private val rxSchedulers: RxSchedulers,
     private val quizRepository: QuizRepository,
     private val guessedWordRepository: GuessedWordRepository,
-    preferences: SharedPreferences
-
 ) : ViewModel() {
     private val disposables = CompositeDisposable()
-    private val liveGuessedWordList: MutableLiveData<List<Word>> = MutableLiveData()
     private val guessedWordList: MutableStateFlow<List<Word>> = MutableStateFlow(emptyList())
     var directionResult: QuizDirectionType = QuizDirectionType.AskWord
     var isAllPassed = true
-    val openedAppCounter: Int = preferences.getInt(COUNTER_KEY, 0)
 
     private val numOfPassed: MutableStateFlow<Int> = MutableStateFlow(0)
     private val resultPercentage: MutableStateFlow<Int> = MutableStateFlow(0)
@@ -82,7 +72,6 @@ class ResultViewModel(
                     resultPercentage.value = calculatedPercentage
                     saveQuizStats(dictionaryId, calculatedPercentage)
                     saveLastPracticeOfDictionary(dictionaryId)
-                    liveGuessedWordList.postValue(guessList)
                     guessedWordList.value = guessList
                     quizRepository.updateQuizList(guessList)
                     numOfPassed.value = guessList.filter { it.lastResult }.size
@@ -121,20 +110,13 @@ class ResultViewModel(
         disposables.clear()
     }
 
-    fun getLiveGuessedList() = liveGuessedWordList
-
     fun getGuessedList() = guessedWordList
 
 
     fun resetGuessedWordCollections() {
         guessedWordRepository.resetGuessedWordMap()
-//        liveGuessedWordList.postValue(mutableListOf())
         guessedWordList.value = emptyList()
         setAllPassedValue(true) // It's true until in evaluation it's turned false
-    }
-
-    fun setDirection(direction: QuizDirectionType) {
-        this.directionResult = direction
     }
 
     private fun setAllPassedValue(lastResult: Boolean) {
