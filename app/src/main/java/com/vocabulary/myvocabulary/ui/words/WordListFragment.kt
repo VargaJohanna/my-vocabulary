@@ -246,7 +246,7 @@ class WordListFragment : Fragment() {
 
     private fun shareDictionary() {
         if (wordViewModel.getLiveWordList().value != null) {
-            shareViewModel.shareDictionary(wordViewModel.getLiveWordList().value!!.first, requireContext())
+            shareViewModel.shareDictionary(wordViewModel.getLiveWordList().value!!.first, requireContext(), "")
         }
     }
 

@@ -1,4 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <paths>
     <files-path name="external_files" path="."/>
+    <!-- This allows sharing files from context.cacheDir -->
+    <cache-path name="my_cache_files" path="." />
+    <!-- You might also want this for context.filesDir -->
+    <files-path name="my_internal_files" path="." />
+
 </paths>

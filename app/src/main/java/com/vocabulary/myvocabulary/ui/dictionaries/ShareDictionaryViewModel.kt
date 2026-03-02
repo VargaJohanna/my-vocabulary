@@ -23,9 +23,7 @@ import io.reactivex.Single
 import io.reactivex.disposables.CompositeDisposable
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
-import kotlinx.coroutines.flow.StateFlow
 import org.apache.commons.csv.CSVFormat
 import org.apache.commons.csv.CSVParser
 import org.apache.commons.csv.CSVPrinter
@@ -148,33 +146,26 @@ class ShareDictionaryViewModel(
         shareDictionaryRepository.storeCsvData(csv)
     }
 
-    private fun writeCsvFile(words: List<Word>, context: Context): File {
-        val file = File("${context.filesDir.path}/export_dictionary.csv")
+    private fun writeCsvFile(words: List<Word>, context: Context, dictionaryName: String): File {
+        val safeName = dictionaryName.replace("\\s+".toRegex(), "_")
+        val file = File(context.cacheDir, "${safeName}_export.csv")
         try {
-            file.createNewFile()
-            val fileWriter = FileWriter(file)
-            val csvPrinter = CSVPrinter(fileWriter, CSVFormat.DEFAULT)
-
-            for (word in words) {
-                val data = listOf(
-                    word.translation,
-                    word.word
-                )
-                csvPrinter.printRecord(data)
+            FileWriter(file).use { fileWriter ->
+                CSVPrinter(fileWriter, CSVFormat.DEFAULT).use { csvPrinter ->
+                    for (word in words) {
+                        csvPrinter.printRecord(word.translation, word.word)
+                    }
+                    fileWriter.flush()
+                }
             }
-
-            fileWriter.flush()
-            fileWriter.close()
-            csvPrinter.close()
         } catch (e: Exception) {
-            e.printStackTrace()
-            Log.e("ERROR", e.message ?: "Unknown error")
+            Log.e("ERROR", "Write CSV failed: ${e.message}")
         }
         return file
     }
 
-    fun shareDictionary(words: List<Word>, context: Context) {
-        val file = writeCsvFile(words, context)
+    fun shareDictionary(words: List<Word>, context: Context, name: String?) {
+        val file = writeCsvFile(words, context, name!!)
         val intent = Intent(Intent.ACTION_SEND)
         intent.type = "text/csv"
         intent.putExtra(
@@ -186,6 +177,33 @@ class ShareDictionaryViewModel(
         )
         intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
         startActivity(context, Intent.createChooser(intent, context.getString(R.string.share_file_title)), null)
+    }
+    fun shareDictionaryCompose(words: List<Word>, context: Context, dictionaryName: String) {
+        disposables += Completable.fromAction {
+            val file = writeCsvFile(words, context, dictionaryName)
+
+            val contentUri = FileProvider.getUriForFile(
+                context,
+                "${context.packageName}.fileprovider",
+                file
+            )
+
+            val intent = Intent(Intent.ACTION_SEND).apply {
+                type = "text/csv"
+                putExtra(Intent.EXTRA_STREAM, contentUri)
+                addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+            }
+
+            val chooser = Intent.createChooser(intent, context.getString(R.string.share_file_title))
+            chooser.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            context.startActivity(chooser)
+        }
+            .subscribeOn(rxSchedulers.io())
+            .observeOn(rxSchedulers.main())
+            .subscribe(
+                { Log.d("SHARE", "Sharing started successfully") },
+                { error -> Log.e("SHARE", "Failed to share dictionary", error) }
+            )
     }
 
     fun getImportedDictionaryDetails(): LiveData<Event<DictionaryDetails>> = importedDictionaryDetails

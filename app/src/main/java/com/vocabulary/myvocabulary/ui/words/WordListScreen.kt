@@ -46,11 +46,13 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.vocabulary.myvocabulary.repositories.sortBy.SortByOptions
+import com.vocabulary.myvocabulary.ui.dictionaries.ShareDictionaryViewModel
 import com.vocabulary.myvocabulary.ui.lottie.NewDictionaryAnimation
 import com.vocabulary.myvocabulary.ui.theme.MyVocabularyTheme
 import com.vocabulary.myvocabulary.ui.theme.dimens
@@ -67,11 +69,12 @@ fun WordListScreen(
     isSearchVisible: Boolean,
     onToggleSearch: (Boolean) -> Unit,
     isSortOpen: Boolean,
-    onToggleSort: (Boolean) -> Unit
+    onToggleSort: (Boolean) -> Unit,
 ) {
     val viewModel: WordListViewModel = koinViewModel(
         parameters = { parametersOf(dictionaryId) }
     )
+
     val dialogFactory: ComposeDialogFactory = koinInject()
     val wordList by viewModel.wordList.collectAsState()
 
@@ -122,7 +125,7 @@ fun WordListScreen(
                 sortByOption = SortByOptions.SortByTranslation,
                 translationDescending = !viewModel.currentSortByData.translationDescending)
             )
-        }
+        },
     )
 }
 
@@ -141,7 +144,7 @@ fun WordListScreenContent(
     onToggleSort: (Boolean) -> Unit,
     sortByDate: () -> Unit,
     sortByExpression: () -> Unit,
-    sortByTranslation: () -> Unit
+    sortByTranslation: () -> Unit,
 ) {
     var showCreateDialog by remember { mutableStateOf(false) }
     var isSheetOpen by rememberSaveable { mutableStateOf(false) }

@@ -3,7 +3,6 @@ package com.vocabulary.myvocabulary.ui.home
 import android.content.SharedPreferences
 import android.net.Uri
 import android.util.Log
-import androidx.activity.result.launch
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
