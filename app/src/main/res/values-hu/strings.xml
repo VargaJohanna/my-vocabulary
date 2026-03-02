@@ -49,7 +49,7 @@
     <string name="result_start_over_label">Kezdjük újra</string>
     <string name="my_vocabulary_app_title">Szó Tár</string>
     <string name="quiz_toolbar">Kvíz</string>
-    <string name="dictionaries_toolbar">Szótárak</string>
+    <string name="dictionaries_toolbar">Könyvtár</string>
     <string name="quizzes_toolbar">Kvízek</string>
     <string name="dictionary_menu_start_quiz">Kvíz indítása</string>
     <string name="word_details_toolbar">Adatok</string>

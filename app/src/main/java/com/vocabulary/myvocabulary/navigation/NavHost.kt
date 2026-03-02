@@ -52,17 +52,7 @@ fun MyVocabularyNavHost(
     NavHost(
         navController = navController,
         startDestination = startDestination,
-        modifier = modifier,
-        enterTransition = {
-            fadeIn(animationSpec = tween(Constants.CLICK_DEBOUNCE_TIME.toInt())) + slideInHorizontally(
-                animationSpec = tween(300)
-            )
-        },
-        exitTransition = {
-            fadeOut(animationSpec = tween(Constants.CLICK_DEBOUNCE_TIME.toInt())) + slideOutHorizontally(
-                animationSpec = tween(300)
-            )
-        }
+        modifier = modifier
     ) {
 
         composable<Home> {
@@ -130,7 +120,7 @@ fun MyVocabularyNavHost(
                 },
                 onUpdateFab = onUpdateFab,
                 isSortOpen = isSortOpen,
-                onToggleSort = onToggleSort
+                onToggleSort = onToggleSort,
             )
         }
 

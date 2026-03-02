@@ -49,7 +49,7 @@
     <string name="result_start_over_label">Start Over</string>
     <string name="my_vocabulary_app_title">My Vocabulary</string>
     <string name="quiz_toolbar">Quiz Time</string>
-    <string name="dictionaries_toolbar">Dictionaries</string>
+    <string name="dictionaries_toolbar">Library</string>
     <string name="quizzes_toolbar">Quizzes</string>
     <string name="dictionary_menu_start_quiz">Start Quiz</string>
     <string name="word_details_toolbar">Word Details</string>

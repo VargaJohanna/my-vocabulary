@@ -21,6 +21,11 @@ import com.vocabulary.myvocabulary.utils.Event
 import io.reactivex.Completable
 import io.reactivex.Single
 import io.reactivex.disposables.CompositeDisposable
+import kotlinx.coroutines.channels.BufferOverflow
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.StateFlow
 import org.apache.commons.csv.CSVFormat
 import org.apache.commons.csv.CSVParser
 import org.apache.commons.csv.CSVPrinter
@@ -38,6 +43,12 @@ class ShareDictionaryViewModel(
 ) : ViewModel() {
     private val disposables = CompositeDisposable()
     private val importedDictionaryDetails: MutableLiveData<Event<DictionaryDetails>> = MutableLiveData()
+    private val _importedDictionaryDetailsFlow: MutableSharedFlow<Event<DictionaryDetails>> = MutableSharedFlow<Event<DictionaryDetails>>(
+        replay = 0,
+        extraBufferCapacity = 1,
+        onBufferOverflow = BufferOverflow.DROP_OLDEST
+    )
+    val importedDictionaryDetailsFlow: SharedFlow<Event<DictionaryDetails>> = _importedDictionaryDetailsFlow
     private val isImport: MutableLiveData<Boolean> = MutableLiveData()
 
     init {
@@ -55,6 +66,7 @@ class ShareDictionaryViewModel(
                 .observeOn(rxSchedulers.main())
                 .subscribe { dictionaryId: Long ->
                     importedDictionaryDetails.postValue(Event(DictionaryDetails(dictionaryId, dictionary.dictionaryName)))
+                    _importedDictionaryDetailsFlow.tryEmit(Event(DictionaryDetails(dictionaryId, dictionary.dictionaryName)))
                 }
     }
 
@@ -84,6 +96,32 @@ class ShareDictionaryViewModel(
                 }
             }
         }
+    }
+    fun parseDataAndCreateWordsCompose(dictionaryId: Long, contentResolver: ContentResolver) {
+        val uri = shareDictionaryRepository.getCsvUri() ?: return
+        disposables += Completable.fromAction {
+            contentResolver.openInputStream(uri)?.use { inputStream ->
+                val reader = BufferedReader(InputStreamReader(inputStream, "UTF-8"))
+                val csvParser = CSVParser(reader, CSVFormat.DEFAULT)
+
+                for (csvRecord in csvParser) {
+                    if (csvRecord.size() >= 2) {
+                        insertWordToDatabase(Word(
+                            containerDictionaryId = dictionaryId,
+                            translation = csvRecord.get(0),
+                            word = csvRecord.get(1),
+                            created = Calendar.getInstance().time
+                        ))
+                    }
+                }
+            }
+        }
+            .subscribeOn(rxSchedulers.io())
+            .observeOn(rxSchedulers.main())
+            .subscribe(
+                { Log.d("IMPORT", "CSV imported successfully") },
+                { error -> Log.e("IMPORT", "Error parsing CSV", error) }
+            )
     }
 
     private fun insertWordToDatabase(word: Word) {

@@ -1,5 +1,9 @@
 package com.vocabulary.myvocabulary.ui.dictionaries
 
+import android.net.Uri
+import android.util.Log
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -46,6 +50,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.style.TextAlign
@@ -67,28 +72,58 @@ fun DictionaryListScreen(
     onUpdateFab: (@Composable () -> Unit) -> Unit,
     onStartQuiz: (dictionaryId: Long) -> Unit,
     isSortOpen: Boolean,
-    onToggleSort: (Boolean) -> Unit
+    onToggleSort: (Boolean) -> Unit,
 ) {
+    val context = LocalContext.current
     val viewModel: DictionaryListViewModel = koinViewModel()
+    val shareDictViewModel: ShareDictionaryViewModel = koinViewModel()
     val dialogFactory: ComposeDialogFactory = koinInject()
     val newDictionary by viewModel.newDictionary.collectAsState()
     var isSavePressed by rememberSaveable { mutableStateOf(false) }
     //isClickable: Set it to true when navigation is done to prevent ghost clicking
-    var isClickable by remember { mutableStateOf(true) }
+    var isClickable by rememberSaveable { mutableStateOf(true) }
     //screenEntryTime: save entry time to add 5 ms wait to prevent ghost clicking
-    val screenEntryTime = remember { System.currentTimeMillis() }
-    var isNavigating by remember { mutableStateOf(false) }
+    val screenEntryTime = rememberSaveable { System.currentTimeMillis() }
+    var isNavigating by rememberSaveable { mutableStateOf(false) }
     val isLoading by viewModel.isLoading.collectAsState()
     val dictionaryList by viewModel.dictionaries.collectAsState()
-    var showCreateDialog by remember { mutableStateOf(false) }
-    var itemToDelete by remember { mutableStateOf<Dictionary?>(null) }
-    var itemToEdit by remember { mutableStateOf<Dictionary?>(null) }
+    var showCreateDialog by rememberSaveable { mutableStateOf(false) }
+    var itemToDelete by rememberSaveable { mutableStateOf<Dictionary?>(null) }
+    var itemToEdit by rememberSaveable { mutableStateOf<Dictionary?>(null) }
+    var isImport by rememberSaveable { mutableStateOf(false) }
+
+    LaunchedEffect(Unit) {
+        shareDictViewModel.importedDictionaryDetailsFlow.collect { event ->
+            event.getContentIfNotHandled()?.let { details ->
+                shareDictViewModel.parseDataAndCreateWordsCompose(
+                    dictionaryId = details.dictionaryId,
+                    contentResolver = context.contentResolver
+                )
+                navigateToWordList(details.dictionaryId, details.dictionaryName)
+                Log.d("Import", "Created ${details.dictionaryName}, starting CSV parse...")
+            }
+        }
+    }
+
+    val filePickerLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.GetContent()
+    ) { uri: Uri? ->
+        uri?.let { data ->
+            shareDictViewModel.saveCsvData(data)
+        }
+    }
 
     LaunchedEffect(Unit) {
         viewModel.fetchDictionaries()
         isClickable = true
         onUpdateFab {
-            FABMenu(onShowCreateDialog = { showCreateDialog = true })
+            FABMenu(
+                onShowCreateDialog = { showCreateDialog = true },
+                onImportClick = {
+                    filePickerLauncher.launch(Constants.MIME_TYPE)
+                    isImport = true
+                }
+            )
         }
     }
 
@@ -101,6 +136,7 @@ fun DictionaryListScreen(
             viewModel.clearNewDictionary()
         }
     }
+
 
     val sortByDate = {
         viewModel.setSortBy(
@@ -210,6 +246,32 @@ fun DictionaryListScreen(
             dialogTitle = stringResource(R.string.renaming_dictionary_title) + " \"${item.dictionaryName}\""
         )
     }
+
+    if(isImport) {
+        if(!showCreateDialog) {
+            dialogFactory.BuildCreateDictionaryDialog(
+                onDismissRequest = {
+                    isImport = false
+                    shareDictViewModel.setIsImport(false)
+                },
+                onConfirmation = { newTitle ->
+                    isImport = false
+                    shareDictViewModel.setIsImport(false)
+                    shareDictViewModel.createDictionary(
+                        Dictionary(
+                            dictionaryName = newTitle,
+                            dictionaryCreated = Calendar.getInstance().time,
+                            dictionaryLastPracticed = null,
+                            dictionaryLastResult = null,
+                            dictionaryFinishedCount = 0,
+                            dictionaryTotalScore = 0
+                        )
+                    )
+                },
+                dialogTitle = stringResource(R.string.import_dictionary_dialog_title)
+            )
+        }
+    }
 }
 
 @Composable
@@ -249,7 +311,10 @@ fun SortMenu(
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
-fun FABMenu(onShowCreateDialog: () -> Unit) {
+fun FABMenu(
+    onShowCreateDialog: () -> Unit,
+    onImportClick: () -> Unit
+    ) {
     var expanded by remember { mutableStateOf(false) }
 
     FloatingActionButtonMenu(
@@ -268,6 +333,7 @@ fun FABMenu(onShowCreateDialog: () -> Unit) {
     ) {
         FloatingActionButtonMenuItem(
             onClick = {
+                onImportClick()
                 expanded = false
             },
             text = { Text(stringResource(R.string.import_fab_label)) },

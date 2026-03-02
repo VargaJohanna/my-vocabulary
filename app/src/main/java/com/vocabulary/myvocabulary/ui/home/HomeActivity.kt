@@ -51,7 +51,6 @@ class HomeActivity : ComponentActivity() {
     private val homeViewModel: HomeViewModel by viewModel()
     private val shareViewModel: ShareDictionaryViewModel by viewModel()
     private val dialogFactory: DialogFactory by inject()
-    val padding = 16.dp
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

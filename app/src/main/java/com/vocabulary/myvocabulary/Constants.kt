@@ -11,8 +11,6 @@ object Constants {
     */
     const val NAV_GHOST_CLICK_THRESHOLD = 500L
 
-    /**
-     * Standard debounce time for general button clicks.
-     */
-    const val CLICK_DEBOUNCE_TIME = 300L
+    const val MIME_TYPE = "text/csv"
+
 }

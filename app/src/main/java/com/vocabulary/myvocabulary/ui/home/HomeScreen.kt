@@ -155,7 +155,7 @@ fun HomeScreenContent(
                 valueThird = mostPracticedDate ?: ""
             )
         } else {
-            PlaceholderCard(
+            PlaceholderCard(    
                 title = stringResource(R.string.most_practiced_label),
                 body = stringResource(R.string.most_practiced_placeholder),
             )
@@ -174,7 +174,7 @@ fun HomeScreenContent(
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     Image(
-                        painter = painterResource(id = R.drawable.ic_vecteezy_abstract_gray_background),
+                        painter = painterResource(id = R.drawable.ic_vecteezy_abstract_pastel),
                         contentDescription = "Placeholder card background",
                         modifier = Modifier
                             .matchParentSize()
@@ -251,7 +251,7 @@ fun DictionaryStatsCard(
             modifier = Modifier.fillMaxWidth()
         ) {
             Image(
-                painter = painterResource(id = R.drawable.ic_vecteezy_abstract_gray_background),
+                painter = painterResource(id = R.drawable.ic_vecteezy_abstract_pastel),
                 contentDescription = "Placeholder card background",
                 modifier = Modifier
                     .matchParentSize()
@@ -368,7 +368,7 @@ fun PlaceholderCard(
             modifier = Modifier.fillMaxWidth()
         ) {
             Image(
-                painter = painterResource(id = R.drawable.ic_vecteezy_abstract_pastel),
+                painter = painterResource(id = R.drawable.ic_vecteezy_abstract_gray_background),
                 contentDescription = "Placeholder card background",
                 modifier = Modifier
                     .matchParentSize()
