@@ -21,25 +21,16 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.Observer
 import androidx.navigation.compose.rememberNavController
-import com.vocabulary.myvocabulary.R
 import com.vocabulary.myvocabulary.navigation.Home
 import com.vocabulary.myvocabulary.navigation.MyVocabularyNavHost
 import com.vocabulary.myvocabulary.navigation.MyVocabularyTopAppBar
-import com.vocabulary.myvocabulary.ui.dictionaries.Dictionary
-import com.vocabulary.myvocabulary.ui.dictionaries.ShareDictionaryViewModel
 import com.vocabulary.myvocabulary.ui.theme.MyVocabularyTheme
-import com.vocabulary.myvocabulary.utils.DialogFactory
-import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
-import java.util.*
 
 class HomeActivity : ComponentActivity() {
     private var importDialog: AlertDialog? = null
     private val homeViewModel: HomeViewModel by viewModel()
-    private val shareViewModel: ShareDictionaryViewModel by viewModel()
-    private val dialogFactory: DialogFactory by inject()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -52,16 +43,9 @@ class HomeActivity : ComponentActivity() {
             MyVocabularyTheme {
                 MyVocabularyApp()
             }
-
         }
-
     }
 
-//TODO: What is this for?
-//    override fun onNewIntent(intent: Intent?) {
-//        super.onNewIntent(intent)
-//        manageIntent(intent?.data)
-//    }
 
     private fun manageIntent(data: Uri?) {
         if (data != null) {
@@ -76,44 +60,6 @@ class HomeActivity : ComponentActivity() {
         importDialog?.dismiss()
         super.onDestroy()
     }
-
-    private fun importDictionary() {
-        shareViewModel.getLiveIsImport().observe(this, Observer { isImport ->
-            if (isImport) {
-                shareViewModel.setIsImport(false)
-                if (importDialog == null || importDialog!!.isShowing.not()) {
-                    importDialog = dialogFactory.buildDictionaryCreateDialog(
-                        this,
-                        getString(R.string.import_dictionary_dialog_title)
-                    ) { nameToCreate ->
-                        shareViewModel.createDictionary(
-                            Dictionary(
-                                dictionaryName = nameToCreate,
-                                dictionaryCreated = Calendar.getInstance().time,
-                                dictionaryLastPracticed = null,
-                                dictionaryLastResult = null,
-                                dictionaryFinishedCount = 0,
-                                dictionaryTotalScore = 0
-                            )
-                        )
-
-                        // TODO: Fix me
-                        shareViewModel.getImportedDictionaryDetails()
-                            .observe(this, Observer { event ->
-                                event.getContentIfNotHandled()?.let {
-                                    shareViewModel.parseDataAndCreateWords(it.dictionaryId, this)
-
-                                    importDialog?.dismiss()
-//                                    findNavController(R.id.home_nav_host_fragment).navigate(R.id.dictionaryListFragment)
-                                }
-                            })
-                    }
-                    importDialog?.show()
-                }
-            }
-        })
-    }
-
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -129,7 +75,6 @@ fun MyVocabularyApp() {
     var isSortOpen by rememberSaveable { mutableStateOf(false) }
     val startDestination = Home
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
-    var onExport by remember { mutableStateOf< () -> Unit>({}) }
 
     Scaffold(
         modifier = Modifier
@@ -162,9 +107,6 @@ fun MyVocabularyApp() {
             isSortOpen = isSortOpen,
             onToggleSort = { isSortOpen = it },
         )
-
     }
-
-
 }
 

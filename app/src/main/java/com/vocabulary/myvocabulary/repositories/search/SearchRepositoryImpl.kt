@@ -2,8 +2,6 @@ package com.vocabulary.myvocabulary.repositories.search
 
 import io.reactivex.Observable
 import io.reactivex.subjects.BehaviorSubject
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
 
 class SearchRepositoryImpl : SearchRepository {
     private val _searchBarState: BehaviorSubject<Boolean> = BehaviorSubject.createDefault(false)

@@ -3,8 +3,6 @@ package com.vocabulary.myvocabulary.repositories.dictionary
 import com.vocabulary.myvocabulary.ui.dictionaries.Dictionary
 import io.reactivex.Observable
 import io.reactivex.Single
-import kotlinx.coroutines.flow.StateFlow
-
 
 interface  DictionaryRepository {
     val allDictionaries: Observable<List<Dictionary>>
