@@ -80,11 +80,6 @@ fun DictionaryListScreen(
     val dialogFactory: ComposeDialogFactory = koinInject()
     val newDictionary by viewModel.newDictionary.collectAsState()
     var isSavePressed by rememberSaveable { mutableStateOf(false) }
-    //isClickable: Set it to true when navigation is done to prevent ghost clicking
-    var isClickable by rememberSaveable { mutableStateOf(true) }
-    //screenEntryTime: save entry time to add 5 ms wait to prevent ghost clicking
-    val screenEntryTime = rememberSaveable { System.currentTimeMillis() }
-    var isNavigating by rememberSaveable { mutableStateOf(false) }
     val isLoading by viewModel.isLoading.collectAsState()
     val dictionaryList by viewModel.dictionaries.collectAsState()
     var showCreateDialog by rememberSaveable { mutableStateOf(false) }
@@ -115,7 +110,6 @@ fun DictionaryListScreen(
 
     LaunchedEffect(Unit) {
         viewModel.fetchDictionaries()
-        isClickable = true
         onUpdateFab {
             FABMenu(
                 onShowCreateDialog = { showCreateDialog = true },
@@ -185,13 +179,8 @@ fun DictionaryListScreen(
                 itemToEdit = dictionary
             },
             onDictionaryClick = { dictionary ->
-                val currentTime = System.currentTimeMillis()
-                if (!isNavigating && (currentTime - screenEntryTime > Constants.NAV_GHOST_CLICK_THRESHOLD)) {
-                    isNavigating = true
-                    navigateToWordList(dictionary.dictionaryId, dictionary.dictionaryName)
-                }
+                navigateToWordList(dictionary.dictionaryId, dictionary.dictionaryName)
             },
-            isClickable = isClickable,
             onStartQuiz = { dictionaryId ->
                 onStartQuiz(dictionaryId)
             }
@@ -368,21 +357,17 @@ fun DictionaryItemView(
     onShowDeleteDialog: (Dictionary) -> Unit,
     onShowEditDialog: (Dictionary) -> Unit,
     onDictionaryClick: (Dictionary) -> Unit,
-    isClickable: Boolean,
     onStartQuiz: (dictionaryId: Long) -> Unit
 ) {
     val padding = MaterialTheme.dimens.PaddingMedium
     Card(
         onClick = {
-            if (isClickable) {
-                onDictionaryClick(dictionaryItem)
-            }
+            onDictionaryClick(dictionaryItem)
         },
         modifier
             .fillMaxWidth()
             .padding(padding),
         elevation = CardDefaults.cardElevation(defaultElevation = 3.dp),
-        enabled = isClickable,
     ) {
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -463,7 +448,6 @@ fun DictionaryLazyList(
     onShowDeleteDialog: (Dictionary) -> Unit,
     onShowEditDialog: (Dictionary) -> Unit,
     onDictionaryClick: (Dictionary) -> Unit,
-    isClickable: Boolean,
     onStartQuiz: (dictionaryId: Long) -> Unit
 ) {
     val state = rememberLazyListState()
@@ -480,7 +464,6 @@ fun DictionaryLazyList(
                 onShowDeleteDialog = onShowDeleteDialog,
                 onShowEditDialog = onShowEditDialog,
                 onDictionaryClick = onDictionaryClick,
-                isClickable = isClickable,
                 onStartQuiz = onStartQuiz
             )
         }
@@ -626,7 +609,6 @@ fun DictionaryListScreenPreview() {
                 onShowDeleteDialog = {},
                 onShowEditDialog = {},
                 onDictionaryClick = {},
-                isClickable = true,
                 onStartQuiz = {}
             )
 

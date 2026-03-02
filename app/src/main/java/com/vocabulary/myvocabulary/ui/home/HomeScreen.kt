@@ -121,7 +121,7 @@ fun HomeScreenContent(
         modifier = Modifier
             .fillMaxSize()
             .verticalScroll(rememberScrollState())
-            .padding(0.dp)
+            .padding(bottom = contentPadding.calculateBottomPadding())
     ) {
         if (lastPracticed != null) {
             val lastPracticedDate = lastPracticed.dictionaryLastPracticed?.let { date ->
@@ -131,7 +131,7 @@ fun HomeScreenContent(
                 labelFirst = stringResource(R.string.last_practiced_label),
                 valueFirst = lastPracticed.dictionaryName,
                 labelSecond = stringResource(R.string.average_rate_label),
-                valueSecond = "${round(lastPracticed.averageResult)} %",
+                valueSecond = "${"%.1f".format(lastPracticed.averageResult)} %",
                 labelThird = stringResource(R.string.last_time_practiced_label),
                 valueThird = lastPracticedDate ?: ""
             )
@@ -186,7 +186,7 @@ fun HomeScreenContent(
                     Column(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(MaterialTheme.dimens.PaddingLarge)
+                            .padding(MaterialTheme.dimens.PaddingMedium)
 
                     ) {
                         Text(
@@ -256,7 +256,7 @@ fun DictionaryStatsCard(
                 modifier = Modifier
                     .matchParentSize()
                     .alpha(0.4f),
-                contentScale = ContentScale.FillWidth,
+                contentScale = ContentScale.FillHeight,
                 alignment = Alignment.BottomEnd
             )
 
@@ -268,10 +268,10 @@ fun DictionaryStatsCard(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(
-                            top = MaterialTheme.dimens.PaddingLarge,
+                            top = MaterialTheme.dimens.PaddingMedium,
                             bottom = MaterialTheme.dimens.PaddingMedium,
-                            start = MaterialTheme.dimens.PaddingLarge,
-                            end = MaterialTheme.dimens.PaddingLarge,
+                            start = MaterialTheme.dimens.PaddingMedium,
+                            end = MaterialTheme.dimens.PaddingMedium,
                         )
                         .align(Alignment.CenterHorizontally)
                 ) {
@@ -297,7 +297,7 @@ fun DictionaryStatsCard(
                         .fillMaxWidth()
                         .padding(
                             vertical = MaterialTheme.dimens.PaddingMedium,
-                            horizontal = MaterialTheme.dimens.PaddingLarge
+                            horizontal = MaterialTheme.dimens.PaddingMedium
                         )
                         .align(Alignment.CenterHorizontally)
                 ) {
@@ -322,9 +322,9 @@ fun DictionaryStatsCard(
                         .fillMaxWidth()
                         .padding(
                             top = MaterialTheme.dimens.PaddingMedium,
-                            bottom = MaterialTheme.dimens.PaddingLarge,
-                            start = MaterialTheme.dimens.PaddingLarge,
-                            end = MaterialTheme.dimens.PaddingLarge,
+                            bottom = MaterialTheme.dimens.PaddingMedium,
+                            start = MaterialTheme.dimens.PaddingMedium,
+                            end = MaterialTheme.dimens.PaddingMedium,
                         )
                         .align(Alignment.CenterHorizontally)
                 ) {
@@ -391,10 +391,10 @@ fun PlaceholderCard(
                     text = title,
                     modifier = Modifier
                         .padding(
-                            top = MaterialTheme.dimens.PaddingLarge,
+                            top = MaterialTheme.dimens.PaddingMedium,
                             bottom = MaterialTheme.dimens.PaddingSmall,
-                            start = MaterialTheme.dimens.PaddingLarge,
-                            end = MaterialTheme.dimens.PaddingLarge
+                            start = MaterialTheme.dimens.PaddingMedium,
+                            end = MaterialTheme.dimens.PaddingMedium
                         )
                         .align(Alignment.Start),
                     style = MaterialTheme.typography.titleMedium
@@ -405,9 +405,9 @@ fun PlaceholderCard(
                     modifier = Modifier
                         .padding(
                             top = MaterialTheme.dimens.PaddingSmall,
-                            bottom = MaterialTheme.dimens.PaddingLarge,
-                            start = MaterialTheme.dimens.PaddingLarge,
-                            end = MaterialTheme.dimens.PaddingLarge
+                            bottom = MaterialTheme.dimens.PaddingMedium,
+                            start = MaterialTheme.dimens.PaddingMedium,
+                            end = MaterialTheme.dimens.PaddingMedium
                         )
                         .align(Alignment.CenterHorizontally),
                     style = MaterialTheme.typography.bodyMedium

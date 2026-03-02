@@ -87,8 +87,6 @@ fun ResultScreen(
 
     LaunchedEffect(Unit) {
         resultViewModel.fetchGuessedList()
-        resultViewModel.saveLastPracticeOfDictionary(dictionaryId)
-        resultViewModel.saveQuizStats(dictionaryId, resultPercentage)
     }
 
     ResultScreenContent(

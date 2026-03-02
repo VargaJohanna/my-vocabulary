@@ -161,7 +161,6 @@ fun MyVocabularyApp() {
             },
             isSortOpen = isSortOpen,
             onToggleSort = { isSortOpen = it },
-            onExport = onExport
         )
 
     }

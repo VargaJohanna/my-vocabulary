@@ -77,11 +77,15 @@ class ResultViewModel(
                 .subscribeOn(rxSchedulers.io())
                 .observeOn(rxSchedulers.main())
                 .subscribe { guessList ->
+                    val calculatedPercentage = if (guessList.isNotEmpty()) {        round(((guessList.filter { it.lastResult }.size.toFloat() / guessList.size.toFloat()) * 100)).toInt()
+                    } else 0
+                    resultPercentage.value = calculatedPercentage
+                    saveQuizStats(dictionaryId, calculatedPercentage)
+                    saveLastPracticeOfDictionary(dictionaryId)
                     liveGuessedWordList.postValue(guessList)
                     guessedWordList.value = guessList
                     quizRepository.updateQuizList(guessList)
                     numOfPassed.value = guessList.filter { it.lastResult }.size
-                    resultPercentage.value = round(((numOfPassed.value.toFloat() / guessList.size.toFloat()) * 100)).toInt()
                 }
     }
 
