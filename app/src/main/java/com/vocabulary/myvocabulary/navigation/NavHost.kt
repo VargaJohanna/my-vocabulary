@@ -68,10 +68,7 @@ fun MyVocabularyNavHost(
                 onUpdateFab { }
 
             }
-
-            HomeScreen(
-                navController = navController
-            )
+            HomeScreen()
         }
 
         composable<DictionaryList> {

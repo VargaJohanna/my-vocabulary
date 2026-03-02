@@ -10,7 +10,11 @@ import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.NavigationBar
+import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -20,11 +24,19 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavDestination.Companion.hasRoute
+import androidx.navigation.NavDestination.Companion.hierarchy
+import androidx.navigation.NavGraph.Companion.findStartDestination
+import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.vocabulary.myvocabulary.navigation.DictionaryList
 import com.vocabulary.myvocabulary.navigation.Home
+import com.vocabulary.myvocabulary.navigation.MyVocabularyDestinations
 import com.vocabulary.myvocabulary.navigation.MyVocabularyNavHost
 import com.vocabulary.myvocabulary.navigation.MyVocabularyTopAppBar
+import com.vocabulary.myvocabulary.navigation.QuizList
 import com.vocabulary.myvocabulary.ui.theme.MyVocabularyTheme
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
@@ -45,7 +57,6 @@ class HomeActivity : ComponentActivity() {
             }
         }
     }
-
 
     private fun manageIntent(data: Uri?) {
         if (data != null) {
@@ -76,6 +87,12 @@ fun MyVocabularyApp() {
     val startDestination = Home
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
 
+    val navBackStackEntry by navController.currentBackStackEntryAsState()
+    val currentDestination = navBackStackEntry?.destination
+    val shouldShowBottomBar = currentDestination?.hasRoute(DictionaryList::class) == true ||
+            currentDestination?.hasRoute(QuizList::class) == true ||
+            currentDestination?.hasRoute(Home::class) == true
+
     Scaffold(
         modifier = Modifier
             .fillMaxSize()
@@ -88,6 +105,32 @@ fun MyVocabularyApp() {
                 actions = appBarActions,
                 onBackClick = { currentBackAction() }
             )
+        },
+        bottomBar = {
+            if (shouldShowBottomBar) {
+                NavigationBar {
+                    MyVocabularyDestinations.entries.forEach { destination ->
+                        val isSelected = currentDestination?.hierarchy?.any {
+                            it.hasRoute(destination.route::class)
+                        } == true
+
+                        NavigationBarItem(
+                            selected = isSelected,
+                            label = { Text(stringResource(destination.label)) },
+                            icon = { Icon(destination.icon, contentDescription = null) },
+                            onClick = {
+                                navController.navigate(destination.route) {
+                                    popUpTo(navController.graph.findStartDestination().id) {
+                                        saveState = true
+                                    }
+                                    launchSingleTop = true
+                                    restoreState = true
+                                }
+                            }
+                        )
+                    }
+                }
+            }
         },
         floatingActionButton = screenFab,
 

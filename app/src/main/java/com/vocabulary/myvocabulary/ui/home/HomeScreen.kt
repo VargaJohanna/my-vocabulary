@@ -5,7 +5,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -15,12 +14,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.NavigationBar
-import androidx.compose.material3.NavigationBarDefaults
-import androidx.compose.material3.NavigationBarItem
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
@@ -34,13 +28,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavDestination.Companion.hasRoute
-import androidx.navigation.NavDestination.Companion.hierarchy
-import androidx.navigation.NavGraph.Companion.findStartDestination
-import androidx.navigation.NavHostController
-import androidx.navigation.compose.currentBackStackEntryAsState
 import com.vocabulary.myvocabulary.R
-import com.vocabulary.myvocabulary.navigation.MyVocabularyDestinations
 import com.vocabulary.myvocabulary.ui.dictionaries.Dictionary
 import com.vocabulary.myvocabulary.ui.theme.dimens
 import com.vocabulary.myvocabulary.ui.words.Word
@@ -51,9 +39,7 @@ import kotlin.math.round
 import kotlin.text.ifEmpty
 
 @Composable
-fun HomeScreen(
-    navController: NavHostController,
-) {
+fun HomeScreen() {
     val homeViewModel: HomeViewModel = koinViewModel()
     val lastPracticedDictionary by homeViewModel.lastPracticedDictionary.collectAsState()
     val mostPracticedDictionary by homeViewModel.mostPracticedDictionary.collectAsState()
@@ -61,49 +47,16 @@ fun HomeScreen(
     val memoriseList by homeViewModel.memoriseList.collectAsState()
     val numOfDictionary by homeViewModel.numOfDictionaries.collectAsState()
 
-    Scaffold(
-        bottomBar = {
-            val navBackStackEntry by navController.currentBackStackEntryAsState()
-            val currentDestination = navBackStackEntry?.destination
-
-            NavigationBar(windowInsets = NavigationBarDefaults.windowInsets) {
-                MyVocabularyDestinations.entries.forEach { destination ->
-                    val isSelected = currentDestination?.hierarchy?.any {
-                        it.hasRoute(destination.route::class)
-                    } == true
-
-                    NavigationBarItem(
-                        selected = isSelected,
-                        onClick = {
-                            navController.navigate(route = destination.route) {
-                                popUpTo(navController.graph.findStartDestination().id) {
-                                    saveState = true
-                                }
-                                launchSingleTop = true
-                                restoreState = true
-                            }
-                        },
-                        icon = { Icon(destination.icon, contentDescription = null) },
-                        label = { Text(text = stringResource(id = destination.label)) }
-                    )
-                }
-            }
-        }
+    Box(
+        modifier = Modifier.fillMaxSize()
     ) {
-        innerPadding ->
-        Box(
-            modifier = Modifier.fillMaxSize()
-        ) {
-            HomeScreenContent(
-                lastPracticed = lastPracticedDictionary,
-                mostPracticed = mostPracticedDictionary,
-                leastPracticed = leastPracticedDictionary,
-                memoriseList = memoriseList,
-                numOfDictionary = numOfDictionary,
-                contentPadding = innerPadding
-            )
-        }
-
+        HomeScreenContent(
+            lastPracticed = lastPracticedDictionary,
+            mostPracticed = mostPracticedDictionary,
+            leastPracticed = leastPracticedDictionary,
+            memoriseList = memoriseList,
+            numOfDictionary = numOfDictionary,
+        )
     }
 }
 
@@ -114,14 +67,11 @@ fun HomeScreenContent(
     leastPracticed: Dictionary?,
     memoriseList: List<Word>,
     numOfDictionary: Int,
-    contentPadding: PaddingValues
-
 ) {
     Column(
         modifier = Modifier
             .fillMaxSize()
             .verticalScroll(rememberScrollState())
-            .padding(bottom = contentPadding.calculateBottomPadding())
     ) {
         if (lastPracticed != null) {
             val lastPracticedDate = lastPracticed.dictionaryLastPracticed?.let { date ->
@@ -519,6 +469,5 @@ fun HomePreview() {
         ),
         memoriseList = wordList,
         numOfDictionary = 1,
-        contentPadding = PaddingValues(0.dp)
     )
 }
