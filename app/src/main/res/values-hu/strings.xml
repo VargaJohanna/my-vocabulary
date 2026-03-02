@@ -1,8 +1,8 @@
 <resources>
     <string name="app_name">Szó Tár</string>
     <string name="example_dictionary_name">Példa szótár</string>
-    <string name="library_button">KÖNYVTÁR</string>
-    <string name="quizzes_button">KVÍZEK</string>
+    <string name="library_button">Könyvtár</string>
+    <string name="quizzes_button">Kvíz</string>
     <string name="add_a_title">Adj meg egy nevet</string>
     <string name="create_dictionary_hint">Írj be egy címet</string>
     <string name="rename_dictionary_hint">Írj be egy új címet</string>

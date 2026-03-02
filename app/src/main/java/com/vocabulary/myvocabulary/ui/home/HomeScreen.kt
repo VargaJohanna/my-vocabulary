@@ -222,14 +222,14 @@ fun DictionaryStatsCard(
                             bottom = MaterialTheme.dimens.PaddingMedium,
                             start = MaterialTheme.dimens.PaddingMedium,
                             end = MaterialTheme.dimens.PaddingMedium,
-                        )
-                        .align(Alignment.CenterHorizontally)
+                        ),
+                    verticalAlignment = Alignment.Bottom
                 ) {
                     Text(
                         text = labelFirst,
                         modifier = Modifier
                             .padding(MaterialTheme.dimens.PaddingMedium)
-                            .align(Alignment.Top),
+                            .align(Alignment.Bottom),
                         style = MaterialTheme.typography.titleMedium
                     )
 
@@ -237,7 +237,7 @@ fun DictionaryStatsCard(
                         text = valueFirst,
                         modifier = Modifier
                             .padding(MaterialTheme.dimens.PaddingMedium)
-                            .align(Alignment.Top),
+                            .align(Alignment.Bottom),
                         style = MaterialTheme.typography.bodyMedium
                     )
 
@@ -255,14 +255,14 @@ fun DictionaryStatsCard(
                         text = labelSecond,
                         modifier = Modifier
                             .padding(MaterialTheme.dimens.PaddingMedium)
-                            .align(Alignment.Top),
+                            .align(Alignment.Bottom),
                         style = MaterialTheme.typography.titleMedium
                     )
                     Text(
                         text = valueSecond,
                         modifier = Modifier
                             .padding(MaterialTheme.dimens.PaddingMedium)
-                            .align(Alignment.Top),
+                            .align(Alignment.Bottom),
                         style = MaterialTheme.typography.bodyMedium
                     )
 
@@ -282,14 +282,14 @@ fun DictionaryStatsCard(
                         text = labelThird,
                         modifier = Modifier
                             .padding(MaterialTheme.dimens.PaddingMedium)
-                            .align(Alignment.Top),
+                            .align(Alignment.Bottom),
                         style = MaterialTheme.typography.titleMedium
                     )
                     Text(
                         text = valueThird,
                         modifier = Modifier
                             .padding(MaterialTheme.dimens.PaddingMedium)
-                            .align(Alignment.Top),
+                            .align(Alignment.Bottom),
                         style = MaterialTheme.typography.bodyMedium
                     )
 
@@ -448,7 +448,15 @@ fun HomePreview() {
             Calendar.getInstance().time
         ))
     HomeScreenContent(
-        lastPracticed = null,
+        lastPracticed = Dictionary(
+            dictionaryId = 0,
+            dictionaryName = "German",
+            dictionaryCreated = Calendar.getInstance().time,
+            dictionaryLastPracticed = null,
+            dictionaryLastResult = null,
+            dictionaryFinishedCount = 0,
+            dictionaryTotalScore = 0
+        ),
         mostPracticed = Dictionary(
             dictionaryId = 0,
             dictionaryName = "German",

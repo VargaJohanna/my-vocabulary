@@ -116,7 +116,7 @@ fun MyVocabularyApp() {
 
                         NavigationBarItem(
                             selected = isSelected,
-                            label = { Text(stringResource(destination.label)) },
+                            label = { Text(text = stringResource(destination.label)) },
                             icon = { Icon(destination.icon, contentDescription = null) },
                             onClick = {
                                 navController.navigate(destination.route) {

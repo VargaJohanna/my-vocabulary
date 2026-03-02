@@ -1,6 +1,5 @@
 package com.vocabulary.myvocabulary.ui.results
 
-import android.content.SharedPreferences
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.vocabulary.myvocabulary.ext.plusAssign
