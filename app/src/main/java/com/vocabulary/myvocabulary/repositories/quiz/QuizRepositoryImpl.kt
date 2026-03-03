@@ -1,5 +1,6 @@
 package com.vocabulary.myvocabulary.repositories.quiz
 
+import androidx.annotation.VisibleForTesting
 import com.vocabulary.myvocabulary.repositories.word.WordRepository
 import com.vocabulary.myvocabulary.ui.quizzes.QuizTypes
 import com.vocabulary.myvocabulary.ui.words.Word
@@ -55,7 +56,7 @@ class QuizRepositoryImpl(
                     _quizList.onNext(it)
                 }
     }
-
+    @VisibleForTesting
     private fun resetWeakestFive(dictionaryId: Long): Single<List<Word>> {
         return wordRepository.getObservableWordList(dictionaryId)
                 .firstOrError()

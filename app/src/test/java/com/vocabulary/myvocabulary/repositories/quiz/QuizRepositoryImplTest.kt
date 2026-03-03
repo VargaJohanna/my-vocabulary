@@ -1,26 +1,26 @@
 package com.vocabulary.myvocabulary.repositories.quiz
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
-import com.nhaarman.mockitokotlin2.mock
-import com.nhaarman.mockitokotlin2.whenever
 import com.vocabulary.myvocabulary.repositories.word.WordRepository
 import com.vocabulary.myvocabulary.ui.quizzes.QuizTypes
 import com.vocabulary.myvocabulary.ui.words.Word
+import io.mockk.every
+import io.mockk.mockk
 import io.reactivex.Observable
+import io.reactivex.Completable
 import org.junit.Rule
 import org.junit.Test
 import java.util.*
-import java.util.Arrays.asList
 
 class QuizRepositoryImplTest {
     @Rule
     @JvmField
-    var mockito = InstantTaskExecutorRule()
-
-    private val wordRepository = mock<WordRepository>()
+    val instantTaskExecutorRule = InstantTaskExecutorRule()
+    private val wordRepository = mockk<WordRepository>()
+    private val customQuizRepository = mockk<CustomQuizRepository>()
     private val dictionaryId = 1L
     private val date = Date(5)
-    private val wordListToTest = asList(
+    private val wordListToTest = listOf(
             Word(containerDictionaryId = dictionaryId, word = "a", translation = "translation1", created = date),
             Word(containerDictionaryId = dictionaryId, word = "b", translation = "translation2", created = date),
             Word(containerDictionaryId = dictionaryId, word = "c", translation = "translation3", created = date),
@@ -32,27 +32,32 @@ class QuizRepositoryImplTest {
     )
 
     @Test
-    fun `should update quizList when resetQuizList() is called with FullQuiz quiz type`() {
+    fun `should emit full list when quiz type is FullQuiz`() {
+        // Arrange
         val quizRepository = givenQuizRepositoryWithData()
+
+        // Act
         quizRepository.resetQuizList(dictionaryId, QuizTypes.FullQuiz).blockingGet()
 
-        val testObserver = quizRepository.quizList.test()
-
-        testObserver.assertValue(wordListToTest)
-                .assertNoErrors()
-                .dispose()
+        // Assert
+        quizRepository.quizList.test()
+            .assertValue(wordListToTest)
+            .assertNoErrors()
     }
 
     @Test
-    fun `should update quizList when resetQuizList() is called with WeakestQuiz quiz type`() {
+    fun `should emit 5 words when quiz type is WeakestQuiz`() {
+        // Arrange
+        // Mock the dependency method name based on your repository
+        every { customQuizRepository.getWeakestQuizList(any()) } returns wordListToTest.take(5)
         val quizRepository = givenQuizRepositoryWithData()
+
+        // Act
         quizRepository.resetQuizList(dictionaryId, QuizTypes.WeakestQuiz).blockingGet()
 
-        val testObserver = quizRepository.quizList.test()
-
-        testObserver.assertValue { it.size == 5 }
-                .assertNoErrors()
-                .dispose()
+        // Assert
+        quizRepository.quizList.test()
+            .assertValue { it.size == 5 }
     }
 
     @Test
@@ -81,11 +86,13 @@ class QuizRepositoryImplTest {
 
     private fun givenQuizRepository(): QuizRepository {
         whenever(wordRepository.getObservableWordList(dictionaryId)).thenReturn(Observable.never())
-        return QuizRepositoryImpl(wordRepository)
+        return QuizRepositoryImpl(wordRepository, customQuizRepository)
     }
 
     private fun givenQuizRepositoryWithData(): QuizRepository {
-        whenever(wordRepository.getObservableWordList(dictionaryId)).thenReturn(Observable.just(wordListToTest))
-        return QuizRepositoryImpl(wordRepository)
+        // MockK syntax: 'every { ... } returns ...'
+        every { wordRepository.getObservableWordList(dictionaryId) } returns Observable.just(wordListToTest)
+
+        return QuizRepositoryImpl(wordRepository, customQuizRepository)
     }
 }

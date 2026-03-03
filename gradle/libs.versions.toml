@@ -12,6 +12,9 @@ koin = "4.1.1"
 foundationLayout = "1.10.0"
 material3-new = "1.5.0-alpha10"
 uiGraphics = "1.10.1"
+mockk = "1.14.9"
+junit5 = "5.13.4"
+google-truth = "1.4.5"
 
 
 [libraries]
@@ -42,6 +45,9 @@ koin-compose = { module = "io.insert-koin:koin-compose", version.ref = "koin" }
 koin-compose-viewmodel = { module = "io.insert-koin:koin-compose-viewmodel", version.ref = "koin" }
 kotlin-reflect = { module = "org.jetbrains.kotlin:kotlin-reflect", version.ref = "kotlin" }
 androidx-compose-ui-graphics = { group = "androidx.compose.ui", name = "ui-graphics", version.ref = "uiGraphics" }
+mockk = { group = "io.mockk", name = "mockk", version.ref = "mockk" }
+junit-jupiter = { group = "org.junit.jupiter", name = "junit-jupiter-api", version.ref = "junit5" }
+google-truth = { group = "com.google.truth", name = "truth", version.ref = "google-truth" }
 
 [plugins]
 jetbrains-kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
