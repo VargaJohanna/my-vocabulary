@@ -19,6 +19,7 @@ import com.vocabulary.myvocabulary.ui.words.Word
 import io.reactivex.disposables.CompositeDisposable
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import java.util.Calendar
 
@@ -75,6 +76,9 @@ class HomeViewModel(
     val memoriseList: StateFlow<List<Word>> = _memoriseList
     private val _numOfDictionaries = MutableStateFlow(0)
     val numOfDictionaries: StateFlow<Int> = _numOfDictionaries
+    private val _isLoadingWords = MutableStateFlow(false)
+    val isLoadingWords: StateFlow<Boolean> = _isLoadingWords.asStateFlow()
+
 
 
     init {
@@ -142,6 +146,10 @@ class HomeViewModel(
         }
     }
 
+    fun refreshMemoriseList() {
+        _isLoadingWords.value = true
+        getListOfWords()
+    }
     private fun fetchWordsForDictionary(dictionaryId: Long) {
         disposables += wordRepository.getObservableWordList(dictionaryId)
             .subscribeOn(rxSchedulers.io())
@@ -160,6 +168,7 @@ class HomeViewModel(
                     } else {
                         _memoriseList.value = emptyList()
                     }
+                    _isLoadingWords.value = false
                 },
                 { error ->
                     Log.e("HOME_VM", "Error fetching words: ${error.message}")

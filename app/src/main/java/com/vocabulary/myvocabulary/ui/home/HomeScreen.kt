@@ -1,5 +1,11 @@
 package com.vocabulary.myvocabulary.ui.home
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -13,6 +19,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Card
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -20,6 +27,7 @@ import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
@@ -28,6 +36,8 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.compose.LifecycleEventEffect
 import com.vocabulary.myvocabulary.R
 import com.vocabulary.myvocabulary.ui.dictionaries.Dictionary
 import com.vocabulary.myvocabulary.ui.theme.dimens
@@ -46,6 +56,11 @@ fun HomeScreen() {
     val leastPracticedDictionary by homeViewModel.leastPracticedDictionary.collectAsState()
     val memoriseList by homeViewModel.memoriseList.collectAsState()
     val numOfDictionary by homeViewModel.numOfDictionaries.collectAsState()
+    val isLoadingWords by homeViewModel.isLoadingWords.collectAsState()
+
+    LifecycleEventEffect(Lifecycle.Event.ON_RESUME) {
+        homeViewModel.refreshMemoriseList()
+    }
 
     Box(
         modifier = Modifier.fillMaxSize()
@@ -56,6 +71,7 @@ fun HomeScreen() {
             leastPracticed = leastPracticedDictionary,
             memoriseList = memoriseList,
             numOfDictionary = numOfDictionary,
+            isLoadingWords = isLoadingWords
         )
     }
 }
@@ -67,6 +83,7 @@ fun HomeScreenContent(
     leastPracticed: Dictionary?,
     memoriseList: List<Word>,
     numOfDictionary: Int,
+    isLoadingWords: Boolean
 ) {
     Column(
         modifier = Modifier
@@ -105,65 +122,99 @@ fun HomeScreenContent(
                 valueThird = mostPracticedDate ?: ""
             )
         } else {
-            PlaceholderCard(    
+            PlaceholderCard(
                 title = stringResource(R.string.most_practiced_label),
                 body = stringResource(R.string.most_practiced_placeholder),
             )
         }
 
         if (leastPracticed != null) {
-            Card(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(
-                        horizontal = MaterialTheme.dimens.PaddingMedium,
-                        vertical = MaterialTheme.dimens.PaddingSmall
-                    )
-            ) {
-                Box(
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Image(
-                        painter = painterResource(id = R.drawable.ic_vecteezy_abstract_pastel),
-                        contentDescription = "Placeholder card background",
-                        modifier = Modifier
-                            .matchParentSize()
-                            .alpha(0.4f),
-                        contentScale = ContentScale.FillHeight,
-                        alignment = Alignment.BottomEnd
-                    )
+            Box(contentAlignment = Alignment.Center) {
+                MemoriseCard(
+                    memoriseList = memoriseList,
+                    isLoadingWords = isLoadingWords
+                )
 
-                    Column(
+                if (isLoadingWords) {
+                    CircularProgressIndicator(
+                        color = MaterialTheme.colorScheme.primary
+                    )
+                }
+            }
+        } else {
+            PlaceholderCard(
+                title = stringResource(R.string.memorise_label),
+                body = stringResource(R.string.memorise_placeholder),
+            )
+        }
+    }
+}
+
+@Composable
+fun MemoriseCard(
+    memoriseList: List<Word>,
+    isLoadingWords: Boolean
+) {
+    AnimatedVisibility(
+        visible = !isLoadingWords,
+        enter = fadeIn(),
+        exit = fadeOut()
+    ) {
+        Card(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(
+                    horizontal = MaterialTheme.dimens.PaddingMedium,
+                    vertical = MaterialTheme.dimens.PaddingSmall
+                )
+        ) {
+            Box(
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Image(
+                    painter = painterResource(id = R.drawable.ic_vecteezy_abstract_pastel),
+                    contentDescription = "Placeholder card background",
+                    modifier = Modifier
+                        .matchParentSize()
+                        .alpha(0.4f),
+                    contentScale = ContentScale.FillBounds,
+                    alignment = Alignment.BottomEnd
+                )
+
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(MaterialTheme.dimens.PaddingMedium)
+                ) {
+                    Text(
+                        text = stringResource(R.string.memorise_label),
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(MaterialTheme.dimens.PaddingMedium)
-
-                    ) {
-                        Text(
-                            text = stringResource(R.string.memorise_label),
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(
-                                    start = MaterialTheme.dimens.PaddingMedium,
-                                    end = MaterialTheme.dimens.PaddingMedium,
-                                    top = MaterialTheme.dimens.PaddingMedium,
-                                    bottom = MaterialTheme.dimens.PaddingMedium
-                                ),
-                            style = MaterialTheme.typography.titleMedium
-                        )
-                        Text(
-                            text = stringResource(R.string.memorise_placeholder),
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(
-                                    horizontal = MaterialTheme.dimens.PaddingMedium,
-                                    vertical = MaterialTheme.dimens.PaddingSmall,
-                                ),
-                            style = MaterialTheme.typography.bodyMedium
-                        )
-                        for (word in memoriseList) {
+                            .padding(
+                                start = MaterialTheme.dimens.PaddingMedium,
+                                end = MaterialTheme.dimens.PaddingMedium,
+                                top = MaterialTheme.dimens.PaddingMedium,
+                                bottom = MaterialTheme.dimens.PaddingMedium
+                            ),
+                        style = MaterialTheme.typography.titleMedium
+                    )
+                    Text(
+                        text = stringResource(R.string.memorise_placeholder),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(
+                                horizontal = MaterialTheme.dimens.PaddingMedium,
+                                vertical = MaterialTheme.dimens.PaddingSmall,
+                            ),
+                        style = MaterialTheme.typography.bodyMedium
+                    )
+                    for (word in memoriseList) {
+                        key(word.wordId) {
                             WordCard(
-                                modifier = Modifier,
+                                modifier = Modifier.animateEnterExit(
+                                    enter = slideInHorizontally(animationSpec = tween(500)),
+                                    exit = slideOutHorizontally(animationSpec = tween(500))
+                                ),
                                 wordItem = word
                             )
                         }
@@ -171,11 +222,6 @@ fun HomeScreenContent(
                 }
             }
 
-        } else {
-            PlaceholderCard(
-                title = stringResource(R.string.memorise_label),
-                body = stringResource(R.string.memorise_placeholder),
-            )
         }
     }
 }
@@ -206,7 +252,7 @@ fun DictionaryStatsCard(
                 modifier = Modifier
                     .matchParentSize()
                     .alpha(0.4f),
-                contentScale = ContentScale.FillHeight,
+                contentScale = ContentScale.FillBounds,
                 alignment = Alignment.BottomEnd
             )
 
@@ -323,7 +369,7 @@ fun PlaceholderCard(
                 modifier = Modifier
                     .matchParentSize()
                     .alpha(0.3f),
-                contentScale = ContentScale.FillWidth,
+                contentScale = ContentScale.FillBounds,
                 alignment = Alignment.BottomEnd
             )
 
@@ -446,7 +492,8 @@ fun HomePreview() {
             0,
             0,
             Calendar.getInstance().time
-        ))
+        )
+    )
     HomeScreenContent(
         lastPracticed = Dictionary(
             dictionaryId = 0,
@@ -477,5 +524,6 @@ fun HomePreview() {
         ),
         memoriseList = wordList,
         numOfDictionary = 1,
+        isLoadingWords = true
     )
 }

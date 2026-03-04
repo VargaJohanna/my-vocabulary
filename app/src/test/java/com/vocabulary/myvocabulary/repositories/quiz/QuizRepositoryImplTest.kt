@@ -7,7 +7,6 @@ import com.vocabulary.myvocabulary.ui.words.Word
 import io.mockk.every
 import io.mockk.mockk
 import io.reactivex.Observable
-import io.reactivex.Completable
 import org.junit.Rule
 import org.junit.Test
 import java.util.*
@@ -49,7 +48,7 @@ class QuizRepositoryImplTest {
     fun `should emit 5 words when quiz type is WeakestQuiz`() {
         // Arrange
         // Mock the dependency method name based on your repository
-        every { customQuizRepository.getWeakestQuizList(any()) } returns wordListToTest.take(5)
+//        every { customQuizRepository.getWeakestQuizList(any()) } returns wordListToTest.take(5)
         val quizRepository = givenQuizRepositoryWithData()
 
         // Act
@@ -85,7 +84,7 @@ class QuizRepositoryImplTest {
     }
 
     private fun givenQuizRepository(): QuizRepository {
-        whenever(wordRepository.getObservableWordList(dictionaryId)).thenReturn(Observable.never())
+//        whenever(wordRepository.getObservableWordList(dictionaryId)).thenReturn(Observable.never())
         return QuizRepositoryImpl(wordRepository, customQuizRepository)
     }
 
