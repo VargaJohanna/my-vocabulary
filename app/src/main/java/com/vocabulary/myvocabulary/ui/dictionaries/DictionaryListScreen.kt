@@ -322,19 +322,6 @@ fun FABMenu(
     ) {
         FloatingActionButtonMenuItem(
             onClick = {
-                onImportClick()
-                expanded = false
-            },
-            text = { Text(stringResource(R.string.import_fab_label)) },
-            icon = {
-                Icon(
-                    imageVector = ImageVector.vectorResource(id = R.drawable.baseline_import_export_24),
-                    contentDescription = "Import dictionary"
-                )
-            }
-        )
-        FloatingActionButtonMenuItem(
-            onClick = {
                 onShowCreateDialog()
                 expanded = false
             },
@@ -343,6 +330,19 @@ fun FABMenu(
                 Icon(
                     imageVector = ImageVector.vectorResource(id = R.drawable.outline_create_new_folder_24),
                     contentDescription = "Create new dictionary icon"
+                )
+            }
+        )
+        FloatingActionButtonMenuItem(
+            onClick = {
+                onImportClick()
+                expanded = false
+            },
+            text = { Text(stringResource(R.string.import_fab_label)) },
+            icon = {
+                Icon(
+                    imageVector = ImageVector.vectorResource(id = R.drawable.baseline_import_export_24),
+                    contentDescription = "Import dictionary"
                 )
             }
         )

@@ -1,11 +1,10 @@
 package com.vocabulary.myvocabulary.ui.home
 
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.core.tween
+import androidx.compose.animation.expandHorizontally
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
-import androidx.compose.animation.slideInHorizontally
-import androidx.compose.animation.slideOutHorizontally
+import androidx.compose.animation.shrinkHorizontally
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -212,8 +211,8 @@ fun MemoriseCard(
                         key(word.wordId) {
                             WordCard(
                                 modifier = Modifier.animateEnterExit(
-                                    enter = slideInHorizontally(animationSpec = tween(500)),
-                                    exit = slideOutHorizontally(animationSpec = tween(500))
+                                    enter = expandHorizontally(),
+                                    exit = shrinkHorizontally()
                                 ),
                                 wordItem = word
                             )

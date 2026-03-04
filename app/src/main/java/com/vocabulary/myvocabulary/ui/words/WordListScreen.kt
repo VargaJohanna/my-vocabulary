@@ -413,7 +413,8 @@ fun WordLazyList(
     val state = rememberLazyListState()
 
     LazyColumn(
-        Modifier.fillMaxWidth(),
+        Modifier.fillMaxWidth()
+            .padding(bottom = MaterialTheme.dimens.PaddingExtraLarge),
         contentPadding = PaddingValues(MaterialTheme.dimens.PaddingMedium),
         state = state
     ) {
