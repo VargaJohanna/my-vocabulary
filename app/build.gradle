@@ -3,42 +3,41 @@ plugins {
     id 'kotlin-android'
     id 'kotlin-kapt'
     id 'androidx.navigation.safeargs.kotlin'
-    id("kotlin-parcelize")
+    id('kotlin-parcelize')
+    id 'androidx.room'
     alias(libs.plugins.compose.compiler)
     alias(libs.plugins.kotlin.serialization)
-
 }
 android {
     namespace = "com.vocabulary.myvocabulary"
-    compileSdkVersion 36
+    compileSdk = 36
     defaultConfig {
-        applicationId "com.vocabulary.myvocabulary"
-        minSdkVersion 23
-        targetSdkVersion 36
-        versionCode 32
-        versionName "1.3"
-        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        applicationId = "com.vocabulary.myvocabulary"
+        minSdk = 23
+        targetSdk = 36
+        versionCode = 32
+        versionName = "1.3"
+        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
+
+    room {
+        schemaDirectory "$projectDir/schemas"
+    }
+
     buildTypes {
         release {
-            minifyEnabled false
+            minifyEnabled = false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
         debug {
-            applicationIdSuffix '.debug'
-            debuggable true
-        }
-    }
-
-    kapt {
-        arguments {
-            arg("room.schemaLocation", "$projectDir/schemas".toString())
+            applicationIdSuffix = '.debug'
+            debuggable = true
         }
     }
 
     buildFeatures {
-        viewBinding true
-        buildConfig true
+        viewBinding = true
+        buildConfig = true
         compose = true
     }
 
@@ -50,10 +49,9 @@ android {
 }
 
 dependencies {
-    implementation libs.androidx.compose.ui.graphics
-    def room_version = "2.8.2"
+    def room_version = "2.6.1"
+    def kotlin_version = '2.2.0'
     def lifecycle_version = "2.2.0"
-    def nav_version = "2.9.5"
     def lottie_version = "6.6.10"
     def lottie_compose_version = "6.7.1"
     def constraint_layout_version = "2.2.1"
@@ -64,7 +62,6 @@ dependencies {
     def junit_version = "4.13.2"
     def androidx_test_version = "1.7.0"
     def espresso_version = "3.7.0"
-    def mockito_core_version = "5.20.0"
     def mockito_kotlin_version = "2.2.0"
     def assertj_core_version = "3.27.6"
     def material_about_version = "0.2.3"
@@ -75,9 +72,11 @@ dependencies {
     def sandbox_version = "1.0.0-alpha13"
     def nav_latest_version = "2.9.6"
 
-    // Standard Android KTX (Keep these)
+    // Standard Android KTX
     implementation libs.core.ktx
     implementation libs.androidx.lifecycle.viewmodel.ktx
+    implementation libs.androidx.compose.ui.graphics
+    implementation libs.androidx.junit.ktx
 
     implementation(libs.kotlin.reflect)
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
@@ -108,7 +107,6 @@ dependencies {
     androidTestImplementation "androidx.test.espresso:espresso-contrib:$espresso_version"
 
     //Mockito
-//    testImplementation "org.mockito:mockito-core:$mockito_core_version"
     testImplementation "com.nhaarman.mockitokotlin2:mockito-kotlin:$mockito_kotlin_version"
     testImplementation "androidx.arch.core:core-testing:$lifecycle_version"
     testImplementation "org.assertj:assertj-core:$assertj_core_version"
@@ -133,9 +131,6 @@ dependencies {
     //Groupie
     implementation "com.github.lisawray.groupie:groupie:$groupie_version"
     implementation "com.github.lisawray.groupie:groupie-viewbinding:$groupie_version"
-
-    //Google Play Core Library
-    implementation libs.core.ktx
 
     implementation "androidx.privacysandbox.tools:tools:$sandbox_version"
     implementation "androidx.privacysandbox.tools:tools-apicompiler:$sandbox_version"
@@ -172,8 +167,13 @@ dependencies {
     implementation libs.koin.core
     implementation libs.koin.compose
 
-    // Tests
+    //Tests
     testImplementation libs.mockk
     testImplementation libs.junit.jupiter
     testImplementation libs.google.truth
+    androidTestImplementation libs.room.testing
+    androidTestImplementation libs.test.core
+    kapt "org.jetbrains.kotlinx:kotlinx-metadata-jvm:0.9.0"
+    implementation libs.kotlinx.serialization.json
 }
+

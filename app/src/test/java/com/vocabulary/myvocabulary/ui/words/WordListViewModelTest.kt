@@ -4,7 +4,7 @@
 //import com.nhaarman.mockitokotlin2.any
 //import com.nhaarman.mockitokotlin2.mock
 //import com.nhaarman.mockitokotlin2.whenever
-//import com.vocabulary.myvocabulary.TestScheduler
+//import .TestScheduler
 //import com.vocabulary.myvocabulary.repositories.sortBy.SortByData
 //import com.vocabulary.myvocabulary.repositories.sortBy.SortByOptions
 //import com.vocabulary.myvocabulary.repositories.sortBy.SortByRepository

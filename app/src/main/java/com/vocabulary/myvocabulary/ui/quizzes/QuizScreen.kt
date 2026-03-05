@@ -84,6 +84,7 @@ fun QuizScreen(
 
     val quizList by quizViewModel.quizList.collectAsState()
     val snackbarMessage = stringResource(R.string.empty_list_snackbar)
+    val isLoading by quizViewModel.isLoading.collectAsState()
 
     val handleExit = {
         resultViewModel.resetGuessedWordCollections()
@@ -95,7 +96,7 @@ fun QuizScreen(
         snackbarHost = { SnackbarHost(hostState = snackbarHostState) }
     ) { padding ->
         Box(modifier = Modifier.padding(padding)) {
-            if(quizViewModel.isLoading.value) {
+            if(isLoading) {
                 Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                     CircularProgressIndicator()
                 }
@@ -123,7 +124,6 @@ fun QuizScreen(
             }
         }
     }
-
 
 // Pass handleExit logic up to the NavHost
     LaunchedEffect(Unit) {

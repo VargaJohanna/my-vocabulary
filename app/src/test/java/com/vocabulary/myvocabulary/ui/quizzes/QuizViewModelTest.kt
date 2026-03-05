@@ -3,7 +3,7 @@
 //import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 //import com.nhaarman.mockitokotlin2.mock
 //import com.nhaarman.mockitokotlin2.whenever
-//import com.vocabulary.myvocabulary.TestScheduler
+//import .TestScheduler
 //import com.vocabulary.myvocabulary.repositories.quiz.QuizRepository
 //import com.vocabulary.myvocabulary.ui.words.Word
 //import io.reactivex.Observable

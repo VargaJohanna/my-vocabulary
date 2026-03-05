@@ -1,1 +1,19 @@
+pluginManagement {
+    repositories {
+        google()        // <--- Required for Android/Room plugins
+        mavenCentral()  // <--- Required for Kotlin plugins
+        gradlePluginPortal()
+    }
+}
+
+dependencyResolutionManagement {
+    repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
+    repositories {
+        google()
+        mavenCentral()
+        maven { url "https://jitpack.io" }
+    }
+}
+
+rootProject.name = "my-vocabulary"
 include ':app'
