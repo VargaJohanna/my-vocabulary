@@ -4,7 +4,6 @@ plugins {
     id 'kotlin-kapt'
     id 'androidx.navigation.safeargs.kotlin'
     id('kotlin-parcelize')
-    id 'androidx.room'
     alias(libs.plugins.compose.compiler)
     alias(libs.plugins.kotlin.serialization)
 }
@@ -18,10 +17,6 @@ android {
         versionCode = 32
         versionName = "1.3"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-    }
-
-    room {
-        schemaDirectory "$projectDir/schemas"
     }
 
     buildTypes {
@@ -48,8 +43,15 @@ android {
     }
 }
 
+configurations.all {
+    resolutionStrategy {
+        // Ensure a recent kotlinx-serialization-json for Room's schema export and kapt
+        force "org.jetbrains.kotlinx:kotlinx-serialization-json:1.9.0"
+    }
+}
+
 dependencies {
-    def room_version = "2.6.1"
+    def room_version = "2.8.2"
     def kotlin_version = '2.2.0'
     def lifecycle_version = "2.2.0"
     def lottie_version = "6.6.10"
@@ -173,7 +175,6 @@ dependencies {
     testImplementation libs.google.truth
     androidTestImplementation libs.room.testing
     androidTestImplementation libs.test.core
-    kapt "org.jetbrains.kotlinx:kotlinx-metadata-jvm:0.9.0"
     implementation libs.kotlinx.serialization.json
 }
 
