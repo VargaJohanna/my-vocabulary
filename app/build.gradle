@@ -176,5 +176,6 @@ dependencies {
     androidTestImplementation libs.room.testing
     androidTestImplementation libs.test.core
     implementation libs.kotlinx.serialization.json
+    testImplementation "org.jetbrains.kotlinx:kotlinx-coroutines-test:1.9.0"
 }
 

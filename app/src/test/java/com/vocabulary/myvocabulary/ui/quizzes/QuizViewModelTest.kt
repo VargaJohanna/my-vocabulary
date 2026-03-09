@@ -1,214 +1,154 @@
-//package com.vocabulary.myvocabulary.ui.quizzes
-//
-//import androidx.arch.core.executor.testing.InstantTaskExecutorRule
-//import com.nhaarman.mockitokotlin2.mock
-//import com.nhaarman.mockitokotlin2.whenever
-//import .TestScheduler
-//import com.vocabulary.myvocabulary.repositories.quiz.QuizRepository
-//import com.vocabulary.myvocabulary.ui.words.Word
-//import io.reactivex.Observable
-//import org.junit.Assert.*
-//import org.junit.Rule
-//import org.junit.Test
-//import java.util.*
-//import java.util.Arrays.asList
-//
-//class QuizViewModelTest {
-//    @Rule
-//    @JvmField
-//    var mockito = InstantTaskExecutorRule()
-//
-//    private val quizRepository = mock<QuizRepository>()
-//    private val dictionaryId = 1L
-//    private val optionType = 1
-//    private val date = Date(5)
-//    private val quizList = asList(
-//            Word(containerDictionaryId = dictionaryId, word = "a", translation = "translation", created = date, lastResult = true),
-//            Word(containerDictionaryId = dictionaryId, word = "b", translation = "translation2", created = date, lastResult = true),
-//            Word(containerDictionaryId = dictionaryId, word = "c", translation = "translation3", created = date, lastResult = false)
-//    )
-//    private val focusableWordListSize2 = asList(
-//            QuizViewModel.FocusableWord(Word(containerDictionaryId = dictionaryId, word = "focus1", translation = "translation1", created = date), false),
-//            QuizViewModel.FocusableWord(Word(containerDictionaryId = dictionaryId, word = "focus2", translation = "translation2", created = date), false)
-//    )
-//    private val focusableWordListSize3 = asList(
-//            QuizViewModel.FocusableWord(Word(containerDictionaryId = dictionaryId, word = "focus1", translation = "translation1", created = date), false),
-//            QuizViewModel.FocusableWord(Word(containerDictionaryId = dictionaryId, word = "focus2", translation = "translation2", created = date), false),
-//            QuizViewModel.FocusableWord(Word(containerDictionaryId = dictionaryId, word = "focus3", translation = "translation3", created = date), false)
-//    )
-//    private val wordOtherDictionaryFailed = Word(containerDictionaryId = 2L, word = "a", translation = "translation", created = date, lastResult = false)
-//    private val wordPassed = Word(containerDictionaryId = dictionaryId, word = "a", translation = "translation", created = date, lastResult = true)
-//    private val wordFailed = Word(containerDictionaryId = dictionaryId, word = "a", translation = "translation", created = date, lastResult = false)
-//    private var quizListToTest = mutableListOf<Word>()
-//
-//    @Test
-//    fun `isDictionaryEmpty should be false when list is not empty`() {
-//        quizListToTest = quizList
-//        val quizViewModel = givenQuizViewModelFailedOnlyFalse()
-//
-//        assertEquals(false, quizViewModel.isDictionaryEmpty)
-//    }
-//
-//    @Test
-//    fun `isDictionaryEmpty should be true when list is empty`() {
-//        val quizViewModel = givenQuizViewModelFailedOnlyFalse()
-//
-//        assertTrue(quizViewModel.isDictionaryEmpty)
-//    }
-//
-//    @Test
-//    fun `should not add word when dictionaryId is different`() {
-//        quizListToTest = asList(wordOtherDictionaryFailed)
-//        val quizViewModel = givenQuizViewModelFailedOnlyFalse()
-//
-//        assertEquals(0, quizViewModel.getFocusableWordList().size)
-//    }
-//
-//    @Test
-//    fun `should add word when failedOnly and lastResult are false`() {
-//        quizListToTest = asList(wordFailed)
-//        val quizViewModel = givenQuizViewModelFailedOnlyFalse()
-//
-//        assertEquals(1, quizViewModel.getFocusableWordList().size)
-//    }
-//
-//    @Test
-//    fun `should not add word when failedOnly and lastResult are true`() {
-//        quizListToTest = asList(wordPassed)
-//        val quizViewModel = givenQuizViewModelFailedOnlyTrue()
-//
-//        assertEquals(0, quizViewModel.getFocusableWordList().size)
-//    }
-//
-//    @Test
-//    fun `should add word when failedOnly is true and lastResult is false`() {
-//        quizListToTest = asList(wordFailed)
-//        val quizViewModel = givenQuizViewModelFailedOnlyTrue()
-//
-//        assertEquals(1, quizViewModel.getFocusableWordList().size)
-//    }
-//
-//    @Test
-//    fun `should add word when failedOnly is false and lastResult is true`() {
-//        quizListToTest = asList(wordPassed)
-//        val quizViewModel = givenQuizViewModelFailedOnlyFalse()
-//
-//        assertEquals(1, quizViewModel.getFocusableWordList().size)
-//    }
-//
-//    @Test
-//    fun `should return empty list failedOnly and lastResult are true`() {
-//        quizListToTest = asList(wordPassed)
-//        val quizViewModel = givenQuizViewModelFailedOnlyTrue()
-//
-//        quizViewModel.getLiveWordList().observeForever(mock())
-//
-//        assertTrue(quizViewModel.getLiveWordList().value?.size == 0)
-//    }
-//
-//    @Test
-//    fun `should return the word to be asked when getLiveWordList() is called`() {
-//        quizListToTest = quizList
-//        val quizViewModel = givenQuizViewModelFailedOnlyFalse()
-//
-//        quizViewModel.getLiveWordList().observeForever(mock())
-//
-//        assertTrue(quizViewModel.getLiveWordList().value?.size != 0)
-//    }
-//
-//    @Test
-//    fun `should set listIsFinished to true when nextClicked() is called`() {
-//        val quizViewModel = givenQuizViewModelFailedOnlyFalse()
-//        quizViewModel.setFocusableWordList(focusableWordListSize2)
-//
-//        quizViewModel.nextClicked()
-//
-//        assertTrue(quizViewModel.getListIsFinished())
-//    }
-//
-//    @Test
-//    fun `should set updateIcon to true when nextClicked() is called`() {
-//        val quizViewModel = givenQuizViewModelFailedOnlyFalse()
-//        quizViewModel.setFocusableWordList(focusableWordListSize2)
-//        quizViewModel.nextClicked()
-//
-//        quizViewModel.getUpdateIcon().observeForever(mock())
-//
-//        assertTrue(quizViewModel.getUpdateIcon().value!!)
-//    }
-//
-//    @Test
-//    fun `should set listIsFinished to false when nextClicked() is called`() {
-//        val quizViewModel = givenQuizViewModelFailedOnlyFalse()
-//        quizViewModel.setFocusableWordList(focusableWordListSize3)
-//
-//        quizViewModel.nextClicked()
-//
-//        assertFalse(quizViewModel.getListIsFinished())
-//    }
-//
-//    @Test
-//    fun `should set updateIcon to false when nextClicked() is called`() {
-//        val quizViewModel = givenQuizViewModelFailedOnlyFalse()
-//        quizViewModel.setFocusableWordList(focusableWordListSize3)
-//
-//        quizViewModel.nextClicked()
-//        quizViewModel.getUpdateIcon().observeForever(mock())
-//
-//        assertFalse(quizViewModel.getUpdateIcon().value!!)
-//    }
-//
-//    @Test
-//    fun `isFocused should be true at index 0 and 1 when nextClicked() is called`() {
-//        val quizViewModel = givenQuizViewModelFailedOnlyFalse()
-//        quizViewModel.setFocusableWordList(focusableWordListSize3)
-//
-//        quizViewModel.nextClicked()
-//
-//        assertTrue(quizViewModel.getFocusableWordList().get(0).isFocused)
-//        assertTrue(quizViewModel.getFocusableWordList().get(1).isFocused)
-//    }
-//
-//    @Test
-//    fun `isFocused should be false at last index when nextClicked() is called`() {
-//        val quizViewModel = givenQuizViewModelFailedOnlyFalse()
-//        quizViewModel.setFocusableWordList(focusableWordListSize3)
-//
-//        quizViewModel.nextClicked()
-//
-//        assertFalse(quizViewModel.getFocusableWordList().get(focusableWordListSize3.size - 1).isFocused)
-//    }
-//
-//    @Test
-//    fun `should update liveSubWordList when nextClicked() is called`() {
-//        val quizViewModel = givenQuizViewModelFailedOnlyFalse()
-//        quizViewModel.setFocusableWordList(focusableWordListSize2)
-//        quizViewModel.nextClicked()
-//
-//        quizViewModel.getLiveWordList().observeForever(mock())
-//
-//        assertEquals(2, quizViewModel.getLiveWordList().value?.size)
-//    }
-//
-//    @Test
-//    fun `should update liveSubWordList when nextClicked() is called twice`() {
-//        val quizViewModel = givenQuizViewModelFailedOnlyFalse()
-//        quizViewModel.setFocusableWordList(focusableWordListSize3)
-//        quizViewModel.nextClicked()
-//        quizViewModel.nextClicked()
-//
-//        quizViewModel.getLiveWordList().observeForever(mock())
-//
-//        assertEquals(3, quizViewModel.getLiveWordList().value?.size)
-//    }
-//
-//    private fun givenQuizViewModelFailedOnlyFalse(): QuizViewModel {
-//        whenever(quizRepository.quizList).thenReturn(Observable.just(quizListToTest))
-//        return QuizViewModel(dictionaryId = dictionaryId, optionType = optionType, failedOnly = false, rxSchedulers = TestScheduler(), quizRepository = quizRepository)
-//    }
-//
-//    private fun givenQuizViewModelFailedOnlyTrue(): QuizViewModel {
-//        whenever(quizRepository.quizList).thenReturn(Observable.just(quizListToTest))
-//        return QuizViewModel(dictionaryId = dictionaryId, optionType = optionType, failedOnly = true, rxSchedulers = TestScheduler(), quizRepository = quizRepository)
-//    }
-//}
+package com.vocabulary.myvocabulary.ui.quizzes
+
+import androidx.arch.core.executor.testing.InstantTaskExecutorRule
+import com.vocabulary.myvocabulary.repositories.quiz.QuizRepository
+import com.vocabulary.myvocabulary.rx.RxSchedulers
+import com.vocabulary.myvocabulary.ui.words.Word
+import io.mockk.*
+import io.reactivex.Completable
+import io.reactivex.subjects.BehaviorSubject
+import io.reactivex.schedulers.Schedulers
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.*
+import org.junit.After
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
+import org.junit.Before
+import org.junit.Rule
+import org.junit.Test
+import java.util.*
+
+@OptIn(ExperimentalCoroutinesApi::class)
+class QuizViewModelTest {
+
+    @get:Rule
+    val instantTaskExecutorRule = InstantTaskExecutorRule()
+
+    private val rxSchedulers: RxSchedulers = mockk()
+    private val quizRepository: QuizRepository = mockk()
+
+    private lateinit var viewModel: QuizViewModel
+
+    private val dictionaryId = 1L
+    private val testDispatcher = UnconfinedTestDispatcher()
+
+    // Use a BehaviorSubject to simulate the repository's quizList stream
+    private val quizListSubject = BehaviorSubject.create<List<Word>>()
+
+    @Before
+    fun setup() {
+        Dispatchers.setMain(testDispatcher)
+
+        // Mock Rx Schedulers to run immediately on the test thread
+        every { rxSchedulers.io() } returns Schedulers.trampoline()
+        every { rxSchedulers.main() } returns Schedulers.trampoline()
+
+        // Mock the quizList observable from repository
+        every { quizRepository.quizList } returns quizListSubject
+
+        viewModel = QuizViewModel(
+            dictionaryId = dictionaryId,
+            failedOnly = false,
+            rxSchedulers = rxSchedulers,
+            quizRepository = quizRepository
+        )
+    }
+
+    @After
+    fun tearDown() {
+        Dispatchers.resetMain()
+        unmockkAll()
+    }
+
+    @Test
+    fun `fetchQuizList should update quizList state when repository emits words`() {
+        // Arrange
+        val words = listOf(
+            Word(1, dictionaryId, "Word1", "Trans1", created = Date()),
+            Word(2, dictionaryId, "Word2", "Trans2", created = Date())
+        )
+
+        // Act
+        viewModel.fetchQuizList()
+        quizListSubject.onNext(words)
+
+        // Assert
+        assertEquals(2, viewModel.quizList.value.size)
+        assertEquals(false, viewModel.isLoading.value)
+        assertEquals(false, viewModel.isDictionaryEmpty)
+    }
+
+    @Test
+    fun `observeQuizList should filter out blank words or translations`() {
+        // Arrange
+        val invalidWords = listOf(
+            Word(1, dictionaryId, "", "Trans1", created = Date()), // Blank word
+            Word(2, dictionaryId, "Word2", "", created = Date()),  // Blank translation
+            Word(3, dictionaryId, "Valid", "Valid", created = Date())
+        )
+
+        // Act
+        viewModel.fetchQuizList()
+        quizListSubject.onNext(invalidWords)
+
+        // Assert
+        assertEquals(1, viewModel.quizList.value.size)
+        assertEquals("Valid", viewModel.quizList.value[0].word)
+    }
+
+    @Test
+    fun `observeQuizList should filter by failedOnly criteria when enabled`() {
+        // Re-initialize ViewModel with failedOnly = true
+        viewModel = QuizViewModel(dictionaryId, true, rxSchedulers, quizRepository)
+
+        val mixedResults = listOf(
+            Word(1, dictionaryId, "W1", "T1", created = Date(), lastResult = true), // Passed
+            Word(2, dictionaryId, "W2", "T2", created = Date(), lastResult = false) // Failed
+        )
+
+        // Act
+        viewModel.fetchQuizList()
+        quizListSubject.onNext(mixedResults)
+
+        // Assert
+        assertEquals(1, viewModel.quizList.value.size)
+        assertEquals("W2", viewModel.quizList.value[0].word)
+    }
+
+    @Test
+    fun `startQuiz should call repository setQuizList when failedOnly is false`() = runTest {
+        // Arrange
+        val quizType = QuizTypes.FullQuiz
+        every { quizRepository.setQuizList(dictionaryId, quizType) } returns Completable.complete()
+
+        // Act
+        viewModel.startQuiz(quizType, dictionaryId)
+
+        // Assert
+        verify { quizRepository.setQuizList(dictionaryId, quizType) }
+    }
+
+    @Test
+    fun `startQuiz should NOT call repository setQuizList when failedOnly is true`() = runTest {
+        // Re-initialize with failedOnly = true
+        viewModel = QuizViewModel(dictionaryId, true, rxSchedulers, quizRepository)
+
+        // Act
+        viewModel.startQuiz(QuizTypes.FullQuiz, dictionaryId)
+
+        // Assert
+        verify(exactly = 0) { quizRepository.setQuizList(any(), any()) }
+    }
+
+    @Test
+    fun `isDictionaryEmpty should be true when repository emits empty list`() {
+        // Act
+        viewModel.fetchQuizList()
+        quizListSubject.onNext(emptyList())
+
+        // Assert
+        assertTrue(viewModel.isDictionaryEmpty)
+        assertTrue(viewModel.quizList.value.isEmpty())
+    }
+}

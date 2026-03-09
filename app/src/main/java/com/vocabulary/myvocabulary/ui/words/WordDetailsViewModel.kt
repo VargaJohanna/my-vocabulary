@@ -15,6 +15,8 @@ class WordDetailsViewModel(
 
     private val disposables = CompositeDisposable()
     private val _currentWord: MutableStateFlow<Word> = MutableStateFlow(Word(0, 0, "", "", 0, 0, 0, Calendar.getInstance().time))
+    //For testing purposes
+    val currentWord: kotlinx.coroutines.flow.StateFlow<Word> = _currentWord
 
     fun fetchWordById(id: Long) {
         disposables += wordRepository.getWordById(id)
