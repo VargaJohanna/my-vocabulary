@@ -66,6 +66,7 @@ class QuizViewModel(
     }
 
     public override fun onCleared() {
+        _quizList.value = emptyList()
         disposables.clear()
         super.onCleared()
     }

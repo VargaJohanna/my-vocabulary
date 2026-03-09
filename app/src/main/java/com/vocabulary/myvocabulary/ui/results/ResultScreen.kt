@@ -67,7 +67,7 @@ fun ResultScreen(
 ) {
 
     val resultViewModel: ResultViewModel = koinViewModel {
-        parametersOf(dictionaryId)
+        parametersOf(dictionaryId, direction)
     }
 
     val resultList by resultViewModel.getGuessedList().collectAsState()
@@ -203,9 +203,9 @@ fun ResultLazyList(
                 )
             } else {
                 ResultListItemFailed(
-                    question = if (directionType == QuizDirectionType.AskWord) item.word else item.translation,
+                    question = if (directionType == QuizDirectionType.AskTranslation) item.translation else item.word,
                     answer = item.lastGuess,
-                    solution = if (directionType == QuizDirectionType.AskWord) item.translation else item.word
+                    solution = if (directionType == QuizDirectionType.AskTranslation) item.word else item.translation
                 )
             }
         }

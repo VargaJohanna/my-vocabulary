@@ -12,6 +12,7 @@ import com.vocabulary.myvocabulary.rx.RxSchedulers
 import com.vocabulary.myvocabulary.ui.quizzes.GuessedWord
 import com.vocabulary.myvocabulary.ui.quizzes.QuizDirectionType
 import com.vocabulary.myvocabulary.ui.quizzes.QuizTypes
+import com.vocabulary.myvocabulary.ui.quizzes.toDirectionType
 import com.vocabulary.myvocabulary.ui.words.Word
 import io.reactivex.Completable
 import io.reactivex.Observable
@@ -23,6 +24,7 @@ import kotlin.math.round
 
 class ResultViewModel(
     val dictionaryId: Long,
+    val quizDirection: Int,
     private val wordRepository: WordRepository,
     private val dictionaryRepository: DictionaryRepository,
     private val rxSchedulers: RxSchedulers,
@@ -31,7 +33,6 @@ class ResultViewModel(
 ) : ViewModel() {
     private val disposables = CompositeDisposable()
     private val guessedWordList: MutableStateFlow<List<Word>> = MutableStateFlow(emptyList())
-    var directionResult: QuizDirectionType = QuizDirectionType.AskWord
     var isAllPassed = true
 
     private val numOfPassed: MutableStateFlow<Int> = MutableStateFlow(0)
@@ -50,57 +51,78 @@ class ResultViewModel(
 
     fun observeGuessedWordMap() {
         disposables += guessedWordRepository.guessedWordMap
-                .map {
-                    when (it) {
-                        is GuessedMapData.EMPTY -> mutableMapOf()
-                        is GuessedMapData.GuessedData -> {
-                            it.map.toMutableMap()
-                        }
+            .map {
+                when (it) {
+                    is GuessedMapData.EMPTY -> mutableMapOf()
+                    is GuessedMapData.GuessedData -> {
+                        it.map.toMutableMap()
                     }
-                }.flatMapSingle {
-                    Observable.fromIterable(it.entries)
-                            .subscribeOn(rxSchedulers.io())
-                            .flatMapSingle { entry -> updateWordRepository(entry) }
-                            .toList()
                 }
-                .subscribeOn(rxSchedulers.io())
-                .observeOn(rxSchedulers.main())
-                .subscribe { guessList ->
-                    val calculatedPercentage = if (guessList.isNotEmpty()) {        round(((guessList.filter { it.lastResult }.size.toFloat() / guessList.size.toFloat()) * 100)).toInt()
-                    } else 0
-                    resultPercentage.value = calculatedPercentage
-                    saveQuizStats(dictionaryId, calculatedPercentage)
-                    saveLastPracticeOfDictionary(dictionaryId)
-                    guessedWordList.value = guessList
-                    quizRepository.updateQuizList(guessList)
-                    numOfPassed.value = guessList.filter { it.lastResult }.size
-                }
+            }.flatMapSingle {
+                Observable.fromIterable(it.entries)
+                    .subscribeOn(rxSchedulers.io())
+                    .flatMapSingle { entry -> updateWordRepository(entry) }
+                    .toList()
+            }
+            .subscribeOn(rxSchedulers.io())
+            .observeOn(rxSchedulers.main())
+            .subscribe { guessList ->
+                val calculatedPercentage = if (guessList.isNotEmpty()) {
+                    round(((guessList.filter { it.lastResult }.size.toFloat() / guessList.size.toFloat()) * 100)).toInt()
+                } else 0
+                resultPercentage.value = calculatedPercentage
+                saveQuizStats(dictionaryId, calculatedPercentage)
+                saveLastPracticeOfDictionary(dictionaryId)
+                guessedWordList.value = guessList
+                quizRepository.updateQuizList(guessList)
+                numOfPassed.value = guessList.filter { it.lastResult }.size
+            }
     }
 
     private fun updateWordRepository(entry: MutableMap.MutableEntry<Long, String>): Single<Word> {
         return wordRepository.getWordById(entry.key)
-                .map {
-                    evaluate(it, entry)
-                }
-                .doOnSuccess {
-                    wordRepository.updateWord(it)
-                }
+            .map {
+                evaluate(it, entry)
+            }
+            .doOnSuccess {
+                wordRepository.updateWord(it)
+            }
     }
 
     private fun evaluate(it: Word, entry: MutableMap.MutableEntry<Long, String>): Word {
-        return if (directionResult == QuizDirectionType.AskWord) {
+        return if (quizDirection.toDirectionType() == QuizDirectionType.AskWord) {
             if (it.translation.equals(entry.value, ignoreCase = true)) {
-                it.copy(lastResult = true, lastGuess = entry.value, beenAsked = it.beenAsked + 1, passed = it.passed + 1)
+                it.copy(
+                    lastResult = true,
+                    lastGuess = entry.value,
+                    beenAsked = it.beenAsked + 1,
+                    passed = it.passed + 1
+                )
             } else {
                 setAllPassedValue(false)
-                it.copy(lastResult = false, lastGuess = entry.value, beenAsked = it.beenAsked + 1, failed = it.failed + 1)
+                it.copy(
+                    lastResult = false,
+                    lastGuess = entry.value,
+                    beenAsked = it.beenAsked + 1,
+                    failed = it.failed + 1
+                )
             }
         } else {
             if (it.word.equals(entry.value, ignoreCase = true)) {
-                it.copy(lastResult = true, lastGuess = entry.value, beenAsked = it.beenAsked + 1, passed = it.passed + 1)
+                it.copy(
+                    lastResult = true,
+                    lastGuess = entry.value,
+                    beenAsked = it.beenAsked + 1,
+                    passed = it.passed + 1
+                )
             } else {
                 setAllPassedValue(false)
-                it.copy(lastResult = false, lastGuess = entry.value, beenAsked = it.beenAsked + 1, failed = it.failed + 1)
+                it.copy(
+                    lastResult = false,
+                    lastGuess = entry.value,
+                    beenAsked = it.beenAsked + 1,
+                    failed = it.failed + 1
+                )
             }
         }
     }

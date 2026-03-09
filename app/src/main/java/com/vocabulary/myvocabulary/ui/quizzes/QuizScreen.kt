@@ -73,7 +73,7 @@ fun QuizScreen(
     }
 
     val resultViewModel: ResultViewModel = koinViewModel {
-        parametersOf(dictionaryId)
+        parametersOf(dictionaryId, direction)
     }
     val snackbarHostState = remember { SnackbarHostState() }
 

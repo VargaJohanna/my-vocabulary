@@ -439,8 +439,8 @@ class ComposeDialogFactory {
             },
             text = {
                 val radioOptions = listOf(
-                    stringResource(R.string.word_list_meaning),
-                    stringResource(R.string.word_list_expression)
+                    stringResource(R.string.word_list_expression),
+                    stringResource(R.string.word_list_meaning)
                 )
                 val (selectedOption, onOptionSelected) = remember { mutableStateOf(radioOptions[0]) }
                 Column(
