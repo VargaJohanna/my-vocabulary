@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Done
@@ -37,6 +38,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
@@ -230,7 +232,7 @@ fun ResultListItemPassed(
             Row(
                 modifier = Modifier
                     .height(IntrinsicSize.Min)
-                    .background(color = MaterialTheme.colorScheme.primaryContainer),
+                    .background(color = MaterialTheme.colorScheme.primaryFixedDim),
                 horizontalArrangement = Arrangement.SpaceEvenly
             ) {
                 Text(
@@ -239,7 +241,8 @@ fun ResultListItemPassed(
                         .weight(0.5f)
                         .align(Alignment.CenterVertically),
                     text = question,
-                    style = MaterialTheme.typography.bodyLarge
+                    style = MaterialTheme.typography.bodyLarge,
+                    color = MaterialTheme.colorScheme.onPrimaryFixed
                 )
 
                 VerticalDivider(
@@ -257,7 +260,7 @@ fun ResultListItemPassed(
                         .align(Alignment.CenterVertically),
                     text = answer,
                     style = MaterialTheme.typography.bodyLarge,
-                    color = MaterialTheme.colorScheme.onPrimaryContainer
+                    color = MaterialTheme.colorScheme.onPrimaryFixed
                 )
                 Icon(
                     modifier = Modifier
@@ -265,7 +268,7 @@ fun ResultListItemPassed(
                         .align(Alignment.CenterVertically),
                     imageVector = Icons.Default.Done,
                     contentDescription = stringResource(R.string.result_start_over_label),
-                    tint = MaterialTheme.colorScheme.onPrimaryContainer
+                    tint = MaterialTheme.colorScheme.onPrimaryFixed
                 )
             }
         }
@@ -363,6 +366,7 @@ fun FabMenu(
         }
     ) {
         FloatingActionButtonMenuItem(
+            containerColor = MaterialTheme.colorScheme.secondaryContainer,
             onClick = {
                 onExpandedChange(false)
                 onRestartNew()
@@ -378,6 +382,7 @@ fun FabMenu(
 
         if (passedQuiz.not()) {
             FloatingActionButtonMenuItem(
+                containerColor = MaterialTheme.colorScheme.secondaryContainer,
                 onClick = {
                     onExpandedChange(false)
                     onRestartFailedOnly()
@@ -392,6 +397,7 @@ fun FabMenu(
             )
         }
         FloatingActionButtonMenuItem(
+            containerColor = MaterialTheme.colorScheme.secondaryContainer,
             onClick = {
                 onExpandedChange(false)
                 onExit()
