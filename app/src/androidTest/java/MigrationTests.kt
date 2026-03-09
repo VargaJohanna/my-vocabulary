@@ -1,9 +1,8 @@
-import androidx.room.testing.MigrationTestHelper
-import androidx.sqlite.db.framework.FrameworkSQLiteOpenHelperFactory
+import android.database.sqlite.SQLiteDatabase
+import androidx.room.Room
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.vocabulary.myvocabulary.repositories.AppDatabase
-import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import java.io.IOException
@@ -11,116 +10,111 @@ import java.io.IOException
 @RunWith(AndroidJUnit4::class)
 class MigrationTest {
     private val TEST_DB = "migration-test"
+    private fun createV4DatabaseWithSchemaAndData(
+        dbName: String,
+        dictionaryName: String,
+        dictionaryCreated: Long,
+        insertWord: Boolean
+    ) {
+        val context = InstrumentationRegistry.getInstrumentation().targetContext
 
-    @get:Rule
-    val helper: MigrationTestHelper = MigrationTestHelper(
-        InstrumentationRegistry.getInstrumentation(),
-        AppDatabase::class.java.canonicalName,
-        FrameworkSQLiteOpenHelperFactory()
-    )
-
-    @Test
-    @Throws(IOException::class)
-    fun migrate4To5() {
-        val testId = 1L
-        val testName = "Test v4"
-        val testCreated = 123456789L
-
-        // 1. Create v4 and insert data
-        var db = helper.createDatabase(TEST_DB, 4)
-        db.execSQL("""
-        INSERT INTO dictionaries (dictionary_id, dictionary_name, dictionary_created) 
-        VALUES ($testId, '$testName', $testCreated)
-    """.trimIndent())
-        db.close()
-
-        // 2. Migrate to v5
-        db = helper.runMigrationsAndValidate(TEST_DB, 5, true, AppDatabase.MIGRATION_4_5)
-
-        // 3. Verify using safe index checks
-        val cursor = db.query("SELECT * FROM dictionaries WHERE dictionary_id = $testId")
-        assert(cursor.moveToFirst())
-
-        val nameIdx = cursor.getColumnIndex("dictionary_name")
-        val createdIdx = cursor.getColumnIndex("dictionary_created")
-        val lastPracticedIdx = cursor.getColumnIndex("dictionary_last_practiced")
-
-        // Ensure columns actually exist (indices are not -1)
-        assert(nameIdx != -1 && createdIdx != -1 && lastPracticedIdx != -1)
-
-        // Verify data hasn't changed
-        assert(cursor.getString(nameIdx) == testName)
-        assert(cursor.getLong(createdIdx) == testCreated)
-
-        // Verify new column is NULL (as expected for nullable Date?)
-        assert(cursor.isNull(lastPracticedIdx))
-
-        cursor.close()
+        context.deleteDatabase(dbName)
+        val dbPath = context.getDatabasePath(dbName).path
+        val v4Db = SQLiteDatabase.openOrCreateDatabase(dbPath, null)
+        v4Db.execSQL(
+            """
+            CREATE TABLE IF NOT EXISTS dictionaries (
+                dictionary_id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+                dictionary_name TEXT NOT NULL,
+                dictionary_created INTEGER NOT NULL
+            )
+            """.trimIndent()
+        )
+        // Words table schema as in v4 (and still in v7)
+        v4Db.execSQL(
+            """
+            CREATE TABLE IF NOT EXISTS words (
+                word_id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+                container_dictionary_id INTEGER NOT NULL,
+                word TEXT NOT NULL,
+                translation TEXT NOT NULL,
+                been_asked INTEGER NOT NULL,
+                failed INTEGER NOT NULL,
+                passed INTEGER NOT NULL,
+                created INTEGER NOT NULL,
+                last_result INTEGER NOT NULL,
+                last_guess TEXT NOT NULL,
+                FOREIGN KEY(container_dictionary_id) REFERENCES dictionaries(dictionary_id) ON UPDATE NO ACTION ON DELETE CASCADE
+            )
+            """.trimIndent()
+        )
+        v4Db.execSQL(
+            "CREATE INDEX IF NOT EXISTS index_words_container_dictionary_id ON words(container_dictionary_id)"
+        )
+        v4Db.execSQL(
+            "INSERT INTO dictionaries (dictionary_name, dictionary_created) " +
+                    "VALUES ('$dictionaryName', $dictionaryCreated)"
+        )
+        if (insertWord) {
+            v4Db.execSQL(
+                """
+                INSERT INTO words (
+                    container_dictionary_id,
+                    word,
+                    translation,
+                    been_asked,
+                    failed,
+                    passed,
+                    created,
+                    last_result,
+                    last_guess
+                ) VALUES (
+                    1,
+                    'new',
+                    'novus',
+                    1,
+                    0,
+                    1,
+                    $dictionaryCreated,
+                    100,
+                    'novus'
+                )
+                """.trimIndent()
+            )
+        }
+        // Mark DB as version 4 so Room runs MIGRATION_4_7
+        v4Db.execSQL("PRAGMA user_version = 4")
+        v4Db.close()
     }
 
+    /**
+     * Validate the real-world production path: schema version 4 -> 7 for dictionaries.
+     */
     @Test
     @Throws(IOException::class)
-    fun migrate5To6() {
-        val testName = "Test v5"
-        val lastPracticed = 987654321L
-
-        // 1. Create v5 and insert data
-        var db = helper.createDatabase(TEST_DB, 5)
-        db.execSQL("INSERT INTO dictionaries (dictionary_name, dictionary_created, dictionary_last_practiced) VALUES ('$testName', 123, '$lastPracticed')")
-        db.close()
-
-        // 2. Migrate to v6
-        db = helper.runMigrationsAndValidate(TEST_DB, 6, true, AppDatabase.MIGRATION_5_6)
-
-        // 3. Verify data integrity
-        val cursor = db.query("SELECT * FROM dictionaries WHERE dictionary_name = '$testName'")
-        assert(cursor.moveToFirst())
-        assert(cursor.getLong(cursor.getColumnIndex("dictionary_last_practiced")) == lastPracticed)
-        // Verify new columns added in v6 are present
-        assert(cursor.getColumnIndex("dictionary_last_result") != -1)
-        assert(cursor.getInt(cursor.getColumnIndex("dictionary_finished_count")) == 0) // Check default value
-        cursor.close()
-    }
-
-    @Test
-    @Throws(IOException::class)
-    fun migrate6To7() {
-        val testName = "Test v6"
-        val finishedCount = 5
-
-        // 1. Create v6 and insert data
-        var db = helper.createDatabase(TEST_DB, 6)
-        db.execSQL("INSERT INTO dictionaries (dictionary_name, dictionary_created, dictionary_finished_count) VALUES ('$testName', 123, '$finishedCount')")
-        db.close()
-
-        // 2. Migrate to v7
-        db = helper.runMigrationsAndValidate(TEST_DB, 7, true, AppDatabase.MIGRATION_6_7)
-
-        // 3. Verify data integrity
-        val cursor = db.query("SELECT * FROM dictionaries WHERE dictionary_name = '$testName'")
-        assert(cursor.moveToFirst())
-        assert(cursor.getInt(cursor.getColumnIndex("dictionary_finished_count")) == finishedCount)
-        // Verify new column added in v7
-        assert(cursor.getInt(cursor.getColumnIndex("dictionary_total_score")) == 0) // Default value
-        cursor.close()
-    }
-
-    @Test
-    @Throws(IOException::class)
-    fun migrate4To7_JumpTest() {
+    fun migrate4To7_preservesDictionaryData() {
         val testName = "Jump User"
         val testCreated = 111222333L
 
-        // 1. Start at v4
-        var db = helper.createDatabase(TEST_DB, 4)
-        db.execSQL("INSERT INTO dictionaries (dictionary_name, dictionary_created) VALUES ('$testName', '$testCreated')")
-        db.close()
+        createV4DatabaseWithSchemaAndData(TEST_DB, testName, testCreated, insertWord = false)
 
-        // 2. Jump directly to v7
-        db = helper.runMigrationsAndValidate(TEST_DB, 7, true, AppDatabase.MIGRATION_4_7)
+        val context = InstrumentationRegistry.getInstrumentation().targetContext
 
-        // 3. Verify all columns across the whole history are present and data is safe
-        val cursor = db.query("SELECT * FROM dictionaries WHERE dictionary_name = '$testName'")
+
+        // Open with Room, applying MIGRATION_4_7
+        val db = Room.databaseBuilder(
+            context,
+            AppDatabase::class.java,
+            TEST_DB
+        )
+            .addMigrations(AppDatabase.MIGRATION_4_7)
+            .allowMainThreadQueries()
+            .build()
+
+        // Verify all expected columns and data on the migrated schema
+        val cursor = db.openHelper.readableDatabase.query(
+            "SELECT * FROM dictionaries WHERE dictionary_name = '$testName'"
+        )
         assert(cursor.moveToFirst())
         assert(cursor.getLong(cursor.getColumnIndex("dictionary_created")) == testCreated)
         assert(cursor.getColumnIndex("dictionary_last_practiced") != -1)
@@ -128,19 +122,46 @@ class MigrationTest {
         assert(cursor.getInt(cursor.getColumnIndex("dictionary_finished_count")) == 0)
         assert(cursor.getInt(cursor.getColumnIndex("dictionary_total_score")) == 0)
         cursor.close()
+        db.close()
     }
 
+    /**
+     * Validate that existing word data from version 4 is preserved after migrating to 7.
+     */
     @Test
     @Throws(IOException::class)
-    fun migrate5To7_JumpTest() {
-        helper.createDatabase(TEST_DB, 5).close()
-        helper.runMigrationsAndValidate(TEST_DB, 7, true, AppDatabase.MIGRATION_5_7)
-    }
+    fun migrate4To7_preservesWordData() {
+        val testName = "Jump User"
+        val testCreated = 111222333L
 
-    @Test
-    @Throws(IOException::class)
-    fun migrate4To6_JumpTest() {
-        helper.createDatabase(TEST_DB, 4).close()
-        helper.runMigrationsAndValidate(TEST_DB, 6, true, AppDatabase.MIGRATION_4_6)
+        createV4DatabaseWithSchemaAndData(TEST_DB, testName, testCreated, insertWord = true)
+
+        val context = InstrumentationRegistry.getInstrumentation().targetContext
+
+
+        val db = Room.databaseBuilder(
+            context,
+            AppDatabase::class.java,
+            TEST_DB
+        )
+            .addMigrations(AppDatabase.MIGRATION_4_7)
+            .allowMainThreadQueries()
+            .build()
+
+        val cursor = db.openHelper.readableDatabase.query(
+            "SELECT * FROM words WHERE container_dictionary_id = 1"
+        )
+        assert(cursor.moveToFirst())
+        // Original columns should still have the same values
+        assert(cursor.getString(cursor.getColumnIndex("word")) == "new")
+        assert(cursor.getString(cursor.getColumnIndex("translation")) == "novus")
+        assert(cursor.getInt(cursor.getColumnIndex("been_asked")) == 1)
+        assert(cursor.getInt(cursor.getColumnIndex("failed")) == 0)
+        assert(cursor.getInt(cursor.getColumnIndex("passed")) == 1)
+        assert(cursor.getInt(cursor.getColumnIndex("last_result")) == 100)
+        assert(cursor.getString(cursor.getColumnIndex("last_guess")) == "novus")
+
+        cursor.close()
+        db.close()
     }
 }

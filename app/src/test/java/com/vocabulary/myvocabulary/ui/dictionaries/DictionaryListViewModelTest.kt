@@ -1,10 +1,7 @@
 package com.vocabulary.myvocabulary.ui.dictionaries
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
-import com.nhaarman.mockitokotlin2.any
-import com.nhaarman.mockitokotlin2.mock
-import com.nhaarman.mockitokotlin2.verify
-import com.nhaarman.mockitokotlin2.whenever
+import com.nhaarman.mockitokotlin2.*
 import com.vocabulary.myvocabulary.TestScheduler
 import com.vocabulary.myvocabulary.repositories.dictionary.DictionaryRepository
 import com.vocabulary.myvocabulary.repositories.quiz.QuizRepository
@@ -85,9 +82,46 @@ class DictionaryListViewModelTest {
         verify(dictionaryRepository).deleteDictionary(dictionaryWithId)
     }
 
+    @Test
+    fun `should update currentSortByData when sortByData emits`() {
+        val sortData = com.vocabulary.myvocabulary.repositories.sortBy.dictionary.SortDictionaryData(
+            dateDescending = false,
+            titleDescending = false
+        )
+        whenever(sortByRepository.sortByData()).thenReturn(Observable.just(sortData))
+        whenever(sortedListRepository.getSortedDictionaryList()).thenReturn(Observable.never())
+
+        val dictionaryListViewModel = DictionaryListViewModel(
+            dictionaryRepository,
+            TestScheduler(),
+            sortByRepository,
+            sortedListRepository
+        )
+
+        Assert.assertEquals(sortData, dictionaryListViewModel.currentSortByData)
+    }
+
+    @Test
+    fun `should delegate setSortBy() to repository`() {
+        val dictionaryListViewModel = givenDictionaryListViewModel()
+        val sortData = com.vocabulary.myvocabulary.repositories.sortBy.dictionary.SortDictionaryData()
+
+        dictionaryListViewModel.setSortBy(sortData)
+
+        verify(sortByRepository).setSortBy(sortData)
+    }
+
     private fun givenDictionaryListViewModel(): DictionaryListViewModel {
         whenever(dictionaryRepository.createDictionary(any())).thenReturn(newDictionaryId)
         whenever(dictionaryRepository.allDictionaries).thenReturn(Observable.never())
-        return DictionaryListViewModel(dictionaryRepository, TestScheduler(), sortByRepository, sortedListRepository)
+        // Ensure ViewModel init subscriptions have safe sources
+        whenever(sortByRepository.sortByData()).thenReturn(Observable.never())
+        whenever(sortedListRepository.getSortedDictionaryList()).thenReturn(Observable.never())
+        return DictionaryListViewModel(
+            dictionaryRepository,
+            TestScheduler(),
+            sortByRepository,
+            sortedListRepository
+        )
     }
 }

@@ -26,43 +26,14 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun wordDao(): WordDao
 
     companion object {
-        val MIGRATION_4_5 = object : Migration(4, 5) {
-            override fun migrate(db: SupportSQLiteDatabase) {
-                db.execSQL("ALTER TABLE dictionaries ADD COLUMN dictionary_last_practiced INTEGER")
-            }
-        }
-        val MIGRATION_4_6 = object : Migration(4, 6) {
-            override fun migrate(db: SupportSQLiteDatabase) {
-                db.execSQL("ALTER TABLE dictionaries ADD COLUMN dictionary_last_practiced INTEGER")
-                db.execSQL("ALTER TABLE dictionaries ADD COLUMN dictionary_last_result INTEGER")
-                db.execSQL("ALTER TABLE dictionaries ADD COLUMN dictionary_finished_count INTEGER NOT NULL DEFAULT 0")
-            }
-        }
+        // Only support the real-world production path: 4 -> 7
+
         val MIGRATION_4_7 = object : Migration(4, 7) {
             override fun migrate(db: SupportSQLiteDatabase) {
                 db.execSQL("ALTER TABLE dictionaries ADD COLUMN dictionary_total_score INTEGER NOT NULL DEFAULT 0")
                 db.execSQL("ALTER TABLE dictionaries ADD COLUMN dictionary_last_practiced INTEGER")
                 db.execSQL("ALTER TABLE dictionaries ADD COLUMN dictionary_last_result INTEGER")
                 db.execSQL("ALTER TABLE dictionaries ADD COLUMN dictionary_finished_count INTEGER NOT NULL DEFAULT 0")
-            }
-        }
-
-        val MIGRATION_5_6 = object : Migration(5, 6) {
-            override fun migrate(db: SupportSQLiteDatabase) {
-                db.execSQL("ALTER TABLE dictionaries ADD COLUMN dictionary_last_result INTEGER")
-                db.execSQL("ALTER TABLE dictionaries ADD COLUMN dictionary_finished_count INTEGER NOT NULL DEFAULT 0")
-            }
-        }
-        val MIGRATION_5_7 = object : Migration(5, 7) {
-            override fun migrate(db: SupportSQLiteDatabase) {
-                db.execSQL("ALTER TABLE dictionaries ADD COLUMN dictionary_total_score INTEGER NOT NULL DEFAULT 0")
-                db.execSQL("ALTER TABLE dictionaries ADD COLUMN dictionary_last_result INTEGER")
-                db.execSQL("ALTER TABLE dictionaries ADD COLUMN dictionary_finished_count INTEGER NOT NULL DEFAULT 0")
-            }
-        }
-        val MIGRATION_6_7 = object : Migration(6, 7) {
-            override fun migrate(db: SupportSQLiteDatabase) {
-                db.execSQL("ALTER TABLE dictionaries ADD COLUMN dictionary_total_score INTEGER NOT NULL DEFAULT 0")
             }
         }
 
@@ -79,12 +50,7 @@ abstract class AppDatabase : RoomDatabase() {
                 context.applicationContext,
                 AppDatabase::class.java, "appdatabase.db"
             )
-                .addMigrations(MIGRATION_4_5)
-                .addMigrations(MIGRATION_5_6)
-                .addMigrations(MIGRATION_4_6)
-                .addMigrations(MIGRATION_6_7)
                 .addMigrations(MIGRATION_4_7)
-                .addMigrations(MIGRATION_5_7)
                 .addCallback(object : Callback() {
                     override fun onCreate(db: SupportSQLiteDatabase) {
                         super.onCreate(db)
