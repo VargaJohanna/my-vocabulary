@@ -75,10 +75,13 @@ dependencies {
     def nav_latest_version = "2.9.6"
 
     // Standard Android KTX
-    implementation libs.core.ktx
     implementation libs.androidx.lifecycle.viewmodel.ktx
     implementation libs.androidx.compose.ui.graphics
     implementation libs.androidx.junit.ktx
+    implementation libs.play.app.update
+    implementation libs.play.app.update.ktx
+    implementation libs.play.review
+    implementation libs.play.review.ktx
 
     implementation(libs.kotlin.reflect)
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
