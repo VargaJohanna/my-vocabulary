@@ -26,6 +26,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.res.stringResource
@@ -206,7 +207,8 @@ class ComposeDialogFactory {
                         state = newWordState,
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(MaterialTheme.dimens.PaddingMedium),
+                            .padding(MaterialTheme.dimens.PaddingMedium)
+                            .focusRequester(focusRequester),
                         label = { Text(stringResource(R.string.create_expression_hint)) },
                         isError = showError,
                         supportingText = {
