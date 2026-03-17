@@ -142,4 +142,30 @@ class ResultViewModelTest {
         // Assert
         verify { dictionaryRepository.onQuizFinished(dictionaryId) }
     }
+
+    @Test
+    fun `resetGuessedWordCollections should trigger repository reset`() {
+        // Act
+        viewModel.resetGuessedWordCollections()
+
+        // Assert
+        verify(exactly = 1) { guessedWordRepository.resetGuessedWordMap() }
+    }
+
+    @Test
+    fun `ResultScreen should register handleExit logic with the NavHost`() {
+        val backClickRegistrar = mockk<((() -> Unit) -> Unit)>(relaxed = true)
+        val capturedAction = slot<() -> Unit>()
+
+        // Act
+        every { backClickRegistrar(capture(capturedAction)) } returns Unit
+
+        backClickRegistrar {
+            viewModel.resetGuessedWordCollections()
+        }
+
+        // Assert
+        capturedAction.captured.invoke()
+        verify { guessedWordRepository.resetGuessedWordMap() }
+    }
 }

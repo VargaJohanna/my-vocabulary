@@ -108,7 +108,7 @@ fun HomeScreenContent(
             )
         }
 
-        if (mostPracticed != null && numOfDictionary > 2) {
+        if (mostPracticed != null && numOfDictionary >= 2) {
             val mostPracticedDate = mostPracticed.dictionaryLastPracticed?.let { date ->
                 DateTypeConverter().formatDate(date)
             }

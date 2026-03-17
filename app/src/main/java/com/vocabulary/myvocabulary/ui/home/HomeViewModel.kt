@@ -139,7 +139,7 @@ class HomeViewModel(
         viewModelScope.launch {
             leastPracticedDictionary
                 .collect { dict ->
-                    if (dict != null && dict.dictionaryId != 0L) {
+                    if (dict != null) {
                         fetchWordsForDictionary(dict.dictionaryId)
                     }
                 }
