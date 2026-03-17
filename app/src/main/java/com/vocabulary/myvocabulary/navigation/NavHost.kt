@@ -194,7 +194,7 @@ fun MyVocabularyNavHost(
                 },
                 onQuizFinished = { dictionaryId, direction, quizType ->
                     navController.navigate(Result(dictionaryId, direction, quizType)) {
-                        popUpTo<Quiz> { inclusive = true }
+                        popUpTo<QuizList> { inclusive = true }
                         launchSingleTop = true
                     }
                 },
@@ -202,7 +202,7 @@ fun MyVocabularyNavHost(
                 onExit = {
                     screenCleanup?.invoke()
                     navController.navigate(QuizList(dictionaryId = null)) {
-                        popUpTo<QuizList> { inclusive = true }
+                        popUpTo<QuizList> { inclusive = false }
                         launchSingleTop = true
                     }
                 }

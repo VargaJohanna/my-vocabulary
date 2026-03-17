@@ -2,7 +2,6 @@ plugins {
     id 'com.android.application'
     id 'kotlin-android'
     id 'kotlin-kapt'
-    id 'androidx.navigation.safeargs.kotlin'
     id('kotlin-parcelize')
     alias(libs.plugins.compose.compiler)
     alias(libs.plugins.kotlin.serialization)
@@ -43,7 +42,7 @@ android {
     }
 }
 
-configurations.all {
+configurations.configureEach {
     resolutionStrategy {
         // Ensure a recent kotlinx-serialization-json for Room's schema export and kapt
         force "org.jetbrains.kotlinx:kotlinx-serialization-json:1.9.0"
@@ -54,9 +53,7 @@ dependencies {
     def room_version = "2.8.2"
     def kotlin_version = '2.2.0'
     def lifecycle_version = "2.2.0"
-    def lottie_version = "6.6.10"
     def lottie_compose_version = "6.7.1"
-    def constraint_layout_version = "2.2.1"
     def material_version = "1.13.0"
     def card_view_version = "1.0.0"
     def rx_android_version = "2.1.1"
@@ -72,10 +69,8 @@ dependencies {
     def apache_csv_version = "1.14.1"
     def groupie_version = "2.10.1"
     def sandbox_version = "1.0.0-alpha13"
-    def nav_latest_version = "2.9.6"
 
     // Standard Android KTX
-    implementation libs.androidx.lifecycle.viewmodel.ktx
     implementation libs.androidx.compose.ui.graphics
     implementation libs.androidx.junit.ktx
     implementation libs.play.app.update
@@ -84,8 +79,6 @@ dependencies {
     implementation libs.play.review.ktx
 
     implementation(libs.kotlin.reflect)
-    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
-    implementation "androidx.constraintlayout:constraintlayout:$constraint_layout_version"
     implementation "com.google.android.material:material:$material_version"
     implementation "androidx.cardview:cardview:$card_view_version"
 
@@ -102,7 +95,6 @@ dependencies {
     implementation "com.squareup.retrofit2:retrofit:$retrofit_version"
     implementation "com.squareup.retrofit2:converter-gson:$retrofit_version"
     implementation "com.squareup.retrofit2:adapter-rxjava2:$retrofit_version"
-    implementation "com.squareup.retrofit2:converter-gson:$retrofit_version"
 
     //Espresso
     testImplementation "junit:junit:$junit_version"
@@ -116,12 +108,7 @@ dependencies {
     testImplementation "androidx.arch.core:core-testing:$lifecycle_version"
     testImplementation "org.assertj:assertj-core:$assertj_core_version"
 
-    //Navigation (Fragment/UI versions - non-compose)
-    implementation "androidx.navigation:navigation-fragment:$nav_latest_version"
-    implementation "androidx.navigation:navigation-ui:$nav_latest_version"
-
     //Lottie animation
-    implementation "com.airbnb.android:lottie:$lottie_version"
     implementation "com.airbnb.android:lottie-compose:$lottie_compose_version"
 
     //About page
@@ -136,12 +123,6 @@ dependencies {
     //Groupie
     implementation "com.github.lisawray.groupie:groupie:$groupie_version"
     implementation "com.github.lisawray.groupie:groupie-viewbinding:$groupie_version"
-
-    implementation "androidx.privacysandbox.tools:tools:$sandbox_version"
-    implementation "androidx.privacysandbox.tools:tools-apicompiler:$sandbox_version"
-    implementation "androidx.privacysandbox.tools:tools-apigenerator:$sandbox_version"
-    implementation "androidx.privacysandbox.tools:tools-core:$sandbox_version"
-    implementation "androidx.privacysandbox.tools:tools-apipackager:$sandbox_version"
 
     // Compose BOM (The Master Version)
     implementation platform(libs.androidx.compose.bom)
