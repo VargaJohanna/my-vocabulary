@@ -2,13 +2,18 @@ package com.vocabulary.myvocabulary.utils
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.foundation.text.input.delete
 import androidx.compose.foundation.text.input.rememberTextFieldState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.AlertDialogDefaults
 import androidx.compose.material3.MaterialTheme
@@ -16,7 +21,6 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
-import androidx.compose.material3.TextFieldColors
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -35,6 +39,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.DialogProperties
+import com.vocabulary.myvocabulary.Constants.TEXT_FIELD_HEIGHT
 import com.vocabulary.myvocabulary.R
 import com.vocabulary.myvocabulary.ui.theme.dimens
 
@@ -57,7 +62,8 @@ class ComposeDialogFactory {
                     state = newDictionaryTitleState,
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(8.dp),
+                        .padding(8.dp)
+                        .heightIn(min = TEXT_FIELD_HEIGHT.dp),
                     label = { Text(stringResource(R.string.create_dictionary_hint)) },
                     isError = showError,
                     supportingText = {
@@ -142,7 +148,8 @@ class ComposeDialogFactory {
                     state = editedTitleState,
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(8.dp),
+                        .padding(8.dp)
+                        .heightIn(min = TEXT_FIELD_HEIGHT.dp),
                     label = { Text(stringResource(R.string.rename_dictionary_hint)) },
                     isError = showError,
                     supportingText = {
@@ -201,14 +208,18 @@ class ComposeDialogFactory {
             title = { Text(text = dialogTitle) },
             text = {
                 Column(
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .wrapContentHeight()
+                        .verticalScroll(rememberScrollState())
                 ) {
                     OutlinedTextField(
                         state = newWordState,
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(MaterialTheme.dimens.PaddingMedium)
-                            .focusRequester(focusRequester),
+                            .focusRequester(focusRequester)
+                            .heightIn(min = TEXT_FIELD_HEIGHT.dp),
                         label = { Text(stringResource(R.string.create_expression_hint)) },
                         isError = showError,
                         supportingText = {
@@ -223,7 +234,8 @@ class ComposeDialogFactory {
                         state = newTranslationState,
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(MaterialTheme.dimens.PaddingMedium),
+                            .padding(MaterialTheme.dimens.PaddingMedium)
+                            .heightIn(min = TEXT_FIELD_HEIGHT.dp),
                         label = { Text(stringResource(R.string.create_translation_hint)) },
                     )
                 }
@@ -300,8 +312,9 @@ class ComposeDialogFactory {
             modifier = modifier,
             confirmButton = { positiveButton() },
             dismissButton = {
-                Row(
-                    horizontalArrangement = Arrangement.Start
+                FlowRow(
+                    horizontalArrangement = Arrangement.Start,
+                    maxItemsInEachRow = 2
                 ) {
                     negativeButton?.let {
                         it()
@@ -343,13 +356,16 @@ class ComposeDialogFactory {
             },
             text = {
                 Column(
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .verticalScroll(rememberScrollState())
                 ) {
                     OutlinedTextField(
                         state = editExpressionState,
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(MaterialTheme.dimens.PaddingMedium),
+                            .padding(MaterialTheme.dimens.PaddingMedium)
+                            .heightIn(min = TEXT_FIELD_HEIGHT.dp),
                         label = { Text(stringResource(R.string.word_list_expression)) },
                         isError = showError,
                         supportingText = {
@@ -364,17 +380,16 @@ class ComposeDialogFactory {
                         state = editTranslationState,
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(MaterialTheme.dimens.PaddingMedium),
+                            .padding(MaterialTheme.dimens.PaddingMedium)
+                            .heightIn(min = TEXT_FIELD_HEIGHT.dp),
                         label = {
                             if (editTranslationState.text.isEmpty()) {
                                 Text(
                                     text = stringResource(R.string.word_list_meaning),
-                                    color = Color.Gray
                                 )
                             } else {
                                 Text(
                                     text = stringResource(R.string.word_list_meaning),
-                                    color = Color.Black
                                 )
                             }
                         }
@@ -449,6 +464,7 @@ class ComposeDialogFactory {
                     modifier = Modifier
                         .fillMaxWidth()
                         .selectableGroup()
+                        .verticalScroll(rememberScrollState())
                 ) {
                     radioOptions.forEach { text ->
                         Row(
@@ -513,7 +529,8 @@ class ComposeDialogFactory {
                     state = editedSize,
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(8.dp),
+                        .padding(8.dp)
+                        .heightIn(min = TEXT_FIELD_HEIGHT.dp),
                     label = { Text(stringResource(R.string.add_a_number)) },
                     isError = showError,
                     supportingText = {
@@ -580,7 +597,8 @@ fun ThirdButtonAlertDialogWithNeutralPreview() {
                     state = newWordState,
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(MaterialTheme.dimens.PaddingMedium),
+                        .padding(MaterialTheme.dimens.PaddingMedium)
+                        .heightIn(min = TEXT_FIELD_HEIGHT.dp),
                     label = { Text("new expression") },
                     isError = showError,
                     supportingText = {
@@ -595,7 +613,8 @@ fun ThirdButtonAlertDialogWithNeutralPreview() {
                     state = newTranslationState,
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(MaterialTheme.dimens.PaddingMedium),
+                        .padding(MaterialTheme.dimens.PaddingMedium)
+                        .heightIn(min = TEXT_FIELD_HEIGHT.dp),
                     label = { Text(stringResource(R.string.create_translation_hint)) },
                 )
             }

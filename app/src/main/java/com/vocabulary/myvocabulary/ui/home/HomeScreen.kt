@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -48,7 +49,9 @@ import kotlin.math.round
 import kotlin.text.ifEmpty
 
 @Composable
-fun HomeScreen() {
+fun HomeScreen(
+    contentPadding: PaddingValues = PaddingValues(0.dp),
+) {
     val homeViewModel: HomeViewModel = koinViewModel()
     val lastPracticedDictionary by homeViewModel.lastPracticedDictionary.collectAsState()
     val mostPracticedDictionary by homeViewModel.mostPracticedDictionary.collectAsState()
@@ -70,7 +73,8 @@ fun HomeScreen() {
             leastPracticed = leastPracticedDictionary,
             memoriseList = memoriseList,
             numOfDictionary = numOfDictionary,
-            isLoadingWords = isLoadingWords
+            isLoadingWords = isLoadingWords,
+            contentPadding = contentPadding
         )
     }
 }
@@ -82,12 +86,15 @@ fun HomeScreenContent(
     leastPracticed: Dictionary?,
     memoriseList: List<Word>,
     numOfDictionary: Int,
-    isLoadingWords: Boolean
+    isLoadingWords: Boolean,
+    contentPadding: PaddingValues
 ) {
-    Column(
+    Column (
         modifier = Modifier
             .fillMaxSize()
             .verticalScroll(rememberScrollState())
+            .padding(contentPadding),
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
         if (lastPracticed != null) {
             val lastPracticedDate = lastPracticed.dictionaryLastPracticed?.let { date ->
@@ -523,6 +530,7 @@ fun HomePreview() {
         ),
         memoriseList = wordList,
         numOfDictionary = 1,
-        isLoadingWords = true
+        isLoadingWords = true,
+        contentPadding = PaddingValues(0.dp)
     )
 }

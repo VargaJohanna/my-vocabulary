@@ -14,7 +14,6 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -27,6 +26,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import com.vocabulary.myvocabulary.R
 import com.vocabulary.myvocabulary.ui.theme.MyVocabularyTheme
 import com.vocabulary.myvocabulary.ui.theme.dimens
@@ -36,6 +36,7 @@ import org.koin.compose.koinInject
 @Composable
 fun QuizListScreen(
     dictionaryIdFromArgs: Long?,
+    contentPadding: PaddingValues = PaddingValues(0.dp),
     onStartQuiz: (quizType: Int, dictionaryId: Long, direction: Int, failedOnly: Boolean) -> Unit
 ) {
 
@@ -51,7 +52,8 @@ fun QuizListScreen(
             onStartQuiz(quizType, dictionaryId, direction, failedOnly)
         },
         onCustomSelected = { quizListViewModel.addCustomQuizSize(size = it) },
-        dictionaryIdFromArgs = dictionaryIdFromArgs
+        dictionaryIdFromArgs = dictionaryIdFromArgs,
+        contentPadding = contentPadding
     )
 }
 
@@ -61,7 +63,8 @@ fun QuizListContent(
     dialogFactory: ComposeDialogFactory,
     onStartQuiz: (quizType: Int, dictionaryId: Long, direction: Int, failedOnly: Boolean) -> Unit,
     onCustomSelected: (size: Int) -> Unit,
-    dictionaryIdFromArgs: Long?
+    dictionaryIdFromArgs: Long?,
+    contentPadding: PaddingValues
 ) {
 
     var showInfoDialog by rememberSaveable { mutableStateOf(false) }
@@ -87,14 +90,18 @@ fun QuizListContent(
     val sortedList = remember(list) {
         list.sortedBy { it.toInt() }
     }
-    Scaffold(
+    Box(
         modifier = Modifier.fillMaxSize()
-    ) { paddingValues ->
+    ) {
         LazyColumn(
             modifier = Modifier
-                .padding(paddingValues)
                 .fillMaxSize(),
-            contentPadding = PaddingValues(MaterialTheme.dimens.PaddingMedium)
+            contentPadding = PaddingValues(
+                top = contentPadding.calculateTopPadding() + MaterialTheme.dimens.PaddingSmall,
+                start = MaterialTheme.dimens.PaddingMedium,
+                end = MaterialTheme.dimens.PaddingMedium,
+                bottom = contentPadding.calculateBottomPadding() + MaterialTheme.dimens.PaddingMedium
+            )
         ) {
             items(sortedList) { item ->
                 QuizCard(
@@ -251,7 +258,8 @@ fun QuizListScreenPreview() {
             dialogFactory = ComposeDialogFactory(),
             onStartQuiz = { _, _, _, _ -> },
             onCustomSelected = {},
-            dictionaryIdFromArgs = null
+            dictionaryIdFromArgs = null,
+            contentPadding = PaddingValues(0.dp)
         )
     }
 }

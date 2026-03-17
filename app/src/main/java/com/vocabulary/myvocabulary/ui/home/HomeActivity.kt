@@ -25,7 +25,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.dp
 import androidx.navigation.NavDestination.Companion.hasRoute
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavGraph.Companion.findStartDestination
@@ -143,7 +142,7 @@ fun MyVocabularyApp() {
             onUpdateFab = { screenFab = it },
             isSearchVisible = isSearchVisible,
             onToggleSearch = { isSearchVisible = it },
-            modifier = Modifier.padding(top = innerPadding.calculateTopPadding(), bottom = 0.dp),
+            modifier = Modifier.padding(innerPadding),
             onBackClick = { newAction ->
                 currentBackAction = newAction
             },
