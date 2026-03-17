@@ -62,7 +62,8 @@ fun ResultScreen(
     quizType: Int,
     onRestartQuiz: (quizType: Int, dictionaryId: Long, direction: Int, failedOnly: Boolean) -> Unit,
     onExit: () -> Unit,
-    onUpdateFab: (@Composable () -> Unit) -> Unit
+    onUpdateFab: (@Composable () -> Unit) -> Unit,
+    onBackClick: (() -> Unit) -> Unit
 ) {
 
     val resultViewModel: ResultViewModel = koinViewModel {
@@ -82,6 +83,13 @@ fun ResultScreen(
 
     BackHandler(enabled = true) {
         handleExit()
+    }
+
+    LaunchedEffect(Unit) {
+        resultViewModel.fetchGuessedList()
+        onBackClick {
+            handleExit()
+        }
     }
 
     LaunchedEffect(Unit) {

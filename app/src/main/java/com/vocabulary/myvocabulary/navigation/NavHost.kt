@@ -67,6 +67,7 @@ fun MyVocabularyNavHost(
 
                 onUpdateFab { }
 
+                onBackClick { }
             }
             HomeScreen()
         }
@@ -220,7 +221,9 @@ fun MyVocabularyNavHost(
                 onUpdateActions { }
 
                 onBackClick {
-                    navController.navigate(Home)
+                    navController.navigate(Home) {
+                        popUpTo<Home> { inclusive = true }
+                    }
                 }
             }
             ResultScreen(
@@ -239,7 +242,8 @@ fun MyVocabularyNavHost(
                         launchSingleTop = true
                     }
                 },
-                onUpdateFab = onUpdateFab
+                onUpdateFab = onUpdateFab,
+                onBackClick = onBackClick
             )
         }
     }
