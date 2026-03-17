@@ -13,7 +13,7 @@ android {
         applicationId = "com.vocabulary.myvocabulary"
         minSdk = 23
         targetSdk = 36
-        versionCode = 36
+        versionCode = 37
         versionName = "2.0"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
