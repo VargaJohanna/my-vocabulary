@@ -6,8 +6,20 @@
 /.idea/*.xml
 /.idea/caches
 .DS_Store
-/build
-/release
 /captures
 .externalNativeBuild
 .idea/misc.xml
+# Logs
+*.log
+firebase-debug.log
+
+# Keystore files
+*.jks
+*.keystore
+
+# Ignore all build folders (any module)
+build/
+
+# Ignore release artifacts
+*.aab
+*.apk
