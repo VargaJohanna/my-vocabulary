@@ -42,6 +42,9 @@ import androidx.compose.ui.window.DialogProperties
 import com.vocabulary.myvocabulary.Constants.TEXT_FIELD_HEIGHT
 import com.vocabulary.myvocabulary.R
 import com.vocabulary.myvocabulary.ui.theme.dimens
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.ui.text.input.KeyboardCapitalization
+
 
 class ComposeDialogFactory {
     @Composable
@@ -52,6 +55,11 @@ class ComposeDialogFactory {
     ) {
         val newDictionaryTitleState = rememberTextFieldState()
         var showError by remember { mutableStateOf(false) }
+        val focusRequester = remember { FocusRequester() }
+
+        LaunchedEffect(Unit) {
+            focusRequester.requestFocus()
+        }
 
         AlertDialog(
             title = {
@@ -63,7 +71,8 @@ class ComposeDialogFactory {
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(8.dp)
-                        .heightIn(min = TEXT_FIELD_HEIGHT.dp),
+                        .heightIn(min = TEXT_FIELD_HEIGHT.dp)
+                        .focusRequester(focusRequester),
                     label = { Text(stringResource(R.string.create_dictionary_hint)) },
                     isError = showError,
                     supportingText = {
@@ -72,6 +81,7 @@ class ComposeDialogFactory {
                         }
                     },
                     inputTransformation = { showError = false },
+                    keyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.Sentences)
                 )
             },
             onDismissRequest = {
@@ -158,6 +168,7 @@ class ComposeDialogFactory {
                         }
                     },
                     inputTransformation = { showError = false },
+                    keyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.Sentences)
                 )
             },
             onDismissRequest = {

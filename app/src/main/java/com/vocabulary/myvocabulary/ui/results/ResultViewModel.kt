@@ -21,6 +21,7 @@ import io.reactivex.disposables.CompositeDisposable
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import kotlin.math.round
+import java.text.Normalizer
 
 class ResultViewModel(
     val dictionaryId: Long,
@@ -90,40 +91,27 @@ class ResultViewModel(
     }
 
     private fun evaluate(it: Word, entry: MutableMap.MutableEntry<Long, String>): Word {
-        return if (quizDirection.toDirectionType() == QuizDirectionType.AskWord) {
-            if (it.translation.equals(entry.value, ignoreCase = true)) {
-                it.copy(
-                    lastResult = true,
-                    lastGuess = entry.value,
-                    beenAsked = it.beenAsked + 1,
-                    passed = it.passed + 1
-                )
-            } else {
-                setAllPassedValue(false)
-                it.copy(
-                    lastResult = false,
-                    lastGuess = entry.value,
-                    beenAsked = it.beenAsked + 1,
-                    failed = it.failed + 1
-                )
-            }
+        val isCorrect = if (quizDirection.toDirectionType() == QuizDirectionType.AskWord) {
+            it.translation.normalize().equals(entry.value.normalize(), ignoreCase = true)
         } else {
-            if (it.word.equals(entry.value, ignoreCase = true)) {
-                it.copy(
-                    lastResult = true,
-                    lastGuess = entry.value,
-                    beenAsked = it.beenAsked + 1,
-                    passed = it.passed + 1
-                )
-            } else {
-                setAllPassedValue(false)
-                it.copy(
-                    lastResult = false,
-                    lastGuess = entry.value,
-                    beenAsked = it.beenAsked + 1,
-                    failed = it.failed + 1
-                )
-            }
+            it.word.normalize().equals(entry.value.normalize(), ignoreCase = true)
+        }
+
+        return if (isCorrect) {
+            it.copy(
+                lastResult = true,
+                lastGuess = entry.value,
+                beenAsked = it.beenAsked + 1,
+                passed = it.passed + 1
+            )
+        } else {
+            setAllPassedValue(false)
+            it.copy(
+                lastResult = false,
+                lastGuess = entry.value,
+                beenAsked = it.beenAsked + 1,
+                failed = it.failed + 1
+            )
         }
     }
 
@@ -163,4 +151,8 @@ class ResultViewModel(
     fun getNumOfPassed() = numOfPassed
 
     fun getResultPercentage() = resultPercentage
+}
+
+private fun String.normalize(): String {
+    return Normalizer.normalize(this, Normalizer.Form.NFC).trim()
 }
