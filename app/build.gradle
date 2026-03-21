@@ -132,5 +132,10 @@ dependencies {
     androidTestImplementation libs.test.core
     implementation libs.kotlinx.serialization.json
     testImplementation "org.jetbrains.kotlinx:kotlinx-coroutines-test:1.9.0"
+
+    //Coroutine
+    implementation libs.kotlinx.coroutines.core
+    implementation libs.kotlinx.coroutines.rx2
+    implementation libs.androidx.lifecycle.runtime.compose
 }
 

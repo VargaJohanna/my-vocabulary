@@ -16,6 +16,7 @@ activityCompose = "1.11.0"
 
 # KotlinX
 serialization = "1.9.0"
+lifecycle-runtime-compose = "2.8.7"
 
 # Dependency Injection
 koin = "4.1.1"
@@ -48,6 +49,10 @@ espresso = "3.7.0"
 mockito-kotlin = "2.2.0"
 assertj-core = "3.27.6"
 
+# Coroutine
+coroutines = "1.10.2"
+coroutines-rx2 = "1.9.0"
+
 
 [libraries]
 # Compose BOM
@@ -75,9 +80,12 @@ androidx-activity-compose = { module = "androidx.activity:activity-compose", ver
 
 # Lifecycle
 androidx-lifecycle-viewmodel-compose = { module = "androidx.lifecycle:lifecycle-viewmodel-compose", version.ref = "lifecycleViewmodelCompose" }
+androidx-lifecycle-runtime-compose = { module = "androidx.lifecycle:lifecycle-runtime-compose", version.ref = "lifecycle-runtime-compose" }
 
 # Kotlin
 kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "serialization"}
+kotlinx-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "coroutines"}
+kotlinx-coroutines-rx2 = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-rx2", version.ref = "coroutines-rx2"}
 
 # Dependency Injection
 koin-android = { module = "io.insert-koin:koin-android", version.ref = "koin" }

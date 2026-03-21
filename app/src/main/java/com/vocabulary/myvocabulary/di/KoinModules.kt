@@ -93,7 +93,7 @@ val viewModelModule = module {
     }
     viewModel { (dictionaryId: Long, quizDirection: Int) -> ResultViewModel(dictionaryId, quizDirection, get(), get(), get(), get(), get()) }
     viewModel { (wordId: Long) -> WordDetailsViewModel(get(), get()) }
-    viewModel { HomeViewModel(get(), get(), get(), get(), get(), get()) }
+    viewModel { HomeViewModel(get(), get(), get(), get(), get()) }
     viewModel { ShareDictionaryViewModel(get(), get(), get(), get()) }
     viewModel { QuizListViewModel(get()) }
 }
