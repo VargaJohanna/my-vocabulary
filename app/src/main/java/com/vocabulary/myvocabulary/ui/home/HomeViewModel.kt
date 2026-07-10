@@ -87,9 +87,10 @@ class HomeViewModel(
     private fun observeQuote() {
         viewModelScope.launch {
             quoteRepository.getQuote()
-                .asFlow()
-                .catch { e -> _liveQuote.value = QuoteData.EMPTY }
-                .collect { _liveQuote.value = it }
+                .catch { e -> _liveQuote.value = QuoteData.EMPTY
+                println("Quote Error: ${e.message}")}
+                .collect { _liveQuote.value = it
+                println("Quote: ${_liveQuote.value}")}
         }
     }
 

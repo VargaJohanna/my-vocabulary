@@ -25,7 +25,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
 import androidx.compose.ui.Alignment
@@ -38,6 +37,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LifecycleEventEffect
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.vocabulary.myvocabulary.R
 import com.vocabulary.myvocabulary.ui.dictionaries.Dictionary
 import com.vocabulary.myvocabulary.ui.theme.dimens
@@ -53,12 +53,13 @@ fun HomeScreen(
     contentPadding: PaddingValues = PaddingValues(0.dp),
 ) {
     val homeViewModel: HomeViewModel = koinViewModel()
-    val lastPracticedDictionary by homeViewModel.lastPracticedDictionary.collectAsState()
-    val mostPracticedDictionary by homeViewModel.mostPracticedDictionary.collectAsState()
-    val leastPracticedDictionary by homeViewModel.leastPracticedDictionary.collectAsState()
-    val memoriseList by homeViewModel.memoriseList.collectAsState()
-    val numOfDictionary by homeViewModel.numOfDictionaries.collectAsState()
-    val isLoadingWords by homeViewModel.isLoadingWords.collectAsState()
+    val lastPracticedDictionary by homeViewModel.lastPracticedDictionary.collectAsStateWithLifecycle()
+    val mostPracticedDictionary by homeViewModel.mostPracticedDictionary.collectAsStateWithLifecycle()
+    val leastPracticedDictionary by homeViewModel.leastPracticedDictionary.collectAsStateWithLifecycle()
+    val memoriseList by homeViewModel.memoriseList.collectAsStateWithLifecycle()
+    val numOfDictionary by homeViewModel.numOfDictionaries.collectAsStateWithLifecycle()
+    val isLoadingWords by homeViewModel.isLoadingWords.collectAsStateWithLifecycle()
+    val quoteState by homeViewModel.liveQuote.collectAsStateWithLifecycle()
 
     LifecycleEventEffect(Lifecycle.Event.ON_RESUME) {
         homeViewModel.refreshMemoriseList()

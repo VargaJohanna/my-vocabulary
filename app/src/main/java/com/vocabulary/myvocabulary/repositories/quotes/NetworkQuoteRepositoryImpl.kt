@@ -2,15 +2,14 @@ package com.vocabulary.myvocabulary.repositories.quotes
 
 import com.vocabulary.myvocabulary.network.QuoteService
 import com.vocabulary.myvocabulary.quotes.QuoteData
-import io.reactivex.Single
 
 class NetworkQuoteRepositoryImpl(
-        private val quoteService: QuoteService
+    private val quoteService: QuoteService
 ) : NetworkQuoteRepository {
 
-    override fun fetchQuote(): Single<QuoteData.Quote> =
-            quoteService.getData().map { it.contents.quotes[0] }
-}
+    override suspend fun fetchQuote(): QuoteData.Quote {
+        val response = quoteService.getData()
 
-data class ResultEntity(val contents: ContentsEntity)
-data class ContentsEntity(val quotes: List<QuoteData.Quote>)
+        return response.firstOrNull() ?: throw Exception("No quotes found in network response")
+    }
+}

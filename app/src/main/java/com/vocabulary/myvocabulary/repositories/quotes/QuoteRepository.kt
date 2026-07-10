@@ -1,8 +1,8 @@
 package com.vocabulary.myvocabulary.repositories.quotes
 
 import com.vocabulary.myvocabulary.quotes.QuoteData
-import io.reactivex.Observable
+import kotlinx.coroutines.flow.Flow
 
 interface QuoteRepository {
-    fun getQuote(): Observable<QuoteData.Quote>
+    fun getQuote(): Flow<QuoteData.Quote>
 }

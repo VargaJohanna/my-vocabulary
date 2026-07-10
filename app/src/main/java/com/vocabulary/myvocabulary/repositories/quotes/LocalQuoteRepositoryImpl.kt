@@ -1,16 +1,15 @@
 package com.vocabulary.myvocabulary.repositories.quotes
 
 import com.vocabulary.myvocabulary.quotes.QuoteData
-import io.reactivex.Maybe
 
 class LocalQuoteRepositoryImpl : LocalQuoteRepository {
     private var localQuote: QuoteData.Quote? = null
 
-    override fun getQuote(): Maybe<QuoteData.Quote> {
-        return if (localQuote == null) Maybe.empty() else Maybe.just(localQuote)
+    override suspend fun getQuote(): QuoteData.Quote? {
+        return localQuote
     }
 
-    override fun saveQuote(quote: QuoteData.Quote) {
+    override suspend fun saveQuote(quote: QuoteData.Quote) {
         localQuote = quote
     }
 }

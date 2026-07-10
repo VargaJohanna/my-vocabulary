@@ -2,6 +2,7 @@ package com.vocabulary.myvocabulary.di
 
 import android.preference.PreferenceManager
 import com.f2prateek.rx.preferences2.RxSharedPreferences
+import com.vocabulary.myvocabulary.BuildConfig
 import com.vocabulary.myvocabulary.Constants
 import com.vocabulary.myvocabulary.network.QuoteService
 import com.vocabulary.myvocabulary.repositories.AppDatabase
@@ -37,6 +38,8 @@ import com.vocabulary.myvocabulary.ui.quizzes.QuizListViewModel
 import com.vocabulary.myvocabulary.ui.words.WordDetailsViewModel
 import com.vocabulary.myvocabulary.ui.words.WordListViewModel
 import com.vocabulary.myvocabulary.utils.ComposeDialogFactory
+import okhttp3.Interceptor
+import okhttp3.OkHttpClient
 import org.koin.core.module.dsl.viewModel
 import org.koin.dsl.module
 import retrofit2.Retrofit
@@ -71,14 +74,27 @@ val repositoryModule = module {
 }
 
 val networkModule = module {
-    single{get<Retrofit>().create(QuoteService::class.java)}
-    single{RxJava2CallAdapterFactory.create()}
+    single {
+        Interceptor { chain ->
+            val request = chain.request().newBuilder()
+                .addHeader("X-Api-Key", BuildConfig.API_KEY)
+                .build()
+            chain.proceed(request)
+        }
+    }
+    single {
+        OkHttpClient.Builder()
+            .addInterceptor(get<Interceptor>())
+            .build()
+    }
     single{GsonConverterFactory.create()}
     single { Retrofit.Builder()
             .baseUrl(Constants.QOD_BASE_URL)
-            .addCallAdapterFactory(get<RxJava2CallAdapterFactory>())
+            .client(get())
             .addConverterFactory(get<GsonConverterFactory>())
-            .build() }
+            .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
+        .build() }
+    single{get<Retrofit>().create(QuoteService::class.java)}
 }
 
 val viewModelModule = module {
