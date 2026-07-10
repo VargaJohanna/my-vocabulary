@@ -39,6 +39,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LifecycleEventEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.vocabulary.myvocabulary.R
+import com.vocabulary.myvocabulary.quotes.QuoteData
 import com.vocabulary.myvocabulary.ui.dictionaries.Dictionary
 import com.vocabulary.myvocabulary.ui.theme.dimens
 import com.vocabulary.myvocabulary.ui.words.Word
@@ -59,7 +60,7 @@ fun HomeScreen(
     val memoriseList by homeViewModel.memoriseList.collectAsStateWithLifecycle()
     val numOfDictionary by homeViewModel.numOfDictionaries.collectAsStateWithLifecycle()
     val isLoadingWords by homeViewModel.isLoadingWords.collectAsStateWithLifecycle()
-    val quoteState by homeViewModel.liveQuote.collectAsStateWithLifecycle()
+    val quoteState by homeViewModel.quoteUiState.collectAsStateWithLifecycle()
 
     LifecycleEventEffect(Lifecycle.Event.ON_RESUME) {
         homeViewModel.refreshMemoriseList()
@@ -75,7 +76,8 @@ fun HomeScreen(
             memoriseList = memoriseList,
             numOfDictionary = numOfDictionary,
             isLoadingWords = isLoadingWords,
-            contentPadding = contentPadding
+            contentPadding = contentPadding,
+            quoteState = quoteState
         )
     }
 }
@@ -88,7 +90,8 @@ fun HomeScreenContent(
     memoriseList: List<Word>,
     numOfDictionary: Int,
     isLoadingWords: Boolean,
-    contentPadding: PaddingValues
+    contentPadding: PaddingValues,
+    quoteState: QuoteUiState
 ) {
     Column (
         modifier = Modifier
@@ -97,6 +100,19 @@ fun HomeScreenContent(
             .padding(contentPadding),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
+        when (quoteState) {
+            is QuoteUiState.Loading -> {
+                CircularProgressIndicator(
+                    color = MaterialTheme.colorScheme.primary
+                )
+            }
+            is QuoteUiState.Success -> {
+                QuoteCard(quote = quoteState.quote)
+            }
+            is QuoteUiState.Error -> {
+                // Don't show card
+            }
+        }
         if (lastPracticed != null) {
             val lastPracticedDate = lastPracticed.dictionaryLastPracticed?.let { date ->
                 DateTypeConverter().formatDate(date)
@@ -229,6 +245,82 @@ fun MemoriseCard(
                 }
             }
 
+        }
+    }
+}
+
+@Composable
+fun QuoteCard(quote: QuoteData.Quote) {
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(
+                horizontal = MaterialTheme.dimens.PaddingMedium,
+                vertical = MaterialTheme.dimens.PaddingSmall
+            )
+    ) {
+        Box(
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Image(
+                painter = painterResource(id = R.drawable.ic_vecteezy_abstract_gray_background),
+                contentDescription = "Placeholder card background",
+                modifier = Modifier
+                    .matchParentSize()
+                    .alpha(0.4f),
+                contentScale = ContentScale.FillBounds,
+                alignment = Alignment.BottomEnd
+            )
+
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(
+                        top = MaterialTheme.dimens.PaddingMedium,
+                        start = MaterialTheme.dimens.PaddingMedium,
+                        end = MaterialTheme.dimens.PaddingMedium,
+                        bottom = MaterialTheme.dimens.PaddingExtraLarge
+                    )
+            ) {
+                Text(
+                    text = stringResource(R.string.quote_title),
+                    modifier = Modifier
+                        .padding(
+                            top = MaterialTheme.dimens.PaddingMedium,
+                            bottom = MaterialTheme.dimens.PaddingSmall,
+                            start = MaterialTheme.dimens.PaddingMedium,
+                            end = MaterialTheme.dimens.PaddingMedium
+                        )
+                        .align(Alignment.Start),
+                    style = MaterialTheme.typography.titleMedium
+                )
+
+                Text(
+                    text = "\"${quote.quote}\"",
+                    modifier = Modifier
+                        .padding(
+                            top = MaterialTheme.dimens.PaddingSmall,
+                            bottom = MaterialTheme.dimens.PaddingMedium,
+                            start = MaterialTheme.dimens.PaddingMedium,
+                            end = MaterialTheme.dimens.PaddingMedium
+                        )
+                        .align(Alignment.CenterHorizontally),
+                    style = MaterialTheme.typography.bodyMedium
+                )
+                
+                Text(
+                    text = quote.author,
+                    modifier = Modifier
+                        .padding(
+                            top = MaterialTheme.dimens.PaddingSmall,
+                            bottom = MaterialTheme.dimens.PaddingMedium,
+                            start = MaterialTheme.dimens.PaddingMedium,
+                            end = MaterialTheme.dimens.PaddingMedium
+                        )
+                        .align(Alignment.End),
+                    style = MaterialTheme.typography.bodySmall
+                )
+            }
         }
     }
 }
@@ -532,6 +624,7 @@ fun HomePreview() {
         memoriseList = wordList,
         numOfDictionary = 1,
         isLoadingWords = true,
-        contentPadding = PaddingValues(0.dp)
+        contentPadding = PaddingValues(0.dp),
+        quoteState = QuoteUiState.Success(QuoteData.Quote(quote = "As with all matters of ht heart, the odds may not be in our favour but it is the only risk worth taking.", author = "Kaushik Ram", work = "Work"))
     )
 }

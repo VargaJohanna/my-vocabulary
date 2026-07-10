@@ -136,5 +136,6 @@
     <string name="most_practiced_placeholder">Once you’ve used a few dictionaries, your most-practiced ones will appear here.</string>
     <string name="memorise_label">Memorise:</string>
     <string name="memorise_placeholder">These are the words and expressions to review. Keep going — you’ve got this!</string>
+    <string name="quote_title">Quote of the day</string>
 
 </resources>

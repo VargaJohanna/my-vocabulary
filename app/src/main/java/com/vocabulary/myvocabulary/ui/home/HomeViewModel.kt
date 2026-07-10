@@ -31,8 +31,8 @@ class HomeViewModel(
     private val preferences: SharedPreferences,
     private val wordRepository: WordRepository
 ) : ViewModel() {
-    private val _liveQuote = MutableStateFlow<QuoteData>(QuoteData.EMPTY)
-    val liveQuote: StateFlow<QuoteData> = _liveQuote.asStateFlow()
+    private val _quoteUiState = MutableStateFlow<QuoteUiState>(QuoteUiState.Loading)
+    val quoteUiState: StateFlow<QuoteUiState> = _quoteUiState.asStateFlow()
     private val openedAppCounter: Int = preferences.getInt(COUNTER_KEY, 0)
     private val _lastPracticedDictionary = MutableStateFlow<Dictionary?>(
         Dictionary(
@@ -86,11 +86,15 @@ class HomeViewModel(
 
     private fun observeQuote() {
         viewModelScope.launch {
+            _quoteUiState.value = QuoteUiState.Loading
+
             quoteRepository.getQuote()
-                .catch { e -> _liveQuote.value = QuoteData.EMPTY
+                .catch { e ->
+                    _quoteUiState.value = QuoteUiState.Error(e.message ?: "Unknown error")
                 println("Quote Error: ${e.message}")}
-                .collect { _liveQuote.value = it
-                println("Quote: ${_liveQuote.value}")}
+                .collect {
+                    _quoteUiState.value = QuoteUiState.Success(it)
+                println("Quote: ${_quoteUiState.value}")}
         }
     }
 
@@ -158,4 +162,10 @@ class HomeViewModel(
     companion object {
         const val COUNTER_KEY = "COUNTER"
     }
+}
+
+sealed interface QuoteUiState {
+    object Loading: QuoteUiState
+    data class Success(val quote: QuoteData.Quote): QuoteUiState
+    data class Error(val message: String) : QuoteUiState
 }
