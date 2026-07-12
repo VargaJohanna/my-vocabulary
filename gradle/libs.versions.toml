@@ -52,6 +52,7 @@ assertj-core = "3.27.6"
 # Coroutine
 coroutines = "1.10.2"
 coroutines-rx2 = "1.9.0"
+animation = "1.11.4"
 
 
 [libraries]
@@ -129,6 +130,7 @@ espresso-contrib = { group = "androidx.test.espresso", name = "espresso-contrib"
 mockito-kotlin = { group = "com.nhaarman.mockitokotlin2", name = "mockito-kotlin", version.ref = "mockito-kotlin" }
 core-testing = { group = "androidx.arch.core", name = "core-testing", version.ref = "lifecycle" }
 assertj-core = { group = "org.assertj", name = "assertj-core", version.ref = "assertj-core" }
+androidx-compose-animation = { group = "androidx.compose.animation", name = "animation", version.ref = "animation" }
 
 [plugins]
 compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }

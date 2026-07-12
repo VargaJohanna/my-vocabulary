@@ -98,6 +98,13 @@ class HomeViewModel(
         }
     }
 
+    fun dismissQuote() {
+        val currentState = _quoteUiState.value
+        if(currentState is QuoteUiState.Success) {
+            _quoteUiState.value = currentState.copy(isVisible = false)
+        }
+    }
+
     fun saveCsvData(csv: Uri) {
         shareDictionaryRepository.storeCsvData(csv)
     }
@@ -166,6 +173,10 @@ class HomeViewModel(
 
 sealed interface QuoteUiState {
     object Loading: QuoteUiState
-    data class Success(val quote: QuoteData.Quote): QuoteUiState
+
+    data class Success(
+        val quote: QuoteData.Quote,
+        val isVisible: Boolean = true
+    ): QuoteUiState
     data class Error(val message: String) : QuoteUiState
 }

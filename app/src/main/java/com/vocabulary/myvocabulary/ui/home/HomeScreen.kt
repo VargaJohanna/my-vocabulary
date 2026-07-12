@@ -2,9 +2,11 @@ package com.vocabulary.myvocabulary.ui.home
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.expandHorizontally
+import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.shrinkHorizontally
+import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -18,9 +20,13 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.Card
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.VerticalDivider
@@ -77,7 +83,8 @@ fun HomeScreen(
             numOfDictionary = numOfDictionary,
             isLoadingWords = isLoadingWords,
             contentPadding = contentPadding,
-            quoteState = quoteState
+            quoteState = quoteState,
+            dismissQuote = homeViewModel::dismissQuote
         )
     }
 }
@@ -91,9 +98,10 @@ fun HomeScreenContent(
     numOfDictionary: Int,
     isLoadingWords: Boolean,
     contentPadding: PaddingValues,
-    quoteState: QuoteUiState
+    quoteState: QuoteUiState,
+    dismissQuote: () -> Unit
 ) {
-    Column (
+    Column(
         modifier = Modifier
             .fillMaxSize()
             .verticalScroll(rememberScrollState())
@@ -106,9 +114,20 @@ fun HomeScreenContent(
                     color = MaterialTheme.colorScheme.primary
                 )
             }
+
             is QuoteUiState.Success -> {
-                QuoteCard(quote = quoteState.quote)
+                AnimatedVisibility(
+                    visible = quoteState.isVisible,
+                    enter = expandVertically(),
+                    exit = shrinkVertically()
+                ) {
+                    QuoteCard(
+                        quote = quoteState.quote,
+                        onCloseClick = { dismissQuote() }
+                    )
+                }
             }
+
             is QuoteUiState.Error -> {
                 // Don't show card
             }
@@ -250,7 +269,10 @@ fun MemoriseCard(
 }
 
 @Composable
-fun QuoteCard(quote: QuoteData.Quote) {
+fun QuoteCard(
+    quote: QuoteData.Quote,
+    onCloseClick: () -> Unit
+) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -271,6 +293,17 @@ fun QuoteCard(quote: QuoteData.Quote) {
                 contentScale = ContentScale.FillBounds,
                 alignment = Alignment.BottomEnd
             )
+
+            IconButton(
+                onClick = { onCloseClick() },
+                modifier = Modifier
+                    .align(Alignment.TopEnd)
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Close,
+                    contentDescription = "Close quote icon",
+                )
+            }
 
             Column(
                 modifier = Modifier
@@ -307,7 +340,7 @@ fun QuoteCard(quote: QuoteData.Quote) {
                         .align(Alignment.CenterHorizontally),
                     style = MaterialTheme.typography.bodyMedium
                 )
-                
+
                 Text(
                     text = quote.author,
                     modifier = Modifier
@@ -625,6 +658,13 @@ fun HomePreview() {
         numOfDictionary = 1,
         isLoadingWords = true,
         contentPadding = PaddingValues(0.dp),
-        quoteState = QuoteUiState.Success(QuoteData.Quote(quote = "As with all matters of ht heart, the odds may not be in our favour but it is the only risk worth taking.", author = "Kaushik Ram", work = "Work"))
+        quoteState = QuoteUiState.Success(
+            QuoteData.Quote(
+                quote = "As with all matters of ht heart, the odds may not be in our favour but it is the only risk worth taking.",
+                author = "Kaushik Ram",
+                work = "Work"
+            ),
+        ),
+        dismissQuote = {}
     )
 }
