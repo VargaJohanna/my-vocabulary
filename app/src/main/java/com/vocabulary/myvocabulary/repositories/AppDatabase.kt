@@ -10,6 +10,8 @@ import androidx.sqlite.db.SupportSQLiteDatabase
 import com.vocabulary.myvocabulary.R
 import com.vocabulary.myvocabulary.repositories.dictionary.DictionaryDao
 import com.vocabulary.myvocabulary.repositories.dictionary.DictionaryEntry
+import com.vocabulary.myvocabulary.repositories.quotes.QuoteDao
+import com.vocabulary.myvocabulary.repositories.quotes.QuoteEntry
 import com.vocabulary.myvocabulary.repositories.word.WordDao
 import com.vocabulary.myvocabulary.repositories.word.WordEntry
 import com.vocabulary.myvocabulary.ui.dictionaries.Dictionary
@@ -19,11 +21,12 @@ import com.vocabulary.myvocabulary.ui.words.toWordEntry
 import com.vocabulary.myvocabulary.utils.DateTypeConverter
 import java.util.*
 
-@Database(entities = [DictionaryEntry::class, WordEntry::class], version = 7, exportSchema = true)
+@Database(entities = [DictionaryEntry::class, WordEntry::class, QuoteEntry::class], version = 8, exportSchema = true)
 @TypeConverters(DateTypeConverter::class)
 abstract class AppDatabase : RoomDatabase() {
     abstract fun dictionaryDao(): DictionaryDao
     abstract fun wordDao(): WordDao
+    abstract fun quoteDao(): QuoteDao
 
     companion object {
         // Only support the real-world production path: 4 -> 7
@@ -34,6 +37,20 @@ abstract class AppDatabase : RoomDatabase() {
                 db.execSQL("ALTER TABLE dictionaries ADD COLUMN dictionary_last_practiced INTEGER")
                 db.execSQL("ALTER TABLE dictionaries ADD COLUMN dictionary_last_result INTEGER")
                 db.execSQL("ALTER TABLE dictionaries ADD COLUMN dictionary_finished_count INTEGER NOT NULL DEFAULT 0")
+            }
+        }
+
+        // NEW: Create the quotes table
+        val MIGRATION_7_8 = object : Migration(7, 8) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL("""
+                    CREATE TABLE IF NOT EXISTS `quotes` (
+                        `id` INTEGER PRIMARY KEY NOT NULL, 
+                        `quote` TEXT NOT NULL, 
+                        `author` TEXT NOT NULL, 
+                        `work` TEXT NOT NULL
+                    )
+                """.trimIndent())
             }
         }
 
@@ -50,7 +67,7 @@ abstract class AppDatabase : RoomDatabase() {
                 context.applicationContext,
                 AppDatabase::class.java, "appdatabase.db"
             )
-                .addMigrations(MIGRATION_4_7)
+                .addMigrations(MIGRATION_4_7, MIGRATION_7_8)
                 .addCallback(object : Callback() {
                     override fun onCreate(db: SupportSQLiteDatabase) {
                         super.onCreate(db)

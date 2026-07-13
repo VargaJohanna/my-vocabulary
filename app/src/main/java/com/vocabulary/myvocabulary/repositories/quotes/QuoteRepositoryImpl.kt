@@ -12,10 +12,12 @@ class QuoteRepositoryImpl(
 ) : QuoteRepository {
 
     override fun getQuote(): Flow<QuoteData.Quote> = flow<QuoteData.Quote> {
+        var localQuoteFound = false
         try {
             val local = localQuoteRepository.getQuote()
             local?.let {
                 emit(it)
+                localQuoteFound = true
             }
         } catch (e: Exception) {
             println("Local fetch failed: ${e.message}")
@@ -26,7 +28,11 @@ class QuoteRepositoryImpl(
             localQuoteRepository.saveQuote(network)
             emit(network)
         } catch (e: Exception) {
-            throw e
+            if(!localQuoteFound) {
+                throw e
+            } else {
+                println("Network update failed, keeping cached quote: ${e.message}")
+            }
         }
     }.flowOn(Dispatchers.IO)
 }

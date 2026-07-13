@@ -50,6 +50,7 @@ val repositoryModule = module {
     single { AppDatabase.getInstance(get()) }
     single { get<AppDatabase>().dictionaryDao() }
     single { get<AppDatabase>().wordDao() }
+    single { get<AppDatabase>().quoteDao() }
     single<DictionaryRepository> { DictionaryRepositoryImpl(get(), get()) }
     single<WordRepository> { WordRepositoryImpl(get()) }
     single<QuizRepository> { QuizRepositoryImpl(get(), get()) }
@@ -64,7 +65,7 @@ val repositoryModule = module {
     }
     single<SortedListRepository> { SortedListRepositoryImpl(get(), get(), get(), get()) }
     single<GuessedWordRepository> { GuessedWordRepositoryImpl() }
-    single<LocalQuoteRepository> { LocalQuoteRepositoryImpl() }
+    single<LocalQuoteRepository> { LocalQuoteRepositoryImpl(get()) }
     single<NetworkQuoteRepository> { NetworkQuoteRepositoryImpl(get()) }
     single<QuoteRepository> { QuoteRepositoryImpl(get(), get()) }
     single { PreferenceManager.getDefaultSharedPreferences(get()) }
