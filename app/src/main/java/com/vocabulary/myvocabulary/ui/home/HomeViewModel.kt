@@ -87,21 +87,28 @@ class HomeViewModel(
     private fun observeQuote() {
         viewModelScope.launch {
             _quoteUiState.value = QuoteUiState.Loading
+            val today = Calendar.getInstance().get(Calendar.DAY_OF_YEAR)
+            val lastDismissal = preferences.getInt(IS_QUOTE_DISMISSED_FOR_TODAY, -1)
 
             quoteRepository.getQuote()
                 .catch { e ->
                     _quoteUiState.value = QuoteUiState.Error(e.message ?: "Unknown error")
                 println("Quote Error: ${e.message}")}
                 .collect {
-                    _quoteUiState.value = QuoteUiState.Success(it)
+                    _quoteUiState.value = QuoteUiState.Success(it, today != lastDismissal)
                 println("Quote: ${_quoteUiState.value}")}
         }
     }
 
     fun dismissQuote() {
         val currentState = _quoteUiState.value
+        val currentDay = Calendar.getInstance().get(Calendar.DAY_OF_YEAR)
         if(currentState is QuoteUiState.Success) {
             _quoteUiState.value = currentState.copy(isVisible = false)
+            preferences.edit().apply {
+                putInt(IS_QUOTE_DISMISSED_FOR_TODAY, currentDay)
+                apply()
+            }
         }
     }
 
@@ -168,6 +175,8 @@ class HomeViewModel(
 
     companion object {
         const val COUNTER_KEY = "COUNTER"
+
+        const val IS_QUOTE_DISMISSED_FOR_TODAY = "IS_QUOTE_DISMISSED_FOR_TODAY"
     }
 }
 
