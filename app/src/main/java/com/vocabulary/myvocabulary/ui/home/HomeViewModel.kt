@@ -2,6 +2,10 @@ package com.vocabulary.myvocabulary.ui.home
 
 import android.content.SharedPreferences
 import android.net.Uri
+import androidx.datastore.core.DataStore
+import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.core.booleanPreferencesKey
+import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.vocabulary.myvocabulary.quotes.QuoteData
@@ -12,13 +16,16 @@ import com.vocabulary.myvocabulary.repositories.word.WordRepository
 import com.vocabulary.myvocabulary.ui.dictionaries.Dictionary
 import com.vocabulary.myvocabulary.ui.words.Word
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.rx2.asFlow
@@ -29,6 +36,7 @@ class HomeViewModel(
     private val shareDictionaryRepository: ShareDictionaryRepository,
     private val dictionaryRepository: DictionaryRepository,
     private val preferences: SharedPreferences,
+    private val dataStore: DataStore<Preferences>,
     private val wordRepository: WordRepository
 ) : ViewModel() {
     private val _quoteUiState = MutableStateFlow<QuoteUiState>(QuoteUiState.Loading)
@@ -88,7 +96,7 @@ class HomeViewModel(
         viewModelScope.launch {
             _quoteUiState.value = QuoteUiState.Loading
             val today = Calendar.getInstance().get(Calendar.DAY_OF_YEAR)
-            val lastDismissal = preferences.getInt(IS_QUOTE_DISMISSED_FOR_TODAY, -1)
+            val lastDismissal = quoteDismissalFlow().first()
 
             quoteRepository.getQuote()
                 .catch { e ->
@@ -100,14 +108,21 @@ class HomeViewModel(
         }
     }
 
+    fun quoteDismissalFlow(): Flow<Int> = dataStore.data.map { pref ->
+        pref[Keys.IS_QUOTE_DISMISSED_FOR_TODAY] ?: 0
+    }
+
     fun dismissQuote() {
         val currentState = _quoteUiState.value
         val currentDay = Calendar.getInstance().get(Calendar.DAY_OF_YEAR)
         if(currentState is QuoteUiState.Success) {
             _quoteUiState.value = currentState.copy(isVisible = false)
-            preferences.edit().apply {
-                putInt(IS_QUOTE_DISMISSED_FOR_TODAY, currentDay)
-                apply()
+            viewModelScope.launch {
+                dataStore.updateData {
+                    it.toMutablePreferences().also { pref ->
+                        pref[Keys.IS_QUOTE_DISMISSED_FOR_TODAY] = currentDay
+                    }
+                }
             }
         }
     }
@@ -175,9 +190,11 @@ class HomeViewModel(
 
     companion object {
         const val COUNTER_KEY = "COUNTER"
-
-        const val IS_QUOTE_DISMISSED_FOR_TODAY = "IS_QUOTE_DISMISSED_FOR_TODAY"
     }
+}
+
+private object Keys {
+    val IS_QUOTE_DISMISSED_FOR_TODAY = intPreferencesKey("IS_QUOTE_DISMISSED_FOR_TODAY")
 }
 
 sealed interface QuoteUiState {

@@ -5,6 +5,6 @@ import retrofit2.http.GET
 
 interface QuoteService {
 
-    @GET("quoteoftheday?category=happiness&categories=truth%2Cwisdom")
+    @GET("quoteoftheday?category=happiness")
     suspend fun getData(): List<QuoteData.Quote>
 }

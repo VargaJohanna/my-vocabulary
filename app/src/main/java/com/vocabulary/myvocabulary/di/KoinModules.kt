@@ -1,6 +1,9 @@
 package com.vocabulary.myvocabulary.di
 
+import android.content.Context
 import android.preference.PreferenceManager
+import androidx.datastore.preferences.core.PreferenceDataStoreFactory
+import androidx.datastore.preferences.preferencesDataStoreFile
 import com.f2prateek.rx.preferences2.RxSharedPreferences
 import com.vocabulary.myvocabulary.BuildConfig
 import com.vocabulary.myvocabulary.Constants
@@ -51,6 +54,11 @@ val repositoryModule = module {
     single { get<AppDatabase>().dictionaryDao() }
     single { get<AppDatabase>().wordDao() }
     single { get<AppDatabase>().quoteDao() }
+    single {
+        PreferenceDataStoreFactory.create(
+            produceFile = { get<Context>().preferencesDataStoreFile("settings") }
+        )
+    }
     single<DictionaryRepository> { DictionaryRepositoryImpl(get(), get()) }
     single<WordRepository> { WordRepositoryImpl(get()) }
     single<QuizRepository> { QuizRepositoryImpl(get(), get()) }
@@ -103,14 +111,15 @@ val viewModelModule = module {
     viewModel { (dictionaryId: Long) -> WordListViewModel(dictionaryId, get(), get(), get(), get(), get(), get()) }
     viewModel { (dictionaryId: Long, optionType: Int, failedOnly: Boolean) ->
         QuizViewModel(
-                dictionaryId,
-                failedOnly,
-                get(),
-                get(),)
+            dictionaryId,
+            failedOnly,
+            get(),
+            get(),
+        )
     }
     viewModel { (dictionaryId: Long, quizDirection: Int) -> ResultViewModel(dictionaryId, quizDirection, get(), get(), get(), get(), get()) }
     viewModel { (wordId: Long) -> WordDetailsViewModel(get(), get()) }
-    viewModel { HomeViewModel(get(), get(), get(), get(), get()) }
+    viewModel { HomeViewModel(get(), get(), get(), get(), get(), get()) }
     viewModel { ShareDictionaryViewModel(get(), get(), get()) }
     viewModel { QuizListViewModel(get()) }
 }

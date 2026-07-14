@@ -11,7 +11,7 @@ class QuoteRepositoryImpl(
     private val localQuoteRepository: LocalQuoteRepository
 ) : QuoteRepository {
 
-    override fun getQuote(): Flow<QuoteData.Quote> = flow<QuoteData.Quote> {
+    override fun getQuote(): Flow<QuoteData.Quote> = flow {
         var localQuoteFound = false
         try {
             val local = localQuoteRepository.getQuote()
