@@ -87,6 +87,47 @@ class MigrationTest {
         v4Db.close()
     }
 
+    private fun createV7Database(dbName: String) {    val context = InstrumentationRegistry.getInstrumentation().targetContext
+        context.deleteDatabase(dbName)
+        val dbPath = context.getDatabasePath(dbName).path
+        val v7Db = SQLiteDatabase.openOrCreateDatabase(dbPath, null)
+
+        // 1. Create Dictionaries (v7 Schema)
+        v7Db.execSQL("""
+        CREATE TABLE IF NOT EXISTS dictionaries (
+            dictionary_id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, 
+            dictionary_name TEXT NOT NULL, 
+            dictionary_created INTEGER NOT NULL,
+            dictionary_last_practiced INTEGER,
+            dictionary_last_result INTEGER,
+            dictionary_finished_count INTEGER NOT NULL DEFAULT 0,
+            dictionary_total_score INTEGER NOT NULL DEFAULT 0
+        )
+    """.trimIndent())
+
+        // 2. Create Words (v7 Schema - must match WordEntry exactly)
+        v7Db.execSQL("""
+        CREATE TABLE IF NOT EXISTS words (
+            word_id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+            container_dictionary_id INTEGER NOT NULL,
+            word TEXT NOT NULL,
+            translation TEXT NOT NULL,
+            been_asked INTEGER NOT NULL,
+            failed INTEGER NOT NULL,
+            passed INTEGER NOT NULL,
+            created INTEGER NOT NULL,
+            last_result INTEGER NOT NULL,
+            last_guess TEXT NOT NULL,
+            FOREIGN KEY(container_dictionary_id) REFERENCES dictionaries(dictionary_id) ON UPDATE NO ACTION ON DELETE CASCADE
+        )
+    """.trimIndent())
+
+        v7Db.execSQL("CREATE INDEX IF NOT EXISTS index_words_container_dictionary_id ON words(container_dictionary_id)")
+
+        v7Db.execSQL("PRAGMA user_version = 7")
+        v7Db.close()
+    }
+
     /**
      * Validate the real-world production path: schema version 4 -> 7 for dictionaries.
      */
@@ -107,7 +148,7 @@ class MigrationTest {
             AppDatabase::class.java,
             TEST_DB
         )
-            .addMigrations(AppDatabase.MIGRATION_4_7)
+            .addMigrations(AppDatabase.MIGRATION_4_7, AppDatabase.MIGRATION_7_8)
             .allowMainThreadQueries()
             .build()
 
@@ -144,7 +185,7 @@ class MigrationTest {
             AppDatabase::class.java,
             TEST_DB
         )
-            .addMigrations(AppDatabase.MIGRATION_4_7)
+            .addMigrations(AppDatabase.MIGRATION_4_7, AppDatabase.MIGRATION_7_8)
             .allowMainThreadQueries()
             .build()
 
@@ -160,6 +201,25 @@ class MigrationTest {
         assert(cursor.getInt(cursor.getColumnIndex("passed")) == 1)
         assert(cursor.getInt(cursor.getColumnIndex("last_result")) == 100)
         assert(cursor.getString(cursor.getColumnIndex("last_guess")) == "novus")
+
+        cursor.close()
+        db.close()
+    }
+
+    @Test
+    @Throws(IOException::class)
+    fun migrate7to8_createQuotesTable() {
+        createV7Database(TEST_DB)
+
+        val context = InstrumentationRegistry.getInstrumentation().targetContext
+        val db = Room.databaseBuilder(context, AppDatabase::class.java, TEST_DB)
+            .addMigrations(AppDatabase.MIGRATION_7_8)
+            .allowMainThreadQueries()
+            .build()
+
+        val cursor = db.openHelper.readableDatabase. query("SELECT name FROM sqlite_master WHERE type='table' AND name='quotes'")
+        assert(cursor.moveToFirst())
+        assert(cursor.getString(0) == "quotes")
 
         cursor.close()
         db.close()
