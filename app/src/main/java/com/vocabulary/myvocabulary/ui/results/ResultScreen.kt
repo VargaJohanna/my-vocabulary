@@ -16,8 +16,10 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ChangeCircle
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Done
+import androidx.compose.material.icons.filled.Error
 import androidx.compose.material.icons.filled.Replay
 import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
@@ -37,9 +39,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -379,7 +379,7 @@ fun FabMenu(
             text = { Text(stringResource(R.string.result_start_over_label)) },
             icon = {
                 Icon(
-                    imageVector = ImageVector.vectorResource(id = R.drawable.ic_refresh_icon),
+                    imageVector = Icons.Default.ChangeCircle,
                     contentDescription = stringResource(R.string.result_start_over_label)
                 )
             }
@@ -395,7 +395,7 @@ fun FabMenu(
                 text = { Text(stringResource(R.string.result_failed_ones_only_label)) },
                 icon = {
                     Icon(
-                        imageVector = ImageVector.vectorResource(id = R.drawable.ic_failed_only),
+                        imageVector = Icons.Default.Error,
                         contentDescription = stringResource(R.string.result_failed_ones_only_label)
                     )
                 }
