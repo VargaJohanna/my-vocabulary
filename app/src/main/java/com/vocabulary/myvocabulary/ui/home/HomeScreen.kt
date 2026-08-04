@@ -146,7 +146,7 @@ fun HomeScreenContent(
             )
         } else {
             PlaceholderCard(
-                title = stringResource(R.string.last_practiced_label),
+                title = stringResource(R.string.last_practiced_placeholder_title),
                 body = stringResource(R.string.last_practiced_placeholder),
             )
         }
@@ -165,7 +165,7 @@ fun HomeScreenContent(
             )
         } else {
             PlaceholderCard(
-                title = stringResource(R.string.most_practiced_label),
+                title = stringResource(R.string.most_practiced_placeholder_title),
                 body = stringResource(R.string.most_practiced_placeholder),
             )
         }
