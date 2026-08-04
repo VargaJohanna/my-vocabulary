@@ -137,6 +137,7 @@
     <string name="memorise_label">Memorizálandó</string>
     <string name="memorise_placeholder">tt találod azokat a szavakat és kifejezéseket, amelyeket érdemes újra átnézned. Menni fog!</string>
     <string name="quote_title">Napi idézet</string>
+    <string name="snack_bar_error">Hiba történt a szavak betöltése közben.</string>
 
 
 </resources>

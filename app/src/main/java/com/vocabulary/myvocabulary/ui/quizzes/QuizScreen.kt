@@ -32,11 +32,9 @@ import androidx.compose.material3.TextField
 import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -44,11 +42,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
-import androidx.compose.ui.geometry.isEmpty
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.vocabulary.myvocabulary.R
 import com.vocabulary.myvocabulary.ui.results.ResultViewModel
 import com.vocabulary.myvocabulary.ui.theme.dimens
@@ -82,9 +80,11 @@ fun QuizScreen(
         quizViewModel.startQuiz(quizType.toQuizType(), dictionaryId)
     }
 
-    val quizList by quizViewModel.quizList.collectAsState()
-    val snackbarMessage = stringResource(R.string.empty_list_snackbar)
-    val isLoading by quizViewModel.isLoading.collectAsState()
+    val quizState by quizViewModel.quizUiState.collectAsStateWithLifecycle()
+//    val quizList by quizViewModel.quizList.collectAsState()
+    val snackBarMessage = stringResource(R.string.empty_list_snackbar)
+    val snackBarErrorMessage = stringResource(R.string.snack_bar_error)
+    val isLoading by quizViewModel.isLoading.collectAsStateWithLifecycle()
 
     val handleExit = {
         resultViewModel.resetGuessedWordCollections()
@@ -96,6 +96,53 @@ fun QuizScreen(
         snackbarHost = { SnackbarHost(hostState = snackbarHostState) }
     ) { padding ->
         Box(modifier = Modifier.padding(padding)) {
+
+            when(val state = quizState) {
+                is QuizUiState.Loading -> {
+                    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                        CircularProgressIndicator()
+                    }
+                }
+
+                is QuizUiState.SuccessList -> {
+                    QuizScreenContent(
+                        direction =  direction,
+                        onGuessSaved = { id, guess ->
+                            resultViewModel.latestGuess(lastGuess = GuessedWord(id, guess))
+                        },
+                        onListFinished = {
+                            onQuizFinished(dictionaryId, direction, quizType)
+                        },
+                        onUpdateFab = onUpdateFab,
+                        state = state,
+                        onNextClicked = {
+                            quizViewModel.onNextClicked()
+                        }
+                    )
+                }
+
+                is QuizUiState.EmptyList -> {
+                    LaunchedEffect(Unit) {
+                        snackbarHostState.showSnackbar(
+                            message = snackBarMessage,
+                            duration = SnackbarDuration.Short
+                        )
+                        handleExit()
+                        onExit()
+                    }
+                }
+
+                is QuizUiState.Error -> {
+                    LaunchedEffect(Unit) {
+                        snackbarHostState.showSnackbar(
+                            message = snackBarErrorMessage,
+                            duration = SnackbarDuration.Short
+                        )
+                        handleExit()
+                        onExit()
+                    }
+                }
+            }
             if(isLoading) {
                 Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                     CircularProgressIndicator()
@@ -110,12 +157,13 @@ fun QuizScreen(
                     onListFinished = {
                         onQuizFinished(dictionaryId, direction, quizType)
                     },
-                    onUpdateFab = onUpdateFab
+                    onUpdateFab = onUpdateFab,
+                    quizState = quizState
                 )
             } else {
                 LaunchedEffect(Unit) {
                     snackbarHostState.showSnackbar(
-                        message = snackbarMessage,
+                        message = snackBarMessage,
                         duration = SnackbarDuration.Short
                     )
                     handleExit()
@@ -141,13 +189,14 @@ fun QuizScreen(
 @Composable
 fun QuizScreenContent(
     direction: Int,
-    quizList: List<Word>,
     onGuessSaved: (Long, String) -> Unit,
     onListFinished: () -> Unit,
     onUpdateFab: (@Composable () -> Unit) -> Unit,
+    state: QuizUiState.SuccessList,
+    onNextClicked: () -> Unit,
 ) {
     //rollingIndex: looping through the quizList so the cards can be shown one by one
-    var rollingIndex by rememberSaveable { mutableStateOf(1) }
+//    var rollingIndex by rememberSaveable { mutableStateOf(1) }
     //guessContent: the given answer by the user
     var guessContent by rememberSaveable { mutableStateOf("") }
     //isFabIconNext: a boolean to know if the FAB should be a next icon or a tick icon.
@@ -160,9 +209,9 @@ fun QuizScreenContent(
 
     val listState = rememberLazyListState()
 
-    LaunchedEffect(rollingIndex) {
-        if (rollingIndex > 1) {
-            listState.animateScrollToItem(rollingIndex - 1)
+    LaunchedEffect(state.rollingIndex) {
+        if (state.rollingIndex > 1) {
+            listState.animateScrollToItem(state.rollingIndex - 1)
         }
     }
 
@@ -189,54 +238,52 @@ fun QuizScreenContent(
             verticalArrangement = Arrangement.spacedBy((-80).dp),
             contentPadding = PaddingValues(bottom = 100.dp)
         ) {
-            if (quizList.isNotEmpty()) {
-                val currentFocusedId = quizList.getOrNull(rollingIndex - 1)?.wordId ?: 0L
-                items(
-                    count = rollingIndex,
-                    key = { index -> quizList.getOrNull(index)?.wordId ?: "fallback_$index" }
-                ) { index ->
-                    val word = quizList.getOrNull(index)
-                    if (word != null) {
-                        val isThisCardActive = word.wordId == currentFocusedId
-                        FocusCard(
-                            modifier = Modifier
-                                .fillMaxWidth(),
-                            word = word,
-                            isActive = isThisCardActive,
-                            editTextContent = {
-                                if (isThisCardActive) {
-                                    guessContent = it
-                                    focusedWordId = word.wordId
-                                }
-                            },
-                            askTranslation = direction.toDirectionType() == QuizDirectionType.AskTranslation
-                        )
-                    }
-                }
-                item {
-                    androidx.compose.foundation.layout.Spacer(
-                        modifier = Modifier.height(300.dp)
+            val currentFocusedId = state.quizList.getOrNull(state.rollingIndex - 1)?.wordId ?: 0L
+            items(
+                count = state.rollingIndex,
+                key = { index -> state.quizList.getOrNull(index)?.wordId ?: "fallback_$index" }
+            ) { index ->
+                val word = state.quizList.getOrNull(index)
+                if (word != null) {
+                    val isThisCardActive = word.wordId == currentFocusedId
+                    FocusCard(
+                        modifier = Modifier
+                            .fillMaxWidth(),
+                        word = word,
+                        isActive = isThisCardActive,
+                        editTextContent = {
+                            if (isThisCardActive) {
+                                guessContent = it
+                                focusedWordId = word.wordId
+                            }
+                        },
+                        askTranslation = direction.toDirectionType() == QuizDirectionType.AskTranslation
                     )
                 }
+            }
+            item {
+                androidx.compose.foundation.layout.Spacer(
+                    modifier = Modifier.height(300.dp)
+                )
             }
         }
     }
 
     //When the last word is in focus then the FAB must be a tick icon.
-    if (rollingIndex == quizList.size) {
+    //TODO: This logic should be in Viewmodel
+    if (state.rollingIndex == state.quizList.size) {
         isFabIconNext = false
     }
 
-    if (nextClicked) {
+    if (state.isNextClicked) {
         nextClicked = false
+        onGuessSaved(focusedWordId, guessContent)
 
         if (rollingIndex < quizList.size) {
             rollingIndex++
             isFabIconNext = true
-            onGuessSaved(focusedWordId, guessContent)
             guessContent = ""
         } else {
-            onGuessSaved(focusedWordId, guessContent)
             onListFinished()
         }
     }
@@ -348,6 +395,7 @@ fun QuizScreenPreview() {
         quizList = previewWords,
         onGuessSaved = { _, _ -> },
         onListFinished = { },
-        onUpdateFab = { }
+        onUpdateFab = { },
+        quizState = QuizViewModel.QuizUiState.Loading
     )
 }
