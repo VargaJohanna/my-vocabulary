@@ -1,6 +1,5 @@
 package com.vocabulary.myvocabulary.ui.quizzes
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.vocabulary.myvocabulary.ext.plusAssign
@@ -11,6 +10,7 @@ import io.reactivex.disposables.CompositeDisposable
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 class QuizViewModel(
@@ -52,44 +52,63 @@ class QuizViewModel(
                 { list ->
                     isDictionaryEmpty = list.isEmpty()
                     if (list.isNotEmpty()) {
-                        val filteredList = list.filter { word ->
+                        val filteredShuffledList = list.filter { word ->
                             val isValid = word.word.isNotBlank() && word.translation.isNotBlank()
                             val matchesCriteria = if (failedOnly) !word.lastResult else true
                             isValid && matchesCriteria
                         }.shuffled()
-                        _quizUiState.value = QuizUiState.SuccessList(
-                            quizList = filteredList.shuffled(),
-                        )
-//                        _quizList.value = filteredList.shuffled()
+
+                        if (filteredShuffledList.isNotEmpty()) {
+                            _quizUiState.value = QuizUiState.SuccessList(
+                                quizList = filteredShuffledList,
+                                currentFocusedWordId = filteredShuffledList.first().wordId
+                            )
+                        } else {
+                            _quizUiState.value = QuizUiState.EmptyList
+                        }
                     } else {
-//                        _quizList.value = emptyList()
                         _quizUiState.value = QuizUiState.EmptyList
                     }
-//                    _isLoading.value = false
                 },
                 { error ->
-//                    Log.e("QuizViewModel", "Error fetching quiz list", error)
                     _quizUiState.value =
                         QuizUiState.Error(error.message ?: "Error fetching quiz list")
-//                    _isLoading.value = false
                 }
             )
     }
 
     fun onNextClicked() {
-        val currentState = _quizUiState.value
-        if (currentState is QuizUiState.SuccessList) {
-            val updateState = currentState.copy(
-                isNextClicked = true,
-                rollingIndex = currentState.rollingIndex + 1,
-                isCardActive = false,
-                isFabIconNext = currentState.quizList.size == currentState.rollingIndex + 1
-            )
+        _quizUiState.update { currentState ->
+            if (currentState is QuizUiState.SuccessList) {
+                val nextIndex = currentState.rollingIndex + 1
+                val hasMoreWords = nextIndex < currentState.quizList.size
+
+                val incrementedState = currentState.copy(
+                    rollingIndex = nextIndex,
+                    isFabIconNext = hasMoreWords,
+                    currentGuess = "",
+                )
+                updateFocusedWord(incrementedState)
+            } else {
+                currentState
+            }
         }
     }
 
+    fun onGuessChanged(guess: String) {
+        _quizUiState.update { currentState ->
+            if (currentState is QuizUiState.SuccessList) {
+                currentState.copy(currentGuess = guess)
+            } else currentState
+        }
+    }
+
+    private fun updateFocusedWord(state: QuizUiState.SuccessList): QuizUiState.SuccessList {
+        val wordId = state.quizList.getOrNull(state.rollingIndex - 1)?.wordId ?: 0L
+        return state.copy(currentFocusedWordId = wordId)
+    }
+
     public override fun onCleared() {
-//        _quizList.value = emptyList()
         _quizUiState.value = QuizUiState.SuccessList(
             quizList = emptyList()
         )
@@ -97,18 +116,16 @@ class QuizViewModel(
         super.onCleared()
     }
 }
+
 sealed interface QuizUiState {
     object Loading : QuizUiState
     object EmptyList : QuizUiState
     data class SuccessList(
         val quizList: List<Word>,
-        val isCardActive: Boolean = true,
-        val isCardLast: Boolean = false,
         val rollingIndex: Int = 1,
-        val guessContent: String = "",
+        val currentGuess: String = "",
         val isFabIconNext: Boolean = true,
-        val isNextClicked: Boolean = false,
-        val focusedWordId: Long = 0L
+        val currentFocusedWordId: Long = 0L,
     ) : QuizUiState
 
     data class Error(val message: String) : QuizUiState

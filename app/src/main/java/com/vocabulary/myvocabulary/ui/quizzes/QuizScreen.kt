@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -33,10 +34,8 @@ import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
@@ -81,10 +80,8 @@ fun QuizScreen(
     }
 
     val quizState by quizViewModel.quizUiState.collectAsStateWithLifecycle()
-//    val quizList by quizViewModel.quizList.collectAsState()
     val snackBarMessage = stringResource(R.string.empty_list_snackbar)
     val snackBarErrorMessage = stringResource(R.string.snack_bar_error)
-    val isLoading by quizViewModel.isLoading.collectAsStateWithLifecycle()
 
     val handleExit = {
         resultViewModel.resetGuessedWordCollections()
@@ -97,7 +94,7 @@ fun QuizScreen(
     ) { padding ->
         Box(modifier = Modifier.padding(padding)) {
 
-            when(val state = quizState) {
+            when (val state = quizState) {
                 is QuizUiState.Loading -> {
                     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                         CircularProgressIndicator()
@@ -106,7 +103,7 @@ fun QuizScreen(
 
                 is QuizUiState.SuccessList -> {
                     QuizScreenContent(
-                        direction =  direction,
+                        direction = direction,
                         onGuessSaved = { id, guess ->
                             resultViewModel.latestGuess(lastGuess = GuessedWord(id, guess))
                         },
@@ -117,7 +114,8 @@ fun QuizScreen(
                         state = state,
                         onNextClicked = {
                             quizViewModel.onNextClicked()
-                        }
+                        },
+                        onGuessChanged = { guess -> quizViewModel.onGuessChanged(guess) }
                     )
                 }
 
@@ -141,33 +139,6 @@ fun QuizScreen(
                         handleExit()
                         onExit()
                     }
-                }
-            }
-            if(isLoading) {
-                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                    CircularProgressIndicator()
-                }
-            } else if(quizList.isNotEmpty()) {
-                QuizScreenContent(
-                    direction =  direction,
-                    quizList = quizList,
-                    onGuessSaved = { id, guess ->
-                        resultViewModel.latestGuess(lastGuess = GuessedWord(id, guess))
-                    },
-                    onListFinished = {
-                        onQuizFinished(dictionaryId, direction, quizType)
-                    },
-                    onUpdateFab = onUpdateFab,
-                    quizState = quizState
-                )
-            } else {
-                LaunchedEffect(Unit) {
-                    snackbarHostState.showSnackbar(
-                        message = snackBarMessage,
-                        duration = SnackbarDuration.Short
-                    )
-                    handleExit()
-                    onExit()
                 }
             }
         }
@@ -194,39 +165,38 @@ fun QuizScreenContent(
     onUpdateFab: (@Composable () -> Unit) -> Unit,
     state: QuizUiState.SuccessList,
     onNextClicked: () -> Unit,
+    onGuessChanged: (String) -> Unit,
 ) {
-    //rollingIndex: looping through the quizList so the cards can be shown one by one
-//    var rollingIndex by rememberSaveable { mutableStateOf(1) }
-    //guessContent: the given answer by the user
-    var guessContent by rememberSaveable { mutableStateOf("") }
-    //isFabIconNext: a boolean to know if the FAB should be a next icon or a tick icon.
-    // When the list is finished, then the FAB should be a tick icon
-    var isFabIconNext by rememberSaveable { mutableStateOf(true) }
-    //nextClicked: a boolean to know if the next button was clicked
-    var nextClicked by rememberSaveable { mutableStateOf(false) }
-    //focusedWordId: the id of the word that is actually in focus
-    var focusedWordId by rememberSaveable { mutableStateOf(0L) }
-
     val listState = rememberLazyListState()
 
     LaunchedEffect(state.rollingIndex) {
-        if (state.rollingIndex > 1) {
+        if (state.rollingIndex > 0) {
             listState.animateScrollToItem(state.rollingIndex - 1)
         }
+
     }
 
-    LaunchedEffect(isFabIconNext) {
+    LaunchedEffect(state) {
         onUpdateFab {
             FabMenu(
-                onNextClicked = { nextClicked = true },
+                onNextClicked = {
+                    val guessToSave = state.currentGuess.trim()
+                    val idToSave = state.currentFocusedWordId
+                    onGuessSaved(idToSave, guessToSave)
+
+                    if(state.isFabIconNext) {
+                        onNextClicked()
+                    } else {
+                        onListFinished()
+                    }
+                },
                 iconToDisplay = {
-                    if (isFabIconNext) Icons.AutoMirrored.Filled.ArrowForward
+                    if (state.isFabIconNext) Icons.AutoMirrored.Filled.ArrowForward
                     else Icons.Default.Check
                 }
             )
         }
     }
-
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -238,23 +208,23 @@ fun QuizScreenContent(
             verticalArrangement = Arrangement.spacedBy((-80).dp),
             contentPadding = PaddingValues(bottom = 100.dp)
         ) {
-            val currentFocusedId = state.quizList.getOrNull(state.rollingIndex - 1)?.wordId ?: 0L
             items(
                 count = state.rollingIndex,
                 key = { index -> state.quizList.getOrNull(index)?.wordId ?: "fallback_$index" }
             ) { index ->
                 val word = state.quizList.getOrNull(index)
                 if (word != null) {
-                    val isThisCardActive = word.wordId == currentFocusedId
+                    val isThisCardActive = remember(word.wordId, state.currentFocusedWordId) {
+                        word.wordId == state.currentFocusedWordId
+                    }
                     FocusCard(
                         modifier = Modifier
                             .fillMaxWidth(),
                         word = word,
                         isActive = isThisCardActive,
-                        editTextContent = {
+                        editTextContent = { newText ->
                             if (isThisCardActive) {
-                                guessContent = it
-                                focusedWordId = word.wordId
+                                onGuessChanged(newText)
                             }
                         },
                         askTranslation = direction.toDirectionType() == QuizDirectionType.AskTranslation
@@ -262,31 +232,13 @@ fun QuizScreenContent(
                 }
             }
             item {
-                androidx.compose.foundation.layout.Spacer(
+                Spacer(
                     modifier = Modifier.height(300.dp)
                 )
             }
         }
     }
 
-    //When the last word is in focus then the FAB must be a tick icon.
-    //TODO: This logic should be in Viewmodel
-    if (state.rollingIndex == state.quizList.size) {
-        isFabIconNext = false
-    }
-
-    if (state.isNextClicked) {
-        nextClicked = false
-        onGuessSaved(focusedWordId, guessContent)
-
-        if (rollingIndex < quizList.size) {
-            rollingIndex++
-            isFabIconNext = true
-            guessContent = ""
-        } else {
-            onListFinished()
-        }
-    }
 }
 
 @Composable
@@ -311,7 +263,9 @@ fun FocusCard(
         }
     }
     LaunchedEffect(editState.text) {
-        editTextContent(editState.text.toString())
+        if (isActive) {
+            editTextContent(editState.text.toString())
+        }
     }
 
 //    AnimatedVisibility(
@@ -392,10 +346,11 @@ fun QuizScreenPreview() {
 
     QuizScreenContent(
         direction = 0,
-        quizList = previewWords,
         onGuessSaved = { _, _ -> },
         onListFinished = { },
         onUpdateFab = { },
-        quizState = QuizViewModel.QuizUiState.Loading
+        onNextClicked = { },
+        state = QuizUiState.SuccessList(previewWords),
+        onGuessChanged = { _ -> }
     )
 }
