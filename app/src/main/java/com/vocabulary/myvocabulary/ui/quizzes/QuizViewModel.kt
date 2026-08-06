@@ -55,14 +55,15 @@ class QuizViewModel(
                     if (list.isNotEmpty()) {
                         val filteredShuffledList = list.filter { word ->
                             val isValid = word.word.isNotBlank() && word.translation.isNotBlank()
-                            val matchesCriteria = if (failedOnly) !word.lastResult else true
+                            val matchesCriteria = if (failedOnly) word.lastResult.not() else true
                             isValid && matchesCriteria
                         }.shuffled()
 
                         if (filteredShuffledList.isNotEmpty()) {
                             _quizUiState.value = QuizUiState.SuccessList(
                                 quizList = filteredShuffledList,
-                                currentFocusedWordId = filteredShuffledList.first().wordId
+                                currentFocusedWordId = filteredShuffledList.first().wordId,
+                                isFabIconNext = filteredShuffledList.size > 1
                             )
                         } else {
                             _quizUiState.value = QuizUiState.EmptyList
@@ -81,6 +82,9 @@ class QuizViewModel(
     fun onNextClicked() {
         _quizUiState.update { currentState ->
             if (currentState is QuizUiState.SuccessList) {
+                if (currentState.rollingIndex >= currentState.quizList.size) {
+                    return@update currentState
+                }
                 val nextIndex = currentState.rollingIndex + 1
                 val hasMoreWords = nextIndex < currentState.quizList.size
 
