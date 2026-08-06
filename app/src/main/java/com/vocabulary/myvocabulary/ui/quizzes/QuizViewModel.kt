@@ -15,7 +15,7 @@ import kotlinx.coroutines.launch
 
 class QuizViewModel(
     val dictionaryId: Long,
-    val failedOnly: Boolean,
+    val isFailedOnly: Boolean,
     private val rxSchedulers: RxSchedulers,
     private val quizRepository: QuizRepository
 ) : ViewModel() {
@@ -30,14 +30,15 @@ class QuizViewModel(
 
 
     fun fetchQuizList() {
-//        _isLoading.value = true
+        if (_quizUiState.value is QuizUiState.SuccessList) return
         _quizUiState.value = QuizUiState.Loading
-        observeQuizList(failedOnly)
+        observeQuizList(isFailedOnly)
     }
 
     fun startQuiz(quizType: QuizTypes, dictionaryId: Long) {
+        if (_quizUiState.value is QuizUiState.SuccessList) return
         viewModelScope.launch {
-            if (failedOnly.not()) {
+            if (isFailedOnly.not()) {
                 quizRepository.setQuizList(dictionaryId, quizType)
                     .subscribe()
             }

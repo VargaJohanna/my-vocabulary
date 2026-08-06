@@ -35,7 +35,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
@@ -227,7 +226,8 @@ fun QuizScreenContent(
                                 onGuessChanged(newText)
                             }
                         },
-                        askTranslation = direction.toDirectionType() == QuizDirectionType.AskTranslation
+                        askTranslation = direction.toDirectionType() == QuizDirectionType.AskTranslation,
+                        initialText = state.currentGuess
                     )
                 }
             }
@@ -248,8 +248,9 @@ fun FocusCard(
     editTextContent: (String) -> Unit,
     isActive: Boolean,
     askTranslation: Boolean,
+    initialText: String
 ) {
-    val editState = rememberTextFieldState("")
+    val editState = rememberTextFieldState(initialText)
     val focusRequester = remember { FocusRequester() }
     val question = if (askTranslation) {
         word.translation
