@@ -113,8 +113,7 @@ val viewModelModule = module {
         QuizViewModel(
             dictionaryId,
             failedOnly,
-            get(),
-            get(),
+            get()
         )
     }
     viewModel { (dictionaryId: Long, quizDirection: Int) -> ResultViewModel(dictionaryId, quizDirection, get(), get(), get(), get(), get()) }

@@ -85,7 +85,7 @@ fun QuizScreen(
     val handleExit = {
         resultViewModel.resetGuessedWordCollections()
         resultViewModel.dispose()
-        quizViewModel.onCleared()
+        quizViewModel.clearList()
     }
 
     Scaffold(

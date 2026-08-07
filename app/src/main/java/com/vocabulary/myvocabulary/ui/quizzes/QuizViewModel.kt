@@ -2,35 +2,36 @@ package com.vocabulary.myvocabulary.ui.quizzes
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.vocabulary.myvocabulary.ext.plusAssign
 import com.vocabulary.myvocabulary.repositories.quiz.QuizRepository
-import com.vocabulary.myvocabulary.rx.RxSchedulers
 import com.vocabulary.myvocabulary.ui.words.Word
-import io.reactivex.disposables.CompositeDisposable
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.rx2.asFlow
+import kotlinx.coroutines.rx2.await
 
 class QuizViewModel(
     val dictionaryId: Long,
     val isFailedOnly: Boolean,
-    private val rxSchedulers: RxSchedulers,
     private val quizRepository: QuizRepository
 ) : ViewModel() {
-    private val disposables = CompositeDisposable()
-    private val _quizList: MutableStateFlow<List<Word>> = MutableStateFlow(emptyList())
-    val quizList: StateFlow<List<Word>> = _quizList
     var isDictionaryEmpty = false
     private val _isLoading: MutableStateFlow<Boolean> = MutableStateFlow(true)
     val isLoading: StateFlow<Boolean> = _isLoading
     private val _quizUiState = MutableStateFlow<QuizUiState>(QuizUiState.Loading)
     val quizUiState: StateFlow<QuizUiState> = _quizUiState.asStateFlow()
 
+    private var quizCollectionJob: Job? = null
+
 
     fun fetchQuizList() {
-        if (_quizUiState.value is QuizUiState.SuccessList) return
+        if (_quizUiState.value is QuizUiState.SuccessList) {
+            return
+        }
         _quizUiState.value = QuizUiState.Loading
         observeQuizList(isFailedOnly)
     }
@@ -39,18 +40,31 @@ class QuizViewModel(
         if (_quizUiState.value is QuizUiState.SuccessList) return
         viewModelScope.launch {
             if (isFailedOnly.not()) {
-                quizRepository.setQuizList(dictionaryId, quizType)
-                    .subscribe()
+                try {
+                    quizRepository.setQuizList(dictionaryId, quizType).await()
+                } catch (e: Exception) {
+                    _quizUiState.value = QuizUiState.Error("Failed to initialize quiz. Error: $e")
+                }
             }
         }
     }
 
     private fun observeQuizList(failedOnly: Boolean) {
-        disposables += quizRepository.quizList
-            .subscribeOn(rxSchedulers.io())
-            .observeOn(rxSchedulers.main())
-            .subscribe(
-                { list ->
+        quizCollectionJob?.cancel()
+
+        quizCollectionJob = viewModelScope.launch{
+            quizRepository.quizList
+                .asFlow()
+                .catch { error ->
+                    _quizUiState.value =
+                        QuizUiState.Error(error.message ?: "Error fetching quiz list")
+                }
+                .collect { list ->
+                    val sampleWord = list.firstOrNull()
+                    //Ignore the list if it belongs to a different dictionary, e.g. from a previous quiz.
+                    if (sampleWord != null && sampleWord.containerDictionaryId != dictionaryId) {
+                        return@collect
+                    }
                     isDictionaryEmpty = list.isEmpty()
                     if (list.isNotEmpty()) {
                         val filteredShuffledList = list.filter { word ->
@@ -71,12 +85,8 @@ class QuizViewModel(
                     } else {
                         _quizUiState.value = QuizUiState.EmptyList
                     }
-                },
-                { error ->
-                    _quizUiState.value =
-                        QuizUiState.Error(error.message ?: "Error fetching quiz list")
                 }
-            )
+        }
     }
 
     fun onNextClicked() {
@@ -113,18 +123,14 @@ class QuizViewModel(
         return state.copy(currentFocusedWordId = wordId)
     }
 
-    public override fun onCleared() {
-        _quizUiState.value = QuizUiState.SuccessList(
-            quizList = emptyList()
-        )
-        disposables.clear()
-        super.onCleared()
+    fun clearList() {
+        _quizUiState.value = QuizUiState.Loading
     }
 }
 
 sealed interface QuizUiState {
-    object Loading : QuizUiState
-    object EmptyList : QuizUiState
+    data object Loading : QuizUiState
+    data object EmptyList : QuizUiState
     data class SuccessList(
         val quizList: List<Word>,
         val rollingIndex: Int = 1,
