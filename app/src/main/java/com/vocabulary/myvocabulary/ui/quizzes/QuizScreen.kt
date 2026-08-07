@@ -73,6 +73,16 @@ fun QuizScreen(
     }
     val snackbarHostState = remember { SnackbarHostState() }
 
+    LaunchedEffect(Unit) {
+        quizViewModel.events.collect { event ->
+            when (event) {
+                is QuizEvent.NavigateToResult -> {
+                    onQuizFinished(dictionaryId, direction, quizType)
+                }
+            }
+        }
+    }
+
     LaunchedEffect(dictionaryId, quizType) {
         quizViewModel.fetchQuizList()
         quizViewModel.startQuiz(quizType.toQuizType(), dictionaryId)
@@ -105,9 +115,6 @@ fun QuizScreen(
                         direction = direction,
                         onGuessSaved = { id, guess ->
                             resultViewModel.latestGuess(lastGuess = GuessedWord(id, guess))
-                        },
-                        onListFinished = {
-                            onQuizFinished(dictionaryId, direction, quizType)
                         },
                         onUpdateFab = onUpdateFab,
                         state = state,
@@ -160,7 +167,6 @@ fun QuizScreen(
 fun QuizScreenContent(
     direction: Int,
     onGuessSaved: (Long, String) -> Unit,
-    onListFinished: () -> Unit,
     onUpdateFab: (@Composable () -> Unit) -> Unit,
     state: QuizUiState.SuccessList,
     onNextClicked: () -> Unit,
@@ -182,12 +188,7 @@ fun QuizScreenContent(
                     val guessToSave = state.currentGuess.trim()
                     val idToSave = state.currentFocusedWordId
                     onGuessSaved(idToSave, guessToSave)
-
-                    if(state.isFabIconNext) {
-                        onNextClicked()
-                    } else {
-                        onListFinished()
-                    }
+                    onNextClicked()
                 },
                 iconToDisplay = {
                     if (state.isFabIconNext) Icons.AutoMirrored.Filled.ArrowForward
@@ -348,7 +349,6 @@ fun QuizScreenPreview() {
     QuizScreenContent(
         direction = 0,
         onGuessSaved = { _, _ -> },
-        onListFinished = { },
         onUpdateFab = { },
         onNextClicked = { },
         state = QuizUiState.SuccessList(previewWords),

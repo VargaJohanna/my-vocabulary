@@ -5,10 +5,12 @@ import androidx.lifecycle.viewModelScope
 import com.vocabulary.myvocabulary.repositories.quiz.QuizRepository
 import com.vocabulary.myvocabulary.ui.words.Word
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.rx2.asFlow
@@ -17,16 +19,13 @@ import kotlinx.coroutines.rx2.await
 class QuizViewModel(
     val dictionaryId: Long,
     val isFailedOnly: Boolean,
-    private val quizRepository: QuizRepository
+    private val quizRepository: QuizRepository,
 ) : ViewModel() {
-    var isDictionaryEmpty = false
-    private val _isLoading: MutableStateFlow<Boolean> = MutableStateFlow(true)
-    val isLoading: StateFlow<Boolean> = _isLoading
     private val _quizUiState = MutableStateFlow<QuizUiState>(QuizUiState.Loading)
     val quizUiState: StateFlow<QuizUiState> = _quizUiState.asStateFlow()
-
     private var quizCollectionJob: Job? = null
-
+    private val _events = Channel<QuizEvent>()
+    val events = _events.receiveAsFlow()
 
     fun fetchQuizList() {
         if (_quizUiState.value is QuizUiState.SuccessList) {
@@ -65,7 +64,6 @@ class QuizViewModel(
                     if (sampleWord != null && sampleWord.containerDictionaryId != dictionaryId) {
                         return@collect
                     }
-                    isDictionaryEmpty = list.isEmpty()
                     if (list.isNotEmpty()) {
                         val filteredShuffledList = list.filter { word ->
                             val isValid = word.word.isNotBlank() && word.translation.isNotBlank()
@@ -93,6 +91,9 @@ class QuizViewModel(
         _quizUiState.update { currentState ->
             if (currentState is QuizUiState.SuccessList) {
                 if (currentState.rollingIndex >= currentState.quizList.size) {
+                    viewModelScope.launch {
+                        _events.send(QuizEvent.NavigateToResult)
+                    }
                     return@update currentState
                 }
                 val nextIndex = currentState.rollingIndex + 1
@@ -140,4 +141,8 @@ sealed interface QuizUiState {
     ) : QuizUiState
 
     data class Error(val message: String) : QuizUiState
+}
+
+sealed interface QuizEvent {
+    data object NavigateToResult : QuizEvent
 }
