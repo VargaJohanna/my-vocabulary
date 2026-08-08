@@ -36,7 +36,9 @@ class QuizViewModel(
         _quizUiState.value = QuizUiState.Loading
 
         try {
-            quizRepository.setQuizList(dictionaryId, quizType.toQuizType())
+            if(isFailedOnly.not()) {
+                quizRepository.setQuizList(dictionaryId, quizType.toQuizType())
+            }
             observeQuizList(isFailedOnly)
 
         } catch (e: Exception) {
@@ -56,7 +58,7 @@ class QuizViewModel(
                 }
                 .collect { list ->
                     val sampleWord = list.firstOrNull()
-                    //Ignore the list if it belongs to a different dictionary, e.g. from a previous quiz.
+                    // Ignore the list if it belongs to a different dictionary, e.g. from a previous quiz.
                     if (sampleWord != null && sampleWord.containerDictionaryId != dictionaryId) {
                         return@collect
                     }
@@ -81,6 +83,7 @@ class QuizViewModel(
                     }
                 }
         }
+
     }
 
     fun onNextClicked() {
