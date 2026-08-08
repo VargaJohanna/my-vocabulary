@@ -13,12 +13,11 @@ import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.rx2.asFlow
-import kotlinx.coroutines.rx2.await
 
 class QuizViewModel(
     val dictionaryId: Long,
     val isFailedOnly: Boolean,
+    val quizType: Int,
     private val quizRepository: QuizRepository,
 ) : ViewModel() {
     private val _quizUiState = MutableStateFlow<QuizUiState>(QuizUiState.Loading)
@@ -27,25 +26,23 @@ class QuizViewModel(
     private val _events = Channel<QuizEvent>()
     val events = _events.receiveAsFlow()
 
-    fun fetchQuizList() {
-        if (_quizUiState.value is QuizUiState.SuccessList) {
-            return
+    init {
+        viewModelScope.launch {
+            initialSetup()
         }
-        _quizUiState.value = QuizUiState.Loading
-        observeQuizList(isFailedOnly)
     }
 
-    fun startQuiz(quizType: QuizTypes, dictionaryId: Long) {
-        if (_quizUiState.value is QuizUiState.SuccessList) return
-        viewModelScope.launch {
-            if (isFailedOnly.not()) {
-                try {
-                    quizRepository.setQuizList(dictionaryId, quizType).await()
-                } catch (e: Exception) {
-                    _quizUiState.value = QuizUiState.Error("Failed to initialize quiz. Error: $e")
-                }
-            }
+    private suspend fun initialSetup() {
+        _quizUiState.value = QuizUiState.Loading
+
+        try {
+            quizRepository.setQuizList(dictionaryId, quizType.toQuizType())
+            observeQuizList(isFailedOnly)
+
+        } catch (e: Exception) {
+            _quizUiState.value = QuizUiState.Error("Failed to initialize quiz. Error: ${e.message}")
         }
+
     }
 
     private fun observeQuizList(failedOnly: Boolean) {
@@ -53,7 +50,6 @@ class QuizViewModel(
 
         quizCollectionJob = viewModelScope.launch{
             quizRepository.quizList
-                .asFlow()
                 .catch { error ->
                     _quizUiState.value =
                         QuizUiState.Error(error.message ?: "Error fetching quiz list")

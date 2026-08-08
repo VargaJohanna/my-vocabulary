@@ -99,8 +99,10 @@ class WordListViewModel(
                 .subscribe()
     }
 
-    fun startNew(dictionaryId: Long, quizType: QuizTypes): Completable {
-        return quizRepository.resetQuizList(dictionaryId, quizType)
+    fun startNew(dictionaryId: Long, quizType: QuizTypes) {
+        viewModelScope.launch{
+            quizRepository.setQuizList(dictionaryId, quizType)
+        }
     }
 
     fun setSortBy(sortByData: SortByData) {

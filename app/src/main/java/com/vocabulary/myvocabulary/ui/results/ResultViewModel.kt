@@ -14,7 +14,6 @@ import com.vocabulary.myvocabulary.ui.quizzes.QuizDirectionType
 import com.vocabulary.myvocabulary.ui.quizzes.QuizTypes
 import com.vocabulary.myvocabulary.ui.quizzes.toDirectionType
 import com.vocabulary.myvocabulary.ui.words.Word
-import io.reactivex.Completable
 import io.reactivex.Observable
 import io.reactivex.Single
 import io.reactivex.disposables.CompositeDisposable
@@ -132,8 +131,10 @@ class ResultViewModel(
         isAllPassed = lastResult
     }
 
-    fun startNew(dictionaryId: Long, quizType: QuizTypes): Completable {
-        return quizRepository.resetQuizList(dictionaryId, quizType)
+    fun startNew(dictionaryId: Long, quizType: QuizTypes) {
+        viewModelScope.launch {
+            quizRepository.setQuizList(dictionaryId, quizType)
+        }
     }
 
     fun latestGuess(lastGuess: GuessedWord) {

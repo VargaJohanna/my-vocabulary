@@ -65,7 +65,7 @@ fun QuizScreen(
     onRegisterExitLogic: (() -> Unit) -> Unit,
 ) {
     val quizViewModel: QuizViewModel = koinViewModel {
-        parametersOf(dictionaryId, direction, failedOnly)
+        parametersOf(dictionaryId, quizType, failedOnly)
     }
 
     val resultViewModel: ResultViewModel = koinViewModel {
@@ -81,11 +81,6 @@ fun QuizScreen(
                 }
             }
         }
-    }
-
-    LaunchedEffect(dictionaryId, quizType) {
-        quizViewModel.fetchQuizList()
-        quizViewModel.startQuiz(quizType.toQuizType(), dictionaryId)
     }
 
     val quizState by quizViewModel.quizUiState.collectAsStateWithLifecycle()
