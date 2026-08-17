@@ -2,6 +2,7 @@ package com.vocabulary.myvocabulary.ui.quizzes
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.vocabulary.myvocabulary.navigation.FabConfiguration
 import com.vocabulary.myvocabulary.repositories.quiz.QuizRepository
 import com.vocabulary.myvocabulary.ui.words.Word
 import kotlinx.coroutines.Job
@@ -22,6 +23,7 @@ class QuizViewModel(
 ) : ViewModel() {
     private val _quizUiState = MutableStateFlow<QuizUiState>(QuizUiState.Loading)
     val quizUiState: StateFlow<QuizUiState> = _quizUiState.asStateFlow()
+
     private var quizCollectionJob: Job? = null
     private val _events = Channel<QuizEvent>()
     val events = _events.receiveAsFlow()

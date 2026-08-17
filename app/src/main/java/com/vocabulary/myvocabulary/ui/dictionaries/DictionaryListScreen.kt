@@ -57,8 +57,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.vocabulary.myvocabulary.Constants
 import com.vocabulary.myvocabulary.R
+import com.vocabulary.myvocabulary.navigation.FabConfiguration
 import com.vocabulary.myvocabulary.repositories.sortBy.dictionary.SortByDictionaryOptions
 import com.vocabulary.myvocabulary.ui.theme.dimens
 import com.vocabulary.myvocabulary.utils.ComposeDialogFactory
@@ -69,7 +69,7 @@ import java.util.Calendar
 @Composable
 fun DictionaryListScreen(
     navigateToWordList: (dictionaryId: Long, dictionaryName: String) -> Unit,
-    onUpdateFab: (@Composable () -> Unit) -> Unit,
+    onUpdateFab: (FabConfiguration) -> Unit,
     onStartQuiz: (dictionaryId: Long) -> Unit,
     isSortOpen: Boolean,
     onToggleSort: (Boolean) -> Unit,
@@ -110,15 +110,15 @@ fun DictionaryListScreen(
 
     LaunchedEffect(Unit) {
         viewModel.fetchDictionaries()
-        onUpdateFab {
-            FABMenu(
-                onShowCreateDialog = { showCreateDialog = true },
-                onImportClick = {
-                    filePickerLauncher.launch(Constants.MIME_TYPE)
-                    isImport = true
-                }
-            )
-        }
+//        onUpdateFab {
+//            FABMenu(
+//                onShowCreateDialog = { showCreateDialog = true },
+//                onImportClick = {
+//                    filePickerLauncher.launch(Constants.MIME_TYPE)
+//                    isImport = true
+//                }
+//            )
+//        }
     }
 
     LaunchedEffect(newDictionary) {

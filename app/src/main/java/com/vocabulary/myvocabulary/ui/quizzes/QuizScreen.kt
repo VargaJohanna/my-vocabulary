@@ -10,7 +10,6 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -21,8 +20,6 @@ import androidx.compose.material.icons.filled.Check
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.FloatingActionButton
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarDuration
@@ -40,12 +37,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.vocabulary.myvocabulary.R
+import com.vocabulary.myvocabulary.navigation.FabConfiguration
 import com.vocabulary.myvocabulary.ui.results.ResultViewModel
 import com.vocabulary.myvocabulary.ui.theme.dimens
 import com.vocabulary.myvocabulary.ui.words.Word
@@ -60,7 +57,7 @@ fun QuizScreen(
     direction: Int,
     failedOnly: Boolean,
     onQuizFinished: (Long, Int, Int) -> Unit,
-    onUpdateFab: (@Composable () -> Unit) -> Unit,
+    onUpdateFab: (FabConfiguration) -> Unit,
     onExit: () -> Unit,
     onRegisterExitLogic: (() -> Unit) -> Unit,
 ) {
@@ -111,7 +108,7 @@ fun QuizScreen(
                         onGuessSaved = { id, guess ->
                             resultViewModel.latestGuess(lastGuess = GuessedWord(id, guess))
                         },
-                        onUpdateFab = onUpdateFab,
+                        onUpdateFab = { onUpdateFab(it) },
                         state = state,
                         onNextClicked = {
                             quizViewModel.onNextClicked()
@@ -162,7 +159,7 @@ fun QuizScreen(
 fun QuizScreenContent(
     direction: Int,
     onGuessSaved: (Long, String) -> Unit,
-    onUpdateFab: (@Composable () -> Unit) -> Unit,
+    onUpdateFab: (FabConfiguration) -> Unit,
     state: QuizUiState.SuccessList,
     onNextClicked: () -> Unit,
     onGuessChanged: (String) -> Unit,
@@ -177,21 +174,22 @@ fun QuizScreenContent(
     }
 
     LaunchedEffect(state) {
-        onUpdateFab {
-            FabMenu(
-                onNextClicked = {
+        onUpdateFab(
+            FabConfiguration.FabButton(
+                isVisible = true,
+                onClick = {
                     val guessToSave = state.currentGuess.trim()
                     val idToSave = state.currentFocusedWordId
                     onGuessSaved(idToSave, guessToSave)
                     onNextClicked()
                 },
-                iconToDisplay = {
-                    if (state.isFabIconNext) Icons.AutoMirrored.Filled.ArrowForward
-                    else Icons.Default.Check
-                }
+                icon = if (state.isFabIconNext) Icons.AutoMirrored.Filled.ArrowForward
+                else Icons.Default.Check,
+                iconLabelId = R.string.quiz_fab_next,
             )
-        }
+        )
     }
+
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -234,7 +232,6 @@ fun QuizScreenContent(
             }
         }
     }
-
 }
 
 @Composable
@@ -313,22 +310,6 @@ fun FocusCard(
             }
         }
 
-    }
-}
-
-@Composable
-fun FabMenu(
-    onNextClicked: () -> Unit,
-    iconToDisplay: () -> ImageVector,
-) {
-    FloatingActionButton(
-        modifier = Modifier.imePadding(),
-        onClick = { onNextClicked() }
-    ) {
-        Icon(
-            imageVector = iconToDisplay(),
-            contentDescription = stringResource(R.string.quiz_fab_next),
-        )
     }
 }
 

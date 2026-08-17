@@ -31,7 +31,7 @@ fun MyVocabularyNavHost(
     modifier: Modifier = Modifier,
     onUpdateActions: (@Composable RowScope.() -> Unit) -> Unit,
     onUpdateTitle: (@Composable () -> Unit) -> Unit,
-    onUpdateFab: (@Composable () -> Unit) -> Unit,
+    onUpdateFab: (FabConfiguration) -> Unit,
     onBackClick: (() -> Unit) -> Unit,
     onToggleSearch: (Boolean) -> Unit,
     isSearchVisible: Boolean,
@@ -65,7 +65,7 @@ fun MyVocabularyNavHost(
                     }
                 }
 
-                onUpdateFab { }
+                onUpdateFab(FabConfiguration.Hidden())
 
                 onBackClick { }
             }
@@ -110,7 +110,7 @@ fun MyVocabularyNavHost(
                         launchSingleTop = true
                     }
                 },
-                onUpdateFab = onUpdateFab,
+                onUpdateFab = { config -> onUpdateFab(config)},
                 isSortOpen = isSortOpen,
                 onToggleSort = onToggleSort,
             )
@@ -121,7 +121,7 @@ fun MyVocabularyNavHost(
                 navBackStackEntry = backStackEntry,
                 navController = navController,        onUpdateTitle = onUpdateTitle,
                 onUpdateActions = onUpdateActions,
-                onUpdateFab = onUpdateFab,
+                onUpdateFab = { onUpdateFab(FabConfiguration.Hidden()) },
                 onBackClick = onBackClick,
                 isSearchVisible = isSearchVisible,
                 onToggleSearch = onToggleSearch,
@@ -141,7 +141,7 @@ fun MyVocabularyNavHost(
 
                 onBackClick { navController.popBackStack() }
 
-                onUpdateFab { }
+                onUpdateFab(FabConfiguration.Hidden())
             }
             AboutScreen()
         }
@@ -158,7 +158,7 @@ fun MyVocabularyNavHost(
 
                 onBackClick { navController.popBackStack() }
 
-                onUpdateFab { }
+                onUpdateFab(FabConfiguration.Hidden())
             }
             QuizListScreen(
                 dictionaryIdFromArgs = args.dictionaryId,
@@ -199,7 +199,7 @@ fun MyVocabularyNavHost(
                         launchSingleTop = true
                     }
                 },
-                onUpdateFab = onUpdateFab,
+                onUpdateFab = { config -> onUpdateFab(config)},
                 onExit = {
                     screenCleanup?.invoke()
                     navController.navigate(QuizList(dictionaryId = null)) {
@@ -242,7 +242,7 @@ fun MyVocabularyNavHost(
                         launchSingleTop = true
                     }
                 },
-                onUpdateFab = onUpdateFab,
+                onUpdateFab = { config -> onUpdateFab(config) },
                 onBackClick = onBackClick
             )
         }

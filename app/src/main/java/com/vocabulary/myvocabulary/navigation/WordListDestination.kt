@@ -45,7 +45,7 @@ fun WordListDestination(
     navController: NavHostController,
     onUpdateTitle: (@Composable () -> Unit) -> Unit,
     onUpdateActions: (@Composable RowScope.() -> Unit) -> Unit,
-    onUpdateFab: (@Composable () -> Unit) -> Unit,
+    onUpdateFab: (FabConfiguration) -> Unit,
     onBackClick: (() -> Unit) -> Unit,
     isSearchVisible: Boolean,
     onToggleSearch: (Boolean) -> Unit,
@@ -150,12 +150,12 @@ fun WordListDestination(
             }
         }
 
-        onUpdateFab { }
+        onUpdateFab(FabConfiguration.Hidden())
     }
 
     WordListScreen(
         dictionaryId = args.dictionaryId,
-        onUpdateFab = onUpdateFab,
+        onUpdateFab = { onUpdateFab },
         isSearchVisible = isSearchVisible,
         onToggleSearch = onToggleSearch,
         isSortOpen = isSortOpen,

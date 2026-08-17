@@ -10,11 +10,18 @@ import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
+import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.FloatingActionButtonMenu
+import androidx.compose.material3.FloatingActionButtonMenuItem
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.ScaffoldDefaults
 import androidx.compose.material3.Text
+import androidx.compose.material3.ToggleFloatingActionButton
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -31,6 +38,7 @@ import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.vocabulary.myvocabulary.navigation.DictionaryList
+import com.vocabulary.myvocabulary.navigation.FabConfiguration
 import com.vocabulary.myvocabulary.navigation.Home
 import com.vocabulary.myvocabulary.navigation.MyVocabularyDestinations
 import com.vocabulary.myvocabulary.navigation.MyVocabularyNavHost
@@ -72,14 +80,14 @@ class HomeActivity : ComponentActivity() {
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun MyVocabularyApp() {
     val navController = rememberNavController()
     var appBarTitle by remember { mutableStateOf<(@Composable () -> Unit)>({}) }
-    var appBarActions by remember { mutableStateOf<@Composable RowScope.() -> Unit>({})}
-    var appBarBackAction by remember { mutableStateOf<@Composable () -> Unit>({})}
-    var screenFab by remember { mutableStateOf<@Composable () -> Unit>({}) }
+    var appBarActions by remember { mutableStateOf<@Composable RowScope.() -> Unit>({}) }
+    var appBarBackAction by remember { mutableStateOf<@Composable () -> Unit>({}) }
+    var screenFab by remember { mutableStateOf<FabConfiguration>(FabConfiguration.Hidden()) }
     var currentBackAction by remember { mutableStateOf<() -> Unit>({ navController.popBackStack() }) }
     var isSearchVisible by rememberSaveable { mutableStateOf(false) }
     var isSortOpen by rememberSaveable { mutableStateOf(false) }
@@ -131,8 +139,66 @@ fun MyVocabularyApp() {
                 }
             }
         },
-        floatingActionButton = screenFab,
+        floatingActionButton = {
+            if (screenFab.isVisible) {
+                when (val fab = screenFab) {
+                    is FabConfiguration.FabButton -> {
+                        FloatingActionButton(
+                            onClick = { fab.onClick() }
+                        ) {
+                            Icon(
+                                imageVector = fab.icon,
+                                contentDescription = stringResource(fab.iconLabelId)
+                            )
+                        }
+                    }
 
+                    is FabConfiguration.FabMenu -> {
+                        FloatingActionButtonMenu(
+                            expanded = fab.expanded,
+                            button = {
+                                ToggleFloatingActionButton(
+                                    checked = fab.expanded,
+                                    onCheckedChange = { fab.onExpandedChange(it) }
+                                ) {
+                                    Icon(
+                                        imageVector = fab.icon,
+                                        contentDescription = stringResource(fab.labelId)
+                                    )
+                                }
+                            }
+                        ) {
+                            fab.items.forEach { item ->
+                                FloatingActionButtonMenuItem(
+                                    containerColor = MaterialTheme.colorScheme.secondaryContainer,
+                                    onClick = { item.onClick() },
+                                    text = {
+                                        item.extendedLabelId?.let {
+                                            Text(text = stringResource(it))
+                                        } ?: run {
+                                            Text(text = stringResource(item.iconLabelId))
+                                        }
+                                    },
+                                    icon = {
+                                        Icon(
+                                            imageVector = item.icon,
+                                            contentDescription = stringResource(item.iconLabelId)
+                                        )
+                                    }
+                                )
+                            }
+                        }
+                    }
+
+                    else -> {
+                        FabConfiguration.Hidden()
+                    }
+                }
+            } else {
+                FabConfiguration.Hidden()
+            }
+        },
+        contentWindowInsets = ScaffoldDefaults.contentWindowInsets
     ) { innerPadding ->
         MyVocabularyNavHost(
             navController = navController,
