@@ -7,4 +7,7 @@ object Constants {
     const val MIME_TYPE = "text/csv"
     const val TEXT_FIELD_HEIGHT = 64
 
+    const val QUICK_QUIZ_SIZE = 5
+    const val WEAKEST_QUIZ_SIZE = 5
+
 }

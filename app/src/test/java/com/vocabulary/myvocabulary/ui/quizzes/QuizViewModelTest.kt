@@ -49,7 +49,7 @@ class QuizViewModelTest {
 
         viewModel = QuizViewModel(
             dictionaryId = dictionaryId,
-            failedOnly = false,
+            isFailedOnly = false,
             rxSchedulers = rxSchedulers,
             quizRepository = quizRepository
         )

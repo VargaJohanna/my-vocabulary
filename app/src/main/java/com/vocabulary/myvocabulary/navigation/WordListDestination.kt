@@ -45,7 +45,7 @@ fun WordListDestination(
     navController: NavHostController,
     onUpdateTitle: (@Composable () -> Unit) -> Unit,
     onUpdateActions: (@Composable RowScope.() -> Unit) -> Unit,
-    onUpdateFab: (@Composable () -> Unit) -> Unit,
+    onUpdateFab: (FabConfiguration) -> Unit,
     onBackClick: (() -> Unit) -> Unit,
     isSearchVisible: Boolean,
     onToggleSearch: (Boolean) -> Unit,
@@ -149,8 +149,6 @@ fun WordListDestination(
                 isSortOpen -> onToggleSort(false)else -> navController.popBackStack()
             }
         }
-
-        onUpdateFab { }
     }
 
     WordListScreen(

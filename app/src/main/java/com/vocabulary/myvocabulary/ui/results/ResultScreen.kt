@@ -22,13 +22,9 @@ import androidx.compose.material.icons.filled.Done
 import androidx.compose.material.icons.filled.Error
 import androidx.compose.material.icons.filled.Replay
 import androidx.compose.material3.Card
-import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
-import androidx.compose.material3.FloatingActionButtonMenu
-import androidx.compose.material3.FloatingActionButtonMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.material3.ToggleFloatingActionButton
 import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -44,6 +40,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.vocabulary.myvocabulary.R
+import com.vocabulary.myvocabulary.navigation.FabConfiguration
 import com.vocabulary.myvocabulary.ui.lottie.FailedAnimation
 import com.vocabulary.myvocabulary.ui.lottie.SuccessAnimation
 import com.vocabulary.myvocabulary.ui.quizzes.QuizDirectionType
@@ -62,7 +59,7 @@ fun ResultScreen(
     quizType: Int,
     onRestartQuiz: (quizType: Int, dictionaryId: Long, direction: Int, failedOnly: Boolean) -> Unit,
     onExit: () -> Unit,
-    onUpdateFab: (@Composable () -> Unit) -> Unit,
+    onUpdateFab: (FabConfiguration) -> Unit,
     onBackClick: (() -> Unit) -> Unit
 ) {
 
@@ -111,8 +108,8 @@ fun ResultScreen(
             resultViewModel.dispose()
             onRestartQuiz(quizType, dictionaryId, direction, true)
         },
-        passedQuiz =  resultViewModel.isAllPassed,
-        onUpdateFab = onUpdateFab,
+        passedQuiz = resultViewModel.isAllPassed,
+        onUpdateFab = { onUpdateFab(it) },
         numOfPassed = numOfPassed,
         numOfWords = numOfWords,
         resultPercentage = resultPercentage
@@ -123,32 +120,97 @@ fun ResultScreen(
 fun ResultScreenContent(
     modifier: Modifier = Modifier,
     resultList: List<Word>,
-    isFabOpen: Boolean = false,
     directionType: QuizDirectionType,
     onExit: () -> Unit,
     onRestartNew: () -> Unit,
     onRestartFailedOnly: () -> Unit,
     passedQuiz: Boolean,
-    onUpdateFab: (@Composable () -> Unit) -> Unit,
+    onUpdateFab: (FabConfiguration) -> Unit,
     numOfPassed: Int,
     numOfWords: Int,
     resultPercentage: Int = 0
 ) {
-    var expanded by remember { mutableStateOf(isFabOpen) }
+    var isFabExpanded by remember { mutableStateOf(false) }
+    val containerColor = MaterialTheme.colorScheme.secondaryContainer
 
-    LaunchedEffect(isFabOpen) { expanded = isFabOpen }
+    LaunchedEffect(passedQuiz, isFabExpanded) {
+        onUpdateFab(
+            if (passedQuiz) {
+                FabConfiguration.FabMenu(
+                    isVisible = true,
+                    expanded = isFabExpanded,
+                    onExpandedChange = { isFabExpanded = it },
+                    icon = Icons.Default.Replay,
+                    labelId = R.string.result_start_over_label,
+                    items =
+                        listOf(
+                            FabConfiguration.FabButton(
+                                icon = Icons.Default.ChangeCircle,
+                                iconLabelId = R.string.result_start_over_label,
+                                onClick = {
+                                    isFabExpanded = false
+                                    onRestartNew()
+                                },
+                                extendedLabelId = R.string.result_start_over_label,
+                                containerColor = containerColor
+                            ),
+                            FabConfiguration.FabButton(
+                                icon = Icons.Default.Close,
+                                iconLabelId = R.string.exit_fab_label,
+                                onClick = {
+                                    isFabExpanded = false
+                                    onExit()
+                                },
+                                extendedLabelId = R.string.exit_fab_label,
+                                containerColor = containerColor
+                            )
+                        )
 
-    LaunchedEffect(passedQuiz) {
-        onUpdateFab {
-            FabMenu(
-                expanded = expanded,
-                onExpandedChange = { expanded = it },
-                onExit = onExit,
-                onRestartNew = onRestartNew,
-                onRestartFailedOnly = onRestartFailedOnly,
-                passedQuiz = passedQuiz
-            )
-        }
+                )
+            } else {
+                FabConfiguration.FabMenu(
+                    isVisible = true,
+                    expanded = isFabExpanded,
+                    onExpandedChange = { isFabExpanded = it },
+                    icon = Icons.Default.Replay,
+                    labelId = R.string.result_start_over_label,
+                    items =
+                        listOf(
+                            FabConfiguration.FabButton(
+                                icon = Icons.Default.ChangeCircle,
+                                iconLabelId = R.string.result_start_over_label,
+                                onClick = {
+                                    isFabExpanded = false
+                                    onRestartNew()
+                                },
+                                extendedLabelId = R.string.result_start_over_label,
+                                containerColor = containerColor
+                            ),
+                            FabConfiguration.FabButton(
+                                icon = Icons.Default.Error,
+                                iconLabelId = R.string.result_failed_ones_only_label,
+                                onClick = {
+                                    isFabExpanded = false
+                                    onRestartFailedOnly()
+                                },
+                                extendedLabelId = R.string.result_failed_ones_only_label,
+                                containerColor = containerColor
+                            ),
+                            FabConfiguration.FabButton(
+                                icon = Icons.Default.Close,
+                                iconLabelId = R.string.exit_fab_label,
+                                onClick = {
+                                    isFabExpanded = false
+                                    onExit()
+                                },
+                                extendedLabelId = R.string.exit_fab_label,
+                                containerColor = containerColor
+                            )
+                        )
+
+                )
+            }
+        )
     }
 
     Box(
@@ -179,7 +241,7 @@ fun ResultScreenContent(
         }
     }
 
-    if(passedQuiz) {
+    if (passedQuiz) {
         SuccessAnimation()
     } else {
         FailedAnimation()
@@ -346,78 +408,6 @@ fun ResultListItemFailed(
     }
 }
 
-@OptIn(ExperimentalMaterial3ExpressiveApi::class)
-@Composable
-fun FabMenu(
-    expanded: Boolean,
-    onExpandedChange: (Boolean) -> Unit,
-    onExit: () -> Unit,
-    onRestartNew: () -> Unit,
-    onRestartFailedOnly: () -> Unit,
-    passedQuiz: Boolean
-) {
-    FloatingActionButtonMenu(
-        expanded = expanded,
-        button = {
-            ToggleFloatingActionButton(
-                checked = expanded,
-                onCheckedChange = { onExpandedChange(it) }
-            ) {
-                Icon(
-                    imageVector = Icons.Default.Replay,
-                    contentDescription = stringResource(R.string.result_start_over_label),
-                )
-            }
-        }
-    ) {
-        FloatingActionButtonMenuItem(
-            containerColor = MaterialTheme.colorScheme.secondaryContainer,
-            onClick = {
-                onExpandedChange(false)
-                onRestartNew()
-            },
-            text = { Text(stringResource(R.string.result_start_over_label)) },
-            icon = {
-                Icon(
-                    imageVector = Icons.Default.ChangeCircle,
-                    contentDescription = stringResource(R.string.result_start_over_label)
-                )
-            }
-        )
-
-        if (passedQuiz.not()) {
-            FloatingActionButtonMenuItem(
-                containerColor = MaterialTheme.colorScheme.secondaryContainer,
-                onClick = {
-                    onExpandedChange(false)
-                    onRestartFailedOnly()
-                },
-                text = { Text(stringResource(R.string.result_failed_ones_only_label)) },
-                icon = {
-                    Icon(
-                        imageVector = Icons.Default.Error,
-                        contentDescription = stringResource(R.string.result_failed_ones_only_label)
-                    )
-                }
-            )
-        }
-        FloatingActionButtonMenuItem(
-            containerColor = MaterialTheme.colorScheme.secondaryContainer,
-            onClick = {
-                onExpandedChange(false)
-                onExit()
-            },
-            text = { Text(stringResource(R.string.exit_fab_label)) },
-            icon = {
-                Icon(
-                    imageVector = Icons.Default.Close,
-                    contentDescription = stringResource(R.string.result_start_over_label)
-                )
-            }
-        )
-    }
-}
-
 @Preview
 @Composable
 fun ResultScreenPreview() {
@@ -451,7 +441,6 @@ fun ResultScreenPreview() {
 
     ResultScreenContent(
         resultList = list,
-        isFabOpen = true,
         directionType = QuizDirectionType.AskTranslation,
         onExit = {},
         onRestartNew = {},

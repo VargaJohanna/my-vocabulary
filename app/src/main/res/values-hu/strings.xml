@@ -137,6 +137,7 @@
     <string name="memorise_label">Emlékeztető</string>
     <string name="memorise_placeholder">Itt találod azokat a szavakat és kifejezéseket, amelyeket érdemes újra átnézned. Menni fog!</string>
     <string name="quote_title">Napi idézet</string>
+    <string name="snack_bar_error">Hiba történt a szavak betöltése közben.</string>
     <string name="last_practiced_placeholder_title">Legutoljára gyakorolt szótár</string>
     <string name="most_practiced_placeholder_title">Legtöbbet gyakorolt szótár</string>
 

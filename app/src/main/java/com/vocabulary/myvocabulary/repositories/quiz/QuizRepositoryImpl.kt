@@ -1,92 +1,71 @@
 package com.vocabulary.myvocabulary.repositories.quiz
 
 import androidx.annotation.VisibleForTesting
+import com.vocabulary.myvocabulary.Constants
 import com.vocabulary.myvocabulary.repositories.word.WordRepository
 import com.vocabulary.myvocabulary.ui.quizzes.QuizTypes
 import com.vocabulary.myvocabulary.ui.words.Word
-import io.reactivex.Completable
-import io.reactivex.Observable
-import io.reactivex.Single
-import io.reactivex.subjects.BehaviorSubject
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.rx2.asFlow
 
 class QuizRepositoryImpl(
         private val wordRepository: WordRepository,
         private val customQuizRepository: CustomQuizRepository
 ) : QuizRepository {
-    private val _quizList: BehaviorSubject<List<Word>> = BehaviorSubject.create<List<Word>>()
-    override val  quizList: Observable<List<Word>> = _quizList
+    private val _quizList = MutableStateFlow<List<Word>> (emptyList())
+    override val quizList: Flow<List<Word>> = _quizList.asStateFlow()
 
-    override fun resetQuizList(dictionaryId: Long, quizType: QuizTypes): Completable {
-        return when (quizType) {
-            QuizTypes.FullQuiz -> resetFullQuizList(dictionaryId)
-            QuizTypes.QuickQuiz -> resetQuickQuizList(dictionaryId)
-            QuizTypes.WeakestQuiz -> resetWeakestFive(dictionaryId)
-            QuizTypes.CustomQuiz -> resetCustomQuizList(dictionaryId)
-        }.ignoreElement()
+//    override fun resetQuizList(dictionaryId: Long, quizType: QuizTypes): Completable {
+//        return when (quizType) {
+//            QuizTypes.FullQuiz -> getFullQuizList(dictionaryId)
+//            QuizTypes.QuickQuiz -> getQuickQuizList(dictionaryId)
+//            QuizTypes.WeakestQuiz -> getWeakestFive(dictionaryId)
+//            QuizTypes.CustomQuiz -> resetCustomQuizList(dictionaryId)
+//        }.ignoreElement()
+//    }
+
+    override suspend fun setQuizList(dictionaryId: Long, quizType: QuizTypes) {
+        val list = when (quizType) {
+            QuizTypes.FullQuiz -> getFullQuizList(dictionaryId)
+            QuizTypes.QuickQuiz -> getQuickQuizList(dictionaryId)
+            QuizTypes.WeakestQuiz -> getWeakestFive(dictionaryId)
+            QuizTypes.CustomQuiz -> getCustomQuizList(dictionaryId)
+        }
+        _quizList.value = list
     }
 
-    override fun setQuizList(dictionaryId: Long, quizType: QuizTypes): Completable {
-        return when (quizType) {
-            QuizTypes.FullQuiz -> resetFullQuizList(dictionaryId)
-            QuizTypes.QuickQuiz -> resetQuickQuizList(dictionaryId)
-            QuizTypes.WeakestQuiz -> resetWeakestFive(dictionaryId)
-            QuizTypes.CustomQuiz -> resetCustomQuizList(dictionaryId)
-        }.toCompletable()
-    }
-
-    private fun resetFullQuizList(dictionaryId: Long): Single<List<Word>> {
+    private suspend fun getFullQuizList(dictionaryId: Long): List<Word> {
         return wordRepository.getObservableWordList(dictionaryId)
-                .firstOrError()
-                .map { list ->
-                    list.filter { it.word.isNotEmpty() }
-
-                }
-                .doOnSuccess {
-                    _quizList.onNext(it)
-                }
+            .asFlow()
+            .first()
+            .filter { it.word.isNotEmpty() }
     }
 
-    private fun resetQuickQuizList(dictionaryId: Long): Single<List<Word>> {
-        return wordRepository.getObservableWordList(dictionaryId)
-                .firstOrError()
-                .map { list -> list.filter { it.word.isNotEmpty() } }
-                .map { it.shuffled() }
-                .map { it.take(5) }
-                .doOnSuccess {
-                    _quizList.onNext(it)
-                }
+    private suspend fun getQuickQuizList(dictionaryId: Long): List<Word> {
+       return getFullQuizList(dictionaryId)
+            .shuffled()
+            .take(Constants.QUICK_QUIZ_SIZE)
     }
     @VisibleForTesting
-    private fun resetWeakestFive(dictionaryId: Long): Single<List<Word>> {
-        return wordRepository.getObservableWordList(dictionaryId)
-                .firstOrError()
-                .map { list -> list.filter { it.word.isNotEmpty() } }
-                .map { sortWeaknessesList(it)}
-                .map { it.take(5) }
-                .doOnSuccess {
-                    _quizList.onNext(it)
-                }
+    private suspend fun getWeakestFive(dictionaryId: Long): List<Word> {
+        val fullList = getFullQuizList(dictionaryId)
+       return sortWeaknessesList(fullList).take(Constants.WEAKEST_QUIZ_SIZE)
     }
 
-    private fun resetCustomQuizList(dictionaryId: Long): Single<List<Word>> {
-        return wordRepository.getObservableWordList(dictionaryId)
-                .firstOrError()
-                .map { list -> list.filter { it.word.isNotEmpty() } }
-                .map { it.shuffled() }
-                .map {
-                    if(customQuizRepository.quizSize > it.size) {
-                        it
-                    } else {
-                        it.take(customQuizRepository.quizSize)
-                    }
-                }
-                .doOnSuccess {
-                    _quizList.onNext(it)
-                }
+    private suspend fun getCustomQuizList(dictionaryId: Long): List<Word> {
+        val fullList = getFullQuizList(dictionaryId)
+        return if(customQuizRepository.quizSize > fullList.size) {
+            fullList.shuffled()
+        } else {
+            fullList.shuffled().take(customQuizRepository.quizSize)
+        }
     }
 
     override fun updateQuizList(list: List<Word>) {
-        _quizList.onNext(list)
+        _quizList.value = list
     }
 
     /*

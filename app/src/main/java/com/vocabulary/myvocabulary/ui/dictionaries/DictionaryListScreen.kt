@@ -30,17 +30,13 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.FloatingActionButton
-import androidx.compose.material3.FloatingActionButtonMenu
-import androidx.compose.material3.FloatingActionButtonMenuItem
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.ToggleFloatingActionButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -59,6 +55,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.vocabulary.myvocabulary.Constants
 import com.vocabulary.myvocabulary.R
+import com.vocabulary.myvocabulary.navigation.FabConfiguration
 import com.vocabulary.myvocabulary.repositories.sortBy.dictionary.SortByDictionaryOptions
 import com.vocabulary.myvocabulary.ui.theme.dimens
 import com.vocabulary.myvocabulary.utils.ComposeDialogFactory
@@ -69,7 +66,7 @@ import java.util.Calendar
 @Composable
 fun DictionaryListScreen(
     navigateToWordList: (dictionaryId: Long, dictionaryName: String) -> Unit,
-    onUpdateFab: (@Composable () -> Unit) -> Unit,
+    onUpdateFab: (FabConfiguration) -> Unit,
     onStartQuiz: (dictionaryId: Long) -> Unit,
     isSortOpen: Boolean,
     onToggleSort: (Boolean) -> Unit,
@@ -86,6 +83,7 @@ fun DictionaryListScreen(
     var itemToDelete by rememberSaveable { mutableStateOf<Dictionary?>(null) }
     var itemToEdit by rememberSaveable { mutableStateOf<Dictionary?>(null) }
     var isImport by rememberSaveable { mutableStateOf(false) }
+    var isFabExpanded by remember { mutableStateOf(false) }
 
     LaunchedEffect(Unit) {
         shareDictViewModel.importedDictionaryDetailsFlow.collect { event ->
@@ -108,17 +106,38 @@ fun DictionaryListScreen(
         }
     }
 
-    LaunchedEffect(Unit) {
+    LaunchedEffect(isFabExpanded) {
         viewModel.fetchDictionaries()
-        onUpdateFab {
-            FABMenu(
-                onShowCreateDialog = { showCreateDialog = true },
-                onImportClick = {
-                    filePickerLauncher.launch(Constants.MIME_TYPE)
-                    isImport = true
-                }
+        onUpdateFab(
+            FabConfiguration.FabMenu(
+                isVisible = true,
+                expanded = isFabExpanded,
+                onExpandedChange = { isFabExpanded = it },
+                icon = if (isFabExpanded) Icons.Default.Clear else Icons.Default.Add,
+                labelId = R.string.dictionary_fab_description,
+                items = listOf(
+                    FabConfiguration.FabButton(
+                        icon = Icons.Outlined.CreateNewFolder,
+                        iconLabelId = R.string.create_fab_label,
+                        onClick = {
+                            isFabExpanded = false
+                            showCreateDialog = true
+                        },
+                        extendedLabelId = R.string.create_fab_label
+                    ),
+                    FabConfiguration.FabButton(
+                        icon = Icons.Default.ImportExport,
+                        iconLabelId = R.string.import_fab_label,
+                        onClick = {
+                            isFabExpanded = false
+                            isImport = true
+                            filePickerLauncher.launch(Constants.MIME_TYPE)
+                        },
+                        extendedLabelId = R.string.import_fab_label
+                    )
+                )
             )
-        }
+        )
     }
 
     LaunchedEffect(newDictionary) {
@@ -236,8 +255,8 @@ fun DictionaryListScreen(
         )
     }
 
-    if(isImport) {
-        if(!showCreateDialog) {
+    if (isImport) {
+        if (!showCreateDialog) {
             dialogFactory.BuildCreateDictionaryDialog(
                 onDismissRequest = {
                     isImport = false
@@ -280,9 +299,12 @@ fun SortMenu(
                 onSortByDate()
                 onToggleSort(false)
             },
-            leadingIcon = { Icon(
-                imageVector = Icons.Default.DateRange,
-                contentDescription = stringResource(R.string.sort_by_date)) }
+            leadingIcon = {
+                Icon(
+                    imageVector = Icons.Default.DateRange,
+                    contentDescription = stringResource(R.string.sort_by_date)
+                )
+            }
 
         )
         DropdownMenuItem(
@@ -291,62 +313,13 @@ fun SortMenu(
                 onSortByTitle()
                 onToggleSort(false)
             },
-            leadingIcon = { Icon(
-                imageVector = Icons.Default.SortByAlpha,
-                contentDescription = stringResource(R.string.sort_by_title)) }
-        )
-    }
-}
-
-@OptIn(ExperimentalMaterial3ExpressiveApi::class)
-@Composable
-fun FABMenu(
-    onShowCreateDialog: () -> Unit,
-    onImportClick: () -> Unit
-    ) {
-    var expanded by remember { mutableStateOf(false) }
-
-    FloatingActionButtonMenu(
-        expanded = expanded,
-        button = {
-            ToggleFloatingActionButton(
-                checked = expanded,
-                onCheckedChange = { expanded = it },
-            ) {
+            leadingIcon = {
                 Icon(
-                    imageVector = if (expanded) Icons.Default.Clear else Icons.Default.Add,
-                    contentDescription = stringResource(R.string.dictionary_fab_description),
-                )
-            }
-        }
-    ) {
-        FloatingActionButtonMenuItem(
-            onClick = {
-                onShowCreateDialog()
-                expanded = false
-            },
-            text = { Text(stringResource(R.string.create_fab_label)) },
-            icon = {
-                Icon(
-                    imageVector = Icons.Outlined.CreateNewFolder,
-                    contentDescription = "Create new dictionary icon"
+                    imageVector = Icons.Default.SortByAlpha,
+                    contentDescription = stringResource(R.string.sort_by_title)
                 )
             }
         )
-        FloatingActionButtonMenuItem(
-            onClick = {
-                onImportClick()
-                expanded = false
-            },
-            text = { Text(stringResource(R.string.import_fab_label)) },
-            icon = {
-                Icon(
-                    imageVector = Icons.Default.ImportExport,
-                    contentDescription = "Import dictionary"
-                )
-            }
-        )
-
     }
 }
 

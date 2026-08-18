@@ -1,78 +1,148 @@
 package com.vocabulary.myvocabulary.ui.quizzes
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.vocabulary.myvocabulary.ext.plusAssign
 import com.vocabulary.myvocabulary.repositories.quiz.QuizRepository
-import com.vocabulary.myvocabulary.rx.RxSchedulers
 import com.vocabulary.myvocabulary.ui.words.Word
-import io.reactivex.disposables.CompositeDisposable
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 class QuizViewModel(
     val dictionaryId: Long,
-    val failedOnly: Boolean,
-    private val rxSchedulers: RxSchedulers,
-    private val quizRepository: QuizRepository
+    val isFailedOnly: Boolean,
+    val quizType: Int,
+    private val quizRepository: QuizRepository,
 ) : ViewModel() {
-    private val disposables = CompositeDisposable()
-    private val _quizList: MutableStateFlow<List<Word>> = MutableStateFlow(emptyList())
-    val quizList: StateFlow<List<Word>> = _quizList
-    var isDictionaryEmpty = false
-    private val _isLoading: MutableStateFlow<Boolean> = MutableStateFlow(true)
-    val isLoading: StateFlow<Boolean> = _isLoading
+    private val _quizUiState = MutableStateFlow<QuizUiState>(QuizUiState.Loading)
+    val quizUiState: StateFlow<QuizUiState> = _quizUiState.asStateFlow()
 
-    fun fetchQuizList() {
-        _isLoading.value = true
-        observeQuizList(failedOnly)
+    private var quizCollectionJob: Job? = null
+    private val _events = Channel<QuizEvent>()
+    val events = _events.receiveAsFlow()
+
+    init {
+        viewModelScope.launch {
+            initialSetup()
+        }
     }
 
-    fun startQuiz(quizType: QuizTypes, dictionaryId: Long) {
-        viewModelScope.launch {
-            if (failedOnly.not()) {
-                quizRepository.setQuizList(dictionaryId, quizType)
-                    .subscribe()
+    private suspend fun initialSetup() {
+        _quizUiState.value = QuizUiState.Loading
+
+        try {
+            if(isFailedOnly.not()) {
+                quizRepository.setQuizList(dictionaryId, quizType.toQuizType())
+            }
+            observeQuizList(isFailedOnly)
+
+        } catch (e: Exception) {
+            _quizUiState.value = QuizUiState.Error("Failed to initialize quiz. Error: ${e.message}")
+        }
+
+    }
+
+    private fun observeQuizList(failedOnly: Boolean) {
+        quizCollectionJob?.cancel()
+
+        quizCollectionJob = viewModelScope.launch{
+            quizRepository.quizList
+                .catch { error ->
+                    _quizUiState.value =
+                        QuizUiState.Error(error.message ?: "Error fetching quiz list")
+                }
+                .collect { list ->
+                    val sampleWord = list.firstOrNull()
+                    // Ignore the list if it belongs to a different dictionary, e.g. from a previous quiz.
+                    if (sampleWord != null && sampleWord.containerDictionaryId != dictionaryId) {
+                        return@collect
+                    }
+                    if (list.isNotEmpty()) {
+                        val filteredShuffledList = list.filter { word ->
+                            val isValid = word.word.isNotBlank() && word.translation.isNotBlank()
+                            val matchesCriteria = if (failedOnly) word.lastResult.not() else true
+                            isValid && matchesCriteria
+                        }.shuffled()
+
+                        if (filteredShuffledList.isNotEmpty()) {
+                            _quizUiState.value = QuizUiState.SuccessList(
+                                quizList = filteredShuffledList,
+                                currentFocusedWordId = filteredShuffledList.first().wordId,
+                                isFabIconNext = filteredShuffledList.size > 1
+                            )
+                        } else {
+                            _quizUiState.value = QuizUiState.EmptyList
+                        }
+                    } else {
+                        _quizUiState.value = QuizUiState.EmptyList
+                    }
+                }
+        }
+
+    }
+
+    fun onNextClicked() {
+        _quizUiState.update { currentState ->
+            if (currentState is QuizUiState.SuccessList) {
+                if (currentState.rollingIndex >= currentState.quizList.size) {
+                    viewModelScope.launch {
+                        _events.send(QuizEvent.NavigateToResult)
+                    }
+                    return@update currentState
+                }
+                val nextIndex = currentState.rollingIndex + 1
+                val hasMoreWords = nextIndex < currentState.quizList.size
+
+                val incrementedState = currentState.copy(
+                    rollingIndex = nextIndex,
+                    isFabIconNext = hasMoreWords,
+                    currentGuess = "",
+                )
+                updateFocusedWord(incrementedState)
+            } else {
+                currentState
             }
         }
     }
 
-    private fun observeQuizList(failedOnly: Boolean) {
-        disposables += quizRepository.quizList
-            .subscribeOn(rxSchedulers.io())
-            .observeOn(rxSchedulers.main())
-            .subscribe(
-                { list ->
-                    isDictionaryEmpty = list.isEmpty()
-                    if (list.isNotEmpty()) {
-                        val filteredList = list.filter { word ->
-                            val isValid = word.word.isNotBlank() && word.translation.isNotBlank()
-                            val matchesCriteria = if (failedOnly) !word.lastResult else true
-                            isValid && matchesCriteria
-                        }.shuffled()
-                        _quizList.value = filteredList.shuffled()
-                    } else {
-                        _quizList.value = emptyList()
-                    }
-                    _isLoading.value = false
-                },
-                { error ->
-                    Log.e("QuizViewModel", "Error fetching quiz list", error)
-                    _isLoading.value = false
-                }
-            )
+    fun onGuessChanged(guess: String) {
+        _quizUiState.update { currentState ->
+            if (currentState is QuizUiState.SuccessList) {
+                currentState.copy(currentGuess = guess)
+            } else currentState
+        }
     }
 
-    public override fun onCleared() {
-        _quizList.value = emptyList()
-        disposables.clear()
-        super.onCleared()
+    private fun updateFocusedWord(state: QuizUiState.SuccessList): QuizUiState.SuccessList {
+        val wordId = state.quizList.getOrNull(state.rollingIndex - 1)?.wordId ?: 0L
+        return state.copy(currentFocusedWordId = wordId)
     }
 
-    data class FocusableWord(
-        val word: Word,
-        val isFocused: Boolean
-    )
+    fun clearList() {
+        _quizUiState.value = QuizUiState.Loading
+    }
+}
+
+sealed interface QuizUiState {
+    data object Loading : QuizUiState
+    data object EmptyList : QuizUiState
+    data class SuccessList(
+        val quizList: List<Word>,
+        val rollingIndex: Int = 1,
+        val currentGuess: String = "",
+        val isFabIconNext: Boolean = true,
+        val currentFocusedWordId: Long = 0L,
+    ) : QuizUiState
+
+    data class Error(val message: String) : QuizUiState
+}
+
+sealed interface QuizEvent {
+    data object NavigateToResult : QuizEvent
 }
