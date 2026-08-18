@@ -327,58 +327,6 @@ fun SortMenu(
     }
 }
 
-@OptIn(ExperimentalMaterial3ExpressiveApi::class)
-@Composable
-fun FABMenu(
-    onShowCreateDialog: () -> Unit,
-    onImportClick: () -> Unit
-) {
-    var expanded by remember { mutableStateOf(false) }
-
-    FloatingActionButtonMenu(
-        expanded = expanded,
-        button = {
-            ToggleFloatingActionButton(
-                checked = expanded,
-                onCheckedChange = { expanded = it },
-            ) {
-                Icon(
-                    imageVector = if (expanded) Icons.Default.Clear else Icons.Default.Add,
-                    contentDescription = stringResource(R.string.dictionary_fab_description),
-                )
-            }
-        }
-    ) {
-        FloatingActionButtonMenuItem(
-            onClick = {
-                onShowCreateDialog()
-                expanded = false
-            },
-            text = { Text(stringResource(R.string.create_fab_label)) },
-            icon = {
-                Icon(
-                    imageVector = Icons.Outlined.CreateNewFolder,
-                    contentDescription = "Create new dictionary icon"
-                )
-            }
-        )
-        FloatingActionButtonMenuItem(
-            onClick = {
-                onImportClick()
-                expanded = false
-            },
-            text = { Text(stringResource(R.string.import_fab_label)) },
-            icon = {
-                Icon(
-                    imageVector = Icons.Default.ImportExport,
-                    contentDescription = "Import dictionary"
-                )
-            }
-        )
-
-    }
-}
-
 @Composable
 fun DictionaryItemView(
     dictionaryItem: Dictionary,
