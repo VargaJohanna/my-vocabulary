@@ -8,6 +8,7 @@ import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AlertDialog
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
@@ -144,6 +145,7 @@ fun MyVocabularyApp() {
                 when (val fab = screenFab) {
                     is FabConfiguration.FabButton -> {
                         FloatingActionButton(
+                            modifier = Modifier.imePadding(),
                             onClick = { fab.onClick() }
                         ) {
                             Icon(
@@ -155,6 +157,7 @@ fun MyVocabularyApp() {
 
                     is FabConfiguration.FabMenu -> {
                         FloatingActionButtonMenu(
+                            modifier = Modifier.imePadding(),
                             expanded = fab.expanded,
                             button = {
                                 ToggleFloatingActionButton(
