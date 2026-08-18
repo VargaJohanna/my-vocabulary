@@ -2,7 +2,6 @@ package com.vocabulary.myvocabulary.ui.quizzes
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.vocabulary.myvocabulary.navigation.FabConfiguration
 import com.vocabulary.myvocabulary.repositories.quiz.QuizRepository
 import com.vocabulary.myvocabulary.ui.words.Word
 import kotlinx.coroutines.Job
