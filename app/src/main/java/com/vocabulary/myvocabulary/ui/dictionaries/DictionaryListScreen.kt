@@ -57,6 +57,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.vocabulary.myvocabulary.Constants
 import com.vocabulary.myvocabulary.R
 import com.vocabulary.myvocabulary.navigation.FabConfiguration
 import com.vocabulary.myvocabulary.repositories.sortBy.dictionary.SortByDictionaryOptions
@@ -86,6 +87,7 @@ fun DictionaryListScreen(
     var itemToDelete by rememberSaveable { mutableStateOf<Dictionary?>(null) }
     var itemToEdit by rememberSaveable { mutableStateOf<Dictionary?>(null) }
     var isImport by rememberSaveable { mutableStateOf(false) }
+    var isFabExpanded by remember { mutableStateOf(false) }
 
     LaunchedEffect(Unit) {
         shareDictViewModel.importedDictionaryDetailsFlow.collect { event ->
@@ -108,17 +110,38 @@ fun DictionaryListScreen(
         }
     }
 
-    LaunchedEffect(Unit) {
+    LaunchedEffect(isFabExpanded) {
         viewModel.fetchDictionaries()
-//        onUpdateFab {
-//            FABMenu(
-//                onShowCreateDialog = { showCreateDialog = true },
-//                onImportClick = {
-//                    filePickerLauncher.launch(Constants.MIME_TYPE)
-//                    isImport = true
-//                }
-//            )
-//        }
+        onUpdateFab(
+            FabConfiguration.FabMenu(
+                isVisible = true,
+                expanded = isFabExpanded,
+                onExpandedChange = { isFabExpanded = it },
+                icon = if (isFabExpanded) Icons.Default.Clear else Icons.Default.Add,
+                labelId = R.string.dictionary_fab_description,
+                items = listOf(
+                    FabConfiguration.FabButton(
+                        icon = Icons.Outlined.CreateNewFolder,
+                        iconLabelId = R.string.create_fab_label,
+                        onClick = {
+                            isFabExpanded = false
+                            showCreateDialog = true
+                        },
+                        extendedLabelId = R.string.create_fab_label
+                    ),
+                    FabConfiguration.FabButton(
+                        icon = Icons.Default.ImportExport,
+                        iconLabelId = R.string.import_fab_label,
+                        onClick = {
+                            isFabExpanded = false
+                            isImport = true
+                            filePickerLauncher.launch(Constants.MIME_TYPE)
+                        },
+                        extendedLabelId = R.string.import_fab_label
+                    )
+                )
+            )
+        )
     }
 
     LaunchedEffect(newDictionary) {
@@ -236,8 +259,8 @@ fun DictionaryListScreen(
         )
     }
 
-    if(isImport) {
-        if(!showCreateDialog) {
+    if (isImport) {
+        if (!showCreateDialog) {
             dialogFactory.BuildCreateDictionaryDialog(
                 onDismissRequest = {
                     isImport = false
@@ -280,9 +303,12 @@ fun SortMenu(
                 onSortByDate()
                 onToggleSort(false)
             },
-            leadingIcon = { Icon(
-                imageVector = Icons.Default.DateRange,
-                contentDescription = stringResource(R.string.sort_by_date)) }
+            leadingIcon = {
+                Icon(
+                    imageVector = Icons.Default.DateRange,
+                    contentDescription = stringResource(R.string.sort_by_date)
+                )
+            }
 
         )
         DropdownMenuItem(
@@ -291,9 +317,12 @@ fun SortMenu(
                 onSortByTitle()
                 onToggleSort(false)
             },
-            leadingIcon = { Icon(
-                imageVector = Icons.Default.SortByAlpha,
-                contentDescription = stringResource(R.string.sort_by_title)) }
+            leadingIcon = {
+                Icon(
+                    imageVector = Icons.Default.SortByAlpha,
+                    contentDescription = stringResource(R.string.sort_by_title)
+                )
+            }
         )
     }
 }
@@ -303,7 +332,7 @@ fun SortMenu(
 fun FABMenu(
     onShowCreateDialog: () -> Unit,
     onImportClick: () -> Unit
-    ) {
+) {
     var expanded by remember { mutableStateOf(false) }
 
     FloatingActionButtonMenu(
