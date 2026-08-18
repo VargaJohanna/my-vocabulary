@@ -134,9 +134,11 @@
     <string name="most_practiced_label">Most practiced:</string>
     <string name="last_practiced_placeholder">Your latest session stats will show up here. Let’s get practicing!</string>
     <string name="most_practiced_placeholder">Once you’ve used a few dictionaries, your most-practiced ones will appear here.</string>
-    <string name="memorise_label">Memorise:</string>
+    <string name="memorise_label">Memorise</string>
     <string name="memorise_placeholder">These are the words and expressions to review. Keep going — you’ve got this!</string>
     <string name="quote_title">Quote of the day</string>
     <string name="snack_bar_error">An error occurred while loading the word list.</string>
+    <string name="last_practiced_placeholder_title">Last practiced</string>
+    <string name="most_practiced_placeholder_title">Most practiced</string>
 
 </resources>

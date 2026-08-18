@@ -111,7 +111,7 @@
     <string name="number_of_words">Szavak száma: %d</string>
     <string name="dictionary_title">Cím</string>
     <string name="custom_dialog_title">Hány szó legyen?</string>
-    <string name="custom_dialog_error">Ennél kicsit  többet</string>
+    <string name="custom_dialog_error">Ennél kicsit többet</string>
     <string name="back_arrow">Vissza</string>
     <string name="home_info">A fejlesztőröl</string>
     <string name="about_appbar">Rólunk</string>
@@ -128,16 +128,18 @@
     <string name="sort_by_translation">Rendezés \"Jelentés\" szerint</string>
     <string name="empty_list_snackbar">Ez a szótár üres.</string>
     <string name="home_label">Otthon</string>
-    <string name="last_practiced_label">Utoljára gyakorolt:</string>
+    <string name="last_practiced_label">Legutoljára gyakorolt szótár:</string>
     <string name="average_rate_label">Átlag eredmény:</string>
-    <string name="last_time_practiced_label">Utoljára gyakorolt:</string>
-    <string name="most_practiced_label">Legtöbbet gyakorolt:</string>
+    <string name="last_time_practiced_label">Utolsó gyakorlás dátuma:</string>
+    <string name="most_practiced_label">Legtöbbet gyakorolt szótár:</string>
     <string name="last_practiced_placeholder">A legutóbbi gyakorlásod statisztikái itt fognak megjelenni. Kezdjünk bele!</string>
     <string name="most_practiced_placeholder">Ha már több szótárt is használtál, itt látod majd a legtöbbet gyakoroltakat.</string>
-    <string name="memorise_label">Memorizálandó</string>
-    <string name="memorise_placeholder">tt találod azokat a szavakat és kifejezéseket, amelyeket érdemes újra átnézned. Menni fog!</string>
+    <string name="memorise_label">Emlékeztető</string>
+    <string name="memorise_placeholder">Itt találod azokat a szavakat és kifejezéseket, amelyeket érdemes újra átnézned. Menni fog!</string>
     <string name="quote_title">Napi idézet</string>
     <string name="snack_bar_error">Hiba történt a szavak betöltése közben.</string>
+    <string name="last_practiced_placeholder_title">Legutoljára gyakorolt szótár</string>
+    <string name="most_practiced_placeholder_title">Legtöbbet gyakorolt szótár</string>
 
 
 </resources>
