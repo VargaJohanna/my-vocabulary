@@ -149,13 +149,11 @@ fun WordListDestination(
                 isSortOpen -> onToggleSort(false)else -> navController.popBackStack()
             }
         }
-
-        onUpdateFab(FabConfiguration.Hidden())
     }
 
     WordListScreen(
         dictionaryId = args.dictionaryId,
-        onUpdateFab = { onUpdateFab },
+        onUpdateFab = onUpdateFab,
         isSearchVisible = isSearchVisible,
         onToggleSearch = onToggleSearch,
         isSortOpen = isSortOpen,

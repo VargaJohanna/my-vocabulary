@@ -121,7 +121,7 @@ fun MyVocabularyNavHost(
                 navBackStackEntry = backStackEntry,
                 navController = navController,        onUpdateTitle = onUpdateTitle,
                 onUpdateActions = onUpdateActions,
-                onUpdateFab = { onUpdateFab(FabConfiguration.Hidden()) },
+                onUpdateFab = { config -> onUpdateFab(config) },
                 onBackClick = onBackClick,
                 isSearchVisible = isSearchVisible,
                 onToggleSearch = onToggleSearch,

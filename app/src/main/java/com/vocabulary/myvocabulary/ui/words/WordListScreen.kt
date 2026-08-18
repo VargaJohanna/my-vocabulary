@@ -28,7 +28,6 @@ import androidx.compose.material3.DockedSearchBar
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -46,13 +45,12 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.vocabulary.myvocabulary.navigation.FabConfiguration
 import com.vocabulary.myvocabulary.repositories.sortBy.SortByOptions
-import com.vocabulary.myvocabulary.ui.dictionaries.ShareDictionaryViewModel
 import com.vocabulary.myvocabulary.ui.lottie.NewDictionaryAnimation
 import com.vocabulary.myvocabulary.ui.theme.MyVocabularyTheme
 import com.vocabulary.myvocabulary.ui.theme.dimens
@@ -65,7 +63,7 @@ import java.util.Calendar
 @Composable
 fun WordListScreen(
     dictionaryId: Long,
-    onUpdateFab: (@Composable () -> Unit) -> Unit,
+    onUpdateFab: (FabConfiguration) -> Unit,
     isSearchVisible: Boolean,
     onToggleSearch: (Boolean) -> Unit,
     isSortOpen: Boolean,
@@ -137,7 +135,7 @@ fun WordListScreenContent(
     onInsertWord: (String, String) -> Unit,
     onEditWord: (Word) -> Unit,
     onDeleteWord: (Word) -> Unit,
-    onUpdateFab: (@Composable () -> Unit) -> Unit,
+    onUpdateFab: (FabConfiguration) -> Unit,
     isSearchVisible: Boolean,
     onSearch: (String) -> Unit,
     isSortOpen: Boolean,
@@ -168,9 +166,16 @@ fun WordListScreenContent(
     var runNewAnimation by rememberSaveable { mutableStateOf(false) }
 
     LaunchedEffect(Unit) {
-        onUpdateFab {
-            FabMenu(onShowCreateDialog = { showCreateDialog = true })
-        }
+        onUpdateFab (
+            FabConfiguration.FabButton(
+                isVisible = true,
+                onClick = {
+                    showCreateDialog = true
+                },
+                icon = Icons.Default.Add,
+                iconLabelId = R.string.dictionary_fab_description,
+            )
+        )
     }
 
     LaunchedEffect(isSearchVisible) {
@@ -394,18 +399,6 @@ fun SortMenu(
 }
 
 @Composable
-fun FabMenu(onShowCreateDialog: () -> Unit) {
-    FloatingActionButton(
-        onClick = { onShowCreateDialog() }
-    ) {
-        Icon(
-            imageVector = Icons.Default.Add,
-            contentDescription = stringResource(R.string.dictionary_fab_description),
-        )
-    }
-}
-
-@Composable
 fun WordLazyList(
     list: List<Word>,
     onClick: (isSheetOpen: Boolean, clickedWord: Word) -> Unit
@@ -490,20 +483,17 @@ fun WordCard(
 @Preview
 @Composable
 fun WordListScreenPreview() {
-    // Some fake data for the preview
     val previewWords = listOf(
         Word(1, 1, "new", "novus", 0, 0, 0, Calendar.getInstance().time),
         Word(2, 1, "body", "corpus", 0, 0, 0, Calendar.getInstance().time),
         Word(3, 1, "day", "diem", 0, 0, 0, Calendar.getInstance().time),
     )
 
-    // Only call the stateless composable with the fake data.
-    // Wrap it in your app's theme for consistent styling.
     MyVocabularyTheme {
         WordListScreenContent(
             wordList = previewWords,
             dialogFactory = ComposeDialogFactory(),
-            onInsertWord = { _, _ -> /* Do nothing in preview */ },
+            onInsertWord = { _, _ -> },
             onDeleteWord = { _ -> },
             onEditWord = { _ -> },
             onUpdateFab = {},
