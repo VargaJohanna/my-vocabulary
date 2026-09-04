@@ -18,6 +18,8 @@ import io.reactivex.Observable
 import io.reactivex.Single
 import io.reactivex.disposables.CompositeDisposable
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlin.math.round
 import java.text.Normalizer
@@ -31,12 +33,25 @@ class ResultViewModel(
     private val quizRepository: QuizRepository,
     private val guessedWordRepository: GuessedWordRepository,
 ) : ViewModel() {
-    private val disposables = CompositeDisposable()
+        private val disposables = CompositeDisposable()
     private val guessedWordList: MutableStateFlow<List<Word>> = MutableStateFlow(emptyList())
-    var isAllPassed = true
 
-    private val numOfPassed: MutableStateFlow<Int> = MutableStateFlow(0)
-    private val resultPercentage: MutableStateFlow<Int> = MutableStateFlow(0)
+    private val _resultUiState = MutableStateFlow<ResultUiState>(ResultUiState.Loading)
+    val resultUiState: StateFlow<ResultUiState> = _resultUiState.asStateFlow()
+
+    init {
+        viewModelScope.launch {
+            initialSetup()
+        }
+    }
+
+    private fun initialSetup() {
+        _resultUiState.value = ResultUiState.Loading
+         try {
+
+         }
+
+    }
 
     override fun onCleared() {
         disposables.clear()
@@ -70,12 +85,23 @@ class ResultViewModel(
                 val calculatedPercentage = if (guessList.isNotEmpty()) {
                     round(((guessList.filter { it.lastResult }.size.toFloat() / guessList.size.toFloat()) * 100)).toInt()
                 } else 0
-                resultPercentage.value = calculatedPercentage
                 saveQuizStats(dictionaryId, calculatedPercentage)
                 saveLastPracticeOfDictionary(dictionaryId)
-                guessedWordList.value = guessList
                 quizRepository.updateQuizList(guessList)
-                numOfPassed.value = guessList.filter { it.lastResult }.size
+                if(guessList.filter { it.lastResult }.size == guessList.size) {
+                    _resultUiState.value = ResultUiState.Success(
+                        resultList = guessList,
+                        percentage = calculatedPercentage,
+                        directionType = quizDirection.toDirectionType()
+                    )
+                } else {
+                    _resultUiState.value = ResultUiState.Failed(
+                        resultList = guessList,
+                        numberOfPassed = guessList.filter { it.lastResult }.size,
+                        percentage = calculatedPercentage,
+                        directionType = quizDirection.toDirectionType()
+                    )
+                }
             }
     }
 
@@ -104,7 +130,6 @@ class ResultViewModel(
                 passed = it.passed + 1
             )
         } else {
-            setAllPassedValue(false)
             it.copy(
                 lastResult = false,
                 lastGuess = entry.value,
@@ -124,11 +149,6 @@ class ResultViewModel(
     fun resetGuessedWordCollections() {
         guessedWordRepository.resetGuessedWordMap()
         guessedWordList.value = emptyList()
-        setAllPassedValue(true) // It's true until in evaluation it's turned false
-    }
-
-    private fun setAllPassedValue(lastResult: Boolean) {
-        isAllPassed = lastResult
     }
 
     fun startNew(dictionaryId: Long, quizType: QuizTypes) {
@@ -148,12 +168,29 @@ class ResultViewModel(
     fun saveQuizStats(id: Long, scorePercentage: Int) {
         dictionaryRepository.saveQuizStats(id, scorePercentage)
     }
-
-    fun getNumOfPassed() = numOfPassed
-
-    fun getResultPercentage() = resultPercentage
 }
 
 private fun String.normalize(): String {
     return Normalizer.normalize(this, Normalizer.Form.NFC).trim()
+}
+
+sealed interface ResultUiState {
+    data object Loading: ResultUiState
+
+    data class Failed(
+        val resultList: List<Word>,
+        val numberOfPassed: Int,
+        val percentage: Int,
+        val directionType: QuizDirectionType
+    ): ResultUiState
+
+    data class Success(
+        val resultList: List<Word>,
+        val percentage: Int,
+        val directionType: QuizDirectionType
+    ): ResultUiState
+
+    data class Error(
+        val message: String
+    ): ResultUiState
 }
