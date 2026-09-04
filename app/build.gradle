@@ -13,8 +13,8 @@ android {
         applicationId = "com.vocabulary.myvocabulary"
         minSdk = 23
         targetSdk = 37
-        versionCode = 42
-        versionName = "2.0"
+        versionCode = 43
+        versionName = "2.1"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         Properties localProperties = new Properties()
         def localPropertiesFile = project.rootProject.file("local.properties")
