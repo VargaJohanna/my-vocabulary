@@ -1,18 +1,24 @@
 package com.vocabulary.myvocabulary.ui.dictionaries
 
-import androidx.arch.core.executor.testing.InstantTaskExecutorRule
+import assertk.assertThat
+import assertk.assertions.isFalse
 import com.nhaarman.mockitokotlin2.*
-import com.vocabulary.myvocabulary.TestScheduler
 import com.vocabulary.myvocabulary.repositories.dictionary.DictionaryRepository
-import com.vocabulary.myvocabulary.repositories.quiz.QuizRepository
 import com.vocabulary.myvocabulary.repositories.sortBy.dictionary.SortDictionaryRepository
 import com.vocabulary.myvocabulary.repositories.sortedList.SortedListRepository
+import com.vocabulary.myvocabulary.testing.MainCoroutineRule
+import com.vocabulary.myvocabulary.testing.TestDispatchers
 import io.reactivex.Observable
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.advanceUntilIdle
+import kotlinx.coroutines.test.runTest
 import org.junit.Assert
+import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import java.util.*
 
+@OptIn(ExperimentalCoroutinesApi::class)
 class DictionaryListViewModelTest {
     val dictionaryTest = Dictionary(dictionaryName = "Test",
         dictionaryCreated = Date(12),
@@ -20,40 +26,48 @@ class DictionaryListViewModelTest {
         dictionaryLastResult = 0,
         dictionaryFinishedCount = 0,
         dictionaryTotalScore = 100)
-    @Rule
-    @JvmField
-    var mockito = InstantTaskExecutorRule()
+    @get:Rule
+    val mainCoroutineRule = MainCoroutineRule()
 
     private val dictionaryRepository = mock<DictionaryRepository>()
-    private val quizRepository = mock<QuizRepository>()
 
     private val sortByRepository = mock<SortDictionaryRepository>()
     private val sortedListRepository = mock<SortedListRepository>()
     private val newDictionaryId = 5L
+    private lateinit var testDispatcher: TestDispatchers
 
-    @Test
-    fun `should create dictionary when insertDictionary() is called`() {
-        val dictionaryListViewModel = givenDictionaryListViewModel()
-        val dictionaryWithId = dictionaryTest
-
-        dictionaryListViewModel.insertDictionary(dictionaryWithId)
-
-        verify(dictionaryRepository).createDictionary(dictionaryWithId)
+    @Before
+    fun setup() {
+        testDispatcher = TestDispatchers(mainCoroutineRule.testDispatcher)
     }
 
     @Test
-    fun `should update newlyCreatedItemDetails when insertDictionary() is called`() {
+    fun `should create dictionary when insertDictionary() is called`() = runTest {
+        val dictionaryListViewModel = givenDictionaryListViewModel()
+        val dictionaryWithId = dictionaryTest
+        assertThat(dictionaryListViewModel.isLoading.value).isFalse()
+
+        dictionaryListViewModel.insertDictionary(dictionaryWithId)
+        
+        advanceUntilIdle()
+
+        verify(dictionaryRepository).createDictionary(dictionaryWithId)
+        assertThat(dictionaryListViewModel.isLoading.value).isFalse()
+    }
+
+    @Test
+    fun `should update newlyCreatedItemDetails when insertDictionary() is called`() = runTest {
         val dictionaryListViewModel = givenDictionaryListViewModel()
         val dictionary = dictionaryTest
 
         dictionaryListViewModel.insertDictionary(dictionary)
-
-//        Assert.assertEquals(DictionaryDetails(newDictionaryId, dictionary.dictionaryName),
-//                dictionaryListViewModel.newlyCreatedItemDetails.value?.peekContent())
+        advanceUntilIdle()
+        Assert.assertEquals(DictionaryDetails(newDictionaryId, dictionary.dictionaryName),
+                dictionaryListViewModel.newDictionary.value.peekContent())
     }
 
     @Test
-    fun `should create dictionary object with given name when createDictionaryObject() is called`(){
+    fun `should create dictionary object with given name when createDictionaryObject() is called`() = runTest {
         val dictionaryListViewModel = givenDictionaryListViewModel()
         val dictionaryName = "Hungarian"
 
@@ -63,27 +77,29 @@ class DictionaryListViewModelTest {
     }
 
     @Test
-    fun `should update dictionary when renameDictionary() is called`() {
+    fun `should update dictionary when renameDictionary() is called`() = runTest {
         val dictionaryListViewModel = givenDictionaryListViewModel()
         val dictionaryToUpdate = dictionaryTest
 
         dictionaryListViewModel.renameDictionary(dictionaryToUpdate)
+        advanceUntilIdle()
 
         verify(dictionaryRepository).updateDictionary(dictionaryToUpdate)
     }
 
     @Test
-    fun `should delete dictionary when deleteDictionary() is called`() {
+    fun `should delete dictionary when deleteDictionary() is called`() = runTest {
         val dictionaryListViewModel = givenDictionaryListViewModel()
         val dictionaryWithId = dictionaryTest
 
         dictionaryListViewModel.deleteDictionary(dictionaryWithId)
+        advanceUntilIdle()
 
         verify(dictionaryRepository).deleteDictionary(dictionaryWithId)
     }
 
     @Test
-    fun `should update currentSortByData when sortByData emits`() {
+    fun `should update currentSortByData when sortByData emits`() = runTest {
         val sortData = com.vocabulary.myvocabulary.repositories.sortBy.dictionary.SortDictionaryData(
             dateDescending = false,
             titleDescending = false
@@ -93,20 +109,22 @@ class DictionaryListViewModelTest {
 
         val dictionaryListViewModel = DictionaryListViewModel(
             dictionaryRepository,
-            TestScheduler(),
             sortByRepository,
-            sortedListRepository
+            sortedListRepository,
+            testDispatcher
         )
+        advanceUntilIdle()
 
         Assert.assertEquals(sortData, dictionaryListViewModel.currentSortByData)
     }
 
     @Test
-    fun `should delegate setSortBy() to repository`() {
+    fun `should delegate setSortBy() to repository`() = runTest {
         val dictionaryListViewModel = givenDictionaryListViewModel()
         val sortData = com.vocabulary.myvocabulary.repositories.sortBy.dictionary.SortDictionaryData()
 
         dictionaryListViewModel.setSortBy(sortData)
+        advanceUntilIdle()
 
         verify(sortByRepository).setSortBy(sortData)
     }
@@ -119,9 +137,9 @@ class DictionaryListViewModelTest {
         whenever(sortedListRepository.getSortedDictionaryList()).thenReturn(Observable.never())
         return DictionaryListViewModel(
             dictionaryRepository,
-            TestScheduler(),
             sortByRepository,
-            sortedListRepository
+            sortedListRepository,
+            testDispatcher
         )
     }
 }

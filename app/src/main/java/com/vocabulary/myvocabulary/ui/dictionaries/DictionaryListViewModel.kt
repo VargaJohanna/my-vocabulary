@@ -2,12 +2,12 @@ package com.vocabulary.myvocabulary.ui.dictionaries
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.vocabulary.myvocabulary.DispatcherProvider
 import com.vocabulary.myvocabulary.repositories.dictionary.DictionaryRepository
 import com.vocabulary.myvocabulary.repositories.sortBy.dictionary.SortDictionaryData
 import com.vocabulary.myvocabulary.repositories.sortBy.dictionary.SortDictionaryRepository
 import com.vocabulary.myvocabulary.repositories.sortedList.SortedListRepository
 import com.vocabulary.myvocabulary.utils.Event
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -20,6 +20,7 @@ class DictionaryListViewModel(
         private val dictionaryRepository: DictionaryRepository,
         private val sortByRepository: SortDictionaryRepository,
         private val sortedListRepository: SortedListRepository,
+        private val dispatchers: DispatcherProvider
 ) : ViewModel() {
     private val _dictionaries: MutableStateFlow<List<Dictionary>> = MutableStateFlow(emptyList())
     val dictionaries: StateFlow<List<Dictionary>> = _dictionaries.asStateFlow()
@@ -49,7 +50,7 @@ class DictionaryListViewModel(
         viewModelScope.launch {
             _isLoading.value = true
             try {
-                val id = withContext(Dispatchers.IO) {
+                val id = withContext(dispatchers.io) {
                     dictionaryRepository.createDictionary(dictionary)
                 }
                 val details = DictionaryDetails(id, dictionary.dictionaryName)
@@ -76,13 +77,13 @@ class DictionaryListViewModel(
             dictionaryCreated = Calendar.getInstance().time, dictionaryLastPracticed = null, dictionaryLastResult = null, dictionaryFinishedCount = 0, dictionaryTotalScore = 0)
 
     fun renameDictionary(dictionary: Dictionary) {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch(dispatchers.io) {
             dictionaryRepository.updateDictionary(dictionary)
         }
     }
 
     fun deleteDictionary(dictionary: Dictionary) {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch(dispatchers.io) {
             dictionaryRepository.deleteDictionary(dictionary)
         }
     }
