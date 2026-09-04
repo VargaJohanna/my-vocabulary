@@ -25,6 +25,10 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarDuration
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
@@ -71,66 +75,87 @@ fun ResultScreen(
 
     val handleExit = {
         resultViewModel.resetGuessedWordCollections()
-        resultViewModel.dispose()
         onExit()
     }
+    val snackBarHostState = remember { SnackbarHostState() }
+    val snackBarErrorMessage = stringResource(R.string.snack_bar_error)
 
     BackHandler(enabled = true) {
         handleExit()
     }
 
     LaunchedEffect(Unit) {
-        resultViewModel.fetchGuessedList()
+        resultViewModel.fetchResults()
+    }
+
+    LaunchedEffect(Unit) {
         onBackClick {
             handleExit()
         }
     }
 
-    when (val uiState = resultState) {
-        is ResultUiState.Loading -> {
-            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                CircularProgressIndicator()
-            }
-        }
-
-        is ResultUiState.Success -> {
-            SuccessScreen(
-                resultState = uiState,
-                onExit = handleExit,
-                onRestartNew = {
-                    resultViewModel.resetGuessedWordCollections()
-                    resultViewModel.startNew(dictionaryId, quizType.toQuizType())
-                    resultViewModel.dispose()
-                    onRestartQuiz(quizType, dictionaryId, direction, false)
-                },
-                onUpdateFab = { onUpdateFab(it) }
-            )
-        }
-
-        is ResultUiState.Failed -> {
-            FailedScreen(
-                resultState = uiState,
-                onExit = handleExit,
-                onRestartNew = {
-                    resultViewModel.resetGuessedWordCollections()
-                    resultViewModel.startNew(dictionaryId, quizType.toQuizType())
-                    resultViewModel.dispose()
-                    onRestartQuiz(quizType, dictionaryId, direction, false)
-                },
-                onUpdateFab = { onUpdateFab(it) },
-                onRestartFailedOnly = {
-                    resultViewModel.resetGuessedWordCollections()
-                    resultViewModel.dispose()
-                    onRestartQuiz(quizType, dictionaryId, direction, true)
+    Scaffold(
+        snackbarHost = { SnackbarHost(hostState = snackBarHostState) }
+    ) { padding ->
+        Box(
+            modifier = Modifier
+                .padding(padding)
+                .fillMaxSize()
+        ) {
+            when (val uiState = resultState) {
+                is ResultUiState.Loading -> {
+                    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                        CircularProgressIndicator()
+                    }
                 }
-            )
+
+                is ResultUiState.Success -> {
+                    SuccessScreen(
+                        resultState = uiState,
+                        onExit = handleExit,
+                        onRestartNew = {
+                            resultViewModel.resetGuessedWordCollections()
+                            resultViewModel.startNew(dictionaryId, quizType.toQuizType())
+                            onRestartQuiz(quizType, dictionaryId, direction, false)
+                        },
+                        onUpdateFab = { onUpdateFab(it) }
+                    )
+                }
+
+                is ResultUiState.Failed -> {
+                    FailedScreen(
+                        resultState = uiState,
+                        onExit = handleExit,
+                        onRestartNew = {
+                            resultViewModel.resetGuessedWordCollections()
+                            resultViewModel.startNew(dictionaryId, quizType.toQuizType())
+                            onRestartQuiz(quizType, dictionaryId, direction, false)
+                        },
+                        onUpdateFab = { onUpdateFab(it) },
+                        onRestartFailedOnly = {
+                            resultViewModel.resetGuessedWordCollections()
+                            onRestartQuiz(quizType, dictionaryId, direction, true)
+                        }
+                    )
+                }
+
+                is ResultUiState.Error -> {
+                    LaunchedEffect(Unit) {
+                        snackBarHostState.showSnackbar(
+                            message = snackBarErrorMessage,
+                            duration = SnackbarDuration.Short
+                        )
+                        handleExit()
+                        onExit()
+                    }
+                }
+            }
         }
     }
 }
 
 @Composable
 fun SuccessScreen(
-    modifier: Modifier = Modifier,
     resultState: ResultUiState.Success,
     onExit: () -> Unit,
     onRestartNew: () -> Unit,
@@ -174,39 +199,34 @@ fun SuccessScreen(
         )
     }
 
-    Box(
-        modifier = modifier.fillMaxSize()
+    Column(
+        modifier = Modifier
+            .fillMaxSize(),
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Column(
+        Text(
             modifier = Modifier
-                .fillMaxSize(),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            Text(
-                modifier = Modifier
-                    .padding(MaterialTheme.dimens.PaddingMedium)
-                    .fillMaxWidth(),
-                textAlign = TextAlign.Center,
-                text = String.format(
-                    stringResource(R.string.result_stats),
-                    100,
-                    resultState.resultList.size,
-                    resultState.percentage
-                )
+                .padding(MaterialTheme.dimens.PaddingMedium)
+                .fillMaxWidth(),
+            textAlign = TextAlign.Center,
+            text = String.format(
+                stringResource(R.string.result_stats),
+                100,
+                resultState.resultList.size,
+                resultState.percentage
             )
-            ResultLazyList(
-                list = resultState.resultList,
-                paddingValues = PaddingValues(0.dp),
-                directionType = resultState.directionType
-            )
-        }
+        )
+        ResultLazyList(
+            list = resultState.resultList,
+            paddingValues = PaddingValues(0.dp),
+            directionType = resultState.directionType
+        )
     }
     SuccessAnimation()
 }
 
 @Composable
 fun FailedScreen(
-    modifier: Modifier = Modifier,
     resultState: ResultUiState.Failed,
     onExit: () -> Unit,
     onRestartNew: () -> Unit,
@@ -261,33 +281,30 @@ fun FailedScreen(
         )
     }
 
-    Box(
-        modifier = modifier.fillMaxSize()
+    Column(
+        modifier = Modifier
+            .fillMaxSize(),
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Column(
+        Text(
             modifier = Modifier
-                .fillMaxSize(),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            Text(
-                modifier = Modifier
-                    .padding(MaterialTheme.dimens.PaddingMedium)
-                    .fillMaxWidth(),
-                textAlign = TextAlign.Center,
-                text = String.format(
-                    stringResource(R.string.result_stats),
-                    resultState.numberOfPassed,
-                    resultState.resultList.size,
-                    resultState.percentage
-                )
+                .padding(MaterialTheme.dimens.PaddingMedium)
+                .fillMaxWidth(),
+            textAlign = TextAlign.Center,
+            text = String.format(
+                stringResource(R.string.result_stats),
+                resultState.numberOfPassed,
+                resultState.resultList.size,
+                resultState.percentage
             )
-            ResultLazyList(
-                list = resultState.resultList,
-                paddingValues = PaddingValues(0.dp),
-                directionType = resultState.directionType
-            )
-        }
+        )
+        ResultLazyList(
+            list = resultState.resultList,
+            paddingValues = PaddingValues(0.dp),
+            directionType = resultState.directionType
+        )
     }
+
     FailedAnimation()
 }
 

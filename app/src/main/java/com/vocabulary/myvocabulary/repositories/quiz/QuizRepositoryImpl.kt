@@ -18,15 +18,6 @@ class QuizRepositoryImpl(
     private val _quizList = MutableStateFlow<List<Word>> (emptyList())
     override val quizList: Flow<List<Word>> = _quizList.asStateFlow()
 
-//    override fun resetQuizList(dictionaryId: Long, quizType: QuizTypes): Completable {
-//        return when (quizType) {
-//            QuizTypes.FullQuiz -> getFullQuizList(dictionaryId)
-//            QuizTypes.QuickQuiz -> getQuickQuizList(dictionaryId)
-//            QuizTypes.WeakestQuiz -> getWeakestFive(dictionaryId)
-//            QuizTypes.CustomQuiz -> resetCustomQuizList(dictionaryId)
-//        }.ignoreElement()
-//    }
-
     override suspend fun setQuizList(dictionaryId: Long, quizType: QuizTypes) {
         val list = when (quizType) {
             QuizTypes.FullQuiz -> getFullQuizList(dictionaryId)
