@@ -7,6 +7,8 @@ import androidx.datastore.preferences.preferencesDataStoreFile
 import com.f2prateek.rx.preferences2.RxSharedPreferences
 import com.vocabulary.myvocabulary.BuildConfig
 import com.vocabulary.myvocabulary.Constants
+import com.vocabulary.myvocabulary.DispatcherProvider
+import com.vocabulary.myvocabulary.StandardDispatchers
 import com.vocabulary.myvocabulary.network.QuoteService
 import com.vocabulary.myvocabulary.repositories.AppDatabase
 import com.vocabulary.myvocabulary.repositories.dictionary.DictionaryRepository
@@ -126,6 +128,7 @@ val viewModelModule = module {
 
 val schedulerModule = module {
     factory<RxSchedulers> { SchedulersImpl() }
+    single<DispatcherProvider> { StandardDispatchers }
 }
 
 val factoryModule = module {
