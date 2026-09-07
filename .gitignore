@@ -11,6 +11,8 @@
 .idea/misc.xml
 # Logs
 *.log
+# Firebase
+.firebase/
 firebase-debug.log
 
 # Keystore files
