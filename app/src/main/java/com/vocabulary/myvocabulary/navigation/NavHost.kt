@@ -243,7 +243,6 @@ fun MyVocabularyNavHost(
                     }
                 },
                 onUpdateFab = { config -> onUpdateFab(config) },
-                onBackClick = onBackClick
             )
         }
     }

@@ -2,12 +2,11 @@ package com.vocabulary.myvocabulary.ui.results
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.vocabulary.myvocabulary.DispatcherProvider
+import com.vocabulary.myvocabulary.domain.ProcessQuizResultsUseCase
 import com.vocabulary.myvocabulary.repositories.dictionary.DictionaryRepository
 import com.vocabulary.myvocabulary.repositories.guessedWord.GuessedMapData
 import com.vocabulary.myvocabulary.repositories.guessedWord.GuessedWordRepository
 import com.vocabulary.myvocabulary.repositories.quiz.QuizRepository
-import com.vocabulary.myvocabulary.repositories.word.WordRepository
 import com.vocabulary.myvocabulary.ui.quizzes.GuessedWord
 import com.vocabulary.myvocabulary.ui.quizzes.QuizDirectionType
 import com.vocabulary.myvocabulary.ui.quizzes.QuizTypes
@@ -19,24 +18,18 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.rx2.await
-import kotlinx.coroutines.withContext
-import kotlin.math.round
-import java.text.Normalizer
 import kotlin.coroutines.cancellation.CancellationException
 
 class ResultViewModel(
     val dictionaryId: Long,
     val quizDirection: Int,
-    private val wordRepository: WordRepository,
     private val dictionaryRepository: DictionaryRepository,
     private val quizRepository: QuizRepository,
     private val guessedWordRepository: GuessedWordRepository,
-    private val dispatchers: DispatcherProvider
+    private val processQuizResultsUseCase: ProcessQuizResultsUseCase
 
 ) : ViewModel() {
     private val guessedWordList: MutableStateFlow<List<Word>> = MutableStateFlow(emptyList())
-
     private val _resultUiState = MutableStateFlow<ResultUiState>(ResultUiState.Loading)
     val resultUiState: StateFlow<ResultUiState> = _resultUiState.asStateFlow()
     private var resultCollectionJob: Job? = null
@@ -54,35 +47,31 @@ class ResultViewModel(
                         is GuessedMapData.GuessedData -> guessMapData.map
                     }
 
-                    if (map.isEmpty()) return@collect
+                    if (map.isEmpty()) _resultUiState.value =
+                        ResultUiState.Error("There were no results to collect.")
 
                     try {
-                        val guessList = map.entries.map { entry ->
-                            updateWordRepositorySuspend(entry.key, entry.value)
-                        }
+                        val resultData = processQuizResultsUseCase(dictionaryId, map, quizDirection)
 
                         ensureActive()
 
-                        val calculatedPercentage = if (guessList.isNotEmpty()) {
-                            round(((guessList.filter { it.lastResult }.size.toFloat() / guessList.size.toFloat()) * 100)).toInt()
-                        } else 0
+                        quizRepository.updateQuizList(resultData.processedWords)
 
-                        saveQuizStats(dictionaryId, calculatedPercentage)
-                        saveLastPracticeOfDictionary(dictionaryId)
-                        quizRepository.updateQuizList(guessList)
-
-                        if (guessList.all { it.lastResult }) {
-                            _resultUiState.value = ResultUiState.Success(
-                                resultList = guessList,
-                                percentage = calculatedPercentage,
-                                directionType = quizDirection.toDirectionType()
+                        if (resultData.allPassed) {
+                            _resultUiState.value = ResultUiState.Data(
+                                resultList = resultData.processedWords,
+                                percentage = resultData.percentage,
+                                directionType = quizDirection.toDirectionType(),
+                                allPassed = true,
+                                numberOfPassed = resultData.processedWords.count { it.lastResult }
                             )
                         } else {
-                            _resultUiState.value = ResultUiState.Failed(
-                                resultList = guessList,
-                                numberOfPassed = guessList.count { it.lastResult },
-                                percentage = calculatedPercentage,
-                                directionType = quizDirection.toDirectionType()
+                            _resultUiState.value = ResultUiState.Data(
+                                resultList = resultData.processedWords,
+                                numberOfPassed = resultData.processedWords.count { it.lastResult },
+                                percentage = resultData.percentage,
+                                directionType = quizDirection.toDirectionType(),
+                                allPassed = false
                             )
                         }
                     } catch (e: Exception) {
@@ -91,38 +80,6 @@ class ResultViewModel(
                             ResultUiState.Error("Failed to process results. Error: ${e.message}")
                     }
                 }
-        }
-    }
-
-    private suspend fun updateWordRepositorySuspend(wordId: Long, guess: String): Word =
-        withContext(dispatchers.io) {
-            val word = wordRepository.getWordById(wordId).await()
-            val updatedWord = evaluate(word, guess)
-            wordRepository.updateWord(updatedWord)
-            updatedWord
-        }
-
-    private fun evaluate(word: Word, guess: String): Word {
-        val isCorrect = if (quizDirection.toDirectionType() == QuizDirectionType.AskWord) {
-            word.translation.normalize().equals(guess.normalize(), ignoreCase = true)
-        } else {
-            word.word.normalize().equals(guess.normalize(), ignoreCase = true)
-        }
-
-        return if (isCorrect) {
-            word.copy(
-                lastResult = true,
-                lastGuess = guess,
-                beenAsked = word.beenAsked + 1,
-                passed = word.passed + 1
-            )
-        } else {
-            word.copy(
-                lastResult = false,
-                lastGuess = guess,
-                beenAsked = word.beenAsked + 1,
-                failed = word.failed + 1
-            )
         }
     }
 
@@ -147,30 +104,17 @@ class ResultViewModel(
     fun saveLastPracticeOfDictionary(dictionaryId: Long) {
         dictionaryRepository.onQuizFinished(dictionaryId)
     }
-
-    fun saveQuizStats(id: Long, scorePercentage: Int) {
-        dictionaryRepository.saveQuizStats(id, scorePercentage)
-    }
-}
-
-private fun String.normalize(): String {
-    return Normalizer.normalize(this, Normalizer.Form.NFC).trim()
 }
 
 sealed interface ResultUiState {
     data object Loading : ResultUiState
 
-    data class Failed(
+    data class Data(
         val resultList: List<Word>,
         val numberOfPassed: Int,
         val percentage: Int,
-        val directionType: QuizDirectionType
-    ) : ResultUiState
-
-    data class Success(
-        val resultList: List<Word>,
-        val percentage: Int,
-        val directionType: QuizDirectionType
+        val directionType: QuizDirectionType,
+        val allPassed: Boolean
     ) : ResultUiState
 
     data class Error(

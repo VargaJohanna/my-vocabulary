@@ -9,6 +9,7 @@ import com.vocabulary.myvocabulary.BuildConfig
 import com.vocabulary.myvocabulary.Constants
 import com.vocabulary.myvocabulary.DispatcherProvider
 import com.vocabulary.myvocabulary.StandardDispatchers
+import com.vocabulary.myvocabulary.domain.ProcessQuizResultsUseCase
 import com.vocabulary.myvocabulary.network.QuoteService
 import com.vocabulary.myvocabulary.repositories.AppDatabase
 import com.vocabulary.myvocabulary.repositories.dictionary.DictionaryRepository
@@ -119,7 +120,7 @@ val viewModelModule = module {
             quizRepository = get()
         )
     }
-    viewModel { (dictionaryId: Long, quizDirection: Int) -> ResultViewModel(dictionaryId, quizDirection, get(), get(), get(), get(), get()) }
+    viewModel { (dictionaryId: Long, quizDirection: Int) -> ResultViewModel(dictionaryId, quizDirection, get(), get(), get(), get()) }
     viewModel { (wordId: Long) -> WordDetailsViewModel(get(), get()) }
     viewModel { HomeViewModel(get(), get(), get(), get(), get(), get()) }
     viewModel { ShareDictionaryViewModel(get(), get(), get()) }
@@ -133,5 +134,9 @@ val schedulerModule = module {
 
 val factoryModule = module {
     single { ComposeDialogFactory() }
+}
+
+val domainModule = module {
+    factory { ProcessQuizResultsUseCase(get(), get(), get()) }
 }
 

@@ -64,7 +64,6 @@ fun ResultScreen(
     onRestartQuiz: (quizType: Int, dictionaryId: Long, direction: Int, failedOnly: Boolean) -> Unit,
     onExit: () -> Unit,
     onUpdateFab: (FabConfiguration) -> Unit,
-    onBackClick: (() -> Unit) -> Unit
 ) {
 
     val resultViewModel: ResultViewModel = koinViewModel {
@@ -88,12 +87,6 @@ fun ResultScreen(
         resultViewModel.fetchResults()
     }
 
-    LaunchedEffect(Unit) {
-        onBackClick {
-            handleExit()
-        }
-    }
-
     Scaffold(
         snackbarHost = { SnackbarHost(hostState = snackBarHostState) }
     ) { padding ->
@@ -109,8 +102,8 @@ fun ResultScreen(
                     }
                 }
 
-                is ResultUiState.Success -> {
-                    SuccessScreen(
+                is ResultUiState.Data -> {
+                    ResultContent(
                         resultState = uiState,
                         onExit = handleExit,
                         onRestartNew = {
@@ -118,24 +111,11 @@ fun ResultScreen(
                             resultViewModel.startNew(dictionaryId, quizType.toQuizType())
                             onRestartQuiz(quizType, dictionaryId, direction, false)
                         },
-                        onUpdateFab = { onUpdateFab(it) }
-                    )
-                }
-
-                is ResultUiState.Failed -> {
-                    FailedScreen(
-                        resultState = uiState,
-                        onExit = handleExit,
-                        onRestartNew = {
-                            resultViewModel.resetGuessedWordCollections()
-                            resultViewModel.startNew(dictionaryId, quizType.toQuizType())
-                            onRestartQuiz(quizType, dictionaryId, direction, false)
-                        },
-                        onUpdateFab = { onUpdateFab(it) },
                         onRestartFailedOnly = {
                             resultViewModel.resetGuessedWordCollections()
                             onRestartQuiz(quizType, dictionaryId, direction, true)
-                        }
+                        },
+                        onUpdateFab = { onUpdateFab(it) }
                     )
                 }
 
@@ -155,129 +135,91 @@ fun ResultScreen(
 }
 
 @Composable
-fun SuccessScreen(
-    resultState: ResultUiState.Success,
+fun ResultContent(
+    resultState: ResultUiState.Data,
     onExit: () -> Unit,
     onRestartNew: () -> Unit,
     onUpdateFab: (FabConfiguration) -> Unit,
-) {
-    var isFabExpanded by remember { mutableStateOf(false) }
-    val containerColor = MaterialTheme.colorScheme.secondaryContainer
-
-    LaunchedEffect(isFabExpanded) {
-        onUpdateFab(
-            FabConfiguration.FabMenu(
-                isVisible = true,
-                expanded = isFabExpanded,
-                onExpandedChange = { isFabExpanded = it },
-                icon = Icons.Default.Replay,
-                labelId = R.string.result_start_over_label,
-                items =
-                    listOf(
-                        FabConfiguration.FabButton(
-                            icon = Icons.Default.ChangeCircle,
-                            iconLabelId = R.string.result_start_over_label,
-                            onClick = {
-                                isFabExpanded = false
-                                onRestartNew()
-                            },
-                            extendedLabelId = R.string.result_start_over_label,
-                            containerColor = containerColor
-                        ),
-                        FabConfiguration.FabButton(
-                            icon = Icons.Default.Close,
-                            iconLabelId = R.string.exit_fab_label,
-                            onClick = {
-                                isFabExpanded = false
-                                onExit()
-                            },
-                            extendedLabelId = R.string.exit_fab_label,
-                            containerColor = containerColor
-                        )
-                    )
-            )
-        )
-    }
-
-    Column(
-        modifier = Modifier
-            .fillMaxSize(),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Text(
-            modifier = Modifier
-                .padding(MaterialTheme.dimens.PaddingMedium)
-                .fillMaxWidth(),
-            textAlign = TextAlign.Center,
-            text = String.format(
-                stringResource(R.string.result_stats),
-                100,
-                resultState.resultList.size,
-                resultState.percentage
-            )
-        )
-        ResultLazyList(
-            list = resultState.resultList,
-            paddingValues = PaddingValues(0.dp),
-            directionType = resultState.directionType
-        )
-    }
-    SuccessAnimation()
-}
-
-@Composable
-fun FailedScreen(
-    resultState: ResultUiState.Failed,
-    onExit: () -> Unit,
-    onRestartNew: () -> Unit,
     onRestartFailedOnly: () -> Unit,
-    onUpdateFab: (FabConfiguration) -> Unit,
 ) {
     var isFabExpanded by remember { mutableStateOf(false) }
     val containerColor = MaterialTheme.colorScheme.secondaryContainer
 
     LaunchedEffect(isFabExpanded) {
         onUpdateFab(
-            FabConfiguration.FabMenu(
-                isVisible = true,
-                expanded = isFabExpanded,
-                onExpandedChange = { isFabExpanded = it },
-                icon = Icons.Default.Replay,
-                labelId = R.string.result_start_over_label,
-                items =
-                    listOf(
-                        FabConfiguration.FabButton(
-                            icon = Icons.Default.ChangeCircle,
-                            iconLabelId = R.string.result_start_over_label,
-                            onClick = {
-                                isFabExpanded = false
-                                onRestartNew()
-                            },
-                            extendedLabelId = R.string.result_start_over_label,
-                            containerColor = containerColor
-                        ),
-                        FabConfiguration.FabButton(
-                            icon = Icons.Default.Error,
-                            iconLabelId = R.string.result_failed_ones_only_label,
-                            onClick = {
-                                isFabExpanded = false
-                                onRestartFailedOnly()
-                            },
-                            extendedLabelId = R.string.result_failed_ones_only_label,
-                            containerColor = containerColor
-                        ),
-                        FabConfiguration.FabButton(
-                            icon = Icons.Default.Close,
-                            iconLabelId = R.string.exit_fab_label,
-                            onClick = {
-                                isFabExpanded = false
-                                onExit()
-                            },
-                            extendedLabelId = R.string.exit_fab_label,
-                            containerColor = containerColor
+            if(resultState.allPassed) {
+                FabConfiguration.FabMenu(
+                    isVisible = true,
+                    expanded = isFabExpanded,
+                    onExpandedChange = { isFabExpanded = it },
+                    icon = Icons.Default.Replay,
+                    labelId = R.string.result_start_over_label,
+                    items =
+                        listOf(
+                            FabConfiguration.FabButton(
+                                icon = Icons.Default.ChangeCircle,
+                                iconLabelId = R.string.result_start_over_label,
+                                onClick = {
+                                    isFabExpanded = false
+                                    onRestartNew()
+                                },
+                                extendedLabelId = R.string.result_start_over_label,
+                                containerColor = containerColor
+                            ),
+                            FabConfiguration.FabButton(
+                                icon = Icons.Default.Close,
+                                iconLabelId = R.string.exit_fab_label,
+                                onClick = {
+                                    isFabExpanded = false
+                                    onExit()
+                                },
+                                extendedLabelId = R.string.exit_fab_label,
+                                containerColor = containerColor
+                            )
                         )
-                    )
-            )
+                )
+            } else {
+                FabConfiguration.FabMenu(
+                    isVisible = true,
+                    expanded = isFabExpanded,
+                    onExpandedChange = { isFabExpanded = it },
+                    icon = Icons.Default.Replay,
+                    labelId = R.string.result_start_over_label,
+                    items =
+                        listOf(
+                            FabConfiguration.FabButton(
+                                icon = Icons.Default.ChangeCircle,
+                                iconLabelId = R.string.result_start_over_label,
+                                onClick = {
+                                    isFabExpanded = false
+                                    onRestartNew()
+                                },
+                                extendedLabelId = R.string.result_start_over_label,
+                                containerColor = containerColor
+                            ),
+                            FabConfiguration.FabButton(
+                                icon = Icons.Default.Error,
+                                iconLabelId = R.string.result_failed_ones_only_label,
+                                onClick = {
+                                    isFabExpanded = false
+                                    onRestartFailedOnly()
+                                },
+                                extendedLabelId = R.string.result_failed_ones_only_label,
+                                containerColor = containerColor
+                            ),
+                            FabConfiguration.FabButton(
+                                icon = Icons.Default.Close,
+                                iconLabelId = R.string.exit_fab_label,
+                                onClick = {
+                                    isFabExpanded = false
+                                    onExit()
+                                },
+                                extendedLabelId = R.string.exit_fab_label,
+                                containerColor = containerColor
+                            )
+                        )
+                )
+            }
         )
     }
 
@@ -304,8 +246,9 @@ fun FailedScreen(
             directionType = resultState.directionType
         )
     }
+    if(resultState.allPassed) SuccessAnimation()
+    else FailedAnimation()
 
-    FailedAnimation()
 }
 
 @Composable
@@ -470,7 +413,7 @@ fun ResultListItemFailed(
 
 @Preview
 @Composable
-fun SuccessScreenPreview() {
+fun ResultContentPreview() {
     val list = listOf(
         Word(
             wordId = 1,
@@ -499,14 +442,17 @@ fun SuccessScreenPreview() {
         Word(3, 1, "day", "diem", 0, 0, 0, Calendar.getInstance().time),
     )
 
-    SuccessScreen(
-        resultState = ResultUiState.Success(
+    ResultContent(
+        resultState = ResultUiState.Data(
             resultList = list,
             directionType = QuizDirectionType.AskTranslation,
             percentage = 66,
+            numberOfPassed = 2,
+            allPassed = true
         ),
         onExit = { },
         onRestartNew = { },
-        onUpdateFab = { }
+        onUpdateFab = { },
+        onRestartFailedOnly = { }
     )
 }
