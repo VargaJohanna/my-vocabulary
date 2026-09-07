@@ -3,7 +3,6 @@ package com.vocabulary.myvocabulary.ui.results
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.vocabulary.myvocabulary.domain.ProcessQuizResultsUseCase
-import com.vocabulary.myvocabulary.repositories.dictionary.DictionaryRepository
 import com.vocabulary.myvocabulary.repositories.guessedWord.GuessedMapData
 import com.vocabulary.myvocabulary.repositories.guessedWord.GuessedWordRepository
 import com.vocabulary.myvocabulary.repositories.quiz.QuizRepository
@@ -23,7 +22,6 @@ import kotlin.coroutines.cancellation.CancellationException
 class ResultViewModel(
     val dictionaryId: Long,
     val quizDirection: Int,
-    private val dictionaryRepository: DictionaryRepository,
     private val quizRepository: QuizRepository,
     private val guessedWordRepository: GuessedWordRepository,
     private val processQuizResultsUseCase: ProcessQuizResultsUseCase
@@ -47,8 +45,10 @@ class ResultViewModel(
                         is GuessedMapData.GuessedData -> guessMapData.map
                     }
 
-                    if (map.isEmpty()) _resultUiState.value =
-                        ResultUiState.Error("There were no results to collect.")
+                    if (map.isEmpty()) {
+                        _resultUiState.value = ResultUiState.Error("There were no results to collect.")
+                        return@collect
+                    }
 
                     try {
                         val resultData = processQuizResultsUseCase(dictionaryId, map, quizDirection)
@@ -99,10 +99,6 @@ class ResultViewModel(
 
     fun latestGuess(lastGuess: GuessedWord) {
         guessedWordRepository.addToGuessedWordMap(lastGuess)
-    }
-
-    fun saveLastPracticeOfDictionary(dictionaryId: Long) {
-        dictionaryRepository.onQuizFinished(dictionaryId)
     }
 }
 

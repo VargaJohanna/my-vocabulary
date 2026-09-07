@@ -1,171 +1,138 @@
 package com.vocabulary.myvocabulary.ui.results
 
-import androidx.arch.core.executor.testing.InstantTaskExecutorRule
-import androidx.compose.ui.input.key.type
-import com.vocabulary.myvocabulary.repositories.dictionary.DictionaryRepository
+import app.cash.turbine.test
+import assertk.assertThat
+import assertk.assertions.isEqualTo
+import assertk.assertions.isTrue
+import com.vocabulary.myvocabulary.domain.ProcessQuizResultsUseCase
+import com.vocabulary.myvocabulary.domain.QuizResult
 import com.vocabulary.myvocabulary.repositories.guessedWord.GuessedMapData
 import com.vocabulary.myvocabulary.repositories.guessedWord.GuessedWordRepository
 import com.vocabulary.myvocabulary.repositories.quiz.QuizRepository
-import com.vocabulary.myvocabulary.repositories.word.WordRepository
-import com.vocabulary.myvocabulary.rx.RxSchedulers
+import com.vocabulary.myvocabulary.testing.MainCoroutineRule
+import com.vocabulary.myvocabulary.ui.quizzes.GuessedWord
 import com.vocabulary.myvocabulary.ui.quizzes.QuizDirectionType
 import com.vocabulary.myvocabulary.ui.quizzes.toInt
-import com.vocabulary.myvocabulary.ui.words.Word
 import io.mockk.*
-import io.reactivex.Observable
-import io.reactivex.Single
-import io.reactivex.schedulers.Schedulers
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.test.UnconfinedTestDispatcher
-import kotlinx.coroutines.test.resetMain
-import kotlinx.coroutines.test.setMain
-import org.junit.After
-import org.junit.Assert.assertEquals
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
-import java.util.*
 
+@OptIn(ExperimentalCoroutinesApi::class)
 class ResultViewModelTest {
 
     @get:Rule
-    val instantTaskExecutorRule = InstantTaskExecutorRule()
-
-    private val wordRepository: WordRepository = mockk()
-    private val dictionaryRepository: DictionaryRepository = mockk(relaxed = true)
-    private val rxSchedulers: RxSchedulers = mockk()
+    val mainCoroutineRule = MainCoroutineRule()
+    private val processQuizResultsUseCase: ProcessQuizResultsUseCase = mockk()
     private val quizRepository: QuizRepository = mockk(relaxed = true)
-    private val guessedWordRepository: GuessedWordRepository = mockk(relaxed = true)
-
+    private val guessedWordRepository: GuessedWordRepository = mockk()
+    
     private lateinit var viewModel: ResultViewModel
     private val dictionaryId = 1L
-    @OptIn(ExperimentalCoroutinesApi::class)
-    private val testDispatcher = UnconfinedTestDispatcher()
+    private val guessedWordMapFlow = MutableStateFlow<GuessedMapData>(GuessedMapData.EMPTY)
 
-    @OptIn(ExperimentalCoroutinesApi::class)
     @Before
     fun setup() {
-        Dispatchers.setMain(testDispatcher)
-
-        // Mock Schedulers for synchronous execution
-        every { rxSchedulers.io() } returns Schedulers.trampoline()
-        every { rxSchedulers.main() } returns Schedulers.trampoline()
+        every { guessedWordRepository.guessedWordMap } returns guessedWordMapFlow
 
         viewModel = ResultViewModel(
             dictionaryId = dictionaryId,
-            quizDirection = QuizDirectionType.AskWord.toInt(), // Assuming 0 or 1
-            wordRepository = wordRepository,
-            dictionaryRepository = dictionaryRepository,
-            rxSchedulers = rxSchedulers,
+            quizDirection = QuizDirectionType.AskWord.toInt(),
             quizRepository = quizRepository,
-            guessedWordRepository = guessedWordRepository
+            guessedWordRepository = guessedWordRepository,
+            processQuizResultsUseCase = processQuizResultsUseCase,
         )
     }
 
-    @OptIn(ExperimentalCoroutinesApi::class)
-    @After
-    fun tearDown() {
-        Dispatchers.resetMain()
-    }
-
     @Test
-    fun `observeGuessedWordMap should correctly evaluate results and update state`() {
+    fun `fetchResults should emit Data state when processing is successful`() = runTest {
         // Arrange
-        val wordId = 10L
-        val userGuess = "Alma"
-        val correctWord = Word(wordId, 1, "Apple", "Alma", created = Date())
-
-        val guessedData = mapOf(wordId to userGuess)
-        every { guessedWordRepository.guessedWordMap } returns Observable.just(
-            GuessedMapData.GuessedData(
-                guessedData
-            )
+        val map = mapOf(1L to "guess")
+        guessedWordMapFlow.value = GuessedMapData.GuessedData(map)
+        
+        val quizResult = QuizResult(
+            processedWords = emptyList(),
+            percentage = 100,
+            numberOfPassed = 1,
+            allPassed = true
         )
-        every { wordRepository.getWordById(wordId) } returns Single.just(correctWord)
-        every { wordRepository.updateWord(any()) } returns Unit
+        coEvery { processQuizResultsUseCase(dictionaryId, map, any()) } returns quizResult
 
-        // Act
-        viewModel.observeGuessedWordMap()
-
-        // Assert
-        // verify percentage calculation: 1 word, 1 correct = 100%
-        assertEquals(100, viewModel.getResultPercentage().value)
-        assertEquals(1, viewModel.getNumOfPassed().value)
-
-        // Verify repository calls
-        verify { dictionaryRepository.saveQuizStats(dictionaryId, 100) }
-        verify { dictionaryRepository.onQuizFinished(dictionaryId) }
-        verify { wordRepository.updateWord(match { it.lastResult == true && it.lastGuess == userGuess }) }
-    }
-
-    @Test
-    fun `observeGuessedWordMap should set isAllPassed to false on wrong answer`() {
-        // Arrange
-        val wordId = 20L
-        val userGuess = "WrongAnswer"
-        val correctWord = Word(wordId, 1, "Bread", "Kenyér", created = Date())
-
-        every { guessedWordRepository.guessedWordMap } returns Observable.just(
-            GuessedMapData.GuessedData(mapOf(wordId to userGuess))
-        )
-        every { wordRepository.getWordById(wordId) } returns Single.just(correctWord)
-        every { wordRepository.updateWord(any()) } returns Unit
-
-        // Act
-        viewModel.observeGuessedWordMap()
-
-        // Assert
-        assertEquals(0, viewModel.getResultPercentage().value)
-        assertEquals(false, viewModel.isAllPassed)
-    }
-
-    @Test
-    fun `resetGuessedWordCollections should clear data and reset isAllPassed`() {
-        // Arrange
-        viewModel.isAllPassed = false
-
-        // Act
-        viewModel.resetGuessedWordCollections()
-
-        // Assert
-        verify { guessedWordRepository.resetGuessedWordMap() }
-        assertEquals(true, viewModel.isAllPassed)
-        assertEquals(0, viewModel.getGuessedList().value.size)
-    }
-
-    @Test
-    fun `saveLastPracticeOfDictionary should delegate to dictionaryRepository`() {
-        // Act
-        viewModel.saveLastPracticeOfDictionary(dictionaryId)
-
-        // Assert
-        verify { dictionaryRepository.onQuizFinished(dictionaryId) }
-    }
-
-    @Test
-    fun `resetGuessedWordCollections should trigger repository reset`() {
-        // Act
-        viewModel.resetGuessedWordCollections()
-
-        // Assert
-        verify(exactly = 1) { guessedWordRepository.resetGuessedWordMap() }
-    }
-
-    @Test
-    fun `ResultScreen should register handleExit logic with the NavHost`() {
-        val backClickRegistrar = mockk<((() -> Unit) -> Unit)>(relaxed = true)
-        val capturedAction = slot<() -> Unit>()
-
-        // Act
-        every { backClickRegistrar(capture(capturedAction)) } returns Unit
-
-        backClickRegistrar {
-            viewModel.resetGuessedWordCollections()
+        // Act & Assert
+        viewModel.resultUiState.test {
+            assertThat(awaitItem()).isEqualTo(ResultUiState.Loading)
+            
+            viewModel.fetchResults()
+            
+            val result = awaitItem()
+            assertThat(result is ResultUiState.Data).isTrue()
+            val data = result as ResultUiState.Data
+            assertThat(data.percentage).isEqualTo(100)
+            assertThat(data.allPassed).isTrue()
         }
+    }
+
+    @Test
+    fun `fetchResults should emit Error state when guessed map is empty`() = runTest {
+        // Arrange
+        guessedWordMapFlow.value = GuessedMapData.EMPTY
+
+        // Act & Assert
+        viewModel.resultUiState.test {
+            assertThat(awaitItem()).isEqualTo(ResultUiState.Loading)
+            
+            viewModel.fetchResults()
+            
+            val result = awaitItem()
+            assertThat(result is ResultUiState.Error).isTrue()
+        }
+    }
+
+    @Test
+    fun `fetchResults should emit Error state when use case fails`() = runTest {
+        // Arrange
+        val map = mapOf(1L to "guess")
+        guessedWordMapFlow.value = GuessedMapData.GuessedData(map)
+        coEvery { processQuizResultsUseCase(any(), any(), any()) } throws Exception("Test Error")
+
+        // Act & Assert
+        viewModel.resultUiState.test {
+            assertThat(awaitItem()).isEqualTo(ResultUiState.Loading)
+            
+            viewModel.fetchResults()
+            
+            val result = awaitItem()
+            assertThat(result is ResultUiState.Error).isTrue()
+            assertThat((result as ResultUiState.Error).message).isEqualTo("Failed to process results. Error: Test Error")
+        }
+    }
+
+    @Test
+    fun `resetGuessedWordCollections should reset state and repository`() = runTest {
+        // Arrange
+        every { guessedWordRepository.resetGuessedWordMap() } just runs
+
+        // Act
+        viewModel.resetGuessedWordCollections()
 
         // Assert
-        capturedAction.captured.invoke()
         verify { guessedWordRepository.resetGuessedWordMap() }
+        assertThat(viewModel.resultUiState.value).isEqualTo(ResultUiState.Loading)
+    }
+
+    @Test
+    fun `latestGuess should delegate to repository`() {
+        // Arrange
+        val guess = GuessedWord(1L, "guess")
+        every { guessedWordRepository.addToGuessedWordMap(guess) } just runs
+
+        // Act
+        viewModel.latestGuess(guess)
+
+        // Assert
+        verify { guessedWordRepository.addToGuessedWordMap(guess) }
     }
 }

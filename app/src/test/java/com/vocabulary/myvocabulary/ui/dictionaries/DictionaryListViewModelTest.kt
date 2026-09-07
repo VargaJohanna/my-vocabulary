@@ -28,9 +28,7 @@ class DictionaryListViewModelTest {
         dictionaryTotalScore = 100)
     @get:Rule
     val mainCoroutineRule = MainCoroutineRule()
-
     private val dictionaryRepository = mock<DictionaryRepository>()
-
     private val sortByRepository = mock<SortDictionaryRepository>()
     private val sortedListRepository = mock<SortedListRepository>()
     private val newDictionaryId = 5L
