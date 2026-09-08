@@ -61,7 +61,7 @@ class DictionaryListViewModelTest {
         dictionaryListViewModel.insertDictionary(dictionary)
         advanceUntilIdle()
         Assert.assertEquals(DictionaryDetails(newDictionaryId, dictionary.dictionaryName),
-                dictionaryListViewModel.newDictionary.value.peekContent())
+                dictionaryListViewModel.createDictionaryEvent.value.peekContent())
     }
 
     @Test

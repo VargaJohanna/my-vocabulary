@@ -1,7 +1,6 @@
 package com.vocabulary.myvocabulary.ui.dictionaries
 
 import android.net.Uri
-import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Arrangement
@@ -36,10 +35,11 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarDuration
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -47,12 +47,12 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.vocabulary.myvocabulary.Constants
 import com.vocabulary.myvocabulary.R
 import com.vocabulary.myvocabulary.navigation.FabConfiguration
@@ -71,29 +71,24 @@ fun DictionaryListScreen(
     isSortOpen: Boolean,
     onToggleSort: (Boolean) -> Unit,
 ) {
-    val context = LocalContext.current
     val viewModel: DictionaryListViewModel = koinViewModel()
-    val shareDictViewModel: ShareDictionaryViewModel = koinViewModel()
     val dialogFactory: ComposeDialogFactory = koinInject()
-    val newDictionary by viewModel.newDictionary.collectAsState()
-    var isSavePressed by rememberSaveable { mutableStateOf(false) }
-    val isLoading by viewModel.isLoading.collectAsState()
-    val dictionaryList by viewModel.dictionaries.collectAsState()
-    var showCreateDialog by rememberSaveable { mutableStateOf(false) }
-    var itemToDelete by rememberSaveable { mutableStateOf<Dictionary?>(null) }
-    var itemToEdit by rememberSaveable { mutableStateOf<Dictionary?>(null) }
-    var isImport by rememberSaveable { mutableStateOf(false) }
-    var isFabExpanded by remember { mutableStateOf(false) }
+    val dialogState by viewModel.activeDialog.collectAsStateWithLifecycle()
+    val createDictionaryEvent by viewModel.createDictionaryEvent.collectAsStateWithLifecycle()
+    var isFabExpanded by rememberSaveable { mutableStateOf(false) }
+    val libraryUiState by viewModel.libraryUiState.collectAsStateWithLifecycle()
+
+    val snackBarHostState = rememberSaveable { SnackbarHostState() }
+    val snackBarErrorMessage = stringResource(R.string.snack_bar_error)
+    val snackBarEmptyMessage = stringResource(R.string.no_dictionaries_found)
+
 
     LaunchedEffect(Unit) {
-        shareDictViewModel.importedDictionaryDetailsFlow.collect { event ->
-            event.getContentIfNotHandled()?.let { details ->
-                shareDictViewModel.parseDataAndCreateWordsCompose(
-                    dictionaryId = details.dictionaryId,
-                    contentResolver = context.contentResolver
-                )
-                navigateToWordList(details.dictionaryId, details.dictionaryName)
-                Log.d("Import", "Created ${details.dictionaryName}, starting CSV parse...")
+        viewModel.events.collect { event ->
+            when (event) {
+                is LibraryEvent.NavigateToWordList -> {
+                    navigateToWordList(event.dictionaryId, event.dictionaryName)
+                }
             }
         }
     }
@@ -102,12 +97,11 @@ fun DictionaryListScreen(
         contract = ActivityResultContracts.GetContent()
     ) { uri: Uri? ->
         uri?.let { data ->
-            shareDictViewModel.saveCsvData(data)
+            viewModel.saveCsvData(data)
         }
     }
 
     LaunchedEffect(isFabExpanded) {
-        viewModel.fetchDictionaries()
         onUpdateFab(
             FabConfiguration.FabMenu(
                 isVisible = true,
@@ -120,8 +114,8 @@ fun DictionaryListScreen(
                         icon = Icons.Outlined.CreateNewFolder,
                         iconLabelId = R.string.create_fab_label,
                         onClick = {
+                            viewModel.setActiveDialogState(DictionaryDialog.Create)
                             isFabExpanded = false
-                            showCreateDialog = true
                         },
                         extendedLabelId = R.string.create_fab_label
                     ),
@@ -130,7 +124,8 @@ fun DictionaryListScreen(
                         iconLabelId = R.string.import_fab_label,
                         onClick = {
                             isFabExpanded = false
-                            isImport = true
+                            viewModel.setIsImport(true)
+                            viewModel.setActiveDialogState(DictionaryDialog.Import)
                             filePickerLauncher.launch(Constants.MIME_TYPE)
                         },
                         extendedLabelId = R.string.import_fab_label
@@ -140,16 +135,12 @@ fun DictionaryListScreen(
         )
     }
 
-    LaunchedEffect(newDictionary) {
-        newDictionary.getContentIfNotHandled()?.let { details ->
-            if (isSavePressed && details != null) {
-                navigateToWordList(details.dictionaryId, details.dictionaryName)
-            }
-            isSavePressed = false
+    LaunchedEffect(createDictionaryEvent) {
+        createDictionaryEvent?.getContentIfNotHandled()?.let { details ->
+            navigateToWordList(details.dictionaryId, details.dictionaryName)
             viewModel.clearNewDictionary()
         }
     }
-
 
     val sortByDate = {
         viewModel.setSortBy(
@@ -167,6 +158,74 @@ fun DictionaryListScreen(
                 titleDescending = !viewModel.currentSortByData.titleDescending
             )
         )
+    }
+
+    dialogState?.let { dialog ->
+        isFabExpanded = false
+        when (dialog) {
+            is DictionaryDialog.Create -> {
+                dialogFactory.BuildCreateDictionaryDialog(
+                    onDismissRequest = {
+                        viewModel.clearActiveDialogState()
+                    },
+                    onConfirmation = { newTitle ->
+                        viewModel.insertDictionary(viewModel.createDictionaryObject(newTitle))
+                        viewModel.clearActiveDialogState()
+                    },
+                    dialogTitle = stringResource(R.string.create_new_dictionary_dialog_title)
+                )
+            }
+            is DictionaryDialog.Delete -> {
+                dialogFactory.BuildDeleteDialog(
+                    onDismissRequest = {
+                        viewModel.clearActiveDialogState()
+                    },
+                    onConfirmation = {
+                        viewModel.deleteDictionary(dialog.dictionary)
+                        viewModel.clearActiveDialogState()
+                    },
+                    dialogTitle = stringResource(R.string.dialog_delete_dictionary_title) + " \"${dialog.dictionary.dictionaryName}\" ?",
+                    message = stringResource(R.string.verify_deletion)
+                )
+            }
+            is DictionaryDialog.Edit -> {
+                dialogFactory.BuildRenameDictionaryDialog(
+                    onDismissRequest = {
+                        viewModel.clearActiveDialogState()
+                    },
+                    onConfirmation = { newTitle ->
+
+                        viewModel.renameDictionary(dialog.dictionary.copy(dictionaryName = newTitle))
+                        viewModel.clearActiveDialogState()
+
+                    },
+                    dialogTitle = stringResource(R.string.renaming_dictionary_title) + " \"${dialog.dictionary.dictionaryName}\""
+                )
+            }
+            is DictionaryDialog.Import -> {
+                dialogFactory.BuildCreateDictionaryDialog(
+                    onDismissRequest = {
+                        viewModel.clearActiveDialogState()
+                        viewModel.setIsImport(false)
+                    },
+                    onConfirmation = { newTitle ->
+                        viewModel.setIsImport(false)
+                        viewModel.createImportedDictionary(
+                            Dictionary(
+                                dictionaryName = newTitle,
+                                dictionaryCreated = Calendar.getInstance().time,
+                                dictionaryLastPracticed = null,
+                                dictionaryLastResult = null,
+                                dictionaryFinishedCount = 0,
+                                dictionaryTotalScore = 0
+                            )
+                        )
+                        viewModel.clearActiveDialogState()
+                    },
+                    dialogTitle = stringResource(R.string.import_dictionary_dialog_title)
+                )
+            }
+        }
     }
 
     Box(
@@ -189,95 +248,48 @@ fun DictionaryListScreen(
                 )
             }
         }
-        DictionaryLazyList(
-            list = dictionaryList,
-            onShowDeleteDialog = { dictionary ->
-                itemToDelete = dictionary
-            },
-            onShowEditDialog = { dictionary ->
-                itemToEdit = dictionary
-            },
-            onDictionaryClick = { dictionary ->
-                navigateToWordList(dictionary.dictionaryId, dictionary.dictionaryName)
-            },
-            onStartQuiz = { dictionaryId ->
-                onStartQuiz(dictionaryId)
+        when (val uiState = libraryUiState) {
+            is LibraryUiState.Loading -> {
+                CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
             }
-        )
-        if (isLoading) {
-            CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
-        }
 
-        if (!isLoading && dictionaryList.isEmpty()) {
-            Text(
-                text = stringResource(R.string.no_dictionaries_found),
-                style = MaterialTheme.typography.bodyLarge,
-                color = MaterialTheme.colorScheme.outline,
-                modifier = Modifier.align(Alignment.Center)
-            )
-        }
-    }
-
-    if (showCreateDialog) {
-        dialogFactory.BuildCreateDictionaryDialog(
-            onDismissRequest = {
-                showCreateDialog = false
-            },
-            onConfirmation = { newTitle ->
-                isSavePressed = true
-                showCreateDialog = false
-                viewModel.insertDictionary(viewModel.createDictionaryObject(newTitle))
-            },
-            dialogTitle = stringResource(R.string.create_new_dictionary_dialog_title)
-        )
-    }
-
-    itemToDelete?.let { dictionary ->
-        dialogFactory.BuildDeleteDialog(
-            onDismissRequest = { itemToDelete = null },
-            onConfirmation = {
-                viewModel.deleteDictionary(dictionary)
-                itemToDelete = null
-            },
-            dialogTitle = stringResource(R.string.dialog_delete_dictionary_title) + " \"${dictionary.dictionaryName}\" ?",
-            message = stringResource(R.string.verify_deletion)
-        )
-    }
-
-    itemToEdit?.let { item ->
-        dialogFactory.BuildRenameDictionaryDialog(
-            onDismissRequest = { itemToEdit = null },
-            onConfirmation = { newTitle ->
-                viewModel.renameDictionary(item.copy(dictionaryName = newTitle))
-                itemToEdit = null
-            },
-            dialogTitle = stringResource(R.string.renaming_dictionary_title) + " \"${item.dictionaryName}\""
-        )
-    }
-
-    if (isImport) {
-        if (!showCreateDialog) {
-            dialogFactory.BuildCreateDictionaryDialog(
-                onDismissRequest = {
-                    isImport = false
-                    shareDictViewModel.setIsImport(false)
-                },
-                onConfirmation = { newTitle ->
-                    isImport = false
-                    shareDictViewModel.setIsImport(false)
-                    shareDictViewModel.createDictionary(
-                        Dictionary(
-                            dictionaryName = newTitle,
-                            dictionaryCreated = Calendar.getInstance().time,
-                            dictionaryLastPracticed = null,
-                            dictionaryLastResult = null,
-                            dictionaryFinishedCount = 0,
-                            dictionaryTotalScore = 0
-                        )
+            is LibraryUiState.Error -> {
+                LaunchedEffect(Unit) {
+                    snackBarHostState.showSnackbar(
+                        message = snackBarErrorMessage,
+                        duration = SnackbarDuration.Short
                     )
-                },
-                dialogTitle = stringResource(R.string.import_dictionary_dialog_title)
-            )
+                    //Should go back to Home. Use Event maybe?
+                }
+            }
+
+            is LibraryUiState.LibraryData -> {
+                DictionaryLazyList(
+                    list = uiState.dictionaryList,
+                    onShowDeleteDialog = { dictionary ->
+                        viewModel.setActiveDialogState(DictionaryDialog.Delete(dictionary))
+                    },
+                    onShowEditDialog = { dictionary ->
+                        viewModel.setActiveDialogState(DictionaryDialog.Edit(dictionary))
+                    },
+                    onDictionaryClick = { dictionary ->
+                        navigateToWordList(dictionary.dictionaryId, dictionary.dictionaryName)
+                    },
+                    onStartQuiz = { dictionaryId ->
+                        onStartQuiz(dictionaryId)
+                    }
+                )
+            }
+
+            is LibraryUiState.Empty -> {
+                LaunchedEffect(Unit) {
+                    snackBarHostState.showSnackbar(
+                        message = snackBarEmptyMessage,
+                        duration = SnackbarDuration.Short
+                    )
+                    //Should go back to Home. Use Event maybe?
+                }
+            }
         }
     }
 }

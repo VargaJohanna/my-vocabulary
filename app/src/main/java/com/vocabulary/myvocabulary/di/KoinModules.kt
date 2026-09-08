@@ -110,7 +110,7 @@ val networkModule = module {
 }
 
 val viewModelModule = module {
-    viewModel { DictionaryListViewModel(get(), get(), get(), get()) }
+    viewModel { DictionaryListViewModel(get(), get(), get(), get(), get(), get<Context>().contentResolver) }
     viewModel { (dictionaryId: Long) -> WordListViewModel(dictionaryId, get(), get(), get(), get(), get(), get()) }
     viewModel { (dictionaryId: Long, quizType: Int, failedOnly: Boolean) ->
         QuizViewModel(
