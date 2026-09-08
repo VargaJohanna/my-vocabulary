@@ -15,6 +15,7 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.rx2.asFlow
@@ -68,14 +69,18 @@ class DictionaryListViewModel(
 
     private fun observeList() {
         viewModelScope.launch {
-            sortedListRepository.getSortedDictionaryList().asFlow().collect {
-                if(it.isEmpty()) {
-                    _libraryUiState.value = LibraryUiState.Empty
-                    return@collect
-                } else {
-                    _libraryUiState.value = LibraryUiState.LibraryData(it)
+            sortedListRepository.getSortedDictionaryList().asFlow()
+                .catch { e ->
+                    if (e is CancellationException) throw e
+                    _libraryUiState.value = LibraryUiState.Error("Failed to observe list. Error: ${e.message}")
                 }
-            }
+                .collect {
+                    if (it.isEmpty()) {
+                        _libraryUiState.value = LibraryUiState.Empty
+                    } else {
+                        _libraryUiState.value = LibraryUiState.LibraryData(it)
+                    }
+                }
         }
     }
 
