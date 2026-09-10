@@ -78,7 +78,7 @@ fun DictionaryListScreen(
     var isFabExpanded by rememberSaveable { mutableStateOf(false) }
     val libraryUiState by viewModel.libraryUiState.collectAsStateWithLifecycle()
 
-    val snackBarHostState = rememberSaveable { SnackbarHostState() }
+    val snackBarHostState = remember { SnackbarHostState() }
     val snackBarErrorMessage = stringResource(R.string.snack_bar_error)
     val snackBarEmptyMessage = stringResource(R.string.no_dictionaries_found)
 

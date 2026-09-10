@@ -27,6 +27,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.vocabulary.myvocabulary.R
 import com.vocabulary.myvocabulary.ui.theme.MyVocabularyTheme
 import com.vocabulary.myvocabulary.ui.theme.dimens
@@ -39,21 +40,21 @@ fun QuizListScreen(
     contentPadding: PaddingValues = PaddingValues(0.dp),
     onStartQuiz: (quizType: Int, dictionaryId: Long, direction: Int, failedOnly: Boolean) -> Unit
 ) {
-
     val dialogFactory: ComposeDialogFactory = koinInject()
     val list = QuizTypes.getQuizTypes()
     val quizListViewModel: QuizListViewModel = koinInject()
+    val dialogState by quizListViewModel.activeDialog.collectAsStateWithLifecycle()
 
     QuizListContent(
         list = list,
         dialogFactory = dialogFactory,
         onStartQuiz = { quizType, dictionaryId, direction, failedOnly ->
-
             onStartQuiz(quizType, dictionaryId, direction, failedOnly)
         },
-        onCustomSelected = { quizListViewModel.addCustomQuizSize(size = it) },
         dictionaryIdFromArgs = dictionaryIdFromArgs,
-        contentPadding = contentPadding
+        contentPadding = contentPadding,
+        quizListViewModel = quizListViewModel,
+        dialogState = dialogState
     )
 }
 
@@ -62,21 +63,14 @@ fun QuizListContent(
     list: List<QuizTypes>,
     dialogFactory: ComposeDialogFactory,
     onStartQuiz: (quizType: Int, dictionaryId: Long, direction: Int, failedOnly: Boolean) -> Unit,
-    onCustomSelected: (size: Int) -> Unit,
     dictionaryIdFromArgs: Long?,
-    contentPadding: PaddingValues
+    contentPadding: PaddingValues,
+    quizListViewModel: QuizListViewModel?,
+    dialogState: QuizListDialog?
 ) {
-
-    var showInfoDialog by rememberSaveable { mutableStateOf(false) }
-    var showCustomDialog by rememberSaveable { mutableStateOf(false) }
-    var dialogTitle by rememberSaveable { mutableStateOf("") }
-    var dialogText by rememberSaveable { mutableStateOf("") }
-    var isSheetOpen by rememberSaveable { mutableStateOf(false) }
-    var showDirectionDialog by rememberSaveable { mutableStateOf(false) }
+    var isDictionarySheetOpen by rememberSaveable { mutableStateOf(false) }
     var selectedQuiz: Int by rememberSaveable { mutableStateOf(0) }
     var selectedDictionaryId: Long by rememberSaveable { mutableStateOf(0L) }
-    var selectedDirection by rememberSaveable { mutableStateOf(0) }
-//    State to track if we should skip the DictionaryPicker
     var hasDictionaryArg by rememberSaveable { mutableStateOf(false) }
     var argDictionaryId by rememberSaveable { mutableStateOf(0L) }
 
@@ -90,6 +84,48 @@ fun QuizListContent(
     val sortedList = remember(list) {
         list.sortedBy { it.toInt() }
     }
+
+    val viewmodel = quizListViewModel ?: return
+        dialogState?.let { dialog ->
+            when (dialog) {
+                is QuizListDialog.CustomDialog -> {
+                    dialogFactory.BuildCustomQuizSizeDialog(
+                        onDismissRequest = {
+                            viewmodel.clearDialogState()
+                        },
+                        onConfirmation = { size ->
+                            viewmodel.addCustomQuizSize(size)
+                            selectedQuiz = QuizTypes.CustomQuiz.toInt()
+                            viewmodel.clearDialogState()
+                            isDictionarySheetOpen = true
+                        }
+                    )
+                }
+
+                is QuizListDialog.DirectionDialog -> {
+                    dialogFactory.BuildChooseDirectionDialog(
+                        onDismissRequest = {
+                            viewmodel.clearDialogState()
+                        },
+                        onConfirmation = { direction ->
+                            onStartQuiz(selectedQuiz, selectedDictionaryId, direction, false)
+                            viewmodel.clearDialogState()
+                            isDictionarySheetOpen = false
+                        }
+                    )
+                }
+
+                is QuizListDialog.InfoDialog -> {
+                    dialogFactory.BuildInfoDialog(
+                        onDismissRequest = { viewmodel.clearDialogState() },
+                        dialogTitle = dialog.title,
+                        dialogText = dialog.text
+                    )
+                }
+            }
+        }
+
+
     Box(
         modifier = Modifier.fillMaxSize()
     ) {
@@ -107,68 +143,30 @@ fun QuizListContent(
                 QuizCard(
                     quizType = item,
                     onInfoClick = { title, info ->
-                        dialogTitle = title
-                        dialogText = info
-                        showInfoDialog = true
+                        viewmodel.setDialogState(QuizListDialog.InfoDialog(title = title, text = info))
                     },
                     onTypeClick = {
                         selectedQuiz = item.toInt()
-                        isSheetOpen = true
+                        isDictionarySheetOpen = true
                     },
-                    onCustomClick = { showCustomDialog = true }
+                    onCustomClick = { viewmodel.setDialogState(QuizListDialog.CustomDialog) }
                 )
             }
         }
-        if (isSheetOpen && !hasDictionaryArg) {
+        if (isDictionarySheetOpen && !hasDictionaryArg) {
             DictionaryPickerBottomSheet(
-                onDismissRequestBottomSheet = { isSheetOpen = it },
+                onDismissRequestBottomSheet = { isDictionarySheetOpen = it },
                 selectedDictionaryId = { selectedDictionaryId = it },
-                showDialog = { showDirectionDialog = it }
+                showDialog = {
+                    if (it) viewmodel.setDialogState(QuizListDialog.DirectionDialog)
+                    else viewmodel.clearDialogState()
+                }
             )
-        } else if (isSheetOpen && hasDictionaryArg) {
+        } else if (isDictionarySheetOpen && hasDictionaryArg) {
             selectedDictionaryId = argDictionaryId
-            isSheetOpen = false
-            showDirectionDialog = true
+            isDictionarySheetOpen = false
+            viewmodel.setDialogState(QuizListDialog.DirectionDialog)
         }
-
-
-    }
-
-    if (showInfoDialog) {
-        dialogFactory.BuildInfoDialog(
-            onDismissRequest = { showInfoDialog = false },
-            dialogTitle = dialogTitle,
-            dialogText = dialogText
-        )
-    }
-
-    if (showDirectionDialog) {
-        dialogFactory.BuildChooseDirectionDialog(
-            onDismissRequest = {
-                showDirectionDialog = false
-            },
-            onConfirmation = { direction ->
-                selectedDirection = direction
-                onStartQuiz(selectedQuiz, selectedDictionaryId, selectedDirection, false)
-                showDirectionDialog = false
-                isSheetOpen = false
-            }
-        )
-    }
-
-    if (showCustomDialog) {
-        dialogFactory.BuildCustomQuizSizeDialog(
-            onDismissRequest = {
-                showCustomDialog = false
-                isSheetOpen = false
-            },
-            onConfirmation = { size ->
-                onCustomSelected(size)
-                selectedQuiz = QuizTypes.CustomQuiz.toInt()
-                isSheetOpen = true
-                showCustomDialog = false
-            }
-        )
     }
 }
 
@@ -192,7 +190,6 @@ fun QuizCard(
             .fillMaxWidth(),
         elevation = CardDefaults.cardElevation(defaultElevation = MaterialTheme.dimens.CardElevationSmall),
     ) {
-
         val quiz: Pair<String, String> = when (quizType) {
             QuizTypes.QuickQuiz -> Pair(
                 stringResource(R.string.quiz_list_quick_one),
@@ -237,9 +234,7 @@ fun QuizCard(
                     contentDescription = "Quiz Info Button"
                 )
             }
-
         }
-
     }
 }
 
@@ -257,9 +252,10 @@ fun QuizListScreenPreview() {
             list = previewList,
             dialogFactory = ComposeDialogFactory(),
             onStartQuiz = { _, _, _, _ -> },
-            onCustomSelected = {},
             dictionaryIdFromArgs = null,
-            contentPadding = PaddingValues(0.dp)
+            contentPadding = PaddingValues(0.dp),
+            quizListViewModel = null,
+            dialogState = null
         )
     }
 }
