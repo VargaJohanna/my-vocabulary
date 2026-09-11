@@ -24,6 +24,7 @@ import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.SortByAlpha
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DockedSearchBar
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
@@ -32,12 +33,12 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SearchBarDefaults
-import com.vocabulary.myvocabulary.R
+import androidx.compose.material3.SnackbarDuration
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -49,6 +50,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.vocabulary.myvocabulary.R
 import com.vocabulary.myvocabulary.navigation.FabConfiguration
 import com.vocabulary.myvocabulary.repositories.sortBy.SortByOptions
 import com.vocabulary.myvocabulary.ui.lottie.NewDictionaryAnimation
@@ -74,103 +77,30 @@ fun WordListScreen(
     )
 
     val dialogFactory: ComposeDialogFactory = koinInject()
-    val wordList by viewModel.wordList.collectAsState()
+    val wordListUiState by viewModel.wordListUiState.collectAsStateWithLifecycle()
+    val dialogState by viewModel.activeDialog.collectAsStateWithLifecycle()
+    val isSheetOpen by viewModel.isSheetOpen.collectAsStateWithLifecycle()
+    val clickedWord by viewModel.clickedWord.collectAsStateWithLifecycle()
 
-    LaunchedEffect(Unit) {
-        viewModel.fetchWordList()
-    }
+    val snackBarHostState = remember { SnackbarHostState() }
+    val snackBarErrorMessage = stringResource(R.string.snack_bar_error)
 
     BackHandler(enabled = isSearchVisible) {
         onToggleSearch(false)
     }
 
-    WordListScreenContent(
-        wordList = wordList.first,
-        dialogFactory = dialogFactory,
-        onInsertWord = { newWord, newTranslation ->
-            viewModel.insertWord(viewModel.createWordObject(newWord, newTranslation))
-        },
-        onEditWord = { word ->
-            viewModel.updateWord(word)
-        },
-        onDeleteWord = { word ->
-            viewModel.deleteWord(word)
-        },
-        onUpdateFab = onUpdateFab,
-
-        onSearch = { searchTerm ->
-            viewModel.setSearchedTerm(searchTerm)
-        },
-        isSearchVisible = isSearchVisible,
-        isSortOpen = isSortOpen,
-        onToggleSort = { toggle ->
-            onToggleSort(toggle)
-        },
-        sortByDate = {
-            viewModel.setSortBy(viewModel.currentSortByData.copy(
-                sortByOption = SortByOptions.SortByDate,
-                dateDescending = !viewModel.currentSortByData.dateDescending)
-            )
-        },
-        sortByExpression = {
-            viewModel.setSortBy(viewModel.currentSortByData.copy(
-                sortByOption = SortByOptions.SortByWord,
-                wordDescending = !viewModel.currentSortByData.wordDescending)
-            )
-        },
-        sortByTranslation = {
-            viewModel.setSortBy(viewModel.currentSortByData.copy(
-                sortByOption = SortByOptions.SortByTranslation,
-                translationDescending = !viewModel.currentSortByData.translationDescending)
-            )
-        },
-    )
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun WordListScreenContent(
-    wordList: List<Word>,
-    dialogFactory: ComposeDialogFactory,
-    onInsertWord: (String, String) -> Unit,
-    onEditWord: (Word) -> Unit,
-    onDeleteWord: (Word) -> Unit,
-    onUpdateFab: (FabConfiguration) -> Unit,
-    isSearchVisible: Boolean,
-    onSearch: (String) -> Unit,
-    isSortOpen: Boolean,
-    onToggleSort: (Boolean) -> Unit,
-    sortByDate: () -> Unit,
-    sortByExpression: () -> Unit,
-    sortByTranslation: () -> Unit,
-) {
-    var showCreateDialog by remember { mutableStateOf(false) }
-    var isSheetOpen by rememberSaveable { mutableStateOf(false) }
-    var clickedWordToEdit by rememberSaveable {
-        mutableStateOf(
-            Word(
-                0,
-                0,
-                "",
-                "",
-                0,
-                0,
-                0,
-                Calendar.getInstance().time
-            )
-        )
+    LaunchedEffect(isSearchVisible) {
+        if (!isSearchVisible) {
+            viewModel.setSearchedTerm("")
+        }
     }
-    var showEditDialog by rememberSaveable { mutableStateOf(false) }
-    var showDeleteDialog by rememberSaveable { mutableStateOf(false) }
-    var searchQuery by rememberSaveable { mutableStateOf("") }
-    var runNewAnimation by rememberSaveable { mutableStateOf(false) }
 
     LaunchedEffect(Unit) {
         onUpdateFab (
             FabConfiguration.FabButton(
                 isVisible = true,
                 onClick = {
-                    showCreateDialog = true
+                    viewModel.setActiveDialog(WordListDialog.Create)
                 },
                 icon = Icons.Default.Add,
                 iconLabelId = R.string.dictionary_fab_description,
@@ -178,18 +108,140 @@ fun WordListScreenContent(
         )
     }
 
-    LaunchedEffect(isSearchVisible) {
-        if (!isSearchVisible) {
-            searchQuery = ""
-            onSearch("")
+    Box(modifier = Modifier.fillMaxSize()) {
+        when (val state = wordListUiState) {
+            is WordListUiState.Loading -> {
+                CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
+            }
+            is WordListUiState.Error -> {
+                LaunchedEffect(Unit) {
+                    snackBarHostState.showSnackbar(
+                        message = snackBarErrorMessage,
+                        duration = SnackbarDuration.Short
+                    )
+                }
+            }
+            is WordListUiState.Empty -> {
+                NewDictionaryAnimation(true)
+            }
+            is WordListUiState.Success -> {
+                NewDictionaryAnimation(false)
+                WordListScreenContent(
+                    wordList = state.wordList,
+                    onSearch = { viewModel.setSearchedTerm(it) },
+                    isSearchVisible = isSearchVisible,
+                    isSortOpen = isSortOpen,
+                    onToggleSort = onToggleSort,
+                    sortByDate = {
+                        viewModel.setSortBy(viewModel.currentSortByData.copy(
+                            sortByOption = SortByOptions.SortByDate,
+                            dateDescending = !viewModel.currentSortByData.dateDescending)
+                        )
+                    },
+                    sortByExpression = {
+                        viewModel.setSortBy(viewModel.currentSortByData.copy(
+                            sortByOption = SortByOptions.SortByWord,
+                            wordDescending = !viewModel.currentSortByData.wordDescending)
+                        )
+                    },
+                    sortByTranslation = {
+                        viewModel.setSortBy(viewModel.currentSortByData.copy(
+                            sortByOption = SortByOptions.SortByTranslation,
+                            translationDescending = !viewModel.currentSortByData.translationDescending)
+                        )
+                    },
+                    onWordClick = { word ->
+                        viewModel.setClickedWord(word)
+                        viewModel.setSheetOpen(true)
+                    }
+                )
+            }
         }
     }
 
-    LaunchedEffect(wordList) {
-        if(wordList.isEmpty()) {
-            runNewAnimation = true
-        } else {
-            runNewAnimation = false
+    if (isSheetOpen && clickedWord != null) {
+        WordDetailsBottomSheet(
+            clickedWord = clickedWord!!,
+            onDismissRequest = { viewModel.setSheetOpen(it) },
+            showEditDialog = { 
+                if (it) viewModel.setActiveDialog(WordListDialog.Edit(clickedWord!!))
+            },
+            showDelete = { 
+                if (it) viewModel.setActiveDialog(WordListDialog.Delete(clickedWord!!))
+            }
+        )
+    }
+
+    dialogState?.let { dialog ->
+        when (dialog) {
+            is WordListDialog.Create -> {
+                dialogFactory.BuildCreateWordDialog(
+                    dialogTitle = stringResource(R.string.create_new_word_dialog_title),
+                    onDismissRequest = {
+                        viewModel.clearActiveDialog()
+                    },
+                    onConfirmation = { newWord, newTranslation ->
+                        viewModel.insertWord(viewModel.createWordObject(newWord, newTranslation))
+                        viewModel.clearActiveDialog()
+                    },
+                    onAddMore = { newWord, newTranslation ->
+                        viewModel.insertWord(viewModel.createWordObject(newWord, newTranslation))
+                    }
+                )
+            }
+            is WordListDialog.Edit -> {
+                dialogFactory.BuildEditWordDialog(
+                    onDismissRequest = {
+                        viewModel.clearActiveDialog()
+                    },
+                    onConfirmation = { editedExpression, editedTranslation ->
+                        viewModel.updateWord(
+                            dialog.word.copy(
+                                word = editedExpression,
+                                translation = editedTranslation
+                            )
+                        )
+                        viewModel.clearActiveDialog()
+                        viewModel.setSheetOpen(false)
+                    },
+                    expression = dialog.word.word,
+                    translation = dialog.word.translation
+                )
+            }
+            is WordListDialog.Delete -> {
+                dialogFactory.BuildDeleteDialog(
+                    onDismissRequest = { viewModel.clearActiveDialog() },
+                    onConfirmation = {
+                        viewModel.deleteWord(dialog.word)
+                        viewModel.clearActiveDialog()
+                        viewModel.setSheetOpen(false)
+                    },
+                    dialogTitle = stringResource(R.string.dialog_delete_word_title),
+                    message = stringResource(R.string.verify_deletion) + "\n\"${dialog.word.word} - ${dialog.word.translation}\" ?"
+                )
+            }
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun WordListScreenContent(
+    wordList: List<Word>,
+    isSearchVisible: Boolean,
+    onSearch: (String) -> Unit,
+    isSortOpen: Boolean,
+    onToggleSort: (Boolean) -> Unit,
+    sortByDate: () -> Unit,
+    sortByExpression: () -> Unit,
+    sortByTranslation: () -> Unit,
+    onWordClick: (Word) -> Unit,
+) {
+    var searchQuery by rememberSaveable { mutableStateOf("") }
+
+    LaunchedEffect(isSearchVisible) {
+        if (!isSearchVisible) {
+            searchQuery = ""
         }
     }
 
@@ -278,77 +330,10 @@ fun WordListScreenContent(
         }
         WordLazyList(
             list = wordList,
-            onClick = { sheetState, clickedWord ->
-                isSheetOpen = sheetState
-                clickedWordToEdit = clickedWord
+            onClick = { clickedWord ->
+                onWordClick(clickedWord)
             }
         )
-
-        if (isSheetOpen) {
-            WordDetailsBottomSheet(
-                clickedWord = clickedWordToEdit,
-                onDismissRequest = { isSheetOpen = it },
-                showEditDialog = { showEditDialog = it },
-                showDelete = { showDeleteDialog = it }
-            )
-        }
-    }
-
-
-    if (showCreateDialog) {
-        dialogFactory.BuildCreateWordDialog(
-            dialogTitle = stringResource(R.string.create_new_word_dialog_title),
-            onDismissRequest = {
-                showCreateDialog = false
-            },
-            onConfirmation = { newWord, newTranslation ->
-                onInsertWord(newWord, newTranslation)
-                showCreateDialog = false
-            },
-            onAddMore = { newWord, newTranslation ->
-                onInsertWord(newWord, newTranslation)
-            }
-        )
-    }
-
-    if (showEditDialog) {
-        dialogFactory.BuildEditWordDialog(
-            onDismissRequest = {
-                showEditDialog = false
-            },
-            onConfirmation = { editedExpression, editedTranslation ->
-                onEditWord(
-                    clickedWordToEdit.copy(
-                        word = editedExpression,
-                        translation = editedTranslation
-                    )
-                )
-                showEditDialog = false
-                isSheetOpen = false
-            },
-            expression = clickedWordToEdit.word,
-            translation = clickedWordToEdit.translation
-        )
-    }
-
-    if (showDeleteDialog) {
-        dialogFactory.BuildDeleteDialog(
-            onDismissRequest = { showDeleteDialog = false },
-            onConfirmation = {
-                onDeleteWord(clickedWordToEdit)
-                showDeleteDialog = false
-                isSheetOpen = false
-            },
-            dialogTitle = stringResource(R.string.dialog_delete_word_title),
-            message = stringResource(R.string.verify_deletion) + "\n\"${clickedWordToEdit.word} - ${clickedWordToEdit.translation}\" ?"
-        )
-    }
-
-    if(runNewAnimation) {
-        NewDictionaryAnimation(true)
-    } else {
-        NewDictionaryAnimation(false)
-
     }
 }
 
@@ -401,12 +386,13 @@ fun SortMenu(
 @Composable
 fun WordLazyList(
     list: List<Word>,
-    onClick: (isSheetOpen: Boolean, clickedWord: Word) -> Unit
+    onClick: (clickedWord: Word) -> Unit
 ) {
     val state = rememberLazyListState()
 
     LazyColumn(
-        Modifier.fillMaxWidth()
+        Modifier
+            .fillMaxWidth()
             .padding(bottom = MaterialTheme.dimens.PaddingExtraLarge),
         contentPadding = PaddingValues(MaterialTheme.dimens.PaddingMedium),
         state = state
@@ -415,8 +401,8 @@ fun WordLazyList(
             WordCard(
                 modifier = Modifier,
                 wordItem = item,
-                onClick = { sheetState ->
-                    onClick(sheetState, item)
+                onClick = { 
+                    onClick(item)
                 }
             )
             if (list.last() == item) {
@@ -439,10 +425,10 @@ fun WordLazyList(
 fun WordCard(
     modifier: Modifier,
     wordItem: Word,
-    onClick: (isSheetOpen: Boolean) -> Unit
+    onClick: () -> Unit
 ) {
     Card(
-        onClick = { onClick(true) },
+        onClick = { onClick() },
         modifier = modifier
             .fillMaxWidth()
             .padding(MaterialTheme.dimens.PaddingMedium),
@@ -492,18 +478,14 @@ fun WordListScreenPreview() {
     MyVocabularyTheme {
         WordListScreenContent(
             wordList = previewWords,
-            dialogFactory = ComposeDialogFactory(),
-            onInsertWord = { _, _ -> },
-            onDeleteWord = { _ -> },
-            onEditWord = { _ -> },
-            onUpdateFab = {},
             onSearch = {},
             isSearchVisible = false,
             isSortOpen = true,
             onToggleSort = {},
             sortByDate = {},
             sortByExpression = {},
-            sortByTranslation = {}
+            sortByTranslation = {},
+            onWordClick = {}
         )
     }
 }

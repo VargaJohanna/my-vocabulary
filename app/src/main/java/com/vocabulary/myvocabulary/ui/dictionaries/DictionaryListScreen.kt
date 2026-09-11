@@ -259,7 +259,6 @@ fun DictionaryListScreen(
                         message = snackBarErrorMessage,
                         duration = SnackbarDuration.Short
                     )
-                    //Should go back to Home. Use Event maybe?
                 }
             }
 

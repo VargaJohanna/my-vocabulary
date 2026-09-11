@@ -1,42 +1,50 @@
 package com.vocabulary.myvocabulary.ui.words
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.vocabulary.myvocabulary.ext.plusAssign
+import com.vocabulary.myvocabulary.DispatcherProvider
 import com.vocabulary.myvocabulary.repositories.quiz.QuizRepository
 import com.vocabulary.myvocabulary.repositories.search.SearchRepository
 import com.vocabulary.myvocabulary.repositories.sortBy.SortByData
 import com.vocabulary.myvocabulary.repositories.sortBy.SortByRepository
 import com.vocabulary.myvocabulary.repositories.sortedList.SortedListRepository
 import com.vocabulary.myvocabulary.repositories.word.WordRepository
-import com.vocabulary.myvocabulary.rx.RxSchedulers
 import com.vocabulary.myvocabulary.ui.quizzes.QuizTypes
-import io.reactivex.Completable
-import io.reactivex.Observable
-import io.reactivex.disposables.CompositeDisposable
-import io.reactivex.functions.BiFunction
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.rx2.asFlow
 import java.util.*
+import kotlin.coroutines.cancellation.CancellationException
 
 class WordListViewModel(
         val dictionaryId: Long,
         private val sortByRepository: SortByRepository,
         private val wordRepository: WordRepository,
         private val sortedListRepository: SortedListRepository,
-        private val rxSchedulers: RxSchedulers,
         private val quizRepository: QuizRepository,
         private val searchRepository: SearchRepository,
+        private val dispatchers: DispatcherProvider,
 ) : ViewModel() {
-    private val disposables = CompositeDisposable()
-    private val _wordList: MutableStateFlow<Pair<List<Word>, Boolean>> = MutableStateFlow(Pair(emptyList(), false))
-    val wordList: StateFlow<Pair<List<Word>, Boolean>> = _wordList
-    var currentSortByData: SortByData = SortByData()
-    private val _searchBarState: MutableStateFlow<Boolean> = MutableStateFlow(false)
 
-    fun fetchWordList() {
+    private val _wordListUiState = MutableStateFlow<WordListUiState>(WordListUiState.Loading)
+    val wordListUiState: StateFlow<WordListUiState> = _wordListUiState.asStateFlow()
+
+    private val _activeDialog = MutableStateFlow<WordListDialog?>(null)
+    val activeDialog = _activeDialog.asStateFlow()
+
+    private val _isSheetOpen = MutableStateFlow(false)
+    val isSheetOpen = _isSheetOpen.asStateFlow()
+
+    private val _clickedWord = MutableStateFlow<Word?>(null)
+    val clickedWord = _clickedWord.asStateFlow()
+
+    var currentSortByData: SortByData = SortByData()
+
+    init {
         viewModelScope.launch {
             observeList()
             observeSortByData()
@@ -44,40 +52,49 @@ class WordListViewModel(
     }
 
     private fun observeSortByData() {
-        disposables += sortByRepository.sortByData()
-                .subscribeOn(rxSchedulers.io())
-                .observeOn(rxSchedulers.main())
-                .subscribe { t -> currentSortByData = t }
+        viewModelScope.launch {
+            sortByRepository.sortByData().asFlow().collect {
+                currentSortByData = it
+            }
+        }
     }
 
     fun insertWord(word: Word) {
-        disposables += Completable.fromCallable { wordRepository.createWord(word) }
-                .subscribeOn(rxSchedulers.io())
-                .observeOn(rxSchedulers.main())
-                .subscribe({},
-                    {throwable ->
-                        Log.e("DB_ERROR", "Could NOT insert word: ${throwable.message}")
-                    })
+        viewModelScope.launch(dispatchers.io) {
+            try {
+                wordRepository.createWord(word)
+            } catch (e: Exception) {
+                if (e is CancellationException) throw e
+                _wordListUiState.value = WordListUiState.Error("Failed to insert word. Error: ${e.message}")
+            }
+        }
     }
 
     private fun observeList() {
-        disposables += Observable.combineLatest(
-                sortedListRepository.getSortedWordList(dictionaryId),
-                searchRepository.searchedTerm,
-                BiFunction<List<Word>, String, List<Word>> { wordList, searchTerm -> searchList(wordList, searchTerm) })
-                .subscribeOn(rxSchedulers.io())
-                .observeOn(rxSchedulers.main())
-                .subscribe { t ->
-                    _wordList.value = Pair(
-                        first = t,
-                        second = _searchBarState.value
-                    )
-                }
-    }
+        viewModelScope.launch {
+            _wordListUiState.value = WordListUiState.Loading
 
-    override fun onCleared() {
-        disposables.clear()
-        super.onCleared()
+            try {
+                val wordsFlow = sortedListRepository.getSortedWordList(dictionaryId).asFlow()
+                val searchFlow = searchRepository.searchedTerm.asFlow()
+
+                combine(wordsFlow, searchFlow) { wordList, searchTerm ->
+                    val filteredList = searchList(wordList, searchTerm)
+                    if (filteredList.isEmpty()) {
+                        WordListUiState.Empty
+                    } else {
+                        WordListUiState.Success(wordList = filteredList)
+                    }
+                }
+                .flowOn(dispatchers.default)
+                .collect { newState ->
+                    _wordListUiState.value = newState
+                }
+            } catch (e: Exception) {
+                if (e is CancellationException) throw e
+                _wordListUiState.value = WordListUiState.Error("Failed to observe list. Error: ${e.message}")
+            }
+        }
     }
 
     fun createWordObject(word: String, translation: String) = Word(containerDictionaryId = dictionaryId,
@@ -86,17 +103,15 @@ class WordListViewModel(
             created = Calendar.getInstance().time)
 
     fun updateWord(word: Word) {
-        disposables += Completable.fromCallable {
+        viewModelScope.launch(dispatchers.io) {
             wordRepository.updateWord(word)
-        }.subscribeOn(rxSchedulers.io())
-                .subscribe()
+        }
     }
 
     fun deleteWord(word: Word) {
-        disposables += Completable.fromCallable {
+        viewModelScope.launch(dispatchers.io) {
             wordRepository.deleteWord(word)
-        }.subscribeOn(rxSchedulers.io())
-                .subscribe()
+        }
     }
 
     fun startNew(dictionaryId: Long, quizType: QuizTypes) {
@@ -116,4 +131,39 @@ class WordListViewModel(
     fun setSearchedTerm(searchTerm: String) {
         searchRepository.setSearchedTerm(searchTerm)
     }
+
+    fun setActiveDialog(dialog: WordListDialog) {
+        _activeDialog.value = dialog
+    }
+
+    fun clearActiveDialog() {
+        _activeDialog.value = null
+    }
+
+    fun setSheetOpen(isOpen: Boolean) {
+        _isSheetOpen.value = isOpen
+    }
+
+    fun setClickedWord(word: Word?) {
+        _clickedWord.value = word
+    }
+}
+
+sealed class WordListDialog {
+    object Create : WordListDialog()
+    data class Edit(val word: Word) : WordListDialog()
+    data class Delete(val word: Word) : WordListDialog()
+}
+
+sealed interface WordListUiState {
+    object Loading : WordListUiState
+    object Empty : WordListUiState
+
+    data class Error(
+        val message: String
+    ) : WordListUiState
+
+    data class Success(
+        val wordList: List<Word>
+    ) : WordListUiState
 }

@@ -18,7 +18,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -27,6 +26,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavHostController
 import androidx.navigation.toRoute
@@ -35,6 +35,7 @@ import com.vocabulary.myvocabulary.ui.dictionaries.ShareDictionaryViewModel
 import com.vocabulary.myvocabulary.ui.theme.dimens
 import com.vocabulary.myvocabulary.ui.words.WordListScreen
 import com.vocabulary.myvocabulary.ui.words.WordListViewModel
+import com.vocabulary.myvocabulary.ui.words.WordListUiState
 import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.parameter.parametersOf
 import java.util.Locale.getDefault
@@ -57,9 +58,9 @@ fun WordListDestination(
 
     val wordListViewModel: WordListViewModel = koinViewModel(parameters = { parametersOf(args.dictionaryId) })
     val shareViewModel: ShareDictionaryViewModel = koinViewModel()
-    val wordListState by wordListViewModel.wordList.collectAsState()
+    val wordListUiState by wordListViewModel.wordListUiState.collectAsStateWithLifecycle()
 
-    LaunchedEffect(isSearchVisible, args.dictionaryName, isSortOpen) {
+    LaunchedEffect(isSearchVisible, args.dictionaryName, isSortOpen, wordListUiState) {
         onUpdateTitle {
             Text( text = args.dictionaryName.replaceFirstChar {
                 if (it.isLowerCase()) it.titlecase(
@@ -132,11 +133,13 @@ fun WordListDestination(
                             )
                         },
                         onClick = {
-                            shareViewModel.shareDictionaryCompose(
-                                words = wordListState.first,
-                                context = context,
-                                dictionaryName = args.dictionaryName
-                            )
+                            (wordListUiState as? WordListUiState.Success)?.let { successState ->
+                                shareViewModel.shareDictionaryCompose(
+                                    words = successState.wordList,
+                                    context = context,
+                                    dictionaryName = args.dictionaryName
+                                )
+                            }
                         }
                     )
                 }
