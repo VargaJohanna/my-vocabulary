@@ -10,6 +10,7 @@ import com.vocabulary.myvocabulary.ui.dictionaries.Dictionary
 import com.vocabulary.myvocabulary.ui.words.Word
 import io.reactivex.Observable
 import io.reactivex.functions.BiFunction
+import kotlinx.coroutines.rx2.asObservable
 
 class SortedListRepositoryImpl(
         private val wordRepository: WordRepository,
@@ -52,7 +53,7 @@ class SortedListRepositoryImpl(
 
     override fun getSortedDictionaryList(): Observable<List<Dictionary>> {
         return Observable.combineLatest(
-                dictionaryRepository.allDictionaries,
+                dictionaryRepository.allDictionaries.asObservable(),
                 sortByDictRepository.sortByData(),
                 BiFunction { list, sortData ->
                     when (sortData.sortByOption) {

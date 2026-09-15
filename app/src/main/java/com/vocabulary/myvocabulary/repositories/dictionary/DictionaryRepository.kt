@@ -1,16 +1,15 @@
 package com.vocabulary.myvocabulary.repositories.dictionary
 
 import com.vocabulary.myvocabulary.ui.dictionaries.Dictionary
-import io.reactivex.Observable
-import io.reactivex.Single
+import kotlinx.coroutines.flow.Flow
 
 interface  DictionaryRepository {
-    val allDictionaries: Observable<List<Dictionary>>
-    val numberOfDictionaries: Observable<Int>
-    fun createDictionary(dictionary: Dictionary): Long
-    fun deleteDictionary(dictionary: Dictionary)
-    fun updateDictionary(dictionary: Dictionary)
-    fun getDictionaryById(dictionaryId: Long): Single<Dictionary>
-    fun onQuizFinished(dictionaryId: Long?)
-    fun saveQuizStats(id: Long, scorePercentage: Int)
+    val allDictionaries: Flow<List<Dictionary>>
+    val numberOfDictionaries: Flow<Int>
+    suspend fun createDictionary(dictionary: Dictionary): Long
+    suspend fun deleteDictionary(dictionary: Dictionary)
+    suspend fun updateDictionary(dictionary: Dictionary)
+    suspend fun getDictionaryById(dictionaryId: Long): Dictionary
+    suspend fun onQuizFinished(dictionaryId: Long?)
+    suspend fun saveQuizStats(id: Long, scorePercentage: Int)
 }

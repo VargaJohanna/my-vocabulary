@@ -19,6 +19,9 @@ import com.vocabulary.myvocabulary.ui.dictionaries.toDictionaryEntry
 import com.vocabulary.myvocabulary.ui.words.Word
 import com.vocabulary.myvocabulary.ui.words.toWordEntry
 import com.vocabulary.myvocabulary.utils.DateTypeConverter
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import java.util.*
 
 @Database(entities = [DictionaryEntry::class, WordEntry::class, QuoteEntry::class], version = 8, exportSchema = true)
@@ -71,7 +74,7 @@ abstract class AppDatabase : RoomDatabase() {
                 .addCallback(object : Callback() {
                     override fun onCreate(db: SupportSQLiteDatabase) {
                         super.onCreate(db)
-                        ioThread {
+                        CoroutineScope(Dispatchers.IO).launch {
                             getInstance(context).dictionaryDao()
                                 .insertDictionary(getDefaultDictionary(context))
                             getListOfDefaultWords(context).forEach {

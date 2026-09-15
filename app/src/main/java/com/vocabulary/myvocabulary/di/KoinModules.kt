@@ -62,7 +62,7 @@ val repositoryModule = module {
             produceFile = { get<Context>().preferencesDataStoreFile("settings") }
         )
     }
-    single<DictionaryRepository> { DictionaryRepositoryImpl(get(), get()) }
+    single<DictionaryRepository> { DictionaryRepositoryImpl(get()) }
     single<WordRepository> { WordRepositoryImpl(get()) }
     single<QuizRepository> { QuizRepositoryImpl(get(), get()) }
     single<SortByRepository> {

@@ -144,7 +144,6 @@ class HomeViewModel(
     private fun getDictionaryStats() {
         viewModelScope.launch {
             dictionaryRepository.allDictionaries
-                .asFlow()
                 .collect { list ->
                     _numOfDictionaries.value = list.size
                     _lastPracticedDictionary.value = list
