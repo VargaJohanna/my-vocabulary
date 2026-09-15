@@ -55,8 +55,8 @@ class ProcessQuizResultsUseCaseTest {
         assertThat(quizResult.percentage).isEqualTo(100)
         assertThat(quizResult.allPassed).isTrue()
         
-        verify(exactly = 1) { dictionaryRepository.saveQuizStats(dictionaryId, 100) }
-        verify(exactly = 1) { dictionaryRepository.onQuizFinished(dictionaryId) }
+        coVerify(exactly = 1) { dictionaryRepository.saveQuizStats(dictionaryId, 100) }
+        coVerify(exactly = 1) { dictionaryRepository.onQuizFinished(dictionaryId) }
         verify(exactly = 2) { wordRepository.updateWord(any()) }
     }
 
@@ -75,7 +75,7 @@ class ProcessQuizResultsUseCaseTest {
         assertThat(quizResult.percentage).isEqualTo(50)
         assertThat(quizResult.allPassed).isFalse()
 
-        verify(exactly = 1) { dictionaryRepository.saveQuizStats(dictionaryId, 50) }
+        coVerify(exactly = 1) { dictionaryRepository.saveQuizStats(dictionaryId, 50) }
     }
 
     @Test
@@ -123,6 +123,6 @@ class ProcessQuizResultsUseCaseTest {
         // Assert
         assertThat(quizResult.percentage).isEqualTo(0)
         assertThat(quizResult.allPassed).isFalse()
-        verify(exactly = 1) { dictionaryRepository.saveQuizStats(dictionaryId, 0) }
+        coVerify(exactly = 1) { dictionaryRepository.saveQuizStats(dictionaryId, 0) }
     }
 }

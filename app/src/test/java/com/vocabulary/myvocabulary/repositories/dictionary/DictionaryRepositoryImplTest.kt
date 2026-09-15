@@ -1,17 +1,17 @@
 package com.vocabulary.myvocabulary.repositories.dictionary
 
-import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.nhaarman.mockitokotlin2.*
 import com.vocabulary.myvocabulary.ui.dictionaries.Dictionary
-import com.vocabulary.myvocabulary.TestScheduler
 import com.vocabulary.myvocabulary.ui.dictionaries.toDictionaryEntry
-import io.reactivex.Observable
-import org.junit.Rule
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.runBlocking
+import org.assertj.core.api.Assertions.assertThat
+import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.Test
 import java.util.*
 
 class DictionaryRepositoryImplTest {
-    // Match what DictionaryEntry.toDictionary() actually produces from the mocked DAO data
     val dictionaryTest = Dictionary(
         dictionaryName = "Test",
         dictionaryCreated = Date(12),
@@ -47,122 +47,122 @@ class DictionaryRepositoryImplTest {
         DictionaryEntry(dictionaryId = 1L, dictionaryName = "Test2", dictionaryCreated = Date(12))
     )
 
-    @Rule
-    @JvmField
-    var mockito = InstantTaskExecutorRule()
-
-    private
-    val dictionaryDao = mock<DictionaryDao>()
+    private val dictionaryDao = mock<DictionaryDao>()
 
     @Test
     fun `should create dictionary when createDictionary() is called`() {
-        val dictionaryRepository = givenDictionaryRepository()
-        val dictionary = dictionaryTest
-        dictionaryRepository.createDictionary(dictionary)
+        runBlocking {
+            val dictionaryRepository = givenDictionaryRepository()
+            val dictionary = dictionaryTest
+            dictionaryRepository.createDictionary(dictionary)
 
-        verify(dictionaryDao).insertDictionary(dictionary.toDictionaryEntry())
+            verify(dictionaryDao).insertDictionary(dictionary.toDictionaryEntry())
+        }
     }
 
     @Test
     fun `should delete dictionary when deleteDictionary() is called`() {
-        val dictionaryRepository = givenDictionaryRepository()
-        val dictionary = dictionaryTest
+        runBlocking {
+            val dictionaryRepository = givenDictionaryRepository()
+            val dictionary = dictionaryTest
 
-        dictionaryRepository.deleteDictionary(dictionary)
+            dictionaryRepository.deleteDictionary(dictionary)
 
-        verify(dictionaryDao).deleteDictionary(dictionary.toDictionaryEntry())
+            verify(dictionaryDao).deleteDictionary(dictionary.toDictionaryEntry())
+        }
     }
 
     @Test
     fun `should update dictionary when updateDictionary() is called`() {
-        val dictionaryRepository = givenDictionaryRepository()
-        val dictionary = dictionaryTest
+        runBlocking {
+            val dictionaryRepository = givenDictionaryRepository()
+            val dictionary = dictionaryTest
 
-        dictionaryRepository.updateDictionary(dictionary)
+            dictionaryRepository.updateDictionary(dictionary)
 
-        verify(dictionaryDao).updateDictionary(dictionary.toDictionaryEntry())
+            verify(dictionaryDao).updateDictionary(dictionary.toDictionaryEntry())
+        }
     }
 
     @Test
     fun `should return a list of dictionaries`() {
-        val dictionaryRepository = givenDictionaryRepositoryWithDaoData()
+        runBlocking {
+            val dictionaryRepository = givenDictionaryRepositoryWithDaoData()
 
-        val testObserver = dictionaryRepository.allDictionaries.test()
+            val result = dictionaryRepository.allDictionaries.first()
 
-        testObserver.assertValues(dictionaryList)
-            .assertNotTerminated()
-            .assertNoErrors()
-            .dispose()
+            assertThat(result).isEqualTo(dictionaryList)
+        }
     }
 
     @Test
     fun `should find dictionary with given id when getDictionaryById() is called`() {
-        val dictionaryRepository = givenDictionaryRepositoryWithDaoData()
-        val dictionary = dictionaryTest
+        runBlocking {
+            val dictionaryRepository = givenDictionaryRepositoryWithDaoData()
+            val dictionary = dictionaryList[0]
 
-        val testObserver =
-            dictionaryRepository.getDictionaryById(dictionary.dictionaryId).test()
+            val result = dictionaryRepository.getDictionaryById(dictionary.dictionaryId)
 
-        testObserver.assertValues(dictionary)
-            .assertNoErrors()
-            .dispose()
-
+            assertThat(result).isEqualTo(dictionary)
+        }
     }
 
     @Test
     fun `should not find dictionary with given id when getDictionaryById() is called`() {
-        val dictionaryRepository = givenDictionaryRepositoryWithDaoData()
-        // Use an id that does not exist in entryList
-        val dictionary = dictionaryTest.copy(dictionaryId = 99L)
+        runBlocking {
+            val dictionaryRepository = givenDictionaryRepositoryWithDaoData()
+            // Use an id that does not exist in entryList
+            val dictionaryId = 99L
 
-        val testObserver =
-            dictionaryRepository.getDictionaryById(dictionary.dictionaryId).test()
-
-        // Expect an error when the dictionary is not found
-        testObserver.assertError(NoSuchElementException::class.java)
+            assertThatThrownBy {
+                runBlocking { dictionaryRepository.getDictionaryById(dictionaryId) }
+            }.isInstanceOf(NoSuchElementException::class.java)
+        }
     }
 
     @Test
     fun `should update last practiced when onQuizFinished() is called`() {
-        val dictionaryRepository = givenDictionaryRepository()
-        val dictionaryId = 42L
+        runBlocking {
+            val dictionaryRepository = givenDictionaryRepository()
+            val dictionaryId = 42L
 
-        dictionaryRepository.onQuizFinished(dictionaryId)
+            dictionaryRepository.onQuizFinished(dictionaryId)
 
-        verify(dictionaryDao).updateLastPracticed(eq(dictionaryId), any())
+            verify(dictionaryDao).updateLastPracticed(eq(dictionaryId), any())
+        }
     }
 
     @Test
     fun `should not call updateLastPracticed when onQuizFinished() is called with null id`() {
-        val dictionaryRepository = givenDictionaryRepository()
+        runBlocking {
+            val dictionaryRepository = givenDictionaryRepository()
 
-        dictionaryRepository.onQuizFinished(null)
+            dictionaryRepository.onQuizFinished(null)
 
-        verify(dictionaryDao, never()).updateLastPracticed(any(), any())
+            verify(dictionaryDao, never()).updateLastPracticed(any(), any())
+        }
     }
 
     @Test
     fun `should save quiz stats when saveQuizStats() is called`() {
-        val dictionaryRepository = givenDictionaryRepository()
-        val dictionaryId = 7L
-        val score = 85
+        runBlocking {
+            val dictionaryRepository = givenDictionaryRepository()
+            val dictionaryId = 7L
+            val score = 85
 
-        dictionaryRepository.saveQuizStats(dictionaryId, score)
+            dictionaryRepository.saveQuizStats(dictionaryId, score)
 
-        verify(dictionaryDao).updateDictionaryStats(eq(dictionaryId), any(), eq(score))
+            verify(dictionaryDao).updateDictionaryStats(eq(dictionaryId), any(), eq(score))
+        }
     }
 
     private fun givenDictionaryRepository(): DictionaryRepository {
-        whenever(dictionaryDao.getAllDictionaries()).thenReturn(Observable.never())
-        return DictionaryRepositoryImpl(dictionaryDao, TestScheduler())
+        whenever(dictionaryDao.getAllDictionaries()).thenReturn(flowOf(emptyList()))
+        return DictionaryRepositoryImpl(dictionaryDao)
     }
 
     private fun givenDictionaryRepositoryWithDaoData(): DictionaryRepository {
-        whenever(dictionaryDao.getAllDictionaries()).thenReturn(
-            Observable.just(
-                entryList
-            )
-        )
-        return DictionaryRepositoryImpl(dictionaryDao, TestScheduler())
+        whenever(dictionaryDao.getAllDictionaries()).thenReturn(flowOf(entryList))
+        return DictionaryRepositoryImpl(dictionaryDao)
     }
 }

@@ -15,6 +15,7 @@ import io.mockk.*
 import io.reactivex.Observable
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert
@@ -51,7 +52,7 @@ class DictionaryListViewModelTest {
         testDispatcher = TestDispatchers(mainCoroutineRule.testDispatcher)
         
         // Default stubs for init block
-        every { dictionaryRepository.allDictionaries } returns Observable.never()
+        every { dictionaryRepository.allDictionaries } returns flowOf(emptyList())
         every { sortByRepository.sortByData() } returns Observable.never()
         every { sortedListRepository.getSortedDictionaryList() } returns Observable.never()
         every { shareDictViewModel.importedDictionaryDetailsFlow } returns MutableSharedFlow()
@@ -110,7 +111,7 @@ class DictionaryListViewModelTest {
         
         advanceUntilIdle()
 
-        verify { dictionaryRepository.createDictionary(dictionaryWithId) }
+        coVerify { dictionaryRepository.createDictionary(dictionaryWithId) }
         assertThat(dictionaryListViewModel.libraryUiState.value).isInstanceOf(LibraryUiState.LibraryData::class)
     }
 
@@ -146,7 +147,7 @@ class DictionaryListViewModelTest {
         dictionaryListViewModel.renameDictionary(dictionaryToUpdate)
         advanceUntilIdle()
 
-        verify { dictionaryRepository.updateDictionary(dictionaryToUpdate) }
+        coVerify { dictionaryRepository.updateDictionary(dictionaryToUpdate) }
     }
 
     @Test
@@ -157,7 +158,7 @@ class DictionaryListViewModelTest {
         dictionaryListViewModel.deleteDictionary(dictionaryWithId)
         advanceUntilIdle()
 
-        verify { dictionaryRepository.deleteDictionary(dictionaryWithId) }
+        coVerify { dictionaryRepository.deleteDictionary(dictionaryWithId) }
     }
 
     @Test
