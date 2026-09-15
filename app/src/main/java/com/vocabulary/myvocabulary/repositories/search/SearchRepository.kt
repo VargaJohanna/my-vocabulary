@@ -1,10 +1,10 @@
 package com.vocabulary.myvocabulary.repositories.search
 
-import io.reactivex.Observable
+import kotlinx.coroutines.flow.Flow
 
 interface SearchRepository {
-    val searchedTerm: Observable<String>
+    val searchedTerm: Flow<String>
     fun setSearchedTerm(search: String)
     fun saveSearchBarStatus(isSearchOpen: Boolean)
-    fun showSearchBar(): Observable<Boolean>
+    fun showSearchBar(): Flow<Boolean>
 }

@@ -1,33 +1,32 @@
 package com.vocabulary.myvocabulary.repositories.search
 
-import androidx.arch.core.executor.testing.InstantTaskExecutorRule
-import org.junit.Assert.*
-import org.junit.Rule
+import app.cash.turbine.test
+import kotlinx.coroutines.test.runTest
+import org.junit.Assert.assertEquals
 import org.junit.Test
 
 class SearchRepositoryImplTest {
-    @Rule
-    @JvmField
-    var mockito = InstantTaskExecutorRule()
 
     @Test
-    fun `should reset searched term when setSearchedTerm() is called`() {
+    fun `should reset searched term when setSearchedTerm() is called`() = runTest {
         val searchRepository = givenSearchRepository()
-        searchRepository.setSearchedTerm("test")
-
-        val testObserver = searchRepository.searchedTerm.test()
-
-        testObserver.assertValue ("test")
+        
+        searchRepository.searchedTerm.test {
+            assertEquals("", awaitItem())
+            searchRepository.setSearchedTerm("test")
+            assertEquals("test", awaitItem())
+        }
     }
 
     @Test
-    fun `should reset search bar status when saveSearchBarStatus() is called`() {
+    fun `should reset search bar status when saveSearchBarStatus() is called`() = runTest {
         val searchRepository = givenSearchRepository()
-        searchRepository.saveSearchBarStatus(true)
-
-        val testObserver = searchRepository.showSearchBar().test()
-
-        testObserver.assertValue (true)
+        
+        searchRepository.showSearchBar().test {
+            assertEquals(false, awaitItem())
+            searchRepository.saveSearchBarStatus(true)
+            assertEquals(true, awaitItem())
+        }
     }
 
     private fun givenSearchRepository() = SearchRepositoryImpl()

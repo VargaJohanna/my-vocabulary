@@ -14,6 +14,7 @@ import com.vocabulary.myvocabulary.testing.TestDispatchers
 import io.mockk.*
 import io.reactivex.Observable
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
@@ -44,14 +45,14 @@ class WordListViewModelTest {
         // Default stubs for init block
         every { sortByRepository.sortByData() } returns Observable.never()
         every { sortedListRepository.getSortedWordList(dictionaryId) } returns Observable.never()
-        every { searchRepository.searchedTerm } returns Observable.never()
+        every { searchRepository.searchedTerm } returns flowOf("")
     }
 
     @Test
     fun `wordListUiState should emit Loading then Success when repository emits items`() = runTest {
         val words = listOf(Word(1, dictionaryId, "word", "translation", 0, 0, 0, Date()))
         every { sortedListRepository.getSortedWordList(dictionaryId) } returns Observable.just(words)
-        every { searchRepository.searchedTerm } returns Observable.just("")
+        every { searchRepository.searchedTerm } returns flowOf("")
 
         viewModel = givenWordListViewModel()
 
@@ -65,8 +66,9 @@ class WordListViewModelTest {
 
     @Test
     fun `wordListUiState should emit Empty when filtered list is empty`() = runTest {
-        every { sortedListRepository.getSortedWordList(dictionaryId) } returns Observable.just(emptyList())
-        every { searchRepository.searchedTerm } returns Observable.just("")
+        val list = emptyList<Word>()
+        every { sortedListRepository.getSortedWordList(dictionaryId) } returns Observable.just(list)
+        every { searchRepository.searchedTerm } returns flowOf("")
 
         viewModel = givenWordListViewModel()
 
@@ -106,7 +108,6 @@ class WordListViewModelTest {
             sortByRepository = sortByRepository,
             wordRepository = wordRepository,
             sortedListRepository = sortedListRepository,
-            quizRepository = quizRepository,
             searchRepository = searchRepository,
             dispatchers = testDispatcher
         )

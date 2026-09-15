@@ -3,13 +3,11 @@ package com.vocabulary.myvocabulary.ui.words
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.vocabulary.myvocabulary.DispatcherProvider
-import com.vocabulary.myvocabulary.repositories.quiz.QuizRepository
 import com.vocabulary.myvocabulary.repositories.search.SearchRepository
 import com.vocabulary.myvocabulary.repositories.sortBy.SortByData
 import com.vocabulary.myvocabulary.repositories.sortBy.SortByRepository
 import com.vocabulary.myvocabulary.repositories.sortedList.SortedListRepository
 import com.vocabulary.myvocabulary.repositories.word.WordRepository
-import com.vocabulary.myvocabulary.ui.quizzes.QuizTypes
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -25,7 +23,6 @@ class WordListViewModel(
         private val sortByRepository: SortByRepository,
         private val wordRepository: WordRepository,
         private val sortedListRepository: SortedListRepository,
-        private val quizRepository: QuizRepository,
         private val searchRepository: SearchRepository,
         private val dispatchers: DispatcherProvider,
 ) : ViewModel() {
@@ -76,7 +73,7 @@ class WordListViewModel(
 
             try {
                 val wordsFlow = sortedListRepository.getSortedWordList(dictionaryId).asFlow()
-                val searchFlow = searchRepository.searchedTerm.asFlow()
+                val searchFlow = searchRepository.searchedTerm
 
                 combine(wordsFlow, searchFlow) { wordList, searchTerm ->
                     val filteredList = searchList(wordList, searchTerm)
@@ -111,12 +108,6 @@ class WordListViewModel(
     fun deleteWord(word: Word) {
         viewModelScope.launch(dispatchers.io) {
             wordRepository.deleteWord(word)
-        }
-    }
-
-    fun startNew(dictionaryId: Long, quizType: QuizTypes) {
-        viewModelScope.launch{
-            quizRepository.setQuizList(dictionaryId, quizType)
         }
     }
 
