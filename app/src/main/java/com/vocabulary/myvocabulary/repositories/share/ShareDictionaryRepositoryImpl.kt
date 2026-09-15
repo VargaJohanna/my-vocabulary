@@ -1,18 +1,18 @@
 package com.vocabulary.myvocabulary.repositories.share
 
 import android.net.Uri
-import io.reactivex.Observable
-import io.reactivex.subjects.BehaviorSubject
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
 
 class ShareDictionaryRepositoryImpl : ShareDictionaryRepository {
-    private val _import = BehaviorSubject.createDefault(false)
-    private val import: Observable<Boolean> = _import
+    private val _import = MutableStateFlow(false)
 
     override fun setIsImport(import: Boolean) {
-        _import.onNext(import)
+        _import.value = import
     }
 
-    override fun getImport() = import
+    override fun getImport(): Flow<Boolean> = _import.asStateFlow()
 
     private var csvData: Uri? = null
 
