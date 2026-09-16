@@ -1,49 +1,54 @@
 package com.vocabulary.myvocabulary.repositories.sortBy.dictionary
 
-import android.content.SharedPreferences
-import com.f2prateek.rx.preferences2.RxSharedPreferences
-import io.reactivex.Observable
-import io.reactivex.functions.Function3
+import androidx.datastore.core.DataStore
+import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.core.booleanPreferencesKey
+import androidx.datastore.preferences.core.edit
+import androidx.datastore.preferences.core.intPreferencesKey
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.launch
 
 class SortDictionaryRepositoryImpl(
-        private val preferences: SharedPreferences,
-        rxPreferences: RxSharedPreferences
+    private val dataStore: DataStore<Preferences>,
+    private val scope: CoroutineScope
 ) : SortDictionaryRepository {
-    private val sortDateDirection: Observable<Boolean> = rxPreferences.getBoolean(SORT_DICT_DATE_DIRECTION_KEY, true).asObservable()
-    private val sortTitleDirection: Observable<Boolean> = rxPreferences.getBoolean(SORT_DICT_TITLE_DIRECTION_KEY, true).asObservable()
-    private val sortBy: Observable<Int> = rxPreferences.getInteger(SORT_DICT_KEY, 0).asObservable()
 
     override fun setSortBy(sortByData: SortDictionaryData) {
-        preferences.edit().apply {
-            putInt(SORT_DICT_KEY, sortByData.sortByOption.toInt())
-            when (sortByData.sortByOption) {
-                SortByDictionaryOptions.SortByDate -> {
-                    putBoolean(SORT_DICT_DATE_DIRECTION_KEY, sortByData.dateDescending)
-                }
-                SortByDictionaryOptions.SortByTitle -> {
-                    putBoolean(SORT_DICT_TITLE_DIRECTION_KEY, sortByData.titleDescending)
+        scope.launch {
+            dataStore.edit { preferences ->
+                preferences[SORT_DICT_KEY] = sortByData.sortByOption.toInt()
+                when (sortByData.sortByOption) {
+                    SortByDictionaryOptions.SortByDate -> {
+                        preferences[SORT_DICT_DATE_DIRECTION_KEY] = sortByData.dateDescending
+                    }
+                    SortByDictionaryOptions.SortByTitle -> {
+                        preferences[SORT_DICT_TITLE_DIRECTION_KEY] = sortByData.titleDescending
+                    }
                 }
             }
-            apply()
         }
     }
 
-    override fun sortByData(): Observable<SortDictionaryData> {
-        return Observable.combineLatest(
-                sortBy,
-                sortDateDirection,
-                sortTitleDirection,
-                Function3 { sortByOption, date, title ->
-                    SortDictionaryData(
-                            sortByOption = sortByOption.toSortByDictionaryOption(),
-                            dateDescending = date,
-                            titleDescending = title)
-                })
+    override fun sortByData(): Flow<SortDictionaryData> {
+        return combine(
+            dataStore.data.map { it[SORT_DICT_KEY] ?: 0 },
+            dataStore.data.map { it[SORT_DICT_DATE_DIRECTION_KEY] ?: true },
+            dataStore.data.map { it[SORT_DICT_TITLE_DIRECTION_KEY] ?: true }
+        ) { sortByOption, date, title ->
+            SortDictionaryData(
+                sortByOption = sortByOption.toSortByDictionaryOption(),
+                dateDescending = date,
+                titleDescending = title
+            )
+        }
     }
 
     companion object {
-        const val SORT_DICT_KEY = "SORT_DICT_KEY"
-        const val SORT_DICT_TITLE_DIRECTION_KEY = "SORT_DICT_TITLE_DIRECTION_KEY"
-        const val SORT_DICT_DATE_DIRECTION_KEY = "SORT_DICT_DATE_DIRECTION_KEY"
+        val SORT_DICT_KEY = intPreferencesKey("SORT_DICT_KEY")
+        val SORT_DICT_TITLE_DIRECTION_KEY = booleanPreferencesKey("SORT_DICT_TITLE_DIRECTION_KEY")
+        val SORT_DICT_DATE_DIRECTION_KEY = booleanPreferencesKey("SORT_DICT_DATE_DIRECTION_KEY")
     }
 }

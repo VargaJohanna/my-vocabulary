@@ -4,7 +4,6 @@ import android.content.Context
 import android.preference.PreferenceManager
 import androidx.datastore.preferences.core.PreferenceDataStoreFactory
 import androidx.datastore.preferences.preferencesDataStoreFile
-import com.f2prateek.rx.preferences2.RxSharedPreferences
 import com.vocabulary.myvocabulary.BuildConfig
 import com.vocabulary.myvocabulary.Constants
 import com.vocabulary.myvocabulary.DispatcherProvider
@@ -44,6 +43,8 @@ import com.vocabulary.myvocabulary.ui.quizzes.QuizListViewModel
 import com.vocabulary.myvocabulary.ui.words.WordDetailsViewModel
 import com.vocabulary.myvocabulary.ui.words.WordListViewModel
 import com.vocabulary.myvocabulary.utils.ComposeDialogFactory
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.SupervisorJob
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
 import org.koin.core.module.dsl.viewModel
@@ -80,7 +81,6 @@ val repositoryModule = module {
     single<NetworkQuoteRepository> { NetworkQuoteRepositoryImpl(get()) }
     single<QuoteRepository> { QuoteRepositoryImpl(get(), get()) }
     single { PreferenceManager.getDefaultSharedPreferences(get()) }
-    single { RxSharedPreferences.create(get()) }
     single<ShareDictionaryRepository> { ShareDictionaryRepositoryImpl() }
     single<CustomQuizRepository> { CustomQuizRepositoryImpl() }
 }
@@ -130,6 +130,7 @@ val viewModelModule = module {
 val schedulerModule = module {
     factory<RxSchedulers> { SchedulersImpl() }
     single<DispatcherProvider> { StandardDispatchers }
+    single { CoroutineScope(SupervisorJob() + get<DispatcherProvider>().io) }
 }
 
 val factoryModule = module {
@@ -139,4 +140,3 @@ val factoryModule = module {
 val domainModule = module {
     factory { ProcessQuizResultsUseCase(get(), get(), get()) }
 }
-

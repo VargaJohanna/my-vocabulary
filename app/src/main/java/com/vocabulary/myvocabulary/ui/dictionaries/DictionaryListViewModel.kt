@@ -132,7 +132,7 @@ class DictionaryListViewModel(
 
     private fun observeSortByData() {
         viewModelScope.launch {
-            sortByRepository.sortByData().asFlow().collect {
+            sortByRepository.sortByData().collect {
                 currentSortByData = it
             }
         }

@@ -22,7 +22,7 @@ class SortedListRepositoryImpl(
     override fun getSortedWordList(dictionaryId: Long): Observable<List<Word>> {
         return Observable.combineLatest(
                 wordRepository.getObservableWordList(dictionaryId),
-                sortByRepository.sortByData(),
+                sortByRepository.sortByData().asObservable(),
                 BiFunction { list, sortData ->
                     when (sortData.sortByOption) {
                         SortByOptions.SortByTranslation ->
@@ -54,7 +54,7 @@ class SortedListRepositoryImpl(
     override fun getSortedDictionaryList(): Observable<List<Dictionary>> {
         return Observable.combineLatest(
                 dictionaryRepository.allDictionaries.asObservable(),
-                sortByDictRepository.sortByData(),
+                sortByDictRepository.sortByData().asObservable(),
                 BiFunction { list, sortData ->
                     when (sortData.sortByOption) {
                         SortByDictionaryOptions.SortByDate ->

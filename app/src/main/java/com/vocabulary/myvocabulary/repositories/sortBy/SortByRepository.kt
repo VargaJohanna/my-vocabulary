@@ -1,8 +1,8 @@
 package com.vocabulary.myvocabulary.repositories.sortBy
 
-import io.reactivex.Observable
+import kotlinx.coroutines.flow.Flow
 
 interface SortByRepository {
     fun setSortBy(sortByData: SortByData)
-    fun sortByData(): Observable<SortByData>
+    fun sortByData(): Flow<SortByData>
 }
