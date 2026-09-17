@@ -1,22 +1,18 @@
 package com.vocabulary.myvocabulary.repositories.word
 
-import androidx.arch.core.executor.testing.InstantTaskExecutorRule
-import com.nhaarman.mockitokotlin2.mock
-import com.nhaarman.mockitokotlin2.verify
-import com.nhaarman.mockitokotlin2.whenever
+import com.nhaarman.mockitokotlin2.*
 import com.vocabulary.myvocabulary.ui.words.Word
 import com.vocabulary.myvocabulary.ui.words.toWordEntry
-import io.reactivex.Observable
-import io.reactivex.Single
-import org.junit.Rule
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.runBlocking
+import org.assertj.core.api.Assertions.assertThat
 import org.junit.Test
 import java.util.*
 import java.util.Arrays.asList
 
 class WordRepositoryImplTest {
-    @Rule
-    @JvmField
-    var mockito = InstantTaskExecutorRule()
+
     private val wordDao = mock<WordDao>()
     private val requestedDictionary = 1L
     private val wordIdToTest = 1L
@@ -29,35 +25,35 @@ class WordRepositoryImplTest {
 
     @Test
     fun `should return a list of words of the given dictionary when getObservableWordList() is called`() {
-        val wordRepository = givenWordRepositoryWithDao()
+        runBlocking {
+            val wordRepository = givenWordRepositoryWithDao()
 
-        val testObserver = wordRepository.getObservableWordList(requestedDictionary).test()
+            val result = wordRepository.getObservableWordList(requestedDictionary).first()
 
-        testObserver.assertValues(wordList)
-                .assertNoErrors()
-                .dispose()
+            assertThat(result).isEqualTo(wordList)
+        }
     }
 
     @Test
     fun `should return true when the requested word is in the dictionary`() {
-        val wordRepository = givenWordRepositoryWithDao()
+        runBlocking {
+            val wordRepository = givenWordRepositoryWithDao()
 
-        val testObserver = wordRepository.getIsWordInDictionary(wordIdToTest).test()
+            val result = wordRepository.getIsWordInDictionary(wordIdToTest).first()
 
-        testObserver.assertValue(true)
-                .assertNoErrors()
-                .dispose()
+            assertThat(result).isTrue()
+        }
     }
 
     @Test
     fun `should return false when the requested word is in the dictionary`() {
-        val wordRepository = givenWordRepositoryWithNoWords()
+        runBlocking {
+            val wordRepository = givenWordRepositoryWithNoWords()
 
-        val testObserver = wordRepository.getIsWordInDictionary(wordIdToTest).test()
+            val result = wordRepository.getIsWordInDictionary(wordIdToTest).first()
 
-        testObserver.assertValue(false)
-                .assertNoErrors()
-                .dispose()
+            assertThat(result).isFalse()
+        }
     }
 
     @Test
@@ -89,11 +85,13 @@ class WordRepositoryImplTest {
 
     @Test
     fun `should return word by requested id`() {
-        val wordRepository = givenWordRepositoryWithWordById()
+        runBlocking {
+            val wordRepository = givenWordRepositoryWithWordById()
 
-        wordRepository.getWordById(wordIdToTest)
+            wordRepository.getWordById(wordIdToTest)
 
-        verify(wordDao).getWordById(wordIdToTest)
+            verify(wordDao).getWordById(wordIdToTest)
+        }
     }
 
     private fun givenWordRepository(): WordRepositoryImpl {
@@ -101,19 +99,21 @@ class WordRepositoryImplTest {
     }
 
     private fun givenWordRepositoryWithDao(): WordRepositoryImpl {
-        whenever(wordDao.getNumberOfWordById(wordIdToTest)).thenReturn(Observable.just(1))
-        whenever(wordDao.getAllWordsInDictionary(requestedDictionary)).thenReturn(Observable.just(wordList.map { it.toWordEntry() }))
+        whenever(wordDao.getNumberOfWordById(wordIdToTest)).thenReturn(flowOf(1))
+        whenever(wordDao.getAllWordsInDictionary(requestedDictionary)).thenReturn(flowOf(wordList.map { it.toWordEntry() }))
         return WordRepositoryImpl(wordDao)
     }
 
     private fun givenWordRepositoryWithNoWords(): WordRepositoryImpl {
-        whenever(wordDao.getNumberOfWordById(wordIdToTest)).thenReturn(Observable.just(0))
-        whenever(wordDao.getAllWordsInDictionary(requestedDictionary)).thenReturn(Observable.just(wordList.map { it.toWordEntry() }))
+        whenever(wordDao.getNumberOfWordById(wordIdToTest)).thenReturn(flowOf(0))
+        whenever(wordDao.getAllWordsInDictionary(requestedDictionary)).thenReturn(flowOf(wordList.map { it.toWordEntry() }))
         return WordRepositoryImpl(wordDao)
     }
 
     private fun givenWordRepositoryWithWordById(): WordRepositoryImpl {
-        whenever(wordDao.getWordById(wordIdToTest)).thenReturn(Single.just(wordToTest.toWordEntry()))
+        runBlocking {
+            whenever(wordDao.getWordById(wordIdToTest)).thenReturn(wordToTest.toWordEntry())
+        }
         return WordRepositoryImpl(wordDao)
     }
 }

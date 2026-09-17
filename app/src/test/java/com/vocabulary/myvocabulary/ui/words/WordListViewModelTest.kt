@@ -4,15 +4,14 @@ import app.cash.turbine.test
 import assertk.assertThat
 import assertk.assertions.isEqualTo
 import assertk.assertions.isInstanceOf
-import com.vocabulary.myvocabulary.repositories.quiz.QuizRepository
 import com.vocabulary.myvocabulary.repositories.search.SearchRepository
+import com.vocabulary.myvocabulary.repositories.sortBy.SortByData
 import com.vocabulary.myvocabulary.repositories.sortBy.SortByRepository
 import com.vocabulary.myvocabulary.repositories.sortedList.SortedListRepository
 import com.vocabulary.myvocabulary.repositories.word.WordRepository
 import com.vocabulary.myvocabulary.testing.MainCoroutineRule
 import com.vocabulary.myvocabulary.testing.TestDispatchers
 import io.mockk.*
-import io.reactivex.Observable
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.advanceUntilIdle
@@ -32,7 +31,6 @@ class WordListViewModelTest {
     private val sortByRepository: SortByRepository = mockk(relaxed = true)
     private val wordRepository: WordRepository = mockk(relaxed = true)
     private val sortedListRepository: SortedListRepository = mockk(relaxed = true)
-    private val quizRepository: QuizRepository = mockk(relaxed = true)
     private val searchRepository: SearchRepository = mockk(relaxed = true)
     
     private lateinit var viewModel: WordListViewModel
@@ -43,15 +41,15 @@ class WordListViewModelTest {
         testDispatcher = TestDispatchers(mainCoroutineRule.testDispatcher)
         
         // Default stubs for init block
-        every { sortByRepository.sortByData() } returns Observable.never()
-        every { sortedListRepository.getSortedWordList(dictionaryId) } returns Observable.never()
+        every { sortByRepository.sortByData() } returns flowOf(SortByData())
+        every { sortedListRepository.getSortedWordList(dictionaryId) } returns flowOf(emptyList())
         every { searchRepository.searchedTerm } returns flowOf("")
     }
 
     @Test
     fun `wordListUiState should emit Loading then Success when repository emits items`() = runTest {
         val words = listOf(Word(1, dictionaryId, "word", "translation", 0, 0, 0, Date()))
-        every { sortedListRepository.getSortedWordList(dictionaryId) } returns Observable.just(words)
+        every { sortedListRepository.getSortedWordList(dictionaryId) } returns flowOf(words)
         every { searchRepository.searchedTerm } returns flowOf("")
 
         viewModel = givenWordListViewModel()
@@ -67,7 +65,7 @@ class WordListViewModelTest {
     @Test
     fun `wordListUiState should emit Empty when filtered list is empty`() = runTest {
         val list = emptyList<Word>()
-        every { sortedListRepository.getSortedWordList(dictionaryId) } returns Observable.just(list)
+        every { sortedListRepository.getSortedWordList(dictionaryId) } returns flowOf(list)
         every { searchRepository.searchedTerm } returns flowOf("")
 
         viewModel = givenWordListViewModel()

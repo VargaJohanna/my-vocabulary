@@ -10,7 +10,6 @@ import com.vocabulary.myvocabulary.testing.MainCoroutineRule
 import com.vocabulary.myvocabulary.testing.TestDispatchers
 import com.vocabulary.myvocabulary.ui.words.Word
 import io.mockk.*
-import io.reactivex.Single
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
@@ -43,8 +42,8 @@ class ProcessQuizResultsUseCaseTest {
     @Test
     fun `test processing when all words are correct`() = runTest {
         // Arrange: 0 is AskWord, answer should be translation
-        every { wordRepository.getWordById(1L) } returns Single.just(testListOfWord[0])
-        every { wordRepository.getWordById(2L) } returns Single.just(testListOfWord[1])
+        coEvery { wordRepository.getWordById(1L) } returns testListOfWord[0]
+        coEvery { wordRepository.getWordById(2L) } returns testListOfWord[1]
 
         val guesses = mapOf(1L to "apple", 2L to "pear")
 
@@ -63,8 +62,8 @@ class ProcessQuizResultsUseCaseTest {
     @Test
     fun `test processing when half of the words are correct`() = runTest {
         // Arrange
-        every { wordRepository.getWordById(1L) } returns Single.just(testListOfWord[0])
-        every { wordRepository.getWordById(2L) } returns Single.just(testListOfWord[1])
+        coEvery { wordRepository.getWordById(1L) } returns testListOfWord[0]
+        coEvery { wordRepository.getWordById(2L) } returns testListOfWord[1]
 
         val guesses = mapOf(1L to "wrong", 2L to "pear")
 
@@ -81,8 +80,8 @@ class ProcessQuizResultsUseCaseTest {
     @Test
     fun `test processing with AskTranslation direction`() = runTest {
         // Arrange: 1 is AskTranslation, answer should be word
-        every { wordRepository.getWordById(1L) } returns Single.just(testListOfWord[0])
-        every { wordRepository.getWordById(2L) } returns Single.just(testListOfWord[1])
+        coEvery { wordRepository.getWordById(1L) } returns testListOfWord[0]
+        coEvery { wordRepository.getWordById(2L) } returns testListOfWord[1]
 
         val guesses = mapOf(1L to "alma", 2L to "körte")
 
@@ -97,7 +96,7 @@ class ProcessQuizResultsUseCaseTest {
     @Test
     fun `test processing ignores case and whitespace`() = runTest {
         // Arrange
-        every { wordRepository.getWordById(1L) } returns Single.just(testListOfWord[0])
+        coEvery { wordRepository.getWordById(1L) } returns testListOfWord[0]
 
         val guesses = mapOf(1L to "  APPLE  ") // Mixed case and spaces
 
@@ -112,8 +111,8 @@ class ProcessQuizResultsUseCaseTest {
     @Test
     fun `test processing with all incorrect answers`() = runTest {
         // Arrange
-        every { wordRepository.getWordById(1L) } returns Single.just(testListOfWord[0])
-        every { wordRepository.getWordById(2L) } returns Single.just(testListOfWord[1])
+        coEvery { wordRepository.getWordById(1L) } returns testListOfWord[0]
+        coEvery { wordRepository.getWordById(2L) } returns testListOfWord[1]
 
         val guesses = mapOf(1L to "wrong1", 2L to "wrong2")
 

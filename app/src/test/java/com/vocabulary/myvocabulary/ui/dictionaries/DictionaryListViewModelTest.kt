@@ -12,9 +12,10 @@ import com.vocabulary.myvocabulary.repositories.sortedList.SortedListRepository
 import com.vocabulary.myvocabulary.testing.MainCoroutineRule
 import com.vocabulary.myvocabulary.testing.TestDispatchers
 import io.mockk.*
-import io.reactivex.Observable
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
@@ -46,6 +47,7 @@ class DictionaryListViewModelTest {
     
     private val newDictionaryId = 5L
     private lateinit var testDispatcher: TestDispatchers
+    private val sortedListFlow = MutableStateFlow<List<Dictionary>>(emptyList())
 
     @Before
     fun setup() {
@@ -53,20 +55,24 @@ class DictionaryListViewModelTest {
         
         // Default stubs for init block
         every { dictionaryRepository.allDictionaries } returns flowOf(emptyList())
-        every { sortByRepository.sortByData() } returns Observable.never()
-        every { sortedListRepository.getSortedDictionaryList() } returns Observable.never()
+        every { sortByRepository.sortByData() } returns flowOf(SortDictionaryData())
+        every { sortedListRepository.getSortedDictionaryList() } returns sortedListFlow
         every { shareDictViewModel.importedDictionaryDetailsFlow } returns MutableSharedFlow()
     }
 
     @Test
     fun `libraryUiState should emit Loading then LibraryData when repository emits items`() = runTest {
         val list = listOf(dictionaryTest)
-        every { sortedListRepository.getSortedDictionaryList() } returns Observable.just(list)
-
+        
         val viewModel = givenDictionaryListViewModel()
 
         viewModel.libraryUiState.test {
             assertThat(awaitItem()).isInstanceOf(LibraryUiState.Loading::class)
+            // State should be Empty initially due to sortedListFlow default
+            assertThat(awaitItem()).isInstanceOf(LibraryUiState.Empty::class)
+            
+            sortedListFlow.value = list
+            
             val state = awaitItem()
             assertThat(state).isInstanceOf(LibraryUiState.LibraryData::class)
             assertThat((state as LibraryUiState.LibraryData).dictionaryList).isEqualTo(list)
@@ -75,8 +81,6 @@ class DictionaryListViewModelTest {
 
     @Test
     fun `libraryUiState should emit Empty when repository emits an empty list`() = runTest {
-        every { sortedListRepository.getSortedDictionaryList() } returns Observable.just(emptyList())
-
         val viewModel = givenDictionaryListViewModel()
 
         viewModel.libraryUiState.test {
@@ -87,7 +91,7 @@ class DictionaryListViewModelTest {
 
     @Test
     fun `libraryUiState should emit Error when repository fails`() = runTest {
-        every { sortedListRepository.getSortedDictionaryList() } returns Observable.error(Exception("DB Crash"))
+        every { sortedListRepository.getSortedDictionaryList() } returns flow { throw Exception("DB Crash") }
 
         val viewModel = givenDictionaryListViewModel()
         
@@ -101,18 +105,28 @@ class DictionaryListViewModelTest {
 
     @Test
     fun `should create dictionary when insertDictionary() is called`() = runTest {
-        val dictionaryListViewModel = givenDictionaryListViewModel()
+        val viewModel = givenDictionaryListViewModel()
         val dictionaryWithId = dictionaryTest
         
         coEvery { dictionaryRepository.createDictionary(any()) } returns newDictionaryId
-        every { sortedListRepository.getSortedDictionaryList() } returns Observable.just(listOf(dictionaryWithId))
 
-        dictionaryListViewModel.insertDictionary(dictionaryWithId)
-        
-        advanceUntilIdle()
+        viewModel.libraryUiState.test {
+            // Skip initial states (Loading, Empty)
+            assertThat(awaitItem()).isInstanceOf(LibraryUiState.Loading::class)
+            assertThat(awaitItem()).isInstanceOf(LibraryUiState.Empty::class)
+
+            viewModel.insertDictionary(dictionaryWithId)
+            
+            // Should transition to Loading during insertion
+            assertThat(awaitItem()).isInstanceOf(LibraryUiState.Loading::class)
+            
+            // Simulate repository update after insertion
+            sortedListFlow.value = listOf(dictionaryWithId)
+            
+            assertThat(awaitItem()).isInstanceOf(LibraryUiState.LibraryData::class)
+        }
 
         coVerify { dictionaryRepository.createDictionary(dictionaryWithId) }
-        assertThat(dictionaryListViewModel.libraryUiState.value).isInstanceOf(LibraryUiState.LibraryData::class)
     }
 
     @Test
@@ -167,7 +181,8 @@ class DictionaryListViewModelTest {
             dateDescending = false,
             titleDescending = false
         )
-        every { sortByRepository.sortByData() } returns Observable.just(sortData)
+        val sortByFlow = MutableStateFlow(SortDictionaryData())
+        every { sortByRepository.sortByData() } returns sortByFlow
 
         val dictionaryListViewModel = DictionaryListViewModel(
             dictionaryRepository,
@@ -177,6 +192,8 @@ class DictionaryListViewModelTest {
             shareDictViewModel,
             contentResolver
         )
+        
+        sortByFlow.value = sortData
         advanceUntilIdle()
 
         Assert.assertEquals(sortData, dictionaryListViewModel.currentSortByData)

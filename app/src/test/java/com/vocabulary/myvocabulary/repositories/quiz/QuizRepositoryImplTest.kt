@@ -9,8 +9,8 @@ import com.vocabulary.myvocabulary.ui.quizzes.QuizTypes
 import com.vocabulary.myvocabulary.ui.words.Word
 import io.mockk.every
 import io.mockk.mockk
-import io.reactivex.Observable
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import org.junit.Rule
 import org.junit.Test
@@ -93,7 +93,7 @@ class QuizRepositoryImplTest {
     }
 
     private fun givenQuizRepositoryWithData(): QuizRepository {
-        every { wordRepository.getObservableWordList(dictionaryId) } returns Observable.just(wordListToTest)
+        every { wordRepository.getObservableWordList(dictionaryId) } returns flowOf(wordListToTest)
         return QuizRepositoryImpl(wordRepository, customQuizRepository)
     }
 }

@@ -1,12 +1,10 @@
 package com.vocabulary.myvocabulary.ui.words
 
-import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.vocabulary.myvocabulary.repositories.word.WordRepository
-import com.vocabulary.myvocabulary.rx.RxSchedulers
+import com.vocabulary.myvocabulary.testing.MainCoroutineRule
 import io.mockk.*
-import io.reactivex.Single
-import io.reactivex.schedulers.Schedulers
-import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Before
@@ -14,15 +12,14 @@ import org.junit.Rule
 import org.junit.Test
 import java.util.*
 
+@OptIn(ExperimentalCoroutinesApi::class)
 class WordDetailsViewModelTest {
 
-    // Rule to handle LiveData/Architecture components execution
     @get:Rule
-    val instantTaskExecutorRule = InstantTaskExecutorRule()
+    val mainCoroutineRule = MainCoroutineRule()
 
     // Mock dependencies
     private val wordRepository: WordRepository = mockk()
-    private val rxSchedulers: RxSchedulers = mockk()
 
     private lateinit var viewModel: WordDetailsViewModel
 
@@ -43,23 +40,20 @@ class WordDetailsViewModelTest {
 
     @Before
     fun setup() {
-        // Mock Schedulers to run everything immediately on the same thread
-        every { rxSchedulers.io() } returns Schedulers.trampoline()
-        every { rxSchedulers.main() } returns Schedulers.trampoline()
-
-        viewModel = WordDetailsViewModel(wordRepository, rxSchedulers)
+        viewModel = WordDetailsViewModel(wordRepository)
     }
 
     @Test
     fun `fetchWordById should update currentWord state when repository returns data`() = runTest {
         // Arrange
-        every { wordRepository.getWordById(testId) } returns Single.just(testWord)
+        coEvery { wordRepository.getWordById(testId) } returns testWord
 
         // Act
         viewModel.fetchWordById(testId)
+        advanceUntilIdle()
 
         // Assert
-        verify { wordRepository.getWordById(testId) }
+        coVerify { wordRepository.getWordById(testId) }
         assertEquals(testWord, viewModel.currentWord.value)
     }
 }
