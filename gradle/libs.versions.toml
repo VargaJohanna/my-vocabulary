@@ -33,10 +33,6 @@ koin = "4.1.1"
 room = "2.8.4"
 room-testing = "2.8.4"
 
-# Reactive
-rx-android = "2.1.1"
-rx-java = "2.2.21"
-
 # Networking
 retrofit = "3.0.0"
 okhttp-logging = "5.5.0"
@@ -45,7 +41,6 @@ okhttp-logging = "5.5.0"
 lottie-compose = "6.7.1"
 apache-csv = "1.14.1"
 material-about = "0.2.3"
-rx-preferences = "2.0.1"
 
 # Testing
 mockk = "1.14.9"
@@ -63,7 +58,6 @@ assertk = "0.28.1"
 
 # Coroutine
 coroutines = "1.10.2"
-coroutines-rx2 = "1.9.0"
 animation = "1.11.4"
 
 [libraries]
@@ -85,7 +79,6 @@ google-material = { group = "com.google.android.material", name = "material", ve
 
 # Compose Runtime
 androidx-runtime-livedata = { module = "androidx.compose.runtime:runtime-livedata" }
-androidx-runtime-rxjava2 = { module = "androidx.compose.runtime:runtime-rxjava2" }
 
 # Jetpack Datastore
 androidx-datastore-preferences = { group = "androidx.datastore", name = "datastore-preferences", version.ref = "datastore" }
@@ -101,7 +94,6 @@ androidx-lifecycle-runtime-compose = { module = "androidx.lifecycle:lifecycle-ru
 # Kotlin
 kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "serialization"}
 kotlinx-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "coroutines"}
-kotlinx-coroutines-rx2 = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-rx2", version.ref = "coroutines-rx2"}
 
 # Dependency Injection
 koin-android = { module = "io.insert-koin:koin-android", version.ref = "koin" }
@@ -114,22 +106,15 @@ androidx-compose-ui-graphics = { group = "androidx.compose.ui", name = "ui-graph
 # Database
 room-runtime = { group = "androidx.room", name = "room-runtime", version.ref = "room" }
 room-compiler = { group = "androidx.room", name = "room-compiler", version.ref = "room" }
-room-rxjava2 = { group = "androidx.room", name = "room-rxjava2", version.ref = "room" }
-
-# Reactive Programming
-rxandroid = { group = "io.reactivex.rxjava2", name = "rxandroid", version.ref = "rx-android" }
-rxjava = { group = "io.reactivex.rxjava2", name = "rxjava", version.ref = "rx-java" }
 
 # Networking
 retrofit = { group = "com.squareup.retrofit2", name = "retrofit", version.ref = "retrofit" }
 retrofit-converter-gson = { group = "com.squareup.retrofit2", name = "converter-gson", version.ref = "retrofit" }
-retrofit-adapter-rxjava2 = { group = "com.squareup.retrofit2", name = "adapter-rxjava2", version.ref = "retrofit" }
 okhttp-logging = { group = "com.squareup.okhttp3", name = "logging-interceptor", version.ref = "okhttp-logging" }
 
 # Utilities
 lottie-compose = { group = "com.airbnb.android", name = "lottie-compose", version.ref = "lottie-compose" }
 material-about = { group = "com.github.jrvansuita", name = "MaterialAbout", version.ref = "material-about" }
-rx-preferences = { group = "com.f2prateek.rx.preferences2", name = "rx-preferences", version.ref = "rx-preferences" }
 commons-csv = { group = "org.apache.commons", name = "commons-csv", version.ref = "apache-csv" }
 
 # Testing

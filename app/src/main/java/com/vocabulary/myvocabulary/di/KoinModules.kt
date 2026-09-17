@@ -28,8 +28,6 @@ import com.vocabulary.myvocabulary.repositories.sortedList.SortedListRepository
 import com.vocabulary.myvocabulary.repositories.sortedList.SortedListRepositoryImpl
 import com.vocabulary.myvocabulary.repositories.word.WordRepository
 import com.vocabulary.myvocabulary.repositories.word.WordRepositoryImpl
-import com.vocabulary.myvocabulary.rx.RxSchedulers
-import com.vocabulary.myvocabulary.rx.SchedulersImpl
 import com.vocabulary.myvocabulary.ui.dictionaries.DictionaryListViewModel
 import com.vocabulary.myvocabulary.ui.home.HomeViewModel
 import com.vocabulary.myvocabulary.ui.dictionaries.ShareDictionaryViewModel
@@ -50,7 +48,6 @@ import okhttp3.OkHttpClient
 import org.koin.core.module.dsl.viewModel
 import org.koin.dsl.module
 import retrofit2.Retrofit
-import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
 import retrofit2.converter.gson.GsonConverterFactory
 
 val repositoryModule = module {
@@ -104,7 +101,6 @@ val networkModule = module {
             .baseUrl(Constants.QOD_BASE_URL)
             .client(get())
             .addConverterFactory(get<GsonConverterFactory>())
-            .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
         .build() }
     single{get<Retrofit>().create(QuoteService::class.java)}
 }
@@ -128,7 +124,6 @@ val viewModelModule = module {
 }
 
 val schedulerModule = module {
-    factory<RxSchedulers> { SchedulersImpl() }
     single<DispatcherProvider> { StandardDispatchers }
     single { CoroutineScope(SupervisorJob() + get<DispatcherProvider>().io) }
 }

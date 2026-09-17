@@ -67,17 +67,11 @@ dependencies {
     implementation libs.room.runtime
     implementation libs.androidx.compose.animation
     ksp libs.room.compiler
-    implementation libs.room.rxjava2
-
-    //RxJava
-    implementation libs.rxandroid
-    implementation libs.rxjava
 
     //Retrofit
     implementation libs.retrofit
     implementation libs.retrofit.converter.gson
     implementation libs.okhttp.logging
-    implementation libs.retrofit.adapter.rxjava2
 
     //Espresso
     testImplementation libs.junit
@@ -97,9 +91,6 @@ dependencies {
     //About page
     implementation libs.material.about
 
-    //Share preferences
-    implementation libs.rx.preferences
-
     //Apache CSV
     implementation libs.commons.csv
 
@@ -113,7 +104,6 @@ dependencies {
     implementation libs.androidx.compose.foundation.layout
     implementation libs.androidx.compose.material.iconsExtended
     implementation libs.androidx.runtime.livedata
-    implementation libs.androidx.runtime.rxjava2
     implementation libs.androidx.adaptive
 
     // Material
@@ -151,7 +141,6 @@ dependencies {
 
     //Coroutine
     implementation libs.kotlinx.coroutines.core
-    implementation libs.kotlinx.coroutines.rx2
     implementation libs.androidx.lifecycle.runtime.compose
 }
 
