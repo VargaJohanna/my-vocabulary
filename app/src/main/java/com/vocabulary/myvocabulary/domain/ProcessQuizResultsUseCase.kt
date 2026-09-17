@@ -6,7 +6,6 @@ import com.vocabulary.myvocabulary.repositories.word.WordRepository
 import com.vocabulary.myvocabulary.ui.quizzes.QuizDirectionType
 import com.vocabulary.myvocabulary.ui.quizzes.toDirectionType
 import com.vocabulary.myvocabulary.ui.words.Word
-import kotlinx.coroutines.rx2.await
 import kotlinx.coroutines.withContext
 import java.text.Normalizer
 import kotlin.math.round
@@ -26,7 +25,7 @@ class ProcessQuizResultsUseCase(
 ) {
     suspend operator fun invoke(dictionaryId: Long, resultsMap: Map<Long, String>, quizDirection: Int): QuizResult = withContext(dispatchers.io) {
         val processedList = resultsMap.entries.map { entry ->
-            val word = wordRepository.getWordById(entry.key).await()
+            val word = wordRepository.getWordById(entry.key)
             val updatedWord = evaluate(word, entry.value, quizDirection)
             wordRepository.updateWord(updatedWord)
             updatedWord

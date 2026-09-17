@@ -14,7 +14,6 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.rx2.asFlow
 import java.util.*
 import kotlin.coroutines.cancellation.CancellationException
 
@@ -72,7 +71,7 @@ class WordListViewModel(
             _wordListUiState.value = WordListUiState.Loading
 
             try {
-                val wordsFlow = sortedListRepository.getSortedWordList(dictionaryId).asFlow()
+                val wordsFlow = sortedListRepository.getSortedWordList(dictionaryId)
                 val searchFlow = searchRepository.searchedTerm
 
                 combine(wordsFlow, searchFlow) { wordList, searchTerm ->

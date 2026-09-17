@@ -1,8 +1,7 @@
 package com.vocabulary.myvocabulary.repositories.word
 
 import androidx.room.*
-import io.reactivex.Observable
-import io.reactivex.Single
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface WordDao {
@@ -16,11 +15,11 @@ interface WordDao {
     fun deleteWord(word: WordEntry)
 
     @Query("SELECT * FROM words WHERE container_dictionary_id = :dictionaryId")
-    fun getAllWordsInDictionary(dictionaryId: Long): Observable<List<WordEntry>>
+    fun getAllWordsInDictionary(dictionaryId: Long): Flow<List<WordEntry>>
 
     @Query("SELECT * FROM words WHERE word_id = :wordId")
-    fun getWordById(wordId: Long): Single<WordEntry>
+    suspend fun getWordById(wordId: Long): WordEntry
 
     @Query("SELECT count(*) FROM words WHERE word_id = :wordId")
-    fun getNumberOfWordById(wordId: Long): Observable<Int>
+    fun getNumberOfWordById(wordId: Long): Flow<Int>
 }

@@ -27,7 +27,6 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.rx2.asFlow
 import java.util.Calendar
 
 class HomeViewModel(
@@ -169,7 +168,7 @@ class HomeViewModel(
         leastPracticedDictionary
             .filterNotNull()
             .flatMapLatest { dict ->
-                wordRepository.getObservableWordList(dict.dictionaryId).asFlow()
+                wordRepository.getObservableWordList(dict.dictionaryId)
             }
             .onEach { list ->
                 if (list.isNotEmpty()) {

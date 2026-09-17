@@ -9,7 +9,6 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.rx2.asFlow
 
 class QuizRepositoryImpl(
         private val wordRepository: WordRepository,
@@ -30,7 +29,6 @@ class QuizRepositoryImpl(
 
     private suspend fun getFullQuizList(dictionaryId: Long): List<Word> {
         return wordRepository.getObservableWordList(dictionaryId)
-            .asFlow()
             .first()
             .filter { it.word.isNotEmpty() }
     }

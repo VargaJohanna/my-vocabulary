@@ -18,7 +18,6 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.rx2.asFlow
 import kotlinx.coroutines.withContext
 import java.util.*
 import kotlin.coroutines.cancellation.CancellationException
@@ -69,7 +68,7 @@ class DictionaryListViewModel(
 
     private fun observeList() {
         viewModelScope.launch {
-            sortedListRepository.getSortedDictionaryList().asFlow()
+            sortedListRepository.getSortedDictionaryList()
                 .catch { e ->
                     if (e is CancellationException) throw e
                     _libraryUiState.value = LibraryUiState.Error("Failed to observe list. Error: ${e.message}")
