@@ -23,6 +23,8 @@ jobs:
       run: chmod +x gradlew
 
     - name: Run Tests
+      env:
+        QUOTE_API_KEY: ${{ secrets.QUOTE_API_KEY }}
       run: ./gradlew test
 
     - name: Increment Version Code
@@ -36,6 +38,8 @@ jobs:
 
     - name: Build App Bundle (AAB)
       if: success()
+      env:
+        QUOTE_API_KEY: ${{ secrets.QUOTE_API_KEY }}
       run: ./gradlew bundleRelease
 
     - name: Save App Bundle as Artifact
