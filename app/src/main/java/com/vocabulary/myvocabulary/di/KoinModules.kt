@@ -28,6 +28,8 @@ import com.vocabulary.myvocabulary.repositories.sortedList.SortedListRepository
 import com.vocabulary.myvocabulary.repositories.sortedList.SortedListRepositoryImpl
 import com.vocabulary.myvocabulary.repositories.word.WordRepository
 import com.vocabulary.myvocabulary.repositories.word.WordRepositoryImpl
+import com.vocabulary.myvocabulary.repositories.user.UserRepository
+import com.vocabulary.myvocabulary.repositories.user.UserRepositoryImpl
 import com.vocabulary.myvocabulary.ui.dictionaries.DictionaryListViewModel
 import com.vocabulary.myvocabulary.ui.home.HomeViewModel
 import com.vocabulary.myvocabulary.ui.dictionaries.ShareDictionaryViewModel
@@ -38,6 +40,7 @@ import com.vocabulary.myvocabulary.repositories.share.ShareDictionaryRepositoryI
 import com.vocabulary.myvocabulary.repositories.sortBy.dictionary.SortDictionaryRepository
 import com.vocabulary.myvocabulary.repositories.sortBy.dictionary.SortDictionaryRepositoryImpl
 import com.vocabulary.myvocabulary.ui.quizzes.QuizListViewModel
+import com.vocabulary.myvocabulary.ui.user.LoginViewModel
 import com.vocabulary.myvocabulary.ui.words.WordDetailsViewModel
 import com.vocabulary.myvocabulary.ui.words.WordListViewModel
 import com.vocabulary.myvocabulary.utils.ComposeDialogFactory
@@ -80,6 +83,7 @@ val repositoryModule = module {
     single { PreferenceManager.getDefaultSharedPreferences(get()) }
     single<ShareDictionaryRepository> { ShareDictionaryRepositoryImpl() }
     single<CustomQuizRepository> { CustomQuizRepositoryImpl() }
+    single<UserRepository> { UserRepositoryImpl() }
 }
 
 val networkModule = module {
@@ -121,6 +125,7 @@ val viewModelModule = module {
     viewModel { HomeViewModel(get(), get(), get(), get(), get(), get()) }
     viewModel { ShareDictionaryViewModel(get(), get(), get()) }
     viewModel { QuizListViewModel(get()) }
+    viewModel { LoginViewModel(get()) }
 }
 
 val schedulerModule = module {

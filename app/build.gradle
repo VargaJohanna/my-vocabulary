@@ -23,8 +23,8 @@ android {
         }
         def rawKey = System.getenv("QUOTE_API_KEY") ?: localProperties.getProperty('QUOTE_API_KEY') ?: ""
         def cleanKey = rawKey.replace("\"", "")
-
         buildConfigField "String", "API_KEY", "\"$cleanKey\""
+        buildConfigField "String", "GOOGLE_WEB_CLIENT_ID", "\"${localProperties.getProperty('GOOGLE_WEB_CLIENT_ID') ?: ""}\""
     }
 
     signingConfigs {
