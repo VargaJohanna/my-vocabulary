@@ -141,5 +141,10 @@
     <string name="last_practiced_placeholder_title">Legutoljára gyakorolt szótár</string>
     <string name="most_practiced_placeholder_title">Legtöbbet gyakorolt szótár</string>
 
-
+    <string name="login_welcome_title">Üdvözöl a Szó Tár</string>
+    <string name="login_welcome_subtitle">Jelentkezz be, hogy biztonságosan elmenthesd a szótáraidat, és bárhonnan elérhesd őket.</string>
+    <string name="login_google_button">Bejelentkezés Google fiókkal</string>
+    <string name="login_error_prefix">Hiba a bejelentkezés során: %1$s</string>
+    <string name="login_loading">Bejelentkezés...</string>
+    <string name="profile_logout">Kijelentkezés</string>
 </resources>

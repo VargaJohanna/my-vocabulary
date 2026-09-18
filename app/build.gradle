@@ -5,6 +5,7 @@ plugins {
     id('kotlin-parcelize')
     alias(libs.plugins.compose.compiler)
     alias(libs.plugins.kotlin.serialization)
+    alias(libs.plugins.google.services)
 }
 android {
     namespace = "com.vocabulary.myvocabulary"

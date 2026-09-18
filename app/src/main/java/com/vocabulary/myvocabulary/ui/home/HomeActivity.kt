@@ -33,6 +33,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.stringResource
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavDestination.Companion.hasRoute
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavGraph.Companion.findStartDestination
@@ -41,11 +42,14 @@ import androidx.navigation.compose.rememberNavController
 import com.vocabulary.myvocabulary.navigation.DictionaryList
 import com.vocabulary.myvocabulary.navigation.FabConfiguration
 import com.vocabulary.myvocabulary.navigation.Home
+import com.vocabulary.myvocabulary.navigation.Login
 import com.vocabulary.myvocabulary.navigation.MyVocabularyDestinations
 import com.vocabulary.myvocabulary.navigation.MyVocabularyNavHost
 import com.vocabulary.myvocabulary.navigation.MyVocabularyTopAppBar
 import com.vocabulary.myvocabulary.navigation.QuizList
 import com.vocabulary.myvocabulary.ui.theme.MyVocabularyTheme
+import com.vocabulary.myvocabulary.ui.user.LoginViewModel
+import org.koin.androidx.compose.koinViewModel
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class HomeActivity : ComponentActivity() {
@@ -84,6 +88,9 @@ class HomeActivity : ComponentActivity() {
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun MyVocabularyApp() {
+    val loginViewModel: LoginViewModel = koinViewModel()
+    val currentUser by loginViewModel.currentUser.collectAsStateWithLifecycle()
+    
     val navController = rememberNavController()
     var appBarTitle by remember { mutableStateOf<(@Composable () -> Unit)>({}) }
     var appBarActions by remember { mutableStateOf<@Composable RowScope.() -> Unit>({}) }
@@ -92,27 +99,29 @@ fun MyVocabularyApp() {
     var currentBackAction by remember { mutableStateOf<() -> Unit>({ navController.popBackStack() }) }
     var isSearchVisible by rememberSaveable { mutableStateOf(false) }
     var isSortOpen by rememberSaveable { mutableStateOf(false) }
-    val startDestination = Home
+    val startDestination = if (currentUser == null) Login else Home
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
 
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentDestination = navBackStackEntry?.destination
-    val shouldShowBottomBar = currentDestination?.hasRoute(DictionaryList::class) == true ||
+    val shouldShowBottomBar = (currentDestination?.hasRoute(DictionaryList::class) == true ||
             currentDestination?.hasRoute(QuizList::class) == true ||
-            currentDestination?.hasRoute(Home::class) == true
+            currentDestination?.hasRoute(Home::class) == true) && currentUser != null
 
     Scaffold(
         modifier = Modifier
             .fillMaxSize()
             .nestedScroll(scrollBehavior.nestedScrollConnection),
         topBar = {
-            MyVocabularyTopAppBar(
-                navController = navController,
-                scrollBehavior = scrollBehavior,
-                title = appBarTitle,
-                actions = appBarActions,
-                onBackClick = { currentBackAction() }
-            )
+            if (currentUser != null) {
+                MyVocabularyTopAppBar(
+                    navController = navController,
+                    scrollBehavior = scrollBehavior,
+                    title = appBarTitle,
+                    actions = appBarActions,
+                    onBackClick = { currentBackAction() }
+                )
+            }
         },
         bottomBar = {
             if (shouldShowBottomBar) {

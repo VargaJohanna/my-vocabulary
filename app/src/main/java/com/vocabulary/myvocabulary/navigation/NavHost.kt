@@ -2,6 +2,7 @@ package com.vocabulary.myvocabulary.navigation
 
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.Logout
 import androidx.compose.material.icons.automirrored.filled.Sort
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material3.Icon
@@ -10,6 +11,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.navigation.NavHostController
@@ -23,6 +25,9 @@ import com.vocabulary.myvocabulary.ui.home.HomeScreen
 import com.vocabulary.myvocabulary.ui.quizzes.QuizListScreen
 import com.vocabulary.myvocabulary.ui.quizzes.QuizScreen
 import com.vocabulary.myvocabulary.ui.results.ResultScreen
+import com.vocabulary.myvocabulary.ui.user.LoginScreen
+import com.vocabulary.myvocabulary.ui.user.LoginViewModel
+import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
 fun MyVocabularyNavHost(
@@ -38,6 +43,7 @@ fun MyVocabularyNavHost(
     onToggleSort: (Boolean) -> Unit,
     isSortOpen: Boolean,
 ) {
+    val context = LocalContext.current
 
     NavHost(
         navController = navController,
@@ -45,7 +51,24 @@ fun MyVocabularyNavHost(
         modifier = modifier
     ) {
 
+        composable<Login> {
+            LaunchedEffect(Unit) {
+                onUpdateTitle { Text(text = "") }
+                onUpdateActions { }
+                onUpdateFab(FabConfiguration.Hidden())
+                onBackClick { }
+            }
+            LoginScreen(
+                onLoginSuccess = {
+                    navController.navigate(Home) {
+                        popUpTo<Login> { inclusive = true }
+                    }
+                }
+            )
+        }
+
         composable<Home> {
+            val loginViewModel: LoginViewModel = koinViewModel()
             LaunchedEffect(Unit) {
                 onUpdateTitle { Text(
                     text = stringResource(R.string.app_name),
@@ -53,6 +76,14 @@ fun MyVocabularyNavHost(
                     overflow = TextOverflow.Ellipsis) }
 
                 onUpdateActions {
+                    IconButton(onClick = {
+                        loginViewModel.onLogoutClick(context = context)
+                    }) {
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Filled.Logout,
+                            contentDescription = stringResource(R.string.profile_logout)
+                        )
+                    }
                     IconButton(onClick = {
                         navController.navigate(About) {
                             launchSingleTop = true

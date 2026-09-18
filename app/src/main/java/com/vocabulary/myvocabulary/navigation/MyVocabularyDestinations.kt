@@ -45,6 +45,9 @@ enum class MyVocabularyDestinations(
 object Home
 
 @Serializable
+object Login
+
+@Serializable
 object DictionaryList
 
 @Serializable

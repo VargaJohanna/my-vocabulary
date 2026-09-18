@@ -141,4 +141,10 @@
     <string name="last_practiced_placeholder_title">Last practiced</string>
     <string name="most_practiced_placeholder_title">Most practiced</string>
 
+    <string name="login_welcome_title">Welcome to My Vocabulary</string>
+    <string name="login_welcome_subtitle">Sign in to securely save your dictionaries and access them anywhere.</string>
+    <string name="login_google_button">Sign in with Google</string>
+    <string name="login_error_prefix">Login failed: %1$s</string>
+    <string name="login_loading">Signing in...</string>
+    <string name="profile_logout">Logout</string>
 </resources>
