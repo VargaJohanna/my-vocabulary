@@ -107,7 +107,7 @@
     <string name="dropdown_menu_label">Menü lista</string>
     <string name="share_file_title">Megosztás</string>
     <string name="search">Keresés</string>
-    <string name="search_hint">Keresés...</string>
+    <string name="search_hint">Keresés&#8230;</string>
     <string name="number_of_words">Szavak száma: %d</string>
     <string name="dictionary_title">Cím</string>
     <string name="custom_dialog_title">Hány szó legyen?</string>
@@ -145,6 +145,6 @@
     <string name="login_welcome_subtitle">Jelentkezz be, hogy biztonságosan elmenthesd a szótáraidat, és bárhonnan elérhesd őket.</string>
     <string name="login_google_button">Bejelentkezés Google fiókkal</string>
     <string name="login_error_prefix">Hiba a bejelentkezés során: %1$s</string>
-    <string name="login_loading">Bejelentkezés...</string>
+    <string name="login_loading">Bejelentkezés&#8230;</string>
     <string name="profile_logout">Kijelentkezés</string>
 </resources>

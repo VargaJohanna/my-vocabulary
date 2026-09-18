@@ -107,7 +107,7 @@
     <string name="dropdown_menu_label">Dropdown menu icon</string>
     <string name="share_file_title">Share file</string>
     <string name="search">Search</string>
-    <string name="search_hint">Search...</string>
+    <string name="search_hint">Search&#8230;</string>
     <string name="number_of_words">Number of words: %1$d</string>
     <string name="dictionary_title">Title</string>
     <string name="custom_dialog_title">Enter number of words to be asked</string>
@@ -145,6 +145,6 @@
     <string name="login_welcome_subtitle">Sign in to securely save your dictionaries and access them anywhere.</string>
     <string name="login_google_button">Sign in with Google</string>
     <string name="login_error_prefix">Login failed: %1$s</string>
-    <string name="login_loading">Signing in...</string>
+    <string name="login_loading">Signing in&#8230;</string>
     <string name="profile_logout">Logout</string>
 </resources>
