@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "1092002037424",
+    "project_id": "myvocabulary-47ab9",
+    "storage_bucket": "myvocabulary-47ab9.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1092002037424:android:cb7478a9ba8ee3b3e84575",
+        "android_client_info": {
+          "package_name": "com.vocabulary.myvocabulary"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDes9_B110ltAWHE2QryRmDs8JdNUTKeII"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

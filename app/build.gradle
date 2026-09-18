@@ -130,6 +130,16 @@ dependencies {
     // Jetpack DataStore
     implementation libs.androidx.datastore.preferences
 
+    // Firebase
+    implementation platform(libs.firebase.bom)
+    implementation libs.firebase.auth
+    implementation libs.firebase.firestore
+
+    // Credentials Manager
+    implementation libs.androidx.credentials
+    implementation libs.androidx.credentials.play.services.auth
+    implementation libs.googleid
+
     //  Tooling
     debugImplementation libs.androidx.ui.tooling
     debugImplementation libs.androidx.ui.test.manifest
