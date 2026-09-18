@@ -36,10 +36,17 @@ jobs:
         sed -i "s/versionCode = $current_version/versionCode = $new_version/g" app/build.gradle
         echo "New version code: $new_version"
 
+    - name: Decode Keystore
+      run: |
+        echo "${{ secrets.KEYSTORE_FILE }}" | base64 --decode > app/release-keystore.jks
+
     - name: Build App Bundle (AAB)
       if: success()
       env:
         QUOTE_API_KEY: ${{ secrets.QUOTE_API_KEY }}
+        KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+        KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+        KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
       run: ./gradlew bundleRelease
 
     - name: Save App Bundle as Artifact
