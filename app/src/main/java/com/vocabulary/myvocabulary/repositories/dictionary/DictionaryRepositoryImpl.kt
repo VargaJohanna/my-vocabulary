@@ -6,6 +6,8 @@ import androidx.work.ExistingWorkPolicy
 import androidx.work.NetworkType
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
+import com.vocabulary.myvocabulary.DispatcherProvider
+import com.vocabulary.myvocabulary.repositories.AppDatabase
 import com.vocabulary.myvocabulary.repositories.sync.CloudSyncRepository
 import com.vocabulary.myvocabulary.repositories.sync.DownloadDictionariesWorker
 import com.vocabulary.myvocabulary.repositories.sync.SyncDictionaryWorker
@@ -17,13 +19,16 @@ import com.vocabulary.myvocabulary.ui.words.toWordEntry
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.withContext
 import java.util.Calendar
 
 class DictionaryRepositoryImpl(
     private val dictionaryDao: DictionaryDao,
     private val wordDao: WordDao,
     private val cloudSyncRepository: CloudSyncRepository,
-    private val workManager: WorkManager
+    private val workManager: WorkManager,
+    private val appDatabase: AppDatabase,
+    private val dispatchers: DispatcherProvider
 ) : DictionaryRepository {
     override val allDictionaries: Flow<List<Dictionary>> = dictionaryDao.getAllDictionaries()
         .map { list ->
@@ -132,5 +137,11 @@ class DictionaryRepositoryImpl(
             ExistingWorkPolicy.KEEP,
             downloadRequest
         )
+    }
+
+    override suspend fun clearLocalData() {
+        withContext(dispatchers.io) {
+            appDatabase.clearAllTables()
+        }
     }
 }

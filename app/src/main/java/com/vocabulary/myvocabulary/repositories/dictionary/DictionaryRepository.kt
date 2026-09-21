@@ -14,4 +14,5 @@ interface  DictionaryRepository {
     suspend fun saveQuizStats(id: Long, scorePercentage: Int)
     suspend fun syncAllToCloud(requireWifi: Boolean = false)
     suspend fun syncFromCloud(userId: String, requireWifi: Boolean = false): Result<Unit>
+    suspend fun clearLocalData()
 }
