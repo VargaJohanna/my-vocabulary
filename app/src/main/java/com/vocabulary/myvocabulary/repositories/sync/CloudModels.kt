@@ -2,6 +2,7 @@ package com.vocabulary.myvocabulary.repositories.sync
 
 import com.vocabulary.myvocabulary.ui.dictionaries.Dictionary
 import com.vocabulary.myvocabulary.ui.words.Word
+import java.util.Date
 
 data class CloudDictionary(
     val id: Long = 0,
@@ -23,6 +24,28 @@ data class CloudWord(
     val passed: Int = 0,
     val created: Long = 0,
     val lastResult: Boolean = false
+)
+
+fun CloudDictionary.toLocal(): Dictionary = Dictionary(
+    dictionaryId = id,
+    dictionaryName = name,
+    dictionaryCreated = Date(created),
+    dictionaryLastPracticed = lastPracticed?.let { Date(it) },
+    dictionaryLastResult = lastResult,
+    dictionaryFinishedCount = finishedCount,
+    dictionaryTotalScore = totalScore
+)
+
+fun CloudWord.toLocal(): Word = Word(
+    wordId = id,
+    containerDictionaryId = dictionaryId,
+    word = word,
+    translation = translation,
+    beenAsked = beenAsked,
+    failed = failed,
+    passed = passed,
+    created = Date(created),
+    lastResult = lastResult
 )
 
 fun Dictionary.toCloud(): CloudDictionary = CloudDictionary(

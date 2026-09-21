@@ -5,7 +5,7 @@ import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface WordDao {
-    @Insert
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertWord(word: WordEntry)
 
     @Update

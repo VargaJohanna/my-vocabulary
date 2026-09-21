@@ -6,7 +6,7 @@ import java.util.Date
 
 @Dao
 interface DictionaryDao {
-    @Insert
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertDictionary(dictionaryEntry: DictionaryEntry): Long
 
     @Update

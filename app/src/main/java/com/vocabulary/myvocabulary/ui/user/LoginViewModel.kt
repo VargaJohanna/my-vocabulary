@@ -37,10 +37,15 @@ class LoginViewModel(
             _uiState.value = LoginUiState.Loading
             val result = userRepository.loginWithGoogle(context)
             if (result.isSuccess) {
-                if (NetworkUtils.isMobileDataActive(context)) {
+                val isMobile = NetworkUtils.isMobileDataActive(context)
+                val uid = userRepository.currentUserId ?: return@launch
+
+                if (isMobile) {
                     _showMobileDataWarning.value = true
                 } else {
-                    dictionaryRepository.syncAllToCloud()
+                    // Sync immediately on Wi-Fi
+                    dictionaryRepository.syncFromCloud(uid, requireWifi = false)
+                    dictionaryRepository.syncAllToCloud(requireWifi = false)
                     _uiState.value = LoginUiState.Success
                 }
             } else {
@@ -52,9 +57,14 @@ class LoginViewModel(
     fun onConfirmSync(proceed: Boolean) {
         viewModelScope.launch {
             _showMobileDataWarning.value = false
-            // If proceed is true, we sync over mobile data (requireWifi = false)
-            // If proceed is false (Wait for Wi-Fi), we schedule for later (requireWifi = true)
+            val uid = userRepository.currentUserId ?: return@launch
+            
+            // For both download and upload:
+            // if proceed = true -> sync now (requireWifi = false)
+            // if proceed = false -> sync later (requireWifi = true)
+            dictionaryRepository.syncFromCloud(uid, requireWifi = !proceed)
             dictionaryRepository.syncAllToCloud(requireWifi = !proceed)
+            
             _uiState.value = LoginUiState.Success
         }
     }

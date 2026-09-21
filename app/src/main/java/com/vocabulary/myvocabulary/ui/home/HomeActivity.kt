@@ -48,10 +48,13 @@ import com.vocabulary.myvocabulary.navigation.MyVocabularyDestinations
 import com.vocabulary.myvocabulary.navigation.MyVocabularyNavHost
 import com.vocabulary.myvocabulary.navigation.MyVocabularyTopAppBar
 import com.vocabulary.myvocabulary.navigation.QuizList
+import com.vocabulary.myvocabulary.ui.splash.SplashScreen
 import com.vocabulary.myvocabulary.ui.theme.MyVocabularyTheme
 import com.vocabulary.myvocabulary.ui.user.LoginViewModel
+import kotlinx.coroutines.delay
 import org.koin.androidx.compose.koinViewModel
 import org.koin.androidx.viewmodel.ext.android.viewModel
+import kotlin.time.Duration.Companion.milliseconds
 
 class HomeActivity : ComponentActivity() {
     private var importDialog: AlertDialog? = null
@@ -92,11 +95,16 @@ fun MyVocabularyApp() {
     val loginViewModel: LoginViewModel = koinViewModel()
     val currentUser by loginViewModel.currentUser.collectAsStateWithLifecycle()
     var isAuthReady by remember {mutableStateOf(false)}
-    LaunchedEffect(currentUser) {
+    LaunchedEffect(Unit) {
+        delay(2000.milliseconds)
         isAuthReady = true
     }
 
-    if (!isAuthReady) return
+    if (!isAuthReady) {
+        SplashScreen()
+        return
+    }
+    
     val navController = rememberNavController()
     var appBarTitle by remember { mutableStateOf<(@Composable () -> Unit)>({}) }
     var appBarActions by remember { mutableStateOf<@Composable RowScope.() -> Unit>({}) }

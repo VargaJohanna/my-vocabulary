@@ -31,6 +31,9 @@ class UserRepositoryImpl(
         }
     }
 
+    override val currentUserId: String?
+        get() = firebaseAuth.currentUser?.uid
+
     override suspend fun loginWithGoogle(context: Context): Result<Unit> {
         val credentialManager = CredentialManager.create(context)
 
