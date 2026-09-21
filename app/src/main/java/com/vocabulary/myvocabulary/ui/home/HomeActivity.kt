@@ -92,7 +92,11 @@ fun MyVocabularyApp() {
     val loginViewModel: LoginViewModel = koinViewModel()
     val currentUser by loginViewModel.currentUser.collectAsStateWithLifecycle()
     var isAuthReady by remember {mutableStateOf(false)}
-    
+    LaunchedEffect(currentUser) {
+        isAuthReady = true
+    }
+
+    if (!isAuthReady) return
     val navController = rememberNavController()
     var appBarTitle by remember { mutableStateOf<(@Composable () -> Unit)>({}) }
     var appBarActions by remember { mutableStateOf<@Composable RowScope.() -> Unit>({}) }
@@ -101,7 +105,7 @@ fun MyVocabularyApp() {
     var currentBackAction by remember { mutableStateOf<() -> Unit>({ navController.popBackStack() }) }
     var isSearchVisible by rememberSaveable { mutableStateOf(false) }
     var isSortOpen by rememberSaveable { mutableStateOf(false) }
-    val startDestination = remember { if (currentUser == null) Login else Home }
+    val startDestination = if (currentUser == null) Login else Home
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
 
     val navBackStackEntry by navController.currentBackStackEntryAsState()
@@ -110,11 +114,7 @@ fun MyVocabularyApp() {
             currentDestination?.hasRoute(QuizList::class) == true ||
             currentDestination?.hasRoute(Home::class) == true) && currentUser != null
 
-    LaunchedEffect(currentUser) {
-        isAuthReady = true
-    }
 
-    if (!isAuthReady) return
 
     Scaffold(
         modifier = Modifier

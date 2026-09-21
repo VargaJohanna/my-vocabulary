@@ -10,10 +10,12 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -44,6 +46,18 @@ fun MyVocabularyNavHost(
     isSortOpen: Boolean,
 ) {
     val context = LocalContext.current
+    val loginViewModel: LoginViewModel = koinViewModel()
+    val currentUser by loginViewModel.currentUser.collectAsStateWithLifecycle()
+
+    // Global Logout Monitor
+    LaunchedEffect(currentUser) {
+        if (currentUser == null) {
+            navController.navigate(Login) {
+                popUpTo(0) { inclusive = true }
+                launchSingleTop = true
+            }
+        }
+    }
 
     NavHost(
         navController = navController,
