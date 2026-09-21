@@ -9,6 +9,7 @@ import androidx.work.WorkManager
 import com.vocabulary.myvocabulary.DispatcherProvider
 import com.vocabulary.myvocabulary.repositories.AppDatabase
 import com.vocabulary.myvocabulary.repositories.sync.CloudSyncRepository
+import com.vocabulary.myvocabulary.repositories.sync.DeleteDictionaryWorker
 import com.vocabulary.myvocabulary.repositories.sync.DownloadDictionariesWorker
 import com.vocabulary.myvocabulary.repositories.sync.SyncDictionaryWorker
 import com.vocabulary.myvocabulary.repositories.sync.toLocal
@@ -45,12 +46,33 @@ class DictionaryRepositoryImpl(
 
     override suspend fun deleteDictionary(dictionary: Dictionary) {
         dictionaryDao.deleteDictionary(dictionary.toDictionaryEntry())
-        // For deletion, we would ideally enqueue a Cloud Delete worker.
+        triggerDeleteSync(dictionary.dictionaryId)
     }
 
     override suspend fun updateDictionary(dictionary: Dictionary) {
         dictionaryDao.updateDictionary(dictionary.toDictionaryEntry())
         triggerSync(dictionary.dictionaryId)
+    }
+
+    private fun triggerDeleteSync(dictionaryId: Long) {
+        val constraints = Constraints.Builder()
+            .setRequiredNetworkType(NetworkType.CONNECTED)
+            .build()
+
+        val deleteRequest = OneTimeWorkRequestBuilder<DeleteDictionaryWorker>()
+            .setConstraints(constraints)
+            .setInputData(
+                Data.Builder()
+                    .putLong(DeleteDictionaryWorker.KEY_DICTIONARY_ID, dictionaryId)
+                    .build()
+            )
+            .build()
+
+        workManager.enqueueUniqueWork(
+            "delete_$dictionaryId",
+            ExistingWorkPolicy.REPLACE,
+            deleteRequest
+        )
     }
 
     private fun triggerSync(dictionaryId: Long, requireWifi: Boolean = false) {

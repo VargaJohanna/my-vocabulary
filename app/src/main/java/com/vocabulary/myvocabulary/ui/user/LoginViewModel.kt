@@ -16,6 +16,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import kotlin.time.Duration.Companion.milliseconds
 
 class LoginViewModel(
     private val userRepository: UserRepository,
@@ -49,7 +50,7 @@ class LoginViewModel(
                 repeat(3) {
                     uid = userRepository.currentUserId
                     if (uid != null) return@repeat
-                    delay(100)
+                    delay(100.milliseconds)
                 }
 
                 if (uid == null) {
