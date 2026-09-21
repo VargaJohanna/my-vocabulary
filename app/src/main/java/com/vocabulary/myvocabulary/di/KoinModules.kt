@@ -28,6 +28,11 @@ import com.vocabulary.myvocabulary.repositories.sortedList.SortedListRepository
 import com.vocabulary.myvocabulary.repositories.sortedList.SortedListRepositoryImpl
 import com.vocabulary.myvocabulary.repositories.word.WordRepository
 import com.vocabulary.myvocabulary.repositories.word.WordRepositoryImpl
+import androidx.work.WorkManager
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
+import com.vocabulary.myvocabulary.repositories.sync.CloudSyncRepository
+import com.vocabulary.myvocabulary.repositories.sync.CloudSyncRepositoryImpl
 import com.vocabulary.myvocabulary.repositories.user.UserRepository
 import com.vocabulary.myvocabulary.repositories.user.UserRepositoryImpl
 import com.vocabulary.myvocabulary.ui.dictionaries.DictionaryListViewModel
@@ -54,6 +59,9 @@ import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
 val repositoryModule = module {
+    single { FirebaseAuth.getInstance() }
+    single { FirebaseFirestore.getInstance() }
+    single { WorkManager.getInstance(get()) }
     single { AppDatabase.getInstance(get()) }
     single { get<AppDatabase>().dictionaryDao() }
     single { get<AppDatabase>().wordDao() }
@@ -63,8 +71,8 @@ val repositoryModule = module {
             produceFile = { get<Context>().preferencesDataStoreFile("settings") }
         )
     }
-    single<DictionaryRepository> { DictionaryRepositoryImpl(get()) }
-    single<WordRepository> { WordRepositoryImpl(get()) }
+    single<DictionaryRepository> { DictionaryRepositoryImpl(get(), get()) }
+    single<WordRepository> { WordRepositoryImpl(get(), get()) }
     single<QuizRepository> { QuizRepositoryImpl(get(), get()) }
     single<SortByRepository> {
         SortByRepositoryImpl(get(), get())
@@ -83,7 +91,8 @@ val repositoryModule = module {
     single { PreferenceManager.getDefaultSharedPreferences(get()) }
     single<ShareDictionaryRepository> { ShareDictionaryRepositoryImpl() }
     single<CustomQuizRepository> { CustomQuizRepositoryImpl() }
-    single<UserRepository> { UserRepositoryImpl() }
+    single<UserRepository> { UserRepositoryImpl(get()) }
+    single<CloudSyncRepository> { CloudSyncRepositoryImpl(get()) }
 }
 
 val networkModule = module {
@@ -125,7 +134,7 @@ val viewModelModule = module {
     viewModel { HomeViewModel(get(), get(), get(), get(), get(), get()) }
     viewModel { ShareDictionaryViewModel(get(), get(), get()) }
     viewModel { QuizListViewModel(get()) }
-    viewModel { LoginViewModel(get()) }
+    viewModel { LoginViewModel(get(), get()) }
 }
 
 val schedulerModule = module {

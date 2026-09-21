@@ -147,4 +147,9 @@
     <string name="login_error_prefix">Login failed: %1$s</string>
     <string name="login_loading">Signing in&#8230;</string>
     <string name="profile_logout">Logout</string>
+
+    <string name="sync_mobile_data_title">Mobile Data Warning</string>
+    <string name="sync_mobile_data_message">You are currently using mobile data. Moving your dictionaries to the cloud may use a significant amount of data. Do you want to proceed now or wait until you are on Wi-Fi?</string>
+    <string name="sync_proceed_anyway">Proceed anyway</string>
+    <string name="sync_wait_wifi">Wait for Wi-Fi</string>
 </resources>

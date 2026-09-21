@@ -17,9 +17,9 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.tasks.await
 
-class UserRepositoryImpl : UserRepository {
-
-    private val firebaseAuth = FirebaseAuth.getInstance()
+class UserRepositoryImpl(
+    private val firebaseAuth: FirebaseAuth
+) : UserRepository {
 
     override val currentUser: Flow<User?> = callbackFlow {
         val authStateListener = FirebaseAuth.AuthStateListener { auth ->
