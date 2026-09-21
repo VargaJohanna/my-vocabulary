@@ -148,8 +148,8 @@
     <string name="login_loading">Bejelentkezés&#8230;</string>
     <string name="profile_logout">Kijelentkezés</string>
 
-    <string name="sync_mobile_data_title">Mobiladat figyelmeztetés</string>
-    <string name="sync_mobile_data_message">Jelenleg mobiladatot használsz. A szótárak felhőbe mozgatása jelentős adatforgalmat generálhat. Folytatod most, vagy megvárod a Wi-Fi kapcsolatot?</string>
-    <string name="sync_proceed_anyway">Folytatás mindenesetre</string>
+    <string name="sync_mobile_data_title">Mobilinternet figyelmeztetés</string>
+    <string name="sync_mobile_data_message">Jelenleg mobilinternetet használsz. A szótárak felhőbe mozgatása jelentős adatforgalmat generálhat. Folytatod most, vagy megvárod a Wi-Fi kapcsolatot?</string>
+    <string name="sync_proceed_anyway">Folytatás most</string>
     <string name="sync_wait_wifi">Várakozás Wi-Fi-re</string>
 </resources>

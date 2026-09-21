@@ -52,9 +52,9 @@ class LoginViewModel(
     fun onConfirmSync(proceed: Boolean) {
         viewModelScope.launch {
             _showMobileDataWarning.value = false
-            if (proceed) {
-                dictionaryRepository.syncAllToCloud()
-            }
+            // If proceed is true, we sync over mobile data (requireWifi = false)
+            // If proceed is false (Wait for Wi-Fi), we schedule for later (requireWifi = true)
+            dictionaryRepository.syncAllToCloud(requireWifi = !proceed)
             _uiState.value = LoginUiState.Success
         }
     }

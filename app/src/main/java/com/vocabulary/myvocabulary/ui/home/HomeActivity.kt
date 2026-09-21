@@ -25,6 +25,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.ToggleFloatingActionButton
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -90,6 +91,7 @@ class HomeActivity : ComponentActivity() {
 fun MyVocabularyApp() {
     val loginViewModel: LoginViewModel = koinViewModel()
     val currentUser by loginViewModel.currentUser.collectAsStateWithLifecycle()
+    var isAuthReady by remember {mutableStateOf(false)}
     
     val navController = rememberNavController()
     var appBarTitle by remember { mutableStateOf<(@Composable () -> Unit)>({}) }
@@ -99,7 +101,7 @@ fun MyVocabularyApp() {
     var currentBackAction by remember { mutableStateOf<() -> Unit>({ navController.popBackStack() }) }
     var isSearchVisible by rememberSaveable { mutableStateOf(false) }
     var isSortOpen by rememberSaveable { mutableStateOf(false) }
-    val startDestination = if (currentUser == null) Login else Home
+    val startDestination = remember { if (currentUser == null) Login else Home }
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
 
     val navBackStackEntry by navController.currentBackStackEntryAsState()
@@ -107,6 +109,12 @@ fun MyVocabularyApp() {
     val shouldShowBottomBar = (currentDestination?.hasRoute(DictionaryList::class) == true ||
             currentDestination?.hasRoute(QuizList::class) == true ||
             currentDestination?.hasRoute(Home::class) == true) && currentUser != null
+
+    LaunchedEffect(currentUser) {
+        isAuthReady = true
+    }
+
+    if (!isAuthReady) return
 
     Scaffold(
         modifier = Modifier
@@ -127,9 +135,9 @@ fun MyVocabularyApp() {
             if (shouldShowBottomBar) {
                 NavigationBar {
                     MyVocabularyDestinations.entries.forEach { destination ->
-                        val isSelected = currentDestination?.hierarchy?.any {
+                        val isSelected = currentDestination.hierarchy.any {
                             it.hasRoute(destination.route::class)
-                        } == true
+                        }
 
                         NavigationBarItem(
                             selected = isSelected,

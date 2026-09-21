@@ -1,6 +1,9 @@
 package com.vocabulary.myvocabulary.repositories.dictionary
 
+import androidx.work.Constraints
 import androidx.work.Data
+import androidx.work.ExistingWorkPolicy
+import androidx.work.NetworkType
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
 import com.vocabulary.myvocabulary.repositories.sync.SyncDictionaryWorker
@@ -37,15 +40,28 @@ class DictionaryRepositoryImpl(
         triggerSync(dictionary.dictionaryId)
     }
 
-    private fun triggerSync(dictionaryId: Long) {
+    private fun triggerSync(dictionaryId: Long, requireWifi: Boolean = false) {
+        val constraints = Constraints.Builder()
+            .setRequiredNetworkType(
+                if (requireWifi) NetworkType.UNMETERED else NetworkType.CONNECTED
+            )
+            .build()
+
         val syncRequest = OneTimeWorkRequestBuilder<SyncDictionaryWorker>()
+            .setConstraints(constraints) // The system now manages the "Wait" for us!
             .setInputData(
                 Data.Builder()
                     .putLong(SyncDictionaryWorker.KEY_DICTIONARY_ID, dictionaryId)
                     .build()
             )
             .build()
-        workManager.enqueue(syncRequest)
+
+        // Use UNIQUE work so we don't spam the system with the same dictionary
+        workManager.enqueueUniqueWork(
+            "sync_$dictionaryId",
+            ExistingWorkPolicy.REPLACE,
+            syncRequest
+        )
     }
 
     override suspend fun getDictionaryById(dictionaryId: Long): Dictionary {
@@ -67,10 +83,10 @@ class DictionaryRepositoryImpl(
         dictionaryDao.updateDictionaryStats(id, Calendar.getInstance().time, scorePercentage)
     }
 
-    override suspend fun syncAllToCloud() {
+    override suspend fun syncAllToCloud(requireWifi: Boolean) {
         val localDictionaries = allDictionaries.first()
         localDictionaries.forEach { dictionary ->
-            triggerSync(dictionary.dictionaryId)
+            triggerSync(dictionary.dictionaryId, requireWifi)
         }
     }
 }

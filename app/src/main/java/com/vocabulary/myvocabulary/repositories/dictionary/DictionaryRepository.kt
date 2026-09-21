@@ -12,5 +12,5 @@ interface  DictionaryRepository {
     suspend fun getDictionaryById(dictionaryId: Long): Dictionary
     suspend fun onQuizFinished(dictionaryId: Long?)
     suspend fun saveQuizStats(id: Long, scorePercentage: Int)
-    suspend fun syncAllToCloud()
+    suspend fun syncAllToCloud(requireWifi: Boolean = false)
 }

@@ -41,8 +41,11 @@ fun LoginScreen(
     val showMobileDataWarning by viewModel.showMobileDataWarning.collectAsStateWithLifecycle()
     val context = LocalContext.current
 
-    LaunchedEffect(currentUser) {
-        if (currentUser != null && !showMobileDataWarning && uiState == LoginUiState.Success) {
+    LaunchedEffect(currentUser, uiState) {
+        val isAlreadyLoggedIn = currentUser != null && uiState is LoginUiState.Idle
+        val isLoginFinished = currentUser != null && uiState is LoginUiState.Success && !showMobileDataWarning
+
+        if (isAlreadyLoggedIn || isLoginFinished) {
             onLoginSuccess()
         }
     }

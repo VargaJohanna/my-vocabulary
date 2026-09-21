@@ -2,7 +2,6 @@ package com.vocabulary.myvocabulary.repositories.sync
 
 import com.vocabulary.myvocabulary.ui.dictionaries.Dictionary
 import com.vocabulary.myvocabulary.ui.words.Word
-import kotlinx.coroutines.flow.Flow
 
 interface CloudSyncRepository {
     suspend fun uploadDictionary(userId: String, dictionary: Dictionary, words: List<Word>): Result<Unit>

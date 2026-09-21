@@ -1,6 +1,9 @@
 package com.vocabulary.myvocabulary.repositories.word
 
+import androidx.work.Constraints
 import androidx.work.Data
+import androidx.work.ExistingWorkPolicy
+import androidx.work.NetworkType
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
 import com.vocabulary.myvocabulary.repositories.sync.SyncDictionaryWorker
@@ -41,15 +44,27 @@ class WordRepositoryImpl(
         triggerSync(word.containerDictionaryId)
     }
 
-    private fun triggerSync(dictionaryId: Long) {
+    private fun triggerSync(dictionaryId: Long, requireWifi: Boolean = false) {
+        val constraints = Constraints.Builder()
+            .setRequiredNetworkType(
+                if (requireWifi) NetworkType.UNMETERED else NetworkType.CONNECTED
+            )
+            .build()
+
         val syncRequest = OneTimeWorkRequestBuilder<SyncDictionaryWorker>()
+            .setConstraints(constraints)
             .setInputData(
                 Data.Builder()
                     .putLong(SyncDictionaryWorker.KEY_DICTIONARY_ID, dictionaryId)
                     .build()
             )
             .build()
-        workManager.enqueue(syncRequest)
+
+        workManager.enqueueUniqueWork(
+            "sync_$dictionaryId",
+            ExistingWorkPolicy.REPLACE,
+            syncRequest
+        )
     }
 
     override suspend fun getWordById(wordId: Long) = wordDao.getWordById(wordId).toWord()

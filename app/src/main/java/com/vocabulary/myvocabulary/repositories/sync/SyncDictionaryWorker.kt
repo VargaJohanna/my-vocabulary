@@ -2,7 +2,6 @@ package com.vocabulary.myvocabulary.repositories.sync
 
 import android.content.Context
 import androidx.work.CoroutineWorker
-import androidx.work.ListenableWorker
 import androidx.work.WorkerParameters
 import com.google.firebase.auth.FirebaseAuth
 import com.vocabulary.myvocabulary.repositories.dictionary.DictionaryRepository
@@ -21,9 +20,9 @@ class SyncDictionaryWorker(
     private val wordRepository: WordRepository by inject()
     private val firebaseAuth: FirebaseAuth by inject()
 
-    override suspend fun doWork(): ListenableWorker.Result {
+    override suspend fun doWork(): Result {
         val dictionaryId = inputData.getLong(KEY_DICTIONARY_ID, -1L)
-        if (dictionaryId == -1L) return ListenableWorker.Result.failure()
+        if (dictionaryId == -1L) return Result.failure()
 
         val userId = firebaseAuth.currentUser?.uid ?: return Result.success()
 
@@ -33,9 +32,9 @@ class SyncDictionaryWorker(
 
             val result = cloudSyncRepository.uploadDictionary(userId, dictionary, words)
             
-            if (result.isSuccess) ListenableWorker.Result.success() else ListenableWorker.Result.retry()
+            if (result.isSuccess) Result.success() else Result.retry()
         } catch (e: Exception) {
-            ListenableWorker.Result.retry()
+            Result.retry()
         }
     }
 
