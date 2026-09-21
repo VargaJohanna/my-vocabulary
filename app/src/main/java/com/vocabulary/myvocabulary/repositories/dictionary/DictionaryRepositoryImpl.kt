@@ -15,6 +15,7 @@ import com.vocabulary.myvocabulary.repositories.sync.toLocal
 import com.vocabulary.myvocabulary.repositories.word.WordDao
 import com.vocabulary.myvocabulary.ui.dictionaries.Dictionary
 import com.vocabulary.myvocabulary.ui.dictionaries.toDictionaryEntry
+import android.util.Log
 import com.vocabulary.myvocabulary.ui.words.toWordEntry
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
@@ -103,20 +104,27 @@ class DictionaryRepositoryImpl(
     }
 
     override suspend fun syncFromCloud(userId: String, requireWifi: Boolean): Result<Unit> {
+        Log.d("Sync", "syncFromCloud called for user: $userId, requireWifi: $requireWifi")
         if (requireWifi) {
             triggerDownload(requireWifi = true)
             return Result.success(Unit)
         }
 
-        return runCatching {
-            val cloudData = cloudSyncRepository.downloadDictionaries(userId).getOrThrow()
+        return withContext(dispatchers.io) {
+            runCatching {
+                val cloudData = cloudSyncRepository.downloadDictionaries(userId).getOrThrow()
+                Log.d("Sync", "Downloaded ${cloudData.size} dictionaries from cloud for user $userId")
 
-            cloudData.forEach { (cloudDict, cloudWords) ->
-                dictionaryDao.insertDictionary(cloudDict.toLocal().toDictionaryEntry())
+                cloudData.forEach { (cloudDict, cloudWords) ->
+                    Log.d("Sync", "Restoring dictionary: ${cloudDict.name} (ID: ${cloudDict.id}) with ${cloudWords.size} words")
+                    dictionaryDao.insertDictionary(cloudDict.toLocal().toDictionaryEntry())
 
-                cloudWords.forEach { cloudWord ->
-                    wordDao.insertWord(cloudWord.toLocal().toWordEntry())
+                    cloudWords.forEach { cloudWord ->
+                        wordDao.insertWord(cloudWord.toLocal().toWordEntry())
+                    }
                 }
+            }.onFailure {
+                Log.e("Sync", "Error in syncFromCloud", it)
             }
         }
     }
@@ -134,7 +142,7 @@ class DictionaryRepositoryImpl(
 
         workManager.enqueueUniqueWork(
             "initial_download",
-            ExistingWorkPolicy.KEEP,
+            ExistingWorkPolicy.REPLACE,
             downloadRequest
         )
     }

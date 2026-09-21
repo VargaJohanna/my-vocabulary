@@ -1,12 +1,15 @@
 package com.vocabulary.myvocabulary.ui.user
 
 import android.content.Context
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.vocabulary.myvocabulary.repositories.dictionary.DictionaryRepository
 import com.vocabulary.myvocabulary.repositories.user.User
 import com.vocabulary.myvocabulary.repositories.user.UserRepository
 import com.vocabulary.myvocabulary.utils.NetworkUtils
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -16,7 +19,8 @@ import kotlinx.coroutines.launch
 
 class LoginViewModel(
     private val userRepository: UserRepository,
-    private val dictionaryRepository: DictionaryRepository
+    private val dictionaryRepository: DictionaryRepository,
+    private val externalScope: CoroutineScope
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow<LoginUiState>(LoginUiState.Idle)
@@ -33,19 +37,41 @@ class LoginViewModel(
         )
 
     fun onLoginClick(context: Context) {
+        Log.d("Sync", "onLoginClick triggered")
         viewModelScope.launch {
             _uiState.value = LoginUiState.Loading
             val result = userRepository.loginWithGoogle(context)
+            Log.d("Sync", "loginWithGoogle returned success: ${result.isSuccess}")
             if (result.isSuccess) {
                 val isMobile = NetworkUtils.isMobileDataActive(context)
-                val uid = userRepository.currentUserId ?: return@launch
+                
+                var uid: String? = null
+                repeat(3) {
+                    uid = userRepository.currentUserId
+                    if (uid != null) return@repeat
+                    delay(100)
+                }
+
+                if (uid == null) {
+                    Log.e("Sync", "Login success but UID is STILL null after retries")
+                    _uiState.value = LoginUiState.Error("User ID not found")
+                    return@launch
+                }
+                
+                Log.d("Sync", "Login success, UID: $uid")
 
                 if (isMobile) {
                     _showMobileDataWarning.value = true
                 } else {
-                    // Sync immediately on Wi-Fi
-                    dictionaryRepository.syncFromCloud(uid, requireWifi = false)
-                    dictionaryRepository.syncAllToCloud(requireWifi = false)
+                    // Sync immediately on Wi-Fi - use externalScope so it survives VM clearance
+                    externalScope.launch {
+                        val syncResult = dictionaryRepository.syncFromCloud(uid!!, requireWifi = false)
+                        if (syncResult.isSuccess) {
+                            dictionaryRepository.syncAllToCloud(requireWifi = false)
+                        } else {
+                            Log.e("Sync", "Background download failed: ${syncResult.exceptionOrNull()?.message}")
+                        }
+                    }
                     _uiState.value = LoginUiState.Success
                 }
             } else {
@@ -59,12 +85,15 @@ class LoginViewModel(
             _showMobileDataWarning.value = false
             val uid = userRepository.currentUserId ?: return@launch
             
-            // For both download and upload:
-            // if proceed = true -> sync now (requireWifi = false)
-            // if proceed = false -> sync later (requireWifi = true)
-            dictionaryRepository.syncFromCloud(uid, requireWifi = !proceed)
-            dictionaryRepository.syncAllToCloud(requireWifi = !proceed)
-            
+            // Use externalScope so the sync survives the screen transition
+            externalScope.launch {
+                val syncResult = dictionaryRepository.syncFromCloud(uid, requireWifi = !proceed)
+                if (syncResult.isSuccess) {
+                    dictionaryRepository.syncAllToCloud(requireWifi = !proceed)
+                } else {
+                    Log.e("Sync", "Background sync failed: ${syncResult.exceptionOrNull()?.message}")
+                }
+            }
             _uiState.value = LoginUiState.Success
         }
     }

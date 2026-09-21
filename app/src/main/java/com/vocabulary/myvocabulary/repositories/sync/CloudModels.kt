@@ -1,29 +1,32 @@
 package com.vocabulary.myvocabulary.repositories.sync
 
+import com.google.firebase.firestore.IgnoreExtraProperties
 import com.vocabulary.myvocabulary.ui.dictionaries.Dictionary
 import com.vocabulary.myvocabulary.ui.words.Word
 import java.util.Date
 
+@IgnoreExtraProperties
 data class CloudDictionary(
-    val id: Long = 0,
-    val name: String = "",
-    val created: Long = 0,
-    val lastPracticed: Long? = null,
-    val lastResult: Int? = null,
-    val finishedCount: Int = 0,
-    val totalScore: Int = 0
+    var id: Long = 0,
+    var name: String = "",
+    var created: Long = 0,
+    var lastPracticed: Long? = null,
+    var lastResult: Int? = null,
+    var finishedCount: Int = 0,
+    var totalScore: Int = 0
 )
 
+@IgnoreExtraProperties
 data class CloudWord(
-    val id: Long = 0,
-    val dictionaryId: Long = 0,
-    val word: String = "",
-    val translation: String = "",
-    val beenAsked: Int = 0,
-    val failed: Int = 0,
-    val passed: Int = 0,
-    val created: Long = 0,
-    val lastResult: Boolean = false
+    var id: Long = 0,
+    var dictionaryId: Long = 0,
+    var word: String = "",
+    var translation: String = "",
+    var beenAsked: Int = 0,
+    var failed: Int = 0,
+    var passed: Int = 0,
+    var created: Long = 0,
+    var lastResult: Boolean = false
 )
 
 fun CloudDictionary.toLocal(): Dictionary = Dictionary(

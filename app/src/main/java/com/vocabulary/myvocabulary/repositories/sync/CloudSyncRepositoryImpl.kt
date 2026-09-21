@@ -1,6 +1,7 @@
 package com.vocabulary.myvocabulary.repositories.sync
 
 import com.google.firebase.firestore.FirebaseFirestore
+import android.util.Log
 import com.vocabulary.myvocabulary.ui.dictionaries.Dictionary
 import com.vocabulary.myvocabulary.ui.words.Word
 import kotlinx.coroutines.tasks.await
@@ -40,14 +41,25 @@ class CloudSyncRepositoryImpl(
     }
 
     override suspend fun downloadDictionaries(userId: String): Result<List<Pair<CloudDictionary, List<CloudWord>>>> = runCatching {
+        Log.d("Sync", "Downloading dictionaries for user $userId from Firestore")
         val dictsQuery = db.collection("users").document(userId)
             .collection("dictionaries").get().await()
+        
+        Log.d("Sync", "Firestore returned ${dictsQuery.size()} dictionaries")
 
         dictsQuery.documents.map { dictDoc ->
+            Log.d("Sync", "Raw dictionary data: ${dictDoc.data}")
             val cloudDict = dictDoc.toObject(CloudDictionary::class.java)!!
-            val wordsQuery = dictDoc.reference.collection("words").get().await()
-            val cloudWords = wordsQuery.documents.map { it.toObject(CloudWord::class.java)!! }
             
+            val wordsQuery = dictDoc.reference.collection("words").get().await()
+            Log.d("Sync", "Found ${wordsQuery.size()} words for dictionary ${cloudDict.name}")
+            
+            val cloudWords = wordsQuery.documents.map { wordDoc ->
+                Log.d("Sync", "Raw word data: ${wordDoc.data}")
+                wordDoc.toObject(CloudWord::class.java)!!
+            }
+            
+            Log.d("Sync", "Fetched dictionary ${cloudDict.name} with ${cloudWords.size} words")
             Pair(cloudDict, cloudWords)
         }
     }

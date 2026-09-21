@@ -134,7 +134,7 @@ val viewModelModule = module {
     viewModel { HomeViewModel(get(), get(), get(), get(), get(), get()) }
     viewModel { ShareDictionaryViewModel(get(), get(), get()) }
     viewModel { QuizListViewModel(get()) }
-    viewModel { LoginViewModel(get(), get()) }
+    viewModel { LoginViewModel(get(), get(), get()) }
 }
 
 val schedulerModule = module {
