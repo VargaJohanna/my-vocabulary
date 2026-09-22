@@ -47,6 +47,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.vocabulary.myvocabulary.R
 import com.vocabulary.myvocabulary.quotes.QuoteData
 import com.vocabulary.myvocabulary.ui.dictionaries.Dictionary
+import com.vocabulary.myvocabulary.ui.shimmer.HomeScreenSkeleton
 import com.vocabulary.myvocabulary.ui.theme.dimens
 import com.vocabulary.myvocabulary.ui.words.Word
 import com.vocabulary.myvocabulary.utils.DateTypeConverter
@@ -60,6 +61,7 @@ fun HomeScreen(
     contentPadding: PaddingValues = PaddingValues(0.dp),
 ) {
     val homeViewModel: HomeViewModel = koinViewModel()
+    val isInitialLoading by homeViewModel.isInitialLoading.collectAsStateWithLifecycle()
     val lastPracticedDictionary by homeViewModel.lastPracticedDictionary.collectAsStateWithLifecycle()
     val mostPracticedDictionary by homeViewModel.mostPracticedDictionary.collectAsStateWithLifecycle()
     val leastPracticedDictionary by homeViewModel.leastPracticedDictionary.collectAsStateWithLifecycle()
@@ -72,9 +74,9 @@ fun HomeScreen(
         homeViewModel.refreshMemoriseList()
     }
 
-    Box(
-        modifier = Modifier.fillMaxSize()
-    ) {
+    if (isInitialLoading) {
+        HomeScreenSkeleton(modifier = Modifier.padding(contentPadding))
+    } else {
         HomeScreenContent(
             lastPracticed = lastPracticedDictionary,
             mostPracticed = mostPracticedDictionary,
@@ -101,92 +103,96 @@ fun HomeScreenContent(
     quoteState: QuoteUiState,
     dismissQuote: () -> Unit
 ) {
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .verticalScroll(rememberScrollState())
-            .padding(contentPadding),
-        horizontalAlignment = Alignment.CenterHorizontally
+    Box(
+        modifier = Modifier.fillMaxSize(),
+        contentAlignment = Alignment.Center
     ) {
-        when (quoteState) {
-            is QuoteUiState.Loading -> {
-                CircularProgressIndicator(
-                    color = MaterialTheme.colorScheme.primary
-                )
-            }
-
-            is QuoteUiState.Success -> {
-                AnimatedVisibility(
-                    visible = quoteState.isVisible,
-                    enter = expandVertically(),
-                    exit = shrinkVertically()
-                ) {
-                    QuoteCard(
-                        quote = quoteState.quote,
-                        onCloseClick = { dismissQuote() }
-                    )
-                }
-            }
-
-            is QuoteUiState.Error -> {
-                // Don't show card
-            }
-        }
-        if (lastPracticed != null) {
-            val lastPracticedDate = lastPracticed.dictionaryLastPracticed?.let { date ->
-                DateTypeConverter().formatDate(date)
-            }
-            DictionaryStatsCard(
-                labelFirst = stringResource(R.string.last_practiced_label),
-                valueFirst = lastPracticed.dictionaryName,
-                labelSecond = stringResource(R.string.average_rate_label),
-                valueSecond = "${"%.1f".format(lastPracticed.averageResult)} %",
-                labelThird = stringResource(R.string.last_time_practiced_label),
-                valueThird = lastPracticedDate ?: ""
-            )
-        } else {
-            PlaceholderCard(
-                title = stringResource(R.string.last_practiced_placeholder_title),
-                body = stringResource(R.string.last_practiced_placeholder),
-            )
-        }
-
-        if (mostPracticed != null && numOfDictionary >= 2) {
-            val mostPracticedDate = mostPracticed.dictionaryLastPracticed?.let { date ->
-                DateTypeConverter().formatDate(date)
-            }
-            DictionaryStatsCard(
-                labelFirst = stringResource(R.string.most_practiced_label),
-                valueFirst = mostPracticed.dictionaryName,
-                labelSecond = stringResource(R.string.average_rate_label),
-                valueSecond = "${round(mostPracticed.averageResult)} %",
-                labelThird = stringResource(R.string.last_time_practiced_label),
-                valueThird = mostPracticedDate ?: ""
-            )
-        } else {
-            PlaceholderCard(
-                title = stringResource(R.string.most_practiced_placeholder_title),
-                body = stringResource(R.string.most_practiced_placeholder),
-            )
-        }
-
-        if (leastPracticed != null) {
-            Box(contentAlignment = Alignment.Center) {
-                MemoriseCard(
-                    memoriseList = memoriseList,
-                    isLoadingWords = isLoadingWords
-                )
-
-                if (isLoadingWords) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .verticalScroll(rememberScrollState())
+                .padding(contentPadding),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            when (quoteState) {
+                is QuoteUiState.Loading -> {
                     CircularProgressIndicator(
                         color = MaterialTheme.colorScheme.primary
                     )
                 }
+
+                is QuoteUiState.Success -> {
+                    AnimatedVisibility(
+                        visible = quoteState.isVisible,
+                        enter = expandVertically(),
+                        exit = shrinkVertically()
+                    ) {
+                        QuoteCard(
+                            quote = quoteState.quote,
+                            onCloseClick = { dismissQuote() }
+                        )
+                    }
+                }
+
+                is QuoteUiState.Error -> {
+                    // Don't show card
+                }
             }
-        } else {
-            PlaceholderCard(
-                title = stringResource(R.string.memorise_label),
-                body = stringResource(R.string.memorise_placeholder),
+
+            if (lastPracticed != null) {
+                val lastPracticedDate = lastPracticed.dictionaryLastPracticed?.let { date ->
+                    DateTypeConverter().formatDate(date)
+                }
+                DictionaryStatsCard(
+                    labelFirst = stringResource(R.string.last_practiced_label),
+                    valueFirst = lastPracticed.dictionaryName,
+                    labelSecond = stringResource(R.string.average_rate_label),
+                    valueSecond = "${"%.1f".format(lastPracticed.averageResult)} %",
+                    labelThird = stringResource(R.string.last_time_practiced_label),
+                    valueThird = lastPracticedDate ?: ""
+                )
+            } else {
+                PlaceholderCard(
+                    title = stringResource(R.string.last_practiced_placeholder_title),
+                    body = stringResource(R.string.last_practiced_placeholder),
+                )
+            }
+
+            if (mostPracticed != null && numOfDictionary > 0) {
+                val mostPracticedDate = mostPracticed.dictionaryLastPracticed?.let { date ->
+                    DateTypeConverter().formatDate(date)
+                }
+                DictionaryStatsCard(
+                    labelFirst = stringResource(R.string.most_practiced_label),
+                    valueFirst = mostPracticed.dictionaryName,
+                    labelSecond = stringResource(R.string.average_rate_label),
+                    valueSecond = "${round(mostPracticed.averageResult)} %",
+                    labelThird = stringResource(R.string.last_time_practiced_label),
+                    valueThird = mostPracticedDate ?: ""
+                )
+            } else {
+                PlaceholderCard(
+                    title = stringResource(R.string.most_practiced_placeholder_title),
+                    body = stringResource(R.string.most_practiced_placeholder),
+                )
+            }
+
+            if (leastPracticed != null) {
+                MemoriseCard(
+                    memoriseList = memoriseList,
+                    isLoadingWords = isLoadingWords
+                )
+            } else {
+                PlaceholderCard(
+                    title = stringResource(R.string.memorise_label),
+                    body = stringResource(R.string.memorise_placeholder),
+                )
+            }
+        }
+
+        if (isLoadingWords) {
+            CircularProgressIndicator(
+                color = MaterialTheme.colorScheme.primary
             )
         }
     }

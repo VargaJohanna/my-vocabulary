@@ -95,9 +95,13 @@ class LoginViewModel(
     fun onConfirmSync(proceed: Boolean) {
         viewModelScope.launch {
             _showMobileDataWarning.value = false
-            val uid = userRepository.currentUserId ?: return@launch
-            
-            // Use externalScope so the sync survives the screen transition
+            _uiState.value = LoginUiState.Loading
+            val uid = userRepository.currentUserId
+            if (uid == null) {
+                _uiState.value = LoginUiState.Error("User ID not found")
+                return@launch
+            }
+
             externalScope.launch {
                 val syncResult = dictionaryRepository.syncFromCloud(uid, requireWifi = !proceed)
                 if (syncResult.isSuccess) {

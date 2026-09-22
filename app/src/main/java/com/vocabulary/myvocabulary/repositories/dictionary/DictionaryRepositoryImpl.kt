@@ -128,7 +128,7 @@ class DictionaryRepositoryImpl(
     override suspend fun syncFromCloud(userId: String, requireWifi: Boolean): Result<Unit> {
         Log.d("Sync", "syncFromCloud called for user: $userId, requireWifi: $requireWifi")
         if (requireWifi) {
-            triggerDownload() // Removed unnecessary 'true'
+            triggerDownload()
             return Result.success(Unit)
         }
 

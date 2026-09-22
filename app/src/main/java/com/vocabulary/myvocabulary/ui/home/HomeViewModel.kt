@@ -17,15 +17,18 @@ import com.vocabulary.myvocabulary.ui.words.Word
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import java.util.Calendar
 
@@ -40,49 +43,34 @@ class HomeViewModel(
     private val _quoteUiState = MutableStateFlow<QuoteUiState>(QuoteUiState.Loading)
     val quoteUiState: StateFlow<QuoteUiState> = _quoteUiState.asStateFlow()
     private val openedAppCounter: Int = preferences.getInt(COUNTER_KEY, 0)
-    private val _lastPracticedDictionary = MutableStateFlow<Dictionary?>(
-        Dictionary(
-            dictionaryId = 0,
-            dictionaryName = "",
-            dictionaryCreated = Calendar.getInstance().time,
-            dictionaryLastPracticed = null,
-            dictionaryLastResult = null,
-            dictionaryFinishedCount = 0,
-            dictionaryTotalScore = 0
-        )
+
+    private val _isStatsLoading = MutableStateFlow(true)
+    private val _isLoadingWords = MutableStateFlow(false)
+    val isLoadingWords: StateFlow<Boolean> = _isLoadingWords.asStateFlow()
+
+    val isInitialLoading: StateFlow<Boolean> = combine(
+        _isStatsLoading,
+        _quoteUiState
+    ) { statsLoading, quoteState ->
+        statsLoading || quoteState is QuoteUiState.Loading
+    }.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(5000),
+        initialValue = true
     )
+
+    private val _lastPracticedDictionary = MutableStateFlow<Dictionary?>(null)
     val lastPracticedDictionary: StateFlow<Dictionary?> = _lastPracticedDictionary.asStateFlow()
-    private val _mostPracticedDictionary = MutableStateFlow<Dictionary?>(
-        Dictionary(
-            dictionaryId = 0,
-            dictionaryName = "",
-            dictionaryCreated = Calendar.getInstance().time,
-            dictionaryLastPracticed = null,
-            dictionaryLastResult = null,
-            dictionaryFinishedCount = 0,
-            dictionaryTotalScore = 0
-        )
-    )
+
+    private val _mostPracticedDictionary = MutableStateFlow<Dictionary?>(null)
     val mostPracticedDictionary: StateFlow<Dictionary?> = _mostPracticedDictionary.asStateFlow()
 
-    private val _leastPracticedDictionary = MutableStateFlow<Dictionary?>(
-        Dictionary(
-            dictionaryId = 0,
-            dictionaryName = "",
-            dictionaryCreated = Calendar.getInstance().time,
-            dictionaryLastPracticed = null,
-            dictionaryLastResult = null,
-            dictionaryFinishedCount = 0,
-            dictionaryTotalScore = 0
-        )
-    )
+    private val _leastPracticedDictionary = MutableStateFlow<Dictionary?>(null)
     val leastPracticedDictionary: StateFlow<Dictionary?> = _leastPracticedDictionary.asStateFlow()
     private val _memoriseList = MutableStateFlow<List<Word>>(emptyList())
     val memoriseList: StateFlow<List<Word>> = _memoriseList.asStateFlow()
     private val _numOfDictionaries = MutableStateFlow(0)
     val numOfDictionaries: StateFlow<Int> = _numOfDictionaries.asStateFlow()
-    private val _isLoadingWords = MutableStateFlow(false)
-    val isLoadingWords: StateFlow<Boolean> = _isLoadingWords.asStateFlow()
 
     init {
         observeQuote()
@@ -154,6 +142,12 @@ class HomeViewModel(
 
                     _leastPracticedDictionary.value = list
                         .minByOrNull { it.dictionaryFinishedCount }
+
+                    if (list.isEmpty()) {
+                        _isLoadingWords.value = false
+                    }
+
+                    _isStatsLoading.value = false
                 }
         }
     }
