@@ -25,7 +25,6 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.ToggleFloatingActionButton
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -50,11 +49,10 @@ import com.vocabulary.myvocabulary.navigation.MyVocabularyTopAppBar
 import com.vocabulary.myvocabulary.navigation.QuizList
 import com.vocabulary.myvocabulary.ui.splash.SplashScreen
 import com.vocabulary.myvocabulary.ui.theme.MyVocabularyTheme
+import com.vocabulary.myvocabulary.ui.user.AuthState
 import com.vocabulary.myvocabulary.ui.user.LoginViewModel
-import kotlinx.coroutines.delay
 import org.koin.androidx.compose.koinViewModel
 import org.koin.androidx.viewmodel.ext.android.viewModel
-import kotlin.time.Duration.Companion.milliseconds
 
 class HomeActivity : ComponentActivity() {
     private var importDialog: AlertDialog? = null
@@ -93,18 +91,15 @@ class HomeActivity : ComponentActivity() {
 @Composable
 fun MyVocabularyApp() {
     val loginViewModel: LoginViewModel = koinViewModel()
-    val currentUser by loginViewModel.currentUser.collectAsStateWithLifecycle()
-    var isAuthReady by remember {mutableStateOf(false)}
-    LaunchedEffect(Unit) {
-        delay(2000.milliseconds)
-        isAuthReady = true
-    }
+    val authState by loginViewModel.authState.collectAsStateWithLifecycle()
 
-    if (!isAuthReady) {
+    if (authState is AuthState.Loading) {
         SplashScreen()
         return
     }
-    
+
+    val currentUser = (authState as? AuthState.Authenticated)?.user
+
     val navController = rememberNavController()
     var appBarTitle by remember { mutableStateOf<(@Composable () -> Unit)>({}) }
     var appBarActions by remember { mutableStateOf<@Composable RowScope.() -> Unit>({}) }
@@ -113,7 +108,7 @@ fun MyVocabularyApp() {
     var currentBackAction by remember { mutableStateOf<() -> Unit>({ navController.popBackStack() }) }
     var isSearchVisible by rememberSaveable { mutableStateOf(false) }
     var isSortOpen by rememberSaveable { mutableStateOf(false) }
-    val startDestination = if (currentUser == null) Login else Home
+    val startDestination = remember { if (currentUser == null) Login else Home }
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
 
     val navBackStackEntry by navController.currentBackStackEntryAsState()

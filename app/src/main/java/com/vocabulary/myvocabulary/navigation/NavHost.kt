@@ -27,6 +27,7 @@ import com.vocabulary.myvocabulary.ui.home.HomeScreen
 import com.vocabulary.myvocabulary.ui.quizzes.QuizListScreen
 import com.vocabulary.myvocabulary.ui.quizzes.QuizScreen
 import com.vocabulary.myvocabulary.ui.results.ResultScreen
+import com.vocabulary.myvocabulary.ui.user.AuthState
 import com.vocabulary.myvocabulary.ui.user.LoginScreen
 import com.vocabulary.myvocabulary.ui.user.LoginViewModel
 import org.koin.compose.viewmodel.koinViewModel
@@ -47,11 +48,11 @@ fun MyVocabularyNavHost(
 ) {
     val context = LocalContext.current
     val loginViewModel: LoginViewModel = koinViewModel()
-    val currentUser by loginViewModel.currentUser.collectAsStateWithLifecycle()
+    val authState by loginViewModel.authState.collectAsStateWithLifecycle()
 
     // Global Logout Monitor
-    LaunchedEffect(currentUser) {
-        if (currentUser == null) {
+    LaunchedEffect(authState) {
+        if (authState is AuthState.Unauthenticated) {
             navController.navigate(Login) {
                 popUpTo(0) { inclusive = true }
                 launchSingleTop = true

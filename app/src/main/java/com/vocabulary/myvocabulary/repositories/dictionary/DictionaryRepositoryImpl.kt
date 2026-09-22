@@ -128,7 +128,7 @@ class DictionaryRepositoryImpl(
     override suspend fun syncFromCloud(userId: String, requireWifi: Boolean): Result<Unit> {
         Log.d("Sync", "syncFromCloud called for user: $userId, requireWifi: $requireWifi")
         if (requireWifi) {
-            triggerDownload(requireWifi = true)
+            triggerDownload() // Removed unnecessary 'true'
             return Result.success(Unit)
         }
 
@@ -151,11 +151,9 @@ class DictionaryRepositoryImpl(
         }
     }
 
-    private fun triggerDownload(requireWifi: Boolean) {
+    private fun triggerDownload() { // Removed unused parameter
         val constraints = Constraints.Builder()
-            .setRequiredNetworkType(
-                if (requireWifi) NetworkType.UNMETERED else NetworkType.CONNECTED
-            )
+            .setRequiredNetworkType(NetworkType.UNMETERED)
             .build()
 
         val downloadRequest = OneTimeWorkRequestBuilder<DownloadDictionariesWorker>()

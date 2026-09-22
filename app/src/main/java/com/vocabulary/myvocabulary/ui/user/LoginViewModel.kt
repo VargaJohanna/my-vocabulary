@@ -14,6 +14,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlin.time.Duration.Companion.milliseconds
@@ -29,6 +30,16 @@ class LoginViewModel(
 
     private val _showMobileDataWarning = MutableStateFlow(false)
     val showMobileDataWarning: StateFlow<Boolean> = _showMobileDataWarning.asStateFlow()
+
+    val authState: StateFlow<AuthState> = userRepository.currentUser
+        .map { user ->
+            if (user != null) AuthState.Authenticated(user) else AuthState.Unauthenticated
+        }
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue = AuthState.Loading
+        )
 
     val currentUser: StateFlow<User?> = userRepository.currentUser
         .stateIn(
@@ -66,7 +77,7 @@ class LoginViewModel(
                 } else {
                     // Sync immediately on Wi-Fi - use externalScope so it survives VM clearance
                     externalScope.launch {
-                        val syncResult = dictionaryRepository.syncFromCloud(uid!!, requireWifi = false)
+                        val syncResult = dictionaryRepository.syncFromCloud(uid, requireWifi = false)
                         if (syncResult.isSuccess) {
                             dictionaryRepository.syncAllToCloud(requireWifi = false)
                         } else {
@@ -112,4 +123,10 @@ sealed interface LoginUiState {
     object Loading : LoginUiState
     object Success : LoginUiState
     data class Error(val message: String) : LoginUiState
+}
+
+sealed interface AuthState {
+    data object Loading : AuthState
+    data class Authenticated(val user: User) : AuthState
+    data object Unauthenticated : AuthState
 }
