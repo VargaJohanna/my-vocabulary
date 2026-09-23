@@ -1,5 +1,6 @@
 package com.vocabulary.myvocabulary.repositories.word
 
+import androidx.work.WorkManager
 import com.nhaarman.mockitokotlin2.*
 import com.vocabulary.myvocabulary.ui.words.Word
 import com.vocabulary.myvocabulary.ui.words.toWordEntry
@@ -17,10 +18,28 @@ class WordRepositoryImplTest {
     private val requestedDictionary = 1L
     private val wordIdToTest = 1L
     private val wordToTest = Word(wordId = 1L, containerDictionaryId = requestedDictionary, word = "a", translation = "b", created = Date(5))
-    private val wordList: List<Word> = asList(
-            Word(wordId = 1L, containerDictionaryId = requestedDictionary, word = "a", translation = "b", created = Date(5)),
-            Word(wordId = 2L, containerDictionaryId = requestedDictionary, word = "b", translation = "c", created = Date(5)),
-            Word(wordId = 3L, containerDictionaryId = requestedDictionary, word = "c", translation = "d", created = Date(5))
+    private val wordList: List<Word> = listOf(
+        Word(
+            wordId = 1L,
+            containerDictionaryId = requestedDictionary,
+            word = "a",
+            translation = "b",
+            created = Date(5)
+        ),
+        Word(
+            wordId = 2L,
+            containerDictionaryId = requestedDictionary,
+            word = "b",
+            translation = "c",
+            created = Date(5)
+        ),
+        Word(
+            wordId = 3L,
+            containerDictionaryId = requestedDictionary,
+            word = "c",
+            translation = "d",
+            created = Date(5)
+        )
     )
 
     @Test
@@ -94,26 +113,28 @@ class WordRepositoryImplTest {
         }
     }
 
+    private val workManager = mock<WorkManager>()
+
     private fun givenWordRepository(): WordRepositoryImpl {
-        return WordRepositoryImpl(wordDao)
+        return WordRepositoryImpl(wordDao, workManager)
     }
 
     private fun givenWordRepositoryWithDao(): WordRepositoryImpl {
         whenever(wordDao.getNumberOfWordById(wordIdToTest)).thenReturn(flowOf(1))
         whenever(wordDao.getAllWordsInDictionary(requestedDictionary)).thenReturn(flowOf(wordList.map { it.toWordEntry() }))
-        return WordRepositoryImpl(wordDao)
+        return WordRepositoryImpl(wordDao, workManager)
     }
 
     private fun givenWordRepositoryWithNoWords(): WordRepositoryImpl {
         whenever(wordDao.getNumberOfWordById(wordIdToTest)).thenReturn(flowOf(0))
         whenever(wordDao.getAllWordsInDictionary(requestedDictionary)).thenReturn(flowOf(wordList.map { it.toWordEntry() }))
-        return WordRepositoryImpl(wordDao)
+        return WordRepositoryImpl(wordDao, workManager)
     }
 
     private fun givenWordRepositoryWithWordById(): WordRepositoryImpl {
         runBlocking {
             whenever(wordDao.getWordById(wordIdToTest)).thenReturn(wordToTest.toWordEntry())
         }
-        return WordRepositoryImpl(wordDao)
+        return WordRepositoryImpl(wordDao, workManager)
     }
 }
