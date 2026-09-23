@@ -7,9 +7,10 @@ import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -27,9 +28,10 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.layout.onGloballyPositioned
-import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
+import com.vocabulary.myvocabulary.ui.theme.MyVocabularyTheme
 import com.vocabulary.myvocabulary.ui.theme.dimens
 
 fun Modifier.shimmerEffect(): Modifier = composed {
@@ -39,18 +41,21 @@ fun Modifier.shimmerEffect(): Modifier = composed {
         initialValue = -2 * size.width.toFloat(),
         targetValue = 2 * size.width.toFloat(),
         animationSpec = infiniteRepeatable(
-            animation = tween(1200, easing = LinearEasing),
+            animation = tween(durationMillis = 1000, easing = LinearEasing),
             repeatMode = RepeatMode.Restart
         ),
         label = "shimmerOffsetX"
     )
 
+    val baseColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.4f)
+    val highlightColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.95f)
+
     background(
         brush = Brush.linearGradient(
             colors = listOf(
-                MaterialTheme.colorScheme.surfaceContainerHighest.copy(alpha = 0.6f),
-                MaterialTheme.colorScheme.surfaceContainerHighest.copy(alpha = 0.2f),
-                MaterialTheme.colorScheme.surfaceContainerHighest.copy(alpha = 0.6f),
+                baseColor,
+                highlightColor,
+                baseColor
             ),
             start = Offset(startOffsetX, 0f),
             end = Offset(startOffsetX + size.width.toFloat(), size.height.toFloat())
@@ -62,8 +67,7 @@ fun Modifier.shimmerEffect(): Modifier = composed {
 
 @Composable
 fun ShimmerCard(
-    modifier: Modifier = Modifier,
-    height: Dp = 120.dp
+    modifier: Modifier = Modifier
 ) {
     Card(
         modifier = modifier
@@ -75,9 +79,9 @@ fun ShimmerCard(
     ) {
         Column(
             modifier = Modifier
-                .fillMaxWidth()
-                .height(height)
-                .padding(MaterialTheme.dimens.PaddingLarge)
+                .fillMaxSize()
+                .padding(MaterialTheme.dimens.PaddingLarge),
+            verticalArrangement = Arrangement.SpaceEvenly
         ) {
             Box(
                 modifier = Modifier
@@ -86,7 +90,6 @@ fun ShimmerCard(
                     .clip(RoundedCornerShape(4.dp))
                     .shimmerEffect()
             )
-            Spacer(modifier = Modifier.height(12.dp))
             Box(
                 modifier = Modifier
                     .fillMaxWidth(0.85f)
@@ -94,7 +97,6 @@ fun ShimmerCard(
                     .clip(RoundedCornerShape(4.dp))
                     .shimmerEffect()
             )
-            Spacer(modifier = Modifier.height(8.dp))
             Box(
                 modifier = Modifier
                     .fillMaxWidth(0.6f)
@@ -112,12 +114,20 @@ fun HomeScreenSkeleton(
 ) {
     Column(
         modifier = modifier
-            .fillMaxWidth()
-            .padding(top = MaterialTheme.dimens.PaddingSmall)
+            .fillMaxSize()
+            .padding(vertical = MaterialTheme.dimens.PaddingSmall)
     ) {
-        ShimmerCard(height = 110.dp)
-        ShimmerCard(height = 130.dp)
-        ShimmerCard(height = 130.dp)
-        ShimmerCard(height = 150.dp)
+        ShimmerCard(modifier = Modifier.weight(1f))
+        ShimmerCard(modifier = Modifier.weight(1f))
+        ShimmerCard(modifier = Modifier.weight(1f))
+        ShimmerCard(modifier = Modifier.weight(1f))
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun HomeScreenSkeletonPreview() {
+    MyVocabularyTheme {
+        HomeScreenSkeleton()
     }
 }
