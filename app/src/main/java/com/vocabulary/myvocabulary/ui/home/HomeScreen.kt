@@ -1,5 +1,6 @@
 package com.vocabulary.myvocabulary.ui.home
 
+import android.util.Log
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.expandHorizontally
 import androidx.compose.animation.expandVertically
@@ -61,33 +62,32 @@ fun HomeScreen(
     contentPadding: PaddingValues = PaddingValues(0.dp),
 ) {
     val homeViewModel: HomeViewModel = koinViewModel()
-    val isInitialLoading by homeViewModel.isInitialLoading.collectAsStateWithLifecycle()
-    val lastPracticedDictionary by homeViewModel.lastPracticedDictionary.collectAsStateWithLifecycle()
-    val mostPracticedDictionary by homeViewModel.mostPracticedDictionary.collectAsStateWithLifecycle()
-    val leastPracticedDictionary by homeViewModel.leastPracticedDictionary.collectAsStateWithLifecycle()
-    val memoriseList by homeViewModel.memoriseList.collectAsStateWithLifecycle()
-    val numOfDictionary by homeViewModel.numOfDictionaries.collectAsStateWithLifecycle()
-    val isLoadingWords by homeViewModel.isLoadingWords.collectAsStateWithLifecycle()
+    val homeUiState by homeViewModel.homeUiState.collectAsStateWithLifecycle()
     val quoteState by homeViewModel.quoteUiState.collectAsStateWithLifecycle()
 
     LifecycleEventEffect(Lifecycle.Event.ON_RESUME) {
         homeViewModel.refreshMemoriseList()
     }
 
-    if (isInitialLoading) {
-        HomeScreenSkeleton(modifier = Modifier.padding(contentPadding))
-    } else {
-        HomeScreenContent(
-            lastPracticed = lastPracticedDictionary,
-            mostPracticed = mostPracticedDictionary,
-            leastPracticed = leastPracticedDictionary,
-            memoriseList = memoriseList,
-            numOfDictionary = numOfDictionary,
-            isLoadingWords = isLoadingWords,
-            contentPadding = contentPadding,
-            quoteState = quoteState,
-            dismissQuote = homeViewModel::dismissQuote
-        )
+    when (val state = homeUiState) {
+        is HomeUiState.Loading -> {
+            HomeScreenSkeleton(modifier = Modifier.padding(contentPadding))
+        }
+        is HomeUiState.Success -> {
+            HomeScreenContent(
+                lastPracticed = state.lastPracticed,
+                mostPracticed = state.mostPracticed,
+                leastPracticed = state.leastPracticed,
+                memoriseList = state.memoriseList,
+                numOfDictionary = state.numOfDictionaries,
+                contentPadding = contentPadding,
+                quoteState = quoteState,
+                dismissQuote = homeViewModel::dismissQuote
+            )
+        }
+        is HomeUiState.Error -> {
+            Log.e("HomeScreen", "Error: ${state.message}")
+        }
     }
 }
 
@@ -98,7 +98,6 @@ fun HomeScreenContent(
     leastPracticed: Dictionary?,
     memoriseList: List<Word>,
     numOfDictionary: Int,
-    isLoadingWords: Boolean,
     contentPadding: PaddingValues,
     quoteState: QuoteUiState,
     dismissQuote: () -> Unit
@@ -180,7 +179,6 @@ fun HomeScreenContent(
             if (leastPracticed != null) {
                 MemoriseCard(
                     memoriseList = memoriseList,
-                    isLoadingWords = isLoadingWords
                 )
             } else {
                 PlaceholderCard(
@@ -189,22 +187,15 @@ fun HomeScreenContent(
                 )
             }
         }
-
-        if (isLoadingWords) {
-            CircularProgressIndicator(
-                color = MaterialTheme.colorScheme.primary
-            )
-        }
     }
 }
 
 @Composable
 fun MemoriseCard(
-    memoriseList: List<Word>,
-    isLoadingWords: Boolean
+    memoriseList: List<Word>
 ) {
     AnimatedVisibility(
-        visible = !isLoadingWords,
+        visible = true,
         enter = fadeIn(),
         exit = fadeOut()
     ) {
@@ -662,7 +653,6 @@ fun HomePreview() {
         ),
         memoriseList = wordList,
         numOfDictionary = 1,
-        isLoadingWords = true,
         contentPadding = PaddingValues(0.dp),
         quoteState = QuoteUiState.Success(
             QuoteData.Quote(

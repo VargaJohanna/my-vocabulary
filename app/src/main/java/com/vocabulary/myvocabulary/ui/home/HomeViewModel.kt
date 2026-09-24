@@ -43,21 +43,7 @@ class HomeViewModel(
     private val _quoteUiState = MutableStateFlow<QuoteUiState>(QuoteUiState.Loading)
     val quoteUiState: StateFlow<QuoteUiState> = _quoteUiState.asStateFlow()
     private val openedAppCounter: Int = preferences.getInt(COUNTER_KEY, 0)
-
     private val _isStatsLoading = MutableStateFlow(true)
-    private val _isLoadingWords = MutableStateFlow(false)
-    val isLoadingWords: StateFlow<Boolean> = _isLoadingWords.asStateFlow()
-
-    val isInitialLoading: StateFlow<Boolean> = combine(
-        _isStatsLoading,
-        _quoteUiState
-    ) { statsLoading, quoteState ->
-        statsLoading || quoteState is QuoteUiState.Loading
-    }.stateIn(
-        scope = viewModelScope,
-        started = SharingStarted.WhileSubscribed(5000),
-        initialValue = true
-    )
 
     private val _lastPracticedDictionary = MutableStateFlow<Dictionary?>(null)
     val lastPracticedDictionary: StateFlow<Dictionary?> = _lastPracticedDictionary.asStateFlow()
@@ -71,6 +57,30 @@ class HomeViewModel(
     val memoriseList: StateFlow<List<Word>> = _memoriseList.asStateFlow()
     private val _numOfDictionaries = MutableStateFlow(0)
     val numOfDictionaries: StateFlow<Int> = _numOfDictionaries.asStateFlow()
+
+    val homeUiState: StateFlow<HomeUiState> = combine(
+        _isStatsLoading,
+        _quoteUiState,
+        dictionaryRepository.isSyncing,
+        dictionaryRepository.allDictionaries
+    ) { isStatsLoading, quoteState, isSyncing, list ->
+        val isLoading = (isStatsLoading && list.isEmpty()) || isSyncing || quoteState is QuoteUiState.Loading
+        if (isLoading) {
+            HomeUiState.Loading
+        } else {
+            HomeUiState.Success(
+                lastPracticed = _lastPracticedDictionary.value,
+                mostPracticed = _mostPracticedDictionary.value,
+                leastPracticed = _leastPracticedDictionary.value,
+                memoriseList = _memoriseList.value,
+                numOfDictionaries = list.size
+            )
+        }
+    }.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(5000),
+        initialValue = HomeUiState.Loading
+    )
 
     init {
         observeQuote()
@@ -87,10 +97,12 @@ class HomeViewModel(
             quoteRepository.getQuote()
                 .catch { e ->
                     _quoteUiState.value = QuoteUiState.Error(e.message ?: "Unknown error")
-                println("Quote Error: ${e.message}")}
+                    println("Quote Error: ${e.message}")
+                }
                 .collect {
                     _quoteUiState.value = QuoteUiState.Success(it, today != lastDismissal)
-                println("Quote: ${_quoteUiState.value}")}
+                    println("Quote: ${_quoteUiState.value}")
+                }
         }
     }
 
@@ -101,7 +113,7 @@ class HomeViewModel(
     fun dismissQuote() {
         val currentState = _quoteUiState.value
         val currentDay = Calendar.getInstance().get(Calendar.DAY_OF_YEAR)
-        if(currentState is QuoteUiState.Success) {
+        if (currentState is QuoteUiState.Success) {
             _quoteUiState.value = currentState.copy(isVisible = false)
             viewModelScope.launch {
                 dataStore.updateData {
@@ -130,6 +142,7 @@ class HomeViewModel(
 
     private fun getDictionaryStats() {
         viewModelScope.launch {
+            _isStatsLoading.value = true
             dictionaryRepository.allDictionaries
                 .collect { list ->
                     _numOfDictionaries.value = list.size
@@ -143,17 +156,12 @@ class HomeViewModel(
                     _leastPracticedDictionary.value = list
                         .minByOrNull { it.dictionaryFinishedCount }
 
-                    if (list.isEmpty()) {
-                        _isLoadingWords.value = false
-                    }
-
                     _isStatsLoading.value = false
                 }
         }
     }
 
     fun refreshMemoriseList() {
-        _isLoadingWords.value = true
         observeMemoriseList()
     }
 
@@ -168,10 +176,10 @@ class HomeViewModel(
                 if (list.isNotEmpty()) {
                     _memoriseList.value = processMemoriseList(list)
                 }
-                _isLoadingWords.value = false
             }
             .launchIn(viewModelScope)
     }
+
     private fun processMemoriseList(list: List<Word>): List<Word> {
         return list.sortedByDescending { it.beenAsked }
             .filter { !it.lastResult }
@@ -189,11 +197,26 @@ private object Keys {
 }
 
 sealed interface QuoteUiState {
-    object Loading: QuoteUiState
+    object Loading : QuoteUiState
 
     data class Success(
         val quote: QuoteData.Quote,
         val isVisible: Boolean = true
-    ): QuoteUiState
+    ) : QuoteUiState
+
     data class Error(val message: String) : QuoteUiState
+}
+
+sealed interface HomeUiState {
+    data object Loading : HomeUiState
+    data class Success(
+        val lastPracticed: Dictionary?,
+        val mostPracticed: Dictionary?,
+        val leastPracticed: Dictionary?,
+        val memoriseList: List<Word>,
+        val numOfDictionaries: Int
+    ) : HomeUiState
+    data class Error(
+        val message: String
+    ) : HomeUiState
 }

@@ -73,12 +73,13 @@ class HomeViewModelTest {
         every { mockPreferences[any<Preferences.Key<Int>>()] } returns 0
         every { dataStore.data } returns flowOf(mockPreferences)
         every { dictionaryRepository.allDictionaries } returns dictionariesFlow
+        every { dictionaryRepository.isSyncing } returns MutableStateFlow(false)
         every { quoteRepository.getQuote() } returns flowOf(testQuote)
         coEvery { wordRepository.getObservableWordList(any()) } returns flowOf(emptyList())
     }
 
     @Test
-    fun `isInitialLoading should emit true initially then false after quote and stats load`() = runTest {
+    fun `homeUiState should emit Loading initially then Success after quote and stats load`() = runTest {
         dictionariesFlow.value = listOf(dict1, dict2)
 
         val viewModel = HomeViewModel(
@@ -90,9 +91,12 @@ class HomeViewModelTest {
             wordRepository
         )
 
-        viewModel.isInitialLoading.test {
-            assertThat(awaitItem()).isTrue()
-            assertThat(awaitItem()).isFalse()
+        viewModel.homeUiState.test {
+            assertThat(awaitItem()).isInstanceOf(HomeUiState.Loading::class)
+            val success = awaitItem()
+            assertThat(success).isInstanceOf(HomeUiState.Success::class)
+            val data = success as HomeUiState.Success
+            assertThat(data.numOfDictionaries).isEqualTo(2)
         }
     }
 

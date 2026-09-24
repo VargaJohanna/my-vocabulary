@@ -2,10 +2,12 @@ package com.vocabulary.myvocabulary.repositories.dictionary
 
 import com.vocabulary.myvocabulary.ui.dictionaries.Dictionary
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.StateFlow
 
 interface  DictionaryRepository {
     val allDictionaries: Flow<List<Dictionary>>
     val numberOfDictionaries: Flow<Int>
+    val isSyncing: StateFlow<Boolean>
     suspend fun createDictionary(dictionary: Dictionary): Long
     suspend fun deleteDictionary(dictionary: Dictionary)
     suspend fun updateDictionary(dictionary: Dictionary)

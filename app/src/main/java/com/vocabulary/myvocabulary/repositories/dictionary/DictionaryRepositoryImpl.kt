@@ -19,6 +19,9 @@ import com.vocabulary.myvocabulary.ui.dictionaries.toDictionaryEntry
 import android.util.Log
 import com.vocabulary.myvocabulary.ui.words.toWordEntry
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
@@ -32,6 +35,9 @@ class DictionaryRepositoryImpl(
     private val appDatabase: AppDatabase,
     private val dispatchers: DispatcherProvider
 ) : DictionaryRepository {
+    private val _isSyncing = MutableStateFlow(false)
+    override val isSyncing: StateFlow<Boolean> = _isSyncing.asStateFlow()
+
     override val allDictionaries: Flow<List<Dictionary>> = dictionaryDao.getAllDictionaries()
         .map { list ->
             list.map { it.toDictionary() }
@@ -132,22 +138,27 @@ class DictionaryRepositoryImpl(
             return Result.success(Unit)
         }
 
-        return withContext(dispatchers.io) {
-            runCatching {
-                val cloudData = cloudSyncRepository.downloadDictionaries(userId).getOrThrow()
-                Log.d("Sync", "Downloaded ${cloudData.size} dictionaries from cloud for user $userId")
+        _isSyncing.value = true
+        return try {
+            withContext(dispatchers.io) {
+                runCatching {
+                    val cloudData = cloudSyncRepository.downloadDictionaries(userId).getOrThrow()
+                    Log.d("Sync", "Downloaded ${cloudData.size} dictionaries from cloud for user $userId")
 
-                cloudData.forEach { (cloudDict, cloudWords) ->
-                    Log.d("Sync", "Restoring dictionary: ${cloudDict.name} (ID: ${cloudDict.id}) with ${cloudWords.size} words")
-                    dictionaryDao.insertDictionary(cloudDict.toLocal().toDictionaryEntry())
+                    cloudData.forEach { (cloudDict, cloudWords) ->
+                        Log.d("Sync", "Restoring dictionary: ${cloudDict.name} (ID: ${cloudDict.id}) with ${cloudWords.size} words")
+                        dictionaryDao.insertDictionary(cloudDict.toLocal().toDictionaryEntry())
 
-                    cloudWords.forEach { cloudWord ->
-                        wordDao.insertWord(cloudWord.toLocal().toWordEntry())
+                        cloudWords.forEach { cloudWord ->
+                            wordDao.insertWord(cloudWord.toLocal().toWordEntry())
+                        }
                     }
+                }.onFailure {
+                    Log.e("Sync", "Error in syncFromCloud", it)
                 }
-            }.onFailure {
-                Log.e("Sync", "Error in syncFromCloud", it)
             }
+        } finally {
+            _isSyncing.value = false
         }
     }
 
