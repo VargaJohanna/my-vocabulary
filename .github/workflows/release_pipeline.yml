@@ -38,8 +38,12 @@ jobs:
         echo "New version code: $new_version"
 
     - name: Decode Keystore
-      run: |
-        echo "${{ secrets.KEYSTORE_FILE }}" | base64 -d > app/release-keystore.jks
+      uses: timheuer/base64-to-file@v2
+      id: android_keystore
+      with:
+        fileName: 'release-keystore.jks'
+        fileDir: './app/'
+        encodedString: ${{ secrets.KEYSTORE_FILE }}
 
     - name: Build App Bundle (AAB)
       if: success()
