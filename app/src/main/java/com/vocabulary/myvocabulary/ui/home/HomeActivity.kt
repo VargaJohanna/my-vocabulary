@@ -47,7 +47,6 @@ import com.vocabulary.myvocabulary.navigation.MyVocabularyDestinations
 import com.vocabulary.myvocabulary.navigation.MyVocabularyNavHost
 import com.vocabulary.myvocabulary.navigation.MyVocabularyTopAppBar
 import com.vocabulary.myvocabulary.navigation.QuizList
-import com.vocabulary.myvocabulary.ui.splash.SplashScreen
 import com.vocabulary.myvocabulary.ui.theme.MyVocabularyTheme
 import com.vocabulary.myvocabulary.ui.user.AuthState
 import com.vocabulary.myvocabulary.ui.user.LoginViewModel
@@ -92,12 +91,6 @@ class HomeActivity : ComponentActivity() {
 fun MyVocabularyApp() {
     val loginViewModel: LoginViewModel = koinViewModel()
     val authState by loginViewModel.authState.collectAsStateWithLifecycle()
-
-    if (authState is AuthState.Loading) {
-        SplashScreen()
-        return
-    }
-
     val currentUser = (authState as? AuthState.Authenticated)?.user
 
     val navController = rememberNavController()
