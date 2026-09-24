@@ -45,6 +45,14 @@ jobs:
         fileDir: './app/'
         encodedString: ${{ secrets.KEYSTORE_FILE }}
 
+    - name: Verify Keystore File
+      run: |
+        if [ ! -f "app/release-keystore.jks" ]; then
+          echo "ERROR: app/release-keystore.jks was not generated!"
+          exit 1
+        fi
+        echo "Keystore file created successfully. Size: $(wc -c < app/release-keystore.jks) bytes"
+
     - name: Build App Bundle (AAB)
       if: success()
       env:
