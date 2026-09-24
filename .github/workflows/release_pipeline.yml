@@ -38,12 +38,13 @@ jobs:
 
     - name: Decode Keystore
       run: |
-        echo "${{ secrets.KEYSTORE_FILE }}" | base64 --decode > app/release-keystore.jks
+        printf '%s' "${{ secrets.KEYSTORE_FILE }}" | base64 --decode > app/release-keystore.jks
 
     - name: Build App Bundle (AAB)
       if: success()
       env:
         QUOTE_API_KEY: ${{ secrets.QUOTE_API_KEY }}
+        GOOGLE_WEB_CLIENT_ID: ${{ secrets.GOOGLE_WEB_CLIENT_ID }}
         KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
         KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
         KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
