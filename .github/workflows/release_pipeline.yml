@@ -3,6 +3,7 @@ name: Release Pipeline
 on:
   push:
     branches: [ master ]
+  workflow_dispatch:
 
 jobs:
   build_and_test:
@@ -38,7 +39,7 @@ jobs:
 
     - name: Decode Keystore
       run: |
-        printf '%s' "${{ secrets.KEYSTORE_FILE }}" | base64 --decode > app/release-keystore.jks
+        echo "${{ secrets.KEYSTORE_FILE }}" | base64 -d > app/release-keystore.jks
 
     - name: Build App Bundle (AAB)
       if: success()
