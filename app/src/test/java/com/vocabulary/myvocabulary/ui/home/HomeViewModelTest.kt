@@ -6,11 +6,9 @@ import androidx.datastore.preferences.core.Preferences
 import app.cash.turbine.test
 import assertk.assertThat
 import assertk.assertions.isEqualTo
-import assertk.assertions.isFalse
 import assertk.assertions.isInstanceOf
 import assertk.assertions.isNotNull
 import assertk.assertions.isNull
-import assertk.assertions.isTrue
 import com.vocabulary.myvocabulary.quotes.QuoteData
 import com.vocabulary.myvocabulary.repositories.dictionary.DictionaryRepository
 import com.vocabulary.myvocabulary.repositories.quotes.QuoteRepository
@@ -97,6 +95,31 @@ class HomeViewModelTest {
             assertThat(success).isInstanceOf(HomeUiState.Success::class)
             val data = success as HomeUiState.Success
             assertThat(data.numOfDictionaries).isEqualTo(2)
+            assertThat(data.lastPracticed?.dictionaryId).isEqualTo(2L)
+        }
+    }
+
+    @Test
+    fun `homeUiState should remain Loading while isSyncing is true`() = runTest {
+        val syncingFlow = MutableStateFlow(true)
+        every { dictionaryRepository.isSyncing } returns syncingFlow
+
+        val viewModel = HomeViewModel(
+            quoteRepository,
+            shareDictionaryRepository,
+            dictionaryRepository,
+            preferences,
+            dataStore,
+            wordRepository
+        )
+
+        viewModel.homeUiState.test {
+            assertThat(awaitItem()).isInstanceOf(HomeUiState.Loading::class)
+
+            syncingFlow.value = false
+
+            val success = awaitItem()
+            assertThat(success).isInstanceOf(HomeUiState.Success::class)
         }
     }
 

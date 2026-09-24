@@ -10,7 +10,6 @@ import kotlinx.coroutines.runBlocking
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.Test
 import java.util.*
-import java.util.Arrays.asList
 
 class WordRepositoryImplTest {
 

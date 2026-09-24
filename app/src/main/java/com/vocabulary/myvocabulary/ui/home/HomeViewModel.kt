@@ -54,9 +54,7 @@ class HomeViewModel(
     private val _leastPracticedDictionary = MutableStateFlow<Dictionary?>(null)
     val leastPracticedDictionary: StateFlow<Dictionary?> = _leastPracticedDictionary.asStateFlow()
     private val _memoriseList = MutableStateFlow<List<Word>>(emptyList())
-    val memoriseList: StateFlow<List<Word>> = _memoriseList.asStateFlow()
     private val _numOfDictionaries = MutableStateFlow(0)
-    val numOfDictionaries: StateFlow<Int> = _numOfDictionaries.asStateFlow()
 
     val homeUiState: StateFlow<HomeUiState> = combine(
         _isStatsLoading,
