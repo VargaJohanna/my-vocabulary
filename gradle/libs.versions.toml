@@ -15,6 +15,7 @@ androidx-credentials = "1.6.0"
 
 # Firebase
 firebaseBom = "34.19.0"
+firebase-crashlytics-plugin = "3.0.3"
 
 # Google ID
 google-id = "1.2.1"
@@ -167,3 +168,4 @@ ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
 google-services = { id = "com.google.gms.google-services", version.ref = "gms-google-services" }
 navigation-safeargs = { id = "androidx.navigation.safeargs.kotlin", version.ref = "navigation" }
 room = { id = "androidx.room", version.ref = "room" }
+firebase-crashlytics = { id = "com.google.firebase.crashlytics", version.ref = "firebase-crashlytics-plugin" }
