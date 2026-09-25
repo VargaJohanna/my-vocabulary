@@ -14,7 +14,7 @@ android {
         applicationId = "com.vocabulary.myvocabulary"
         minSdk = 23
         targetSdk = 37
-        versionCode = 45
+        versionCode = 46
         versionName = "3.0"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         Properties localProperties = new Properties()
