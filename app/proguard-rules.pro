@@ -1,27 +1,21 @@
-# Preserve Line Numbers for Crashlytics stack traces
--keepattributes SourceFile,LineNumberTable
--renamesourcefileattribute SourceFile
+# Add project specific ProGuard rules here.
+# You can control the set of applied configuration files using the
+# proguardFiles setting in build.gradle.
+#
+# For more details, see
+#   http://developer.android.com/guide/developing/tools/proguard.html
 
-# Preserve Room Entities, DAOs, and Database
--keep class * extends androidx.room.RoomDatabase
--keep @androidx.room.Entity class * { *; }
--keep @androidx.room.Dao class * { *; }
+# If your project uses WebView with JS, uncomment the following
+# and specify the fully qualified class name to the JavaScript interface
+# class:
+#-keepclassmembers class fqcn.of.javascript.interface.for.webview {
+#   public *;
+#}
 
-# Preserve Gson & Retrofit Data Models
--keepclassmembers class * {
-    @com.google.gson.annotations.SerializedName <fields>;
-}
--keepattributes *Annotation*,Signature,InnerClasses,EnclosingMethod
+# Uncomment this to preserve the line number information for
+# debugging stack traces.
+#-keepattributes SourceFile,LineNumberTable
 
-# Preserve Kotlin Serialization Models
--keep @**.Serializable class * { *; }
-
-# Ignore missing optional annotations
--dontwarn edu.umd.cs.findbugs.annotations.**
--dontwarn org.apache.commons.csv.**
-
-# Preserve Quote Data Models & Quiz Types
--keep class com.vocabulary.myvocabulary.quotes.** { *; }
--keepclassmembers class com.vocabulary.myvocabulary.quotes.** { *; }
--keep class com.vocabulary.myvocabulary.ui.quizzes.QuizTypes** { *; }
--keepclassmembers class com.vocabulary.myvocabulary.ui.quizzes.QuizTypes** { *; }
+# If you keep the line number information, uncomment this to
+# hide the original source file name.
+#-renamesourcefileattribute SourceFile
