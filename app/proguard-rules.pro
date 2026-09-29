@@ -19,3 +19,9 @@
 # Ignore missing optional annotations
 -dontwarn edu.umd.cs.findbugs.annotations.**
 -dontwarn org.apache.commons.csv.**
+
+# Preserve Quote Data Models & Quiz Types
+-keep class com.vocabulary.myvocabulary.quotes.** { *; }
+-keepclassmembers class com.vocabulary.myvocabulary.quotes.** { *; }
+-keep class com.vocabulary.myvocabulary.ui.quizzes.QuizTypes** { *; }
+-keepclassmembers class com.vocabulary.myvocabulary.ui.quizzes.QuizTypes** { *; }

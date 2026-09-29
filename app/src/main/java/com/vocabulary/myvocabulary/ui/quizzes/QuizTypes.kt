@@ -1,7 +1,5 @@
 package com.vocabulary.myvocabulary.ui.quizzes
 
-import kotlinx.serialization.Serializable
-
 sealed class QuizTypes {
     object QuickQuiz : QuizTypes()
     object FullQuiz : QuizTypes()
@@ -10,7 +8,12 @@ sealed class QuizTypes {
 
     companion object {
         fun getQuizTypes(): List<QuizTypes> {
-            return QuizTypes::class.sealedSubclasses.mapNotNull { it.objectInstance }
+            return listOf(
+                QuickQuiz,
+                FullQuiz,
+                WeakestQuiz,
+                CustomQuiz
+            )
         }
     }
 }
