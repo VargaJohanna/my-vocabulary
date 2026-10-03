@@ -86,44 +86,44 @@ fun QuizListContent(
     }
 
     val viewmodel = quizListViewModel ?: return
-        dialogState?.let { dialog ->
-            when (dialog) {
-                is QuizListDialog.CustomDialog -> {
-                    dialogFactory.BuildCustomQuizSizeDialog(
-                        onDismissRequest = {
-                            viewmodel.clearDialogState()
-                        },
-                        onConfirmation = { size ->
-                            viewmodel.addCustomQuizSize(size)
-                            selectedQuiz = QuizTypes.CustomQuiz.toInt()
-                            viewmodel.clearDialogState()
-                            isDictionarySheetOpen = true
-                        }
-                    )
-                }
+    dialogState?.let { dialog ->
+        when (dialog) {
+            is QuizListDialog.CustomDialog -> {
+                dialogFactory.BuildCustomQuizSizeDialog(
+                    onDismissRequest = {
+                        viewmodel.clearDialogState()
+                    },
+                    onConfirmation = { size ->
+                        viewmodel.addCustomQuizSize(size)
+                        selectedQuiz = QuizTypes.CustomQuiz.toInt()
+                        viewmodel.clearDialogState()
+                        isDictionarySheetOpen = true
+                    }
+                )
+            }
 
-                is QuizListDialog.DirectionDialog -> {
-                    dialogFactory.BuildChooseDirectionDialog(
-                        onDismissRequest = {
-                            viewmodel.clearDialogState()
-                        },
-                        onConfirmation = { direction ->
-                            onStartQuiz(selectedQuiz, selectedDictionaryId, direction, false)
-                            viewmodel.clearDialogState()
-                            isDictionarySheetOpen = false
-                        }
-                    )
-                }
+            is QuizListDialog.DirectionDialog -> {
+                dialogFactory.BuildChooseDirectionDialog(
+                    onDismissRequest = {
+                        viewmodel.clearDialogState()
+                    },
+                    onConfirmation = { direction ->
+                        viewmodel.clearDialogState()
+                        isDictionarySheetOpen = false
+                        onStartQuiz(selectedQuiz, selectedDictionaryId, direction, false)
+                    }
+                )
+            }
 
-                is QuizListDialog.InfoDialog -> {
-                    dialogFactory.BuildInfoDialog(
-                        onDismissRequest = { viewmodel.clearDialogState() },
-                        dialogTitle = dialog.title,
-                        dialogText = dialog.text
-                    )
-                }
+            is QuizListDialog.InfoDialog -> {
+                dialogFactory.BuildInfoDialog(
+                    onDismissRequest = { viewmodel.clearDialogState() },
+                    dialogTitle = dialog.title,
+                    dialogText = dialog.text
+                )
             }
         }
+    }
 
 
     Box(
@@ -143,7 +143,12 @@ fun QuizListContent(
                 QuizCard(
                     quizType = item,
                     onInfoClick = { title, info ->
-                        viewmodel.setDialogState(QuizListDialog.InfoDialog(title = title, text = info))
+                        viewmodel.setDialogState(
+                            QuizListDialog.InfoDialog(
+                                title = title,
+                                text = info
+                            )
+                        )
                     },
                     onTypeClick = {
                         selectedQuiz = item.toInt()

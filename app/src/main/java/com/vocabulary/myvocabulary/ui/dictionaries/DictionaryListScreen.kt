@@ -402,7 +402,10 @@ fun DictionaryOptionsButton(
             onDismissRequest = { expanded = false }) {
             DropdownMenuItem(
                 text = { Text(stringResource(R.string.dictionary_menu_start_quiz)) },
-                onClick = { onStartQuiz(dictionaryItem.dictionaryId) }
+                onClick = {
+                    expanded = false
+                    onStartQuiz(dictionaryItem.dictionaryId)
+                }
             )
 
             HorizontalDivider()

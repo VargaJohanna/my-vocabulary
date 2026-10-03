@@ -1,6 +1,5 @@
 package com.vocabulary.myvocabulary.ui.quizzes
 
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
@@ -8,7 +7,6 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
@@ -73,9 +71,6 @@ fun DictionaryPickerBottomSheet(
             )
         }
         is LibraryUiState.Loading -> {
-            Box{
-                CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
-            }
         }
     }
 }
@@ -110,7 +105,12 @@ fun DictionaryPickerContent(
                 .padding(MaterialTheme.dimens.PaddingMedium)
         ) {
             items(dictionaryList) { item ->
-                DictionaryCard(item, onSelectedDictionary, showQuizDirectionDialog)
+                DictionaryCard(
+                    item = item,
+                    onSelect = onSelectedDictionary,
+                    showQuizDirectionDialog = showQuizDirectionDialog,
+                    onDismissBottomSheet = { onDismissRequestBottomSheet(false) }
+                )
             }
         }
     }
@@ -120,11 +120,13 @@ fun DictionaryPickerContent(
 fun DictionaryCard(
     item: Dictionary,
     onSelect: (id: Long) -> Unit,
-    showQuizDirectionDialog: (isDialogOpen: Boolean) -> Unit
+    showQuizDirectionDialog: (isDialogOpen: Boolean) -> Unit,
+    onDismissBottomSheet: () -> Unit
 ) {
     Card(
         onClick = {
             onSelect(item.dictionaryId)
+            onDismissBottomSheet()
             showQuizDirectionDialog(true)
         },
         modifier = Modifier
