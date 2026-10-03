@@ -86,9 +86,9 @@ class LoginViewModelTest {
 
     @Test
     fun `onLoginClick should perform sync and set Success when on Wi-Fi`() = runTest {
-        coEvery { userRepository.loginWithGoogle(context) } returns Result.success(Unit)
+        coEvery { userRepository.loginWithGoogle(context) } returns Result.success(true)
         every { NetworkUtils.isMobileDataActive(context) } returns false
-        coEvery { dictionaryRepository.syncFromCloud("user_123", requireWifi = false) } returns Result.success(Unit)
+        coEvery { dictionaryRepository.syncFromCloud(context, "user_123", requireWifi = false, isNewUser = true) } returns Result.success(Unit)
 
         val viewModel = LoginViewModel(userRepository, dictionaryRepository, TestScope(mainCoroutineRule.testDispatcher))
 
@@ -101,13 +101,13 @@ class LoginViewModelTest {
             assertThat(awaitItem()).isEqualTo(LoginUiState.Success)
         }
 
-        coVerify { dictionaryRepository.syncFromCloud("user_123", requireWifi = false) }
+        coVerify { dictionaryRepository.syncFromCloud(context, "user_123", requireWifi = false, isNewUser = true) }
         coVerify { dictionaryRepository.syncAllToCloud(requireWifi = false) }
     }
 
     @Test
     fun `onLoginClick should show mobile data warning when on cellular data`() = runTest {
-        coEvery { userRepository.loginWithGoogle(context) } returns Result.success(Unit)
+        coEvery { userRepository.loginWithGoogle(context) } returns Result.success(true)
         every { NetworkUtils.isMobileDataActive(context) } returns true
 
         val viewModel = LoginViewModel(userRepository, dictionaryRepository, TestScope(mainCoroutineRule.testDispatcher))
@@ -141,21 +141,21 @@ class LoginViewModelTest {
 
     @Test
     fun `onConfirmSync should proceed with sync and set Success state`() = runTest {
-        coEvery { dictionaryRepository.syncFromCloud("user_123", requireWifi = false) } returns Result.success(Unit)
+        coEvery { dictionaryRepository.syncFromCloud(context, "user_123", requireWifi = false, isNewUser = false) } returns Result.success(Unit)
 
         val viewModel = LoginViewModel(userRepository, dictionaryRepository, TestScope(mainCoroutineRule.testDispatcher))
 
         viewModel.uiState.test {
             assertThat(awaitItem()).isEqualTo(LoginUiState.Idle)
 
-            viewModel.onConfirmSync(proceed = true)
+            viewModel.onConfirmSync(context, proceed = true)
 
             assertThat(awaitItem()).isEqualTo(LoginUiState.Loading)
             assertThat(awaitItem()).isEqualTo(LoginUiState.Success)
         }
 
         assertThat(viewModel.showMobileDataWarning.value).isFalse()
-        coVerify { dictionaryRepository.syncFromCloud("user_123", requireWifi = false) }
+        coVerify { dictionaryRepository.syncFromCloud(context, "user_123", requireWifi = false, isNewUser = false) }
     }
 
     @Test

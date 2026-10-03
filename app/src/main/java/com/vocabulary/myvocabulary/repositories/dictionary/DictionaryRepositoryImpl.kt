@@ -1,5 +1,6 @@
 package com.vocabulary.myvocabulary.repositories.dictionary
 
+import android.content.Context
 import androidx.work.Constraints
 import androidx.work.Data
 import androidx.work.ExistingWorkPolicy
@@ -131,8 +132,8 @@ class DictionaryRepositoryImpl(
         }
     }
 
-    override suspend fun syncFromCloud(userId: String, requireWifi: Boolean): Result<Unit> {
-        Log.d("Sync", "syncFromCloud called for user: $userId, requireWifi: $requireWifi")
+    override suspend fun syncFromCloud(context: Context, userId: String, requireWifi: Boolean, isNewUser: Boolean): Result<Unit> {
+        Log.d("Sync", "syncFromCloud called for user: $userId, requireWifi: $requireWifi, isNewUser: $isNewUser")
         if (requireWifi) {
             triggerDownload()
             return Result.success(Unit)
@@ -145,12 +146,20 @@ class DictionaryRepositoryImpl(
                     val cloudData = cloudSyncRepository.downloadDictionaries(userId).getOrThrow()
                     Log.d("Sync", "Downloaded ${cloudData.size} dictionaries from cloud for user $userId")
 
-                    cloudData.forEach { (cloudDict, cloudWords) ->
-                        Log.d("Sync", "Restoring dictionary: ${cloudDict.name} (ID: ${cloudDict.id}) with ${cloudWords.size} words")
-                        dictionaryDao.insertDictionary(cloudDict.toLocal().toDictionaryEntry())
+                    if (cloudData.isNotEmpty()) {
+                        cloudData.forEach { (cloudDict, cloudWords) ->
+                            Log.d("Sync", "Restoring dictionary: ${cloudDict.name} (ID: ${cloudDict.id}) with ${cloudWords.size} words")
+                            dictionaryDao.insertDictionary(cloudDict.toLocal().toDictionaryEntry())
 
-                        cloudWords.forEach { cloudWord ->
-                            wordDao.insertWord(cloudWord.toLocal().toWordEntry())
+                            cloudWords.forEach { cloudWord ->
+                                wordDao.insertWord(cloudWord.toLocal().toWordEntry())
+                            }
+                        }
+                    } else if (isNewUser && dictionaryDao.getAllDictionaries().first().isEmpty()) {
+                        Log.d("Sync", "Brand new user detected with empty cloud data. Inserting default example dictionary.")
+                        dictionaryDao.insertDictionary(AppDatabase.getDefaultDictionary(context))
+                        AppDatabase.getListOfDefaultWords(context).forEach { word ->
+                            wordDao.insertWord(word)
                         }
                     }
                 }.onFailure {

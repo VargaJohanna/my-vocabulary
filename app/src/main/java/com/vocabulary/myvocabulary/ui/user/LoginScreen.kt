@@ -52,16 +52,16 @@ fun LoginScreen(
 
     if (showMobileDataWarning) {
         AlertDialog(
-            onDismissRequest = { viewModel.onConfirmSync(false) },
+            onDismissRequest = { viewModel.onConfirmSync(context, false) },
             title = { Text(stringResource(R.string.sync_mobile_data_title)) },
             text = { Text(stringResource(R.string.sync_mobile_data_message)) },
             confirmButton = {
-                TextButton(onClick = { viewModel.onConfirmSync(true) }) {
+                TextButton(onClick = { viewModel.onConfirmSync(context, true) }) {
                     Text(stringResource(R.string.sync_proceed_anyway))
                 }
             },
             dismissButton = {
-                TextButton(onClick = { viewModel.onConfirmSync(false) }) {
+                TextButton(onClick = { viewModel.onConfirmSync(context, false) }) {
                     Text(stringResource(R.string.sync_wait_wifi))
                 }
             }

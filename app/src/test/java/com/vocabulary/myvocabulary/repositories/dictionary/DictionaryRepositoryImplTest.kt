@@ -156,7 +156,7 @@ class DictionaryRepositoryImplTest {
         val dictionaryRepository = givenDictionaryRepository()
         coEvery { cloudSyncRepository.downloadDictionaries("user_123") } returns Result.success(emptyList())
 
-        val result = dictionaryRepository.syncFromCloud("user_123", requireWifi = false)
+        val result = dictionaryRepository.syncFromCloud(mockk(relaxed = true), "user_123", requireWifi = false, isNewUser = false)
 
         assertThat(result.isSuccess).isTrue
         coVerify { cloudSyncRepository.downloadDictionaries("user_123") }

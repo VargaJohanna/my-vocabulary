@@ -48,6 +48,8 @@ class LoginViewModel(
             initialValue = null
         )
 
+    private var isNewUser: Boolean = false
+
     fun onLoginClick(context: Context) {
         Log.d("Sync", "onLoginClick triggered")
         viewModelScope.launch {
@@ -55,6 +57,7 @@ class LoginViewModel(
             val result = userRepository.loginWithGoogle(context)
             Log.d("Sync", "loginWithGoogle returned success: ${result.isSuccess}")
             if (result.isSuccess) {
+                isNewUser = result.getOrDefault(false)
                 val isMobile = NetworkUtils.isMobileDataActive(context)
                 
                 var uid: String? = null
@@ -77,7 +80,7 @@ class LoginViewModel(
                 } else {
                     // Sync immediately on Wi-Fi - use externalScope so it survives VM clearance
                     externalScope.launch {
-                        val syncResult = dictionaryRepository.syncFromCloud(uid, requireWifi = false)
+                        val syncResult = dictionaryRepository.syncFromCloud(context, uid, requireWifi = false, isNewUser = isNewUser)
                         if (syncResult.isSuccess) {
                             dictionaryRepository.syncAllToCloud(requireWifi = false)
                         } else {
@@ -92,7 +95,7 @@ class LoginViewModel(
         }
     }
 
-    fun onConfirmSync(proceed: Boolean) {
+    fun onConfirmSync(context: Context, proceed: Boolean) {
         viewModelScope.launch {
             _showMobileDataWarning.value = false
             _uiState.value = LoginUiState.Loading
@@ -103,7 +106,7 @@ class LoginViewModel(
             }
 
             externalScope.launch {
-                val syncResult = dictionaryRepository.syncFromCloud(uid, requireWifi = !proceed)
+                val syncResult = dictionaryRepository.syncFromCloud(context, uid, requireWifi = !proceed, isNewUser = isNewUser)
                 if (syncResult.isSuccess) {
                     dictionaryRepository.syncAllToCloud(requireWifi = !proceed)
                 } else {

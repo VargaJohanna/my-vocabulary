@@ -82,19 +82,22 @@ abstract class AppDatabase : RoomDatabase() {
                             }
                         }
                     }
+                })
+                .fallbackToDestructiveMigrationOnDowngrade()
+                .build()
 
-                    private fun getDefaultDictionary(context: Context): DictionaryEntry =
-                        Dictionary(
-                            dictionaryId = 1L,
-                            dictionaryName = context.getString(R.string.example_dictionary_title),
-                            dictionaryCreated = Calendar.getInstance().time,
-                            dictionaryLastPracticed = null,
-                            dictionaryLastResult = null,
-                            dictionaryFinishedCount = 0,
-                            dictionaryTotalScore = 0
-                        ).toDictionaryEntry()
+        fun getDefaultDictionary(context: Context): DictionaryEntry =
+            Dictionary(
+                dictionaryId = 1L,
+                dictionaryName = context.getString(R.string.example_dictionary_title),
+                dictionaryCreated = Calendar.getInstance().time,
+                dictionaryLastPracticed = null,
+                dictionaryLastResult = null,
+                dictionaryFinishedCount = 0,
+                dictionaryTotalScore = 0
+            ).toDictionaryEntry()
 
-                    private fun getListOfDefaultWords(context: Context): List<WordEntry> {
+        fun getListOfDefaultWords(context: Context): List<WordEntry> {
                         return listOf(
                             Word(
                                 1,
@@ -198,8 +201,5 @@ abstract class AppDatabase : RoomDatabase() {
                             ).toWordEntry()
                         )
                     }
-                })
-                .fallbackToDestructiveMigrationOnDowngrade()
-                        .build()
     }
 }

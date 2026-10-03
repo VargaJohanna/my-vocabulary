@@ -34,7 +34,7 @@ class UserRepositoryImpl(
     override val currentUserId: String?
         get() = firebaseAuth.currentUser?.uid
 
-    override suspend fun loginWithGoogle(context: Context): Result<Unit> {
+    override suspend fun loginWithGoogle(context: Context): Result<Boolean> {
         val credentialManager = CredentialManager.create(context)
 
         val googleIdOption = GetGoogleIdOption.Builder()
@@ -59,8 +59,9 @@ class UserRepositoryImpl(
                 val googleIdTokenCredential = GoogleIdTokenCredential.createFrom(credential.data)
                 val authCredential = GoogleAuthProvider.getCredential(googleIdTokenCredential.idToken, null)
                 
-                firebaseAuth.signInWithCredential(authCredential).await()
-                Result.success(Unit)
+                val authResult = firebaseAuth.signInWithCredential(authCredential).await()
+                val isNewUser = authResult.additionalUserInfo?.isNewUser == true
+                Result.success(isNewUser)
             } else {
                 Result.failure(Exception("Invalid credential type received"))
             }

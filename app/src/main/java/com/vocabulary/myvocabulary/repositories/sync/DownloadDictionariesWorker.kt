@@ -2,7 +2,6 @@ package com.vocabulary.myvocabulary.repositories.sync
 
 import android.content.Context
 import androidx.work.CoroutineWorker
-import androidx.work.ListenableWorker
 import androidx.work.WorkerParameters
 import com.google.firebase.auth.FirebaseAuth
 import com.vocabulary.myvocabulary.repositories.dictionary.DictionaryRepository
@@ -21,7 +20,7 @@ class DownloadDictionariesWorker(
         val userId = firebaseAuth.currentUser?.uid ?: return Result.success()
 
         return try {
-            val result = dictionaryRepository.syncFromCloud(userId)
+            val result = dictionaryRepository.syncFromCloud(applicationContext, userId)
             if (result.isSuccess) Result.success() else Result.retry()
         } catch (e: Exception) {
             Result.retry()
