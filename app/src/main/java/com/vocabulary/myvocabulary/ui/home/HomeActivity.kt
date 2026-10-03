@@ -121,7 +121,6 @@ fun MyVocabularyApp() {
                 MyVocabularyTopAppBar(
                     navController = navController,
                     scrollBehavior = scrollBehavior,
-                    title = appBarTitle,
                     actions = appBarActions,
                     onBackClick = { currentBackAction() }
                 )
