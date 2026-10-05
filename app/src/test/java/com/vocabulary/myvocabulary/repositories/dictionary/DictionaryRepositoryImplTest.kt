@@ -162,6 +162,32 @@ class DictionaryRepositoryImplTest {
         coVerify { cloudSyncRepository.downloadDictionaries("user_123") }
     }
 
+    @Test
+    fun `should upload unsynced dictionaries and update sync status when syncUnsyncedDictionaries is called`() = runTest {
+        val dictionaryRepository = givenDictionaryRepository()
+        val unsyncedEntry = DictionaryEntry(dictionaryId = 1L, dictionaryName = "Unsynced", dictionaryCreated = Date(), isSynced = false)
+        coEvery { dictionaryDao.getUnsyncedDictionaries() } returns listOf(unsyncedEntry)
+        coEvery { wordDao.getAllWordsInDictionary(1L) } returns flowOf(emptyList())
+        coEvery { cloudSyncRepository.uploadDictionary(any(), any(), any()) } returns Result.success(Unit)
+
+        val result = dictionaryRepository.syncUnsyncedDictionaries("user_123")
+
+        assertThat(result.isSuccess).isTrue
+        coVerify { cloudSyncRepository.uploadDictionary(eq("user_123"), any(), any()) }
+        coVerify { dictionaryDao.updateSyncStatus(1L, isSynced = true) }
+    }
+
+    @Test
+    fun `should do nothing when syncUnsyncedDictionaries has no unsynced dictionaries`() = runTest {
+        val dictionaryRepository = givenDictionaryRepository()
+        coEvery { dictionaryDao.getUnsyncedDictionaries() } returns emptyList()
+
+        val result = dictionaryRepository.syncUnsyncedDictionaries("user_123")
+
+        assertThat(result.isSuccess).isTrue
+        coVerify(exactly = 0) { cloudSyncRepository.uploadDictionary(any(), any(), any()) }
+    }
+
     private fun givenDictionaryRepository(): DictionaryRepository {
         every { dictionaryDao.getAllDictionaries() } returns flowOf(emptyList())
         return DictionaryRepositoryImpl(dictionaryDao, wordDao, cloudSyncRepository, workManager, appDatabase, dispatchers)

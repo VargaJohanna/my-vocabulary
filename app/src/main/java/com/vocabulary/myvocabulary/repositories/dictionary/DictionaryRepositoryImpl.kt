@@ -18,6 +18,8 @@ import com.vocabulary.myvocabulary.repositories.word.WordDao
 import com.vocabulary.myvocabulary.ui.dictionaries.Dictionary
 import com.vocabulary.myvocabulary.ui.dictionaries.toDictionaryEntry
 import android.util.Log
+import com.google.firebase.auth.FirebaseAuth
+import com.vocabulary.myvocabulary.repositories.word.toWord
 import com.vocabulary.myvocabulary.ui.words.toWordEntry
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -46,7 +48,7 @@ class DictionaryRepositoryImpl(
     override val numberOfDictionaries: Flow<Int> = allDictionaries.map { it.size }
 
     override suspend fun createDictionary(dictionary: Dictionary): Long {
-        val id = dictionaryDao.insertDictionary(dictionary.toDictionaryEntry())
+        val id = dictionaryDao.insertDictionary(dictionary.copy(isSynced = false).toDictionaryEntry())
         triggerSync(id)
         return id
     }
@@ -57,7 +59,7 @@ class DictionaryRepositoryImpl(
     }
 
     override suspend fun updateDictionary(dictionary: Dictionary) {
-        dictionaryDao.updateDictionary(dictionary.toDictionaryEntry())
+        dictionaryDao.updateDictionary(dictionary.copy(isSynced = false).toDictionaryEntry())
         triggerSync(dictionary.dictionaryId)
     }
 
@@ -126,9 +128,35 @@ class DictionaryRepositoryImpl(
     }
 
     override suspend fun syncAllToCloud(requireWifi: Boolean) {
-        val localDictionaries = allDictionaries.first()
-        localDictionaries.forEach { dictionary ->
-            triggerSync(dictionary.dictionaryId, requireWifi)
+        val userId = FirebaseAuth.getInstance().currentUser?.uid ?: return
+        syncUnsyncedDictionaries(userId)
+    }
+
+    override suspend fun syncUnsyncedDictionaries(userId: String): Result<Unit> {
+        _isSyncing.value = true
+        return try {
+            withContext(dispatchers.io) {
+                runCatching {
+                    val unsyncedEntries = dictionaryDao.getUnsyncedDictionaries()
+                    Log.d("Sync", "Found ${unsyncedEntries.size} unsynced dictionaries for user $userId")
+
+                    unsyncedEntries.forEach { entry ->
+                        val dict = entry.toDictionary()
+                        val wordEntries = wordDao.getAllWordsInDictionary(dict.dictionaryId).first()
+                        val words = wordEntries.map { it.toWord() }
+
+                        val uploadResult = cloudSyncRepository.uploadDictionary(userId, dict, words)
+                        if (uploadResult.isSuccess) {
+                            Log.d("Sync", "Successfully synced dictionary: ${dict.dictionaryName} to cloud")
+                            dictionaryDao.updateSyncStatus(dict.dictionaryId, isSynced = true)
+                        }
+                    }
+                }.onFailure {
+                    Log.e("Sync", "Error in syncUnsyncedDictionaries", it)
+                }
+            }
+        } finally {
+            _isSyncing.value = false
         }
     }
 
@@ -149,7 +177,7 @@ class DictionaryRepositoryImpl(
                     if (cloudData.isNotEmpty()) {
                         cloudData.forEach { (cloudDict, cloudWords) ->
                             Log.d("Sync", "Restoring dictionary: ${cloudDict.name} (ID: ${cloudDict.id}) with ${cloudWords.size} words")
-                            dictionaryDao.insertDictionary(cloudDict.toLocal().toDictionaryEntry())
+                            dictionaryDao.insertDictionary(cloudDict.toLocal().copy(isSynced = true).toDictionaryEntry())
 
                             cloudWords.forEach { cloudWord ->
                                 wordDao.insertWord(cloudWord.toLocal().toWordEntry())
@@ -171,7 +199,7 @@ class DictionaryRepositoryImpl(
         }
     }
 
-    private fun triggerDownload() { // Removed unused parameter
+    private fun triggerDownload() {
         val constraints = Constraints.Builder()
             .setRequiredNetworkType(NetworkType.UNMETERED)
             .build()

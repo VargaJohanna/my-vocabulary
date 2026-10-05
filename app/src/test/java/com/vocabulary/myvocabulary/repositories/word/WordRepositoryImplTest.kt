@@ -2,6 +2,7 @@ package com.vocabulary.myvocabulary.repositories.word
 
 import androidx.work.WorkManager
 import com.nhaarman.mockitokotlin2.*
+import com.vocabulary.myvocabulary.repositories.dictionary.DictionaryDao
 import com.vocabulary.myvocabulary.ui.words.Word
 import com.vocabulary.myvocabulary.ui.words.toWordEntry
 import kotlinx.coroutines.flow.first
@@ -14,6 +15,7 @@ import java.util.*
 class WordRepositoryImplTest {
 
     private val wordDao = mock<WordDao>()
+    private val dictionaryDao = mock<DictionaryDao>()
     private val requestedDictionary = 1L
     private val wordIdToTest = 1L
     private val wordToTest = Word(wordId = 1L, containerDictionaryId = requestedDictionary, word = "a", translation = "b", created = Date(5))
@@ -115,25 +117,25 @@ class WordRepositoryImplTest {
     private val workManager = mock<WorkManager>()
 
     private fun givenWordRepository(): WordRepositoryImpl {
-        return WordRepositoryImpl(wordDao, workManager)
+        return WordRepositoryImpl(wordDao, dictionaryDao, workManager)
     }
 
     private fun givenWordRepositoryWithDao(): WordRepositoryImpl {
         whenever(wordDao.getNumberOfWordById(wordIdToTest)).thenReturn(flowOf(1))
         whenever(wordDao.getAllWordsInDictionary(requestedDictionary)).thenReturn(flowOf(wordList.map { it.toWordEntry() }))
-        return WordRepositoryImpl(wordDao, workManager)
+        return WordRepositoryImpl(wordDao, dictionaryDao, workManager)
     }
 
     private fun givenWordRepositoryWithNoWords(): WordRepositoryImpl {
         whenever(wordDao.getNumberOfWordById(wordIdToTest)).thenReturn(flowOf(0))
         whenever(wordDao.getAllWordsInDictionary(requestedDictionary)).thenReturn(flowOf(wordList.map { it.toWordEntry() }))
-        return WordRepositoryImpl(wordDao, workManager)
+        return WordRepositoryImpl(wordDao, dictionaryDao, workManager)
     }
 
     private fun givenWordRepositoryWithWordById(): WordRepositoryImpl {
         runBlocking {
             whenever(wordDao.getWordById(wordIdToTest)).thenReturn(wordToTest.toWordEntry())
         }
-        return WordRepositoryImpl(wordDao, workManager)
+        return WordRepositoryImpl(wordDao, dictionaryDao, workManager)
     }
 }

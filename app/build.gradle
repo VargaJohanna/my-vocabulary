@@ -106,6 +106,7 @@ dependencies {
     testImplementation libs.mockito.kotlin
     testImplementation libs.core.testing
     testImplementation libs.assertj.core
+    testImplementation libs.room.testing
 
     //Lottie animation
     implementation libs.lottie.compose

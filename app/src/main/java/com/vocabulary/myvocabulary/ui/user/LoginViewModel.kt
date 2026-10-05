@@ -119,7 +119,7 @@ class LoginViewModel(
 
     fun onLogoutClick(context: Context) {
         viewModelScope.launch {
-            dictionaryRepository.clearLocalData()
+//            dictionaryRepository.clearLocalData()
             userRepository.logout(context)
         }
     }

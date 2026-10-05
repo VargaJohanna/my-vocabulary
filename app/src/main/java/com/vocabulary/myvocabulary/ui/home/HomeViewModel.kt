@@ -62,8 +62,9 @@ class HomeViewModel(
         dictionaryRepository.isSyncing,
         dictionaryRepository.allDictionaries
     ) { isStatsLoading, quoteState, isSyncing, list ->
-        val isLoading = (isStatsLoading && list.isEmpty()) || isSyncing || quoteState is QuoteUiState.Loading
-        if (isLoading) {
+        if (isSyncing) {
+            HomeUiState.Syncing
+        } else if ((isStatsLoading && list.isEmpty()) || quoteState is QuoteUiState.Loading) {
             HomeUiState.Loading
         } else {
             HomeUiState.Success(
@@ -206,6 +207,7 @@ sealed interface QuoteUiState {
 }
 
 sealed interface HomeUiState {
+    data object Syncing : HomeUiState
     data object Loading : HomeUiState
     data class Success(
         val lastPracticed: Dictionary?,

@@ -224,4 +224,66 @@ class MigrationTest {
         cursor.close()
         db.close()
     }
+
+    private fun createV8Database(dbName: String, dictionaryName: String, created: Long, totalScore: Int) {
+        val context = InstrumentationRegistry.getInstrumentation().targetContext
+        context.deleteDatabase(dbName)
+        val dbPath = context.getDatabasePath(dbName).path
+        val v8Db = SQLiteDatabase.openOrCreateDatabase(dbPath, null)
+
+        v8Db.execSQL("""
+            CREATE TABLE IF NOT EXISTS dictionaries (
+                dictionary_id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, 
+                dictionary_name TEXT NOT NULL, 
+                dictionary_created INTEGER NOT NULL,
+                dictionary_last_practiced INTEGER,
+                dictionary_last_result INTEGER,
+                dictionary_finished_count INTEGER NOT NULL DEFAULT 0,
+                dictionary_total_score INTEGER NOT NULL DEFAULT 0
+            )
+        """.trimIndent())
+
+        v8Db.execSQL("""
+            INSERT INTO dictionaries (dictionary_name, dictionary_created, dictionary_total_score, dictionary_finished_count) 
+            VALUES ('$dictionaryName', $created, $totalScore, 5)
+        """.trimIndent())
+
+        v8Db.execSQL("PRAGMA user_version = 8")
+        v8Db.close()
+    }
+
+    @Test
+    @Throws(IOException::class)
+    fun migrate8to9_preservesDictionaryDataAndAddsIsSyncedColumn() {
+        val testName = "V8 Test Dictionary"
+        val testCreated = 1700000000000L
+        val testScore = 450
+
+        createV8Database(TEST_DB, testName, testCreated, testScore)
+
+        val context = InstrumentationRegistry.getInstrumentation().targetContext
+        val db = Room.databaseBuilder(context, AppDatabase::class.java, TEST_DB)
+            .addMigrations(AppDatabase.MIGRATION_8_9)
+            .allowMainThreadQueries()
+            .build()
+
+        val cursor = db.openHelper.readableDatabase.query(
+            "SELECT * FROM dictionaries WHERE dictionary_name = '$testName'"
+        )
+        assert(cursor.moveToFirst())
+
+        // Verify all existing fields are 100% preserved
+        assert(cursor.getString(cursor.getColumnIndex("dictionary_name")) == testName)
+        assert(cursor.getLong(cursor.getColumnIndex("dictionary_created")) == testCreated)
+        assert(cursor.getInt(cursor.getColumnIndex("dictionary_total_score")) == testScore)
+        assert(cursor.getInt(cursor.getColumnIndex("dictionary_finished_count")) == 5)
+
+        // Verify the new column 'is_synced' exists and defaults to 0 (false)
+        val isSyncedIdx = cursor.getColumnIndex("is_synced")
+        assert(isSyncedIdx != -1)
+        assert(cursor.getInt(isSyncedIdx) == 0)
+
+        cursor.close()
+        db.close()
+    }
 }

@@ -25,6 +25,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.ToggleFloatingActionButton
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -47,10 +48,12 @@ import com.vocabulary.myvocabulary.navigation.MyVocabularyDestinations
 import com.vocabulary.myvocabulary.navigation.MyVocabularyNavHost
 import com.vocabulary.myvocabulary.navigation.MyVocabularyTopAppBar
 import com.vocabulary.myvocabulary.navigation.QuizList
+import com.vocabulary.myvocabulary.repositories.dictionary.DictionaryRepository
 import com.vocabulary.myvocabulary.ui.theme.MyVocabularyTheme
 import com.vocabulary.myvocabulary.ui.user.AuthState
 import com.vocabulary.myvocabulary.ui.user.LoginViewModel
 import org.koin.androidx.compose.koinViewModel
+import org.koin.compose.koinInject
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class HomeActivity : ComponentActivity() {
@@ -92,6 +95,13 @@ fun MyVocabularyApp() {
     val loginViewModel: LoginViewModel = koinViewModel()
     val authState by loginViewModel.authState.collectAsStateWithLifecycle()
     val currentUser = (authState as? AuthState.Authenticated)?.user
+    val dictionaryRepository: DictionaryRepository = koinInject()
+
+    LaunchedEffect(currentUser) {
+        currentUser?.let { user ->
+            dictionaryRepository.syncUnsyncedDictionaries(user.uid)
+        }
+    }
 
     val navController = rememberNavController()
     var appBarTitle by remember { mutableStateOf<(@Composable () -> Unit)>({}) }

@@ -10,7 +10,8 @@ data class Dictionary(
     val dictionaryLastPracticed: Date?,
     val dictionaryLastResult: Int?,
     val dictionaryFinishedCount: Int,
-    val dictionaryTotalScore: Int
+    val dictionaryTotalScore: Int,
+    val isSynced: Boolean = false
 ) {
     val averageResult: Float
         get() = if (dictionaryFinishedCount > 0) {
@@ -31,7 +32,8 @@ fun Dictionary.toDictionaryEntry(): DictionaryEntry {
             dictionaryLastPracticed,
             dictionaryLastResult,
             dictionaryFinishedCount,
-            dictionaryTotalScore
+            dictionaryTotalScore,
+            isSynced
         )
     }
 }

@@ -18,16 +18,16 @@ class CloudSyncRepositoryImpl(
         val dictRef = db.collection("users").document(userId)
             .collection("dictionaries").document(dictionary.dictionaryId.toString())
 
-        db.runBatch { batch ->
-            // Set dictionary data
-            batch.set(dictRef, dictionary.toCloud())
+        dictRef.set(dictionary.toCloud()).await()
 
-            // Set words in subcollection
-            words.forEach { word ->
-                val wordRef = dictRef.collection("words").document(word.wordId.toString())
-                batch.set(wordRef, word.toCloud())
-            }
-        }.await()
+        words.chunked(400).forEach { wordChunk ->
+            db.runBatch { batch ->
+                wordChunk.forEach { word ->
+                    val wordRef = dictRef.collection("words").document(word.wordId.toString())
+                    batch.set(wordRef, word.toCloud())
+                }
+            }.await()
+        }
     }
 
     override suspend fun deleteDictionary(userId: String, dictionaryId: Long): Result<Unit> = runCatching {

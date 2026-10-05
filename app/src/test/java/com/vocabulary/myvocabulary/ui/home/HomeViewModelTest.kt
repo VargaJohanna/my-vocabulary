@@ -100,7 +100,7 @@ class HomeViewModelTest {
     }
 
     @Test
-    fun `homeUiState should remain Loading while isSyncing is true`() = runTest {
+    fun `homeUiState should emit Syncing while isSyncing is true`() = runTest {
         val syncingFlow = MutableStateFlow(true)
         every { dictionaryRepository.isSyncing } returns syncingFlow
 
@@ -115,6 +115,7 @@ class HomeViewModelTest {
 
         viewModel.homeUiState.test {
             assertThat(awaitItem()).isInstanceOf(HomeUiState.Loading::class)
+            assertThat(awaitItem()).isInstanceOf(HomeUiState.Syncing::class)
 
             syncingFlow.value = false
 

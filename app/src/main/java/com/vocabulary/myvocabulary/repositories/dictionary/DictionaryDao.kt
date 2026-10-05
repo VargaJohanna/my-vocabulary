@@ -26,4 +26,10 @@ interface DictionaryDao {
 
     @Query("UPDATE dictionaries SET dictionary_last_practiced = :date, dictionary_last_result = :result, dictionary_finished_count = dictionary_finished_count + 1, dictionary_total_score = dictionary_total_score + :result WHERE dictionary_id = :id")
     suspend fun updateDictionaryStats(id: Long, date: Date, result: Int)
+
+    @Query("SELECT * FROM dictionaries WHERE is_synced = 0")
+    suspend fun getUnsyncedDictionaries(): List<DictionaryEntry>
+
+    @Query("UPDATE dictionaries SET is_synced = :isSynced WHERE dictionary_id = :id")
+    suspend fun updateSyncStatus(id: Long, isSynced: Boolean)
 }

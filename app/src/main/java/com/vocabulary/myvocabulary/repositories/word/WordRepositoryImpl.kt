@@ -6,14 +6,19 @@ import androidx.work.ExistingWorkPolicy
 import androidx.work.NetworkType
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
+import com.vocabulary.myvocabulary.repositories.dictionary.DictionaryDao
 import com.vocabulary.myvocabulary.repositories.sync.SyncDictionaryWorker
 import com.vocabulary.myvocabulary.ui.words.Word
 import com.vocabulary.myvocabulary.ui.words.toWordEntry
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.launch
 
 class WordRepositoryImpl(
     private val wordDao: WordDao,
+    private val dictionaryDao: DictionaryDao,
     private val workManager: WorkManager
 ) : WordRepository {
 
@@ -31,16 +36,25 @@ class WordRepositoryImpl(
 
     override fun createWord(word: Word) {
         wordDao.insertWord(word.toWordEntry())
+        CoroutineScope(Dispatchers.IO).launch {
+            dictionaryDao.updateSyncStatus(word.containerDictionaryId, isSynced = false)
+        }
         triggerSync(word.containerDictionaryId)
     }
 
     override fun deleteWord(word: Word) {
         wordDao.deleteWord(word.toWordEntry())
+        CoroutineScope(Dispatchers.IO).launch {
+            dictionaryDao.updateSyncStatus(word.containerDictionaryId, isSynced = false)
+        }
         triggerSync(word.containerDictionaryId)
     }
 
     override fun updateWord(word: Word) {
         wordDao.updateWord(word.toWordEntry())
+        CoroutineScope(Dispatchers.IO).launch {
+            dictionaryDao.updateSyncStatus(word.containerDictionaryId, isSynced = false)
+        }
         triggerSync(word.containerDictionaryId)
     }
 
