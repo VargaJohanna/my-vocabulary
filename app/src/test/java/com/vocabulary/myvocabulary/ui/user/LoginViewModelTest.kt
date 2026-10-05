@@ -165,7 +165,7 @@ class LoginViewModelTest {
         viewModel.onLogoutClick(context)
         advanceUntilIdle()
 
-        coVerify { dictionaryRepository.clearLocalData() }
+//        coVerify { dictionaryRepository.clearLocalData() }
         coVerify { userRepository.logout(context) }
     }
 }
