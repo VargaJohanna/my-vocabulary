@@ -142,13 +142,13 @@ class MigrationTest {
         val context = InstrumentationRegistry.getInstrumentation().targetContext
 
 
-        // Open with Room, applying MIGRATION_4_7
+        // Open with Room, applying migrations up to 9
         val db = Room.databaseBuilder(
             context,
             AppDatabase::class.java,
             TEST_DB
         )
-            .addMigrations(AppDatabase.MIGRATION_4_7, AppDatabase.MIGRATION_7_8)
+            .addMigrations(AppDatabase.MIGRATION_4_7, AppDatabase.MIGRATION_7_8, AppDatabase.MIGRATION_8_9)
             .allowMainThreadQueries()
             .build()
 
@@ -185,7 +185,7 @@ class MigrationTest {
             AppDatabase::class.java,
             TEST_DB
         )
-            .addMigrations(AppDatabase.MIGRATION_4_7, AppDatabase.MIGRATION_7_8)
+            .addMigrations(AppDatabase.MIGRATION_4_7, AppDatabase.MIGRATION_7_8, AppDatabase.MIGRATION_8_9)
             .allowMainThreadQueries()
             .build()
 
@@ -213,7 +213,7 @@ class MigrationTest {
 
         val context = InstrumentationRegistry.getInstrumentation().targetContext
         val db = Room.databaseBuilder(context, AppDatabase::class.java, TEST_DB)
-            .addMigrations(AppDatabase.MIGRATION_7_8)
+            .addMigrations(AppDatabase.MIGRATION_7_8, AppDatabase.MIGRATION_8_9)
             .allowMainThreadQueries()
             .build()
 
@@ -242,6 +242,33 @@ class MigrationTest {
                 dictionary_total_score INTEGER NOT NULL DEFAULT 0
             )
         """.trimIndent())
+
+        v8Db.execSQL("""
+            CREATE TABLE IF NOT EXISTS words (
+                word_id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+                container_dictionary_id INTEGER NOT NULL,
+                word TEXT NOT NULL,
+                translation TEXT NOT NULL,
+                been_asked INTEGER NOT NULL,
+                failed INTEGER NOT NULL,
+                passed INTEGER NOT NULL,
+                created INTEGER NOT NULL,
+                last_result INTEGER NOT NULL,
+                last_guess TEXT NOT NULL,
+                FOREIGN KEY(container_dictionary_id) REFERENCES dictionaries(dictionary_id) ON UPDATE NO ACTION ON DELETE CASCADE
+            )
+        """.trimIndent())
+
+        v8Db.execSQL("""
+            CREATE TABLE IF NOT EXISTS quotes (
+                id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+                quote TEXT NOT NULL,
+                author TEXT NOT NULL,
+                work TEXT NOT NULL
+            )
+        """.trimIndent())
+
+        v8Db.execSQL("CREATE INDEX IF NOT EXISTS index_words_container_dictionary_id ON words(container_dictionary_id)")
 
         v8Db.execSQL("""
             INSERT INTO dictionaries (dictionary_name, dictionary_created, dictionary_total_score, dictionary_finished_count) 
