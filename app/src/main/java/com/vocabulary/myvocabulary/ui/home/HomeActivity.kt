@@ -122,8 +122,6 @@ fun MyVocabularyApp() {
             currentDestination?.hasRoute(QuizList::class) == true ||
             currentDestination?.hasRoute(Home::class) == true) && currentUser != null
 
-
-
     Scaffold(
         modifier = Modifier
             .semantics {

@@ -45,7 +45,8 @@ fun LoginScreen(
 
     LaunchedEffect(currentUser, uiState) {
         val isAlreadyLoggedIn = currentUser != null && uiState is LoginUiState.Idle
-        val isLoginFinished = currentUser != null && uiState is LoginUiState.Success && !showMobileDataWarning
+        val isLoginFinished =
+            currentUser != null && uiState is LoginUiState.Success && !showMobileDataWarning
 
         if (isAlreadyLoggedIn || isLoginFinished) {
             onLoginSuccess()
@@ -84,7 +85,8 @@ fun LoginScreenContent(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(horizontal = MaterialTheme.dimens.PaddingLarge),
+            .padding(horizontal = MaterialTheme.dimens.PaddingLarge)
+            .semantics { contentDescription = "status_${uiState::class.simpleName}" },
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
@@ -120,19 +122,25 @@ fun LoginScreenContent(
 
                 Spacer(modifier = Modifier.height(32.dp))
 
+                // <for_tests>
+                val signInText = stringResource(R.string.login_google_button)
+                val loadingText = stringResource(R.string.login_loading)
+                // </for_tests>
                 if (uiState is LoginUiState.Loading) {
                     CircularProgressIndicator()
                     Spacer(modifier = Modifier.height(16.dp))
-                    Text(text = stringResource(R.string.login_loading))
+                    Text(
+                        text = loadingText,
+                        modifier = Modifier.semantics { contentDescription = loadingText })
                 } else {
                     Button(
                         onClick = onLoginClick,
                         modifier = Modifier
-                            .semantics { contentDescription = "login_button" }
+                            .semantics { contentDescription = signInText }
                             .fillMaxWidth(),
                         shape = MaterialTheme.shapes.large
                     ) {
-                        Text(text = stringResource(R.string.login_google_button))
+                        Text(text = signInText)
                     }
                 }
 
